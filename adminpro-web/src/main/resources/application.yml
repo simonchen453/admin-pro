@@ -58,11 +58,11 @@ spring:
             min-idle: 10
             maximum-pool-size: 50
             connection-test-query: SELECT 1
-            max-lifetime: 60000
+            max-lifetime: 1800000
+            keepalive-time: 300000
             connection-timeout: 30000
             pool-name: masterHikariCP
             validation-timeout: 3000
-            idle-timeout: 60000
         slave:
             enabled: true
             type: com.zaxxer.hikari.HikariDataSource
@@ -73,11 +73,11 @@ spring:
             min-idle: 10
             maximum-pool-size: 50
             connection-test-query: SELECT 1
-            max-lifetime: 60000
+            max-lifetime: 1800000
+            keepalive-time: 300000
             connection-timeout: 30000
             pool-name: slavekHikariCP
             validation-timeout: 3000
-            idle-timeout: 60000
     cache:
         type: jcache
         # 支持三种缓存类型：simple、redis、jcache

@@ -28,7 +28,7 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        log.debug("### Swagger扫描路径: {}, enabled: {}", scanPackage, swaggerEnabled);
+        log.info("### Swagger扫描路径: {}, enabled: {}", scanPackage, swaggerEnabled);
         
         return new OpenAPI()
                 .info(new Info()

@@ -91,20 +91,13 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler(logoutSuccessHandler))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/js/**", "/plugins/**", "/css/**", "/images/**", "/img/**", "/icons/**")
+                        .permitAll())
                 .authenticationProvider(customAuthenticationProvider)
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return httpSecurity.build();
-    }
-
-    /**
-     * 配置 WebSecurity，设置不拦截规则
-     *
-     * @param web WebSecurity
-     */
-    @Bean
-    public org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().requestMatchers("/js/**", "/plugins/**", "/css/**", "/images/**", "/img/**", "/icons/**");
     }
 
     /**

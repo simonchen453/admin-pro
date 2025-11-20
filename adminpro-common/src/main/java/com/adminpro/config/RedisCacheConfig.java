@@ -12,6 +12,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
@@ -32,13 +33,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 @Slf4j
-@ConditionalOnProperty(value = "spring.cache.type", havingValue = "redis", matchIfMissing = true)
+@ConditionalOnProperty(value = "spring.cache.type", havingValue = "redis", matchIfMissing = false)
 public class RedisCacheConfig extends CachingConfigurerSupport {
 
     /**
      * 缓存管理器
      */
     @Bean
+    @Primary
     public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         RedisCacheWriter writer = RedisCacheWriter.lockingRedisCacheWriter(connectionFactory);
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();

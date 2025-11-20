@@ -80,8 +80,10 @@ spring:
             idle-timeout: 60000
     cache:
         type: simple
-        # 如果启用 Redis，可以改为 type: redis
-        # type: redis
+        # 支持三种缓存类型：simple、redis、jcache
+        # type: simple   # 简单内存缓存（默认）
+        # type: redis    # Redis 缓存
+        # type: jcache   # EhCache 3.x 缓存（通过 JCache 标准）
 #    redis:
 #        open: true  # 是否开启redis缓存  true开启   false关闭
 #        database: 3

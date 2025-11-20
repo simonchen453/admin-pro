@@ -72,13 +72,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 } else if (StringUtils.equals(error, NOT_ACCEPTABLE_EXCEPTION)) {
                     apiResponse.put(REST_CODE, String.valueOf(HttpStatus.NOT_ACCEPTABLE.value()));
                 } else {
-                    apiResponse.put(REST_CODE, errorAttributes.get("status").toString());
+                    Object status = errorAttributes.get("status");
+                    if (status != null) {
+                        apiResponse.put(REST_CODE, String.valueOf(status));
+                    } else {
+                        apiResponse.put(REST_CODE, String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+                    }
                 }
                 String path = (String) errorAttributes.get("path");
                 String trace = (String) errorAttributes.get("trace");
-//                apiResponse.put(MESSAGE, errorAttributes.get(MESSAGE).toString());
+                String message = (String) errorAttributes.get(MESSAGE);
+                apiResponse.put(MESSAGE, message != null ? message : "Unknown error");
                 apiResponse.put("success", false);
-                apiResponse.put("path", path);
+                apiResponse.put("path", path != null ? path : "");
                 apiResponse.put("errors", null);
                 apiResponse.put("data", null);
                 logger.debug("===============errorAttributes start===========================");

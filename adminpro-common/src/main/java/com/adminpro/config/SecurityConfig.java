@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -92,12 +93,28 @@ public class SecurityConfig {
                         .addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler(logoutSuccessHandler))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/js/**", "/plugins/**", "/css/**", "/images/**", "/img/**", "/icons/**")
+                        .requestMatchers(
+                                "/rest/auth/captcha.jpg", "/rest/auth/login",
+                                "/login", "/login/admin",
+                                "/", "/sessionExpired", "/sessionTerminate",
+                                "/error", "/favicon.ico"
+                        )
+                        .permitAll()
+                        .anyRequest()
                         .permitAll())
                 .authenticationProvider(customAuthenticationProvider)
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return httpSecurity.build();
+    }
+
+    /**
+     * 配置 WebSecurity，设置不拦截规则（仅用于静态资源）
+     *
+     */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring().requestMatchers("/js/**", "/plugins/**", "/css/**", "/images/**", "/img/**", "/icons/**");
     }
 
     /**

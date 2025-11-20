@@ -1,0 +1,15 @@
+.captcha-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.captcha-container img {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  transition: border-color 0.3s ease;
+}
+
+.captcha-container img:hover {
+  border-color: #1890ff;
+}

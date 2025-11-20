@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 生产环境特定配置 -->
+    <property name="FILE_PATH" value="${PROJECT_PATH:-/usr/local/tomcat}/logs" />
+    
+    <!-- 引入公共配置 -->
+    <include resource="logback/logback-base.xml" />
+    
+    <!-- 生产环境：应用日志级别为 INFO -->
+    <logger name="com.adminpro" level="INFO" />
+    
+    <!-- Root 日志级别：INFO，仅输出到文件（不输出到控制台） -->
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="ERROR_FILE" />
+    </root>
+</configuration>

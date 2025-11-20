@@ -1,0 +1,21 @@
+{
+  "aliyunAccessKeyId": "",
+  "aliyunAccessKeySecret": "",
+  "aliyunBucketName": "",
+  "aliyunDomain": "",
+  "aliyunEndPoint": "",
+  "aliyunPrefix": "",
+  "qcloudBucketName": "",
+  "qcloudDomain": "",
+  "qcloudPrefix": "",
+  "qcloudSecretId": "",
+  "qcloudSecretKey": "",
+  "qcloudRegion": "",
+  "qcloudAppId": 1,
+  "qiniuAccessKey": "",
+  "qiniuBucketName": "",
+  "qiniuDomain": "",
+  "qiniuPrefix": "",
+  "qiniuSecretKey": "",
+  "type": 1
+}

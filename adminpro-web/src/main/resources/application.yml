@@ -1,0 +1,159 @@
+# Tomcat
+server:
+    tomcat:
+        uri-encoding: UTF-8
+        threads:
+            max: 1000
+            min-spare: 30
+    port: 8080
+    servlet:
+      context-path: /adminpro
+      session:
+          timeout: PT30M
+      encoding:
+          force: true
+          charset: UTF-8
+          enabled: true
+
+# mysql
+spring:
+    profiles:
+        active: ${SPRING_PROFILES_ACTIVE:dev}
+    mvc:
+        pathmatch:
+            matching-strategy: ant_path_matcher
+    jackson:
+        date-format: yyyy-MM-dd HH:mm:ss
+        time-zone: GMT+8
+    servlet:
+        multipart:
+            max-file-size: 100MB
+            max-request-size: 100MB
+            enabled: true
+    mail:
+        host: ${MAIL_HOST:smtp.example.com}
+        username: ${MAIL_USERNAME:}
+        password: ${MAIL_PASSWORD:}
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
+                        required: true
+    session:
+        store-type: none
+    main:
+        allow-bean-definition-overriding: true
+    liquibase:
+        enabled: true
+        change-log: classpath:/changelog/db.changelog-master.xml
+    datasource:
+        master:
+            type: com.zaxxer.hikari.HikariDataSource
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            jdbc-url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:adminpro}?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=${DB_USE_SSL:false}&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
+            username: ${DB_USERNAME:adminpro}
+            password: ${DB_PASSWORD:password$1}
+            min-idle: 10
+            maximum-pool-size: 50
+            connection-test-query: SELECT 1
+            max-lifetime: 60000
+            connection-timeout: 30000
+            pool-name: masterHikariCP
+            validation-timeout: 3000
+            idle-timeout: 60000
+        slave:
+            enabled: true
+            type: com.zaxxer.hikari.HikariDataSource
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            jdbc-url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:adminpro}?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=${DB_USE_SSL:false}&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
+            username: ${DB_USERNAME:adminpro}
+            password: ${DB_PASSWORD:password$1}
+            min-idle: 10
+            maximum-pool-size: 50
+            connection-test-query: SELECT 1
+            max-lifetime: 60000
+            connection-timeout: 30000
+            pool-name: slavekHikariCP
+            validation-timeout: 3000
+            idle-timeout: 60000
+    cache:
+        type: simple
+        # 如果启用 Redis，可以改为 type: redis
+        # type: redis
+#    redis:
+#        open: true  # 是否开启redis缓存  true开启   false关闭
+#        database: 3
+#        host: 127.0.0.1
+#        port: 6379
+#        password:       # 密码（默认为空）
+#        lettuce:
+#            pool:
+#                # 最大活跃链接数 默认8
+#                max-active: 100
+#                # 最大空闲连接数 默认8
+#                max-idle: 100
+#                # 最小空闲连接数 默认0
+#                min-idle: 0
+    web:
+        resources:
+            static-locations: classpath:/config/
+            chain:
+                compressed: true
+                cache: false
+management:
+    context-path: /actuator
+    security:
+      enabled: ${MANAGEMENT_SECURITY_ENABLED:true}
+    endpoints:
+      web:
+        base-path: /actuator
+        exposure:
+          include: health,info
+app:
+    upload:
+        public:
+            dir: ${UPLOAD_PUBLIC_DIR:file:./upload/public/}
+        private:
+            dir: ${UPLOAD_PRIVATE_DIR:file:./upload/private/}
+    jdbc:
+        show:
+            sql: ${APP_JDBC_SHOW_SQL:false}
+    cors:
+        allowed-origins: ${APP_CORS_ORIGINS:http://localhost:3000,http://localhost:5173}
+    swagger:
+        enabled: ${APP_SWAGGER_ENABLED:true}
+        scan:
+            package: com.adminpro
+    springdoc:
+        api-docs:
+            path: /v3/api-docs
+        swagger-ui:
+            path: /swagger-ui.html
+            enabled: ${APP_SWAGGER_ENABLED:true}
+    password:
+        validate:
+            reg: ^([A-Z]|[a-z]|[0-9]){6,20}$
+gen:
+    # 作者
+    author: ${GEN_AUTHOR:AdminPro}
+    # 默认生成包路径 module 需改成自己的模块名称 如 system monitor tool
+    packageName: adminpro
+    # 自动去除表前缀，默认是true
+    autoRemovePre: true
+    # 表前缀(类名不会包含表前缀)
+    tablePrefix: sys_
+    # 表后缀(类名不会包含表后缀)
+    tableSuffix: _tbl
+    colPrefix: col_
+logging:
+    config: classpath:logback/logback-${spring.profiles.active:dev}.xml
+wx:
+    miniapp:
+        configs:
+            - appid: #微信小程序的appid
+              secret: #微信小程序的Secret
+              token: #微信小程序消息服务器配置的token
+              aesKey: #微信小程序消息服务器配置的EncodingAESKey
+              msgDataFormat: JSON

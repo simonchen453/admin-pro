@@ -1,0 +1,14 @@
+{
+  "CertPath": "cert/apiclient_cert.p12",
+  "AppID": "",
+  "MchID": "",
+  "Key": "",
+  "NotifyUrl": "api/v1/payment/wxpay/notify",
+  "RefundNotifyUrl": "api/v1/payment/wxpay/refund/notify",
+  "HttpReadTimeoutMs": 10000,
+  "HttpConnectTimeoutMs": 2000,
+  "PrimaryDomain": "api.mch.weixin.qq.com",
+  "AlternateDomain": "api2.mch.weixin.qq.com",
+  "ReportWorkerNum": 1,
+  "ReportBatchSize": 2
+}

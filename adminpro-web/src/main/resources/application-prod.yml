@@ -1,0 +1,23 @@
+# 生产环境配置
+app:
+  jdbc:
+    show:
+      sql: false
+  cors:
+    allowed-origins: ${APP_CORS_ORIGINS:https://yourdomain.com}
+
+logging:
+  config: classpath:logback/logback-prod.xml
+  level:
+    com.adminpro: INFO
+    root: INFO
+
+management:
+  security:
+    enabled: true
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info
+

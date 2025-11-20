@@ -1,0 +1,106 @@
+# Maven
+/target/
+/*/target/
+/**/generated-sources/
+/**/generated-test-sources/
+/*/sopTemp/
+/bin/
+/*/bin/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# IDE - IntelliJ IDEA
+/**/.idea/
+/**/*.iml
+.idea/
+*.iml
+
+# IDE - Eclipse
+/**/.settings/
+/**/.classpath
+/**/.project
+.settings/
+.classpath
+.project
+
+# IDE - VS Code
+.vscode/
+*.code-workspace
+
+# IDE - Other
+*.swp
+*.swo
+*~
+/**/~$*
+
+# 日志文件
+*.log
+logs/
+*.log.*
+
+# 上传文件目录
+upload/
+**/upload/
+
+# 前端 - Node
+frontend/node_modules/
+frontend/.pnpm-store/
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# 前端 - 构建输出
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend/.vite/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# 前端 - 环境变量
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+.env
+.env.local
+.env.*.local
+
+# 前端 - 缓存
+frontend/.cache/
+frontend/.temp/
+.cache/
+.temp/
+.cache/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# 其他
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+*.pid
+*.seed
+*.pid.lock

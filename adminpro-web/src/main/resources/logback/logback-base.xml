@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <!-- 公共属性配置 -->
+    <property name="LOG_FILE_MAX_HISTORY" value="30"/>
+    <property name="LOG_FILE_MAX_SIZE" value="50MB"/>
+    
+    <!-- 引入 Spring Boot 默认配置 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+    
+    <!-- 文件输出 Appender -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <file>${FILE_PATH:-./logs}/adminpro.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${FILE_PATH:-./logs}/%d{yyyy-MM}/adminpro-%d{yyyy-MM-dd}-%i.log.gz</fileNamePattern>
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>${LOG_FILE_MAX_HISTORY}</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    
+    <!-- 错误日志单独输出 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <file>${FILE_PATH:-./logs}/adminpro-error.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${FILE_PATH:-./logs}/%d{yyyy-MM}/adminpro-error-%d{yyyy-MM-dd}-%i.log.gz</fileNamePattern>
+            <maxFileSize>${LOG_FILE_MAX_SIZE}</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    
+    <!-- 第三方库日志级别配置 -->
+    <logger name="org" level="INFO"/>
+    <logger name="springfox" level="WARN"/>
+    <logger name="io.lettuce.core" level="WARN"/>
+    <logger name="io.netty" level="WARN"/>
+    <logger name="freemarker" level="ERROR"/>
+    <logger name="org.springframework.web.servlet" level="WARN"/>
+    <logger name="com.zaxxer.hikari" level="INFO"/>
+    <logger name="net.sf.ehcache" level="INFO"/>
+    <logger name="org.springframework.jdbc.core" level="WARN"/>
+    <logger name="org.springframework.web.servlet.mvc" level="WARN"/>
+    
+    <!-- 应用日志配置 -->
+    <logger name="com.adminpro.framework.security" level="INFO"/>
+</included>
+

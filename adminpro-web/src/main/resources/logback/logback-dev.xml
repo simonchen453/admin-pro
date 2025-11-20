@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 开发环境特定配置 -->
+    <property name="FILE_PATH" value="./logs" />
+    
+    <!-- 引入公共配置 -->
+    <include resource="logback/logback-base.xml" />
+    
+    <!-- 开发环境：应用日志级别为 DEBUG -->
+    <logger name="com.adminpro" level="DEBUG" />
+    
+    <!-- Root 日志级别：DEBUG，输出到控制台和文件 -->
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="ERROR_FILE" />
+    </root>
+</configuration>

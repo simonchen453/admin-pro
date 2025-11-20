@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="simon" id="1000004">
+        <preConditions onFail="CONTINUE">
+            <dbms type="mysql"/>
+        </preConditions>
+        <sql splitStatements="false">
+            DROP PROCEDURE IF EXISTS `JDBC_SP_COMMON_SEQUENCE`;
+            CREATE PROCEDURE `JDBC_SP_COMMON_SEQUENCE`(IN seqName VARCHAR(128), OUT currentValue BIGINT)
+            BEGIN
+            UPDATE SYS_COMMONS_SEQUENCE
+            SET COL_SEQ_NEXT_VALUE = (COL_SEQ_NEXT_VALUE + 1)
+            WHERE
+            COL_SEQ_NAME = seqName;
+            SELECT COL_SEQ_NEXT_VALUE INTO currentValue FROM SYS_COMMONS_SEQUENCE WHERE COL_SEQ_NAME = seqName;
+            IF currentValue IS NULL THEN
+            BEGIN
+            INSERT INTO SYS_COMMONS_SEQUENCE (COL_SEQ_NAME, COL_SEQ_NEXT_VALUE) VALUES (seqName, 1)
+            on duplicate key UPDATE COL_SEQ_NEXT_VALUE = (COL_SEQ_NEXT_VALUE + 1);
+            SELECT COL_SEQ_NEXT_VALUE INTO currentValue FROM SYS_COMMONS_SEQUENCE WHERE COL_SEQ_NAME = seqName FOR
+            UPDATE;
+            END;
+            END IF;
+            END;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

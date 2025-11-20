@@ -1,0 +1,27 @@
+/* 应用根样式 */
+#root {
+  height: 100vh;
+  width: 100%;
+}
+
+/* 布局相关样式 */
+.logo {
+  height: 32px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .ant-layout-sider {
+    position: fixed !important;
+    height: 100vh;
+    z-index: 1000;
+  }
+}

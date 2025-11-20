@@ -79,7 +79,7 @@ spring:
             validation-timeout: 3000
             idle-timeout: 60000
     cache:
-        type: simple
+        type: jcache
         # 支持三种缓存类型：simple、redis、jcache
         # type: simple   # 简单内存缓存（默认）
         # type: redis    # Redis 缓存

@@ -3,236 +3,55 @@
         xmlns='http://www.ehcache.org/v3'
         xsi:schemaLocation='http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.10.xsd'>
 
-    <!-- 默认缓存配置 -->
-    <cache alias="defaultCache">
+    <!-- 默认模板 -->
+    <cache-template name="defaultTemplate">
         <key-type>java.lang.String</key-type>
         <value-type>java.lang.Object</value-type>
         <expiry>
             <ttl unit="seconds">120</ttl>
         </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
+        <resources>
+            <heap unit="entries">10000</heap>
+            <offheap unit="MB">100</offheap>
+        </resources>
+    </cache-template>
 
-    <!-- 自定义缓存配置 -->
-    <cache alias="sys:userdomain">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:role">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:post">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:dept">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:dict">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:config">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:session">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:menu:session">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:menu:parent:session">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:userdomain:env">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:menu">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:city:level">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:city:levelparent">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:city:id">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:city:title">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:auth:token">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:wx:session:key">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:auth:user.detail">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:user:register:code">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:user:login:captcha">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:resource:process">
-        <key-type>java.lang.String</key-type>
-        <value-type>java.lang.Object</value-type>
-        <expiry>
-            <ttl unit="seconds">120</ttl>
-        </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
-
-    <cache alias="sys:lock">
+    <!-- 锁缓存模板（15秒过期） -->
+    <cache-template name="lockTemplate">
         <key-type>java.lang.String</key-type>
         <value-type>java.lang.Object</value-type>
         <expiry>
             <ttl unit="seconds">15</ttl>
         </expiry>
-        <heap unit="entries">10000</heap>
-        <disk-store unit="MB">100</disk-store>
-    </cache>
+        <resources>
+            <heap unit="entries">10000</heap>
+            <offheap unit="MB">100</offheap>
+        </resources>
+    </cache-template>
+
+    <!-- 各种缓存定义 -->
+    <cache alias="defaultCache" uses-template="defaultTemplate"/>
+    <cache alias="sys:user:register:code" uses-template="defaultTemplate"/>
+    <cache alias="sys:user:login:captcha" uses-template="defaultTemplate"/>
+    <cache alias="sys:resource:process" uses-template="defaultTemplate"/>
+    <cache alias="sys:city:id" uses-template="defaultTemplate"/>
+    <cache alias="sys:city:title" uses-template="defaultTemplate"/>
+    <cache alias="sys:auth:token" uses-template="defaultTemplate"/>
+    <cache alias="sys:menu:parent:session" uses-template="defaultTemplate"/>
+    <cache alias="sys:userdomain:env" uses-template="defaultTemplate"/>
+    <cache alias="sys:menu" uses-template="defaultTemplate"/>
+    <cache alias="sys:dept" uses-template="defaultTemplate"/>
+    <cache alias="sys:dict" uses-template="defaultTemplate"/>
+    <cache alias="sys:config" uses-template="defaultTemplate"/>
+    <cache alias="sys:city:level" uses-template="defaultTemplate"/>
+    <cache alias="sys:city:levelparent" uses-template="defaultTemplate"/>
+    <cache alias="sys:userdomain" uses-template="defaultTemplate"/>
+    <cache alias="sys:role" uses-template="defaultTemplate"/>
+    <cache alias="sys:post" uses-template="defaultTemplate"/>
+    <cache alias="sys:session" uses-template="defaultTemplate"/>
+    <cache alias="sys:menu:session" uses-template="defaultTemplate"/>
+    <cache alias="sys:wx:session:key" uses-template="defaultTemplate"/>
+    <cache alias="sys:auth:user.detail" uses-template="defaultTemplate"/>
+    <cache alias="sys:lock" uses-template="lockTemplate"/>
 
 </config>

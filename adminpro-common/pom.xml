@@ -39,17 +39,31 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
-        <!-- EhCache 3.x 坐标 -->
+        <!-- EhCache 3.x Jakarta 兼容版本（适用于 Spring Boot 3.x） -->
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>3.10.0</version>
+            <version>3.10.8</version>
+            <classifier>jakarta</classifier>
         </dependency>
-        <!-- JCache (JSR-107) API - 使用 javax.cache (JCache 标准) -->
+        <!-- JCache (JSR-107) API - 使用 javax.cache（JCache 标准，与 EhCache Jakarta 版本兼容） -->
         <dependency>
             <groupId>javax.cache</groupId>
             <artifactId>cache-api</artifactId>
             <version>1.1.1</version>
+        </dependency>
+        <!-- Jakarta JAXB API -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
+        <!-- JAXB 实现 (Glassfish) -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.3</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
         <dependency>

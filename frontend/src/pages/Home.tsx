@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Row, Col, Statistic, Button, List, Avatar, Tag, Space, Typography, Empty, Spin, Descriptions } from 'antd';
 import { 
   UserOutlined, 
@@ -15,13 +15,16 @@ import {
   SafetyOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { getUserListApi } from '../api/user';
-import { getRoleListApi } from '../api/role';
-import { getSessionListApi } from '../api/session';
-import { getSystemInfoApi } from '../api/common';
-import { getDeptListApi } from '../api/dept';
-import type { SystemInfo } from '../types';
+import { getSystemInfoApi, getStatisticsApi } from '../api/common';
+import { getSysLogListApi } from '../api/syslog';
+import type { SystemInfo, SysLogEntity } from '../types';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/zh-cn';
 import './Home.css';
+
+dayjs.extend(relativeTime);
+dayjs.locale('zh-cn');
 
 const { Title, Text } = Typography;
 
@@ -30,7 +33,6 @@ interface StatisticCard {
   value: number | string;
   icon: React.ReactNode;
   color: string;
-  path?: string;
 }
 
 interface QuickAction {
@@ -71,60 +73,82 @@ function Home() {
     { title: '代码生成器', icon: <CodeOutlined />, path: '/admin/generator', color: '#eb2f96' },
   ];
 
+  const handleQuickActionClick = useCallback((path: string) => {
+    return (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      navigate(path);
+    };
+  }, [navigate]);
+
+  const convertSysLogToActivity = (log: SysLogEntity): RecentActivity => {
+    const operation = log.operation || '系统操作';
+    const method = log.method || '';
+    let type: 'login' | 'operation' | 'system' = 'operation';
+    let title = operation;
+    
+    if (operation.includes('登录') || operation.includes('login')) {
+      type = 'login';
+      title = '用户登录';
+    } else if (operation.includes('系统') || method.includes('system')) {
+      type = 'system';
+      title = '系统操作';
+    }
+
+    const description = log.params ? `${operation} - ${log.params}` : operation;
+    const createdDate = log.createdDate || '';
+    const time = createdDate ? dayjs(createdDate).fromNow() : '未知时间';
+
+    return {
+      id: log.id || '',
+      type,
+      title,
+      description: description.length > 50 ? description.substring(0, 50) + '...' : description,
+      time,
+      user: log.loginName || log.userId || undefined,
+    };
+  };
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [userRes, roleRes, sessionRes, deptRes, systemInfoRes] = await Promise.allSettled([
-          getUserListApi({ page: 1, pageSize: 1 }),
-          getRoleListApi({ pageNo: 1, pageSize: 1 }),
-          getSessionListApi({ pageNo: 1, pageSize: 1 }),
-          getDeptListApi({}),
+        const [statisticsRes, systemInfoRes, sysLogRes] = await Promise.allSettled([
+          getStatisticsApi(),
           getSystemInfoApi(),
+          getSysLogListApi({ pageNo: 1, pageSize: 10 }),
         ]);
 
         const stats: StatisticCard[] = [];
         
-        if (userRes.status === 'fulfilled') {
-          stats.push({
-            title: '用户总数',
-            value: userRes.value.pagination?.total || 0,
-            icon: <UserOutlined />,
-            color: '#1890ff',
-            path: '/admin/user',
-          });
-        }
-
-        if (roleRes.status === 'fulfilled') {
-          stats.push({
-            title: '角色数量',
-            value: roleRes.value.data?.totalCount || 0,
-            icon: <TeamOutlined />,
-            color: '#52c41a',
-            path: '/admin/role',
-          });
-        }
-
-        if (deptRes.status === 'fulfilled') {
-          const deptData = deptRes.value.data;
-          const deptCount = Array.isArray(deptData) ? deptData.length : 0;
-          stats.push({
-            title: '部门数量',
-            value: deptCount,
-            icon: <ApartmentOutlined />,
-            color: '#faad14',
-            path: '/admin/dept',
-          });
-        }
-
-        if (sessionRes.status === 'fulfilled') {
-          stats.push({
-            title: '在线会话',
-            value: sessionRes.value.data?.totalCount || 0,
-            icon: <WifiOutlined />,
-            color: '#722ed1',
-            path: '/admin/session',
-          });
+        if (statisticsRes.status === 'fulfilled' && statisticsRes.value.data) {
+          const data = statisticsRes.value.data;
+          stats.push(
+            {
+              title: '用户总数',
+              value: data.userCount || 0,
+              icon: <UserOutlined />,
+              color: '#1890ff',
+            },
+            {
+              title: '角色数量',
+              value: data.roleCount || 0,
+              icon: <TeamOutlined />,
+              color: '#52c41a',
+            },
+            {
+              title: '部门数量',
+              value: data.deptCount || 0,
+              icon: <ApartmentOutlined />,
+              color: '#faad14',
+            },
+            {
+              title: '在线会话',
+              value: data.sessionCount || 0,
+              icon: <WifiOutlined />,
+              color: '#722ed1',
+            }
+          );
         }
 
         setStatistics(stats);
@@ -133,34 +157,25 @@ function Home() {
           setSystemInfo(systemInfoRes.value.data);
         }
 
-        const activities: RecentActivity[] = [
-          {
-            id: '1',
-            type: 'login',
-            title: '用户登录',
-            description: '管理员登录系统',
-            time: '刚刚',
-            user: 'admin',
-          },
-          {
-            id: '2',
-            type: 'operation',
-            title: '系统操作',
-            description: '创建了新用户',
-            time: '5分钟前',
-            user: 'admin',
-          },
-          {
-            id: '3',
-            type: 'system',
-            title: '系统通知',
-            description: '定时任务执行完成',
-            time: '10分钟前',
-          },
-        ];
-        setRecentActivities(activities);
+        if (sysLogRes.status === 'fulfilled') {
+          const responseData = sysLogRes.value as any;
+          const logList = responseData?.data?.records || responseData?.records || [];
+          
+          if (Array.isArray(logList) && logList.length > 0) {
+            const activities = logList
+              .slice(0, 10)
+              .map(convertSysLogToActivity)
+              .filter(activity => activity.id);
+            setRecentActivities(activities);
+          } else {
+            setRecentActivities([]);
+          }
+        } else {
+          setRecentActivities([]);
+        }
       } catch (error) {
         console.error('加载数据失败:', error);
+        setRecentActivities([]);
       } finally {
         setLoading(false);
       }
@@ -182,11 +197,6 @@ function Home() {
     }
   };
 
-  const handleStatisticClick = (path?: string) => {
-    if (path) {
-      navigate(path);
-    }
-  };
 
   return (
     <div className="home-container">
@@ -203,11 +213,7 @@ function Home() {
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           {statistics.map((stat, index) => (
             <Col xs={24} sm={12} lg={6} key={index}>
-              <Card
-                hoverable
-                onClick={() => handleStatisticClick(stat.path)}
-                className="statistic-card"
-              >
+              <Card className="statistic-card">
                 <Statistic
                   title={stat.title}
                   value={stat.value}
@@ -238,7 +244,7 @@ function Home() {
                       block
                       className="quick-action-btn"
                       icon={action.icon}
-                      onClick={() => navigate(action.path)}
+                      onClick={handleQuickActionClick(action.path)}
                       style={{ 
                         height: '80px',
                         display: 'flex',
@@ -276,7 +282,7 @@ function Home() {
                           <Space>
                             <Text strong>{item.title}</Text>
                             {item.user && (
-                              <Tag color="blue" size="small">{item.user}</Tag>
+                              <Tag color="blue">{item.user}</Tag>
                             )}
                           </Space>
                         }

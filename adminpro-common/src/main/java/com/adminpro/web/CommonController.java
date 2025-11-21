@@ -20,6 +20,7 @@ import com.adminpro.rbac.domains.entity.domain.DomainEntity;
 import com.adminpro.rbac.domains.entity.domain.DomainService;
 import com.adminpro.rbac.domains.entity.menu.MenuEntity;
 import com.adminpro.rbac.domains.entity.menu.MenuService;
+import com.adminpro.rbac.domains.entity.role.RoleService;
 import com.adminpro.rbac.domains.entity.user.UserEntity;
 import com.adminpro.rbac.domains.entity.user.UserIden;
 import com.adminpro.rbac.domains.entity.user.UserService;
@@ -27,6 +28,8 @@ import com.adminpro.rbac.domains.vo.menu.MenuTreeVo;
 import com.adminpro.rbac.domains.vo.oss.FileUploadVo;
 import com.adminpro.rbac.domains.vo.tree.TreeSelect;
 import com.adminpro.rbac.domains.vo.user.ChangePwdVo;
+import com.adminpro.tools.domains.entity.session.SessionService;
+import com.adminpro.tools.domains.enums.SessionStatus;
 import com.adminpro.tools.domains.entity.oss.OSSEntity;
 import com.adminpro.tools.domains.entity.oss.OSSService;
 import com.adminpro.web.vo.ServerInfo;
@@ -60,6 +63,44 @@ public class CommonController extends BaseRoutingController {
 
     @Autowired
     private OSSService ossService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private SessionService sessionService;
+
+    /**
+     * 获取首页统计数据
+     *
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/statistics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public R<Map<String, Long>> statistics() {
+        Map<String, Long> stats = new HashMap<>();
+        
+        SearchParam userParam = startPaging();
+        long userCount = userService.search(userParam).getTotalCount();
+        stats.put("userCount", userCount);
+        
+        SearchParam roleParam = startPaging();
+        long roleCount = roleService.findAll().size();
+        stats.put("roleCount", roleCount);
+        
+        List<DeptEntity> deptList = deptService.findAll();
+        stats.put("deptCount", (long) deptList.size());
+        
+        SearchParam sessionParam = startPaging();
+        sessionParam.addFilter("status", SessionStatus.ACTIVE.getCode());
+        long sessionCount = sessionService.search(sessionParam).getTotalCount();
+        stats.put("sessionCount", sessionCount);
+        
+        return R.ok(stats);
+    }
 
     /**
      * 修改密码

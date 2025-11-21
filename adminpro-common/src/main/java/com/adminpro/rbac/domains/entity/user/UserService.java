@@ -1,5 +1,6 @@
 package com.adminpro.rbac.domains.entity.user;
 
+import com.adminpro.core.base.entity.BaseService;
 import com.adminpro.core.base.util.SpringUtil;
 import com.adminpro.core.exceptions.BaseRuntimeException;
 import com.adminpro.core.jdbc.SearchParam;
@@ -19,7 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService extends BaseService<UserEntity, UserIden> {
+
+    @Autowired
+    protected UserService(UserDao dao) {
+        super(dao);
+    }
 
     public static UserService getInstance() {
         return SpringUtil.getBean(UserService.class);
@@ -37,10 +43,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity update(UserEntity entity) {
+    public void update(UserEntity entity) {
         dao.update(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
-        return entity;
     }
 
     @Transactional
@@ -91,7 +96,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity create(UserEntity entity) {
+    public void create(UserEntity entity) {
         String password = entity.getPassword();
         if (StringUtils.isEmpty(password)) {
             entity.setPassword(ConfigHelper.getString(RbacConstants.USER_DEFAULT_PASSWORD));
@@ -101,7 +106,6 @@ public class UserService {
         entity.setPassword(encryptPwd);
         dao.create(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
-        return entity;
     }
 
     public UserEntity findById(UserIden userIden) {

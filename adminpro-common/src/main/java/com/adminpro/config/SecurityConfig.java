@@ -81,27 +81,21 @@ public class SecurityConfig {
         httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
+
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                         .contentTypeOptions(contentType -> {})
                         .httpStrictTransportSecurity(hsts -> hsts
                                 .maxAgeInSeconds(31536000)))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler(logoutSuccessHandler))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/rest/auth/captcha.jpg", "/rest/auth/login",
-                                "/login", "/login/admin",
-                                "/", "/sessionExpired", "/sessionTerminate",
-                                "/error", "/favicon.ico"
-                        )
-                        .permitAll()
-                        .anyRequest()
-                        .permitAll())
                 .authenticationProvider(customAuthenticationProvider)
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         

@@ -32,15 +32,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint, S
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException {
         int code = HttpStatus.UNAUTHORIZED.value();
         String msg = StringHelper.format("请求访问：{}，认证失败，无法访问系统资源", request.getRequestURI());
-        boolean restRequest = WebHelper.isRestRequest();
-        boolean ajaxRequest = WebHelper.isAjaxRequest(request);
-        String url = WebHelper.getRequestUriWithoutContextPath(request);
         logger.error(msg, e);
-        if (ajaxRequest || restRequest) {
-            WebHelper.renderString(response, JsonUtil.toJson(R.error(String.valueOf(code), msg)));
-        } else {
-            String sessionNotExist = ConfigHelper.getString(BaseConstants.URL_SESSION_DOES_NOT_EXIST_KEY);
-            WebHelper.redirect(request.getContextPath() + sessionNotExist + "?" + WebHelper.LOGIN_CONTINUE_URL + "=" + url);
-        }
+        WebHelper.renderString(response, JsonUtil.toJson(R.error(String.valueOf(code), msg)));
     }
 }

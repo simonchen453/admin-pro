@@ -10,7 +10,9 @@ import com.adminpro.tools.domains.enums.SessionStatus;
 import com.adminpro.web.BaseConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
+import org.springframework.http.server.PathContainer;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.*;
@@ -95,11 +97,24 @@ public class SessionFilter implements Filter {
     private boolean checkWhiteList() {
         String[] whiteList = ConfigHelper.getStringArray(BaseConstants.SESSION_FILTER_WHITE_LIST_KEY);
         HttpServletRequest request = WebHelper.getHttpRequest();
-        AntPathRequestMatcher matcher;
+        if (request == null) {
+            return false;
+        }
+        PathPatternParser parser = PathPatternParser.defaultInstance;
+        String requestPath = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        if (contextPath != null && !contextPath.isEmpty() && requestPath.startsWith(contextPath)) {
+            requestPath = requestPath.substring(contextPath.length());
+        }
+        PathContainer pathContainer = PathContainer.parsePath(requestPath);
         for (int i = 0; i < whiteList.length; i++) {
-            matcher = new AntPathRequestMatcher(whiteList[i]);
-            if (matcher.matches(request)) {
-                return true;
+            try {
+                PathPattern pattern = parser.parse(whiteList[i]);
+                if (pattern.matches(pathContainer)) {
+                    return true;
+                }
+            } catch (Exception e) {
+                logger.debug("Failed to match path pattern: {}", whiteList[i], e);
             }
         }
         return false;

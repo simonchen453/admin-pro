@@ -13,10 +13,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -92,6 +90,15 @@ public class SecurityConfig {
 
 //                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
+                .authorizeHttpRequests(auth -> auth
+                        // 静态资源允许所有访问
+                        .requestMatchers("/js/**", "/plugins/**", "/css/**", "/images/**", "/img/**", "/icons/**")
+                        .permitAll()
+                        // 默认所有接口都允许访问（不强制认证）
+                        // 通过 @PreAuthorize 注解来控制需要权限的接口
+                        .anyRequest().permitAll()
+                )
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .addLogoutHandler(logoutHandler)
@@ -100,15 +107,6 @@ public class SecurityConfig {
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return httpSecurity.build();
-    }
-
-    /**
-     * 配置 WebSecurity，设置不拦截规则（仅用于静态资源）
-     *
-     */
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().requestMatchers("/js/**", "/plugins/**", "/css/**", "/images/**", "/img/**", "/icons/**");
     }
 
     /**

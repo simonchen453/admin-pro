@@ -6,6 +6,8 @@ import com.adminpro.core.base.util.DateUtil;
 import com.adminpro.core.exceptions.APIException;
 import com.adminpro.framework.common.constants.WebConstants;
 import com.adminpro.framework.common.helper.ConfigHelper;
+
+import static com.adminpro.framework.common.constants.ConfigKeys.User;
 import com.adminpro.framework.common.helper.WebHelper;
 import com.adminpro.framework.common.web.BaseController;
 import com.adminpro.rbac.api.Device;
@@ -124,7 +126,7 @@ public class AuthController extends BaseController {
             loginResponse.setMobileNo(userEntity.getMobileNo());
             loginResponse.setDate(DateUtil.formatDate(new Date()));
             if (StringUtils.isEmpty(userEntity.getAvatarUrl())) {
-                String avatarUrl = ConfigHelper.getString("app.user.avatar.url");
+                String avatarUrl = ConfigHelper.getString(User.AVATAR_URL);
                 loginResponse.setAvatarUrl(WebConstants.getServerAddress() + avatarUrl);
             } else {
                 loginResponse.setAvatarUrl(userEntity.getAvatarUrl());

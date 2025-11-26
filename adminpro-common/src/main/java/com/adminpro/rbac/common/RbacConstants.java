@@ -2,7 +2,10 @@ package com.adminpro.rbac.common;
 
 import com.adminpro.framework.common.helper.ConfigHelper;
 
-import static com.adminpro.framework.common.constants.ConfigKeys.*;
+import static com.adminpro.framework.common.constants.ConfigKeys.App;
+import static com.adminpro.framework.common.constants.ConfigKeys.Auth;
+import static com.adminpro.framework.common.constants.ConfigKeys.Default;
+import static com.adminpro.framework.common.constants.ConfigKeys.Dept;
 
 /**
  * Created by simon on 2017/5/31.
@@ -31,106 +34,132 @@ public class RbacConstants {
 
     public static final String USER_DEFAULT_PASSWORD = "password$1";
 
+    // ========== 默认值配置 ==========
+    
     /**
-     * 默认的民族
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     * 获取默认民族代码
+     * 
+     * @return 默认民族代码，默认值 "01"
      */
     public static String getDefaultNation() {
-        return ConfigHelper.getString(APP_DEFAULT_NATION, "01");
+        return ConfigHelper.getString(Default.NATION, "01");
     }
 
     /**
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
-     */
-    public static String[] getNeedCheckCaptureDomains() {
-        return ConfigHelper.getStringArray(APP_CHECK_CAPTURE_DOMAINS);
-    }
-
-    /**
-     * 默认的国家
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     * 获取默认国家代码
+     * 
+     * @return 默认国家代码，默认值 "156"
      */
     public static String getDefaultNationality() {
-        return ConfigHelper.getString(APP_DEFAULT_NATIONALITY, "156");
+        return ConfigHelper.getString(Default.NATIONALITY, "156");
     }
 
     /**
-     * 默认省
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     * 获取默认省份代码
+     * 
+     * @return 默认省份代码，默认值 "320000"
      */
     public static String getDefaultProvince() {
-        return ConfigHelper.getString(APP_DEFAULT_PROVINCE, "320000");
+        return ConfigHelper.getString(Default.PROVINCE, "320000");
     }
 
     /**
-     * 默认市
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     * 获取默认城市代码
+     * 
+     * @return 默认城市代码，默认值 "320500"
      */
     public static String getDefaultCity() {
-        return ConfigHelper.getString(APP_DEFAULT_CITY, "320500");
+        return ConfigHelper.getString(Default.CITY, "320500");
     }
 
     /**
-     * 默认区
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     * 获取默认区县代码
+     * 
+     * @return 默认区县代码，默认值 "320506"
      */
     public static String getDefaultDistrict() {
-        return ConfigHelper.getString(APP_DEFAULT_DISTRICT, "320506");
+        return ConfigHelper.getString(Default.DISTRICT, "320506");
     }
 
     /**
-     * 默认婚姻状态
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     * 获取默认婚姻状态
+     * 
+     * @return 默认婚姻状态，默认值 "10"
      */
     public static String getDefaultMaritalstatus() {
-        return ConfigHelper.getString(APP_DEFAULT_MARITALSTATUS, "10");
+        return ConfigHelper.getString(Default.MARITALSTATUS, "10");
     }
 
     /**
-     * 默认证件类型
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     * 获取默认证件类型
+     * 
+     * @return 默认证件类型，默认值 "1"
      */
     public static String getDefaultCerttype() {
-        return ConfigHelper.getString(APP_DEFAULT_CERTTYPE, "1");
+        return ConfigHelper.getString(Default.CERTTYPE, "1");
     }
 
     /**
-     * 默认身份类别
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     * 获取默认身份类别
+     * 
+     * @return 默认身份类别，默认值 "1"
      */
     public static String getDefaultIdtype() {
-        return ConfigHelper.getString(APP_DEFAULT_IDTYPE, "1");
+        return ConfigHelper.getString(Default.IDTYPE, "1");
+    }
+
+    // ========== 应用配置 ==========
+    
+    /**
+     * 获取文件上传目录
+     * 
+     * @return 上传目录路径，默认值 "/upload/"
+     */
+    public static String getUploadPath() {
+        return ConfigHelper.getString(App.UPLOAD_DIR, "/upload/");
+    }
+
+    /**
+     * 获取部署模式
+     * 
+     * @return 部署模式（dev/prod），默认值 "prod"
+     */
+    public static String getDeploymentMode() {
+        return ConfigHelper.getString(App.DEPLOYMENT_MODE, "prod");
+    }
+
+    // ========== 部门配置 ==========
+    
+    /**
+     * 获取部门超级父级 ID（根部门 ID）
+     * 
+     * @return 根部门 ID，默认值 "0"
+     */
+    public static String getDeptSuperParentId() {
+        return ConfigHelper.getString(Dept.SUPER_PARENT_ID, "0");
+    }
+
+    // ========== 验证码配置 ==========
+    
+    /**
+     * 获取验证码过期时间（单位：分钟）
+     * 
+     * @return 过期时间，默认值 5 分钟
+     */
+    public static int getAuthCodeExpirePeriod() {
+        return ConfigHelper.getInt(Auth.CODE_EXPIRE_PERIOD, 5);
+    }
+
+    /**
+     * 获取需要检查验证码的域名列表
+     * 
+     * @return 域名数组，从配置中读取（逗号分隔的字符串会被转换为数组）
+     */
+    public static String[] getNeedCheckCaptureDomains() {
+        return ConfigHelper.getStringArray(Auth.CHECK_CAPTURE_DOMAINS);
     }
 
     public static final String CLOUD_STORAGE_CONFIG = "ossconfig";
-
-    /**
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
-     */
-    public static String getUploadPath() {
-        return ConfigHelper.getString(APP_UPLOAD_DIR, "/upload/");
-    }
-
-    /**
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
-     */
-    public static String getDeploymentMode() {
-        return ConfigHelper.getString(APP_DEPLOYMENT_MODE, "prod");
-    }
-
-    /**
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
-     */
-    public static int getAuthCodeExpirePeriod() {
-        return ConfigHelper.getInt(APP_AUTH_CODE_EXPIRE_PERIOD, 5);
-    }
-
-    /**
-     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
-     */
-    public static String getDeptSuperParentId() {
-        return ConfigHelper.getString(APP_DEPT_SUPER_PARENT_ID, "0");
-    }
 
 
     /**

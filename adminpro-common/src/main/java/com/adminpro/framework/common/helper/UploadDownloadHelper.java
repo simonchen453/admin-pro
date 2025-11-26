@@ -7,6 +7,8 @@ import com.adminpro.core.base.util.IdGenerator;
 import com.adminpro.core.base.util.SpringUtil;
 import com.adminpro.framework.common.constants.WebConstants;
 import com.adminpro.tools.api.OSSFactory;
+
+import static com.adminpro.framework.common.constants.ConfigKeys.Oss;
 import com.adminpro.tools.domains.entity.oss.OSSEntity;
 import com.adminpro.tools.domains.entity.oss.OSSService;
 import com.adminpro.web.BaseConstants;
@@ -112,7 +114,7 @@ public class UploadDownloadHelper {
         }
         String originalFilename = file.getOriginalFilename();
         OSSEntity entity = OSSFactory.build().uploadSuffix(file.getBytes(), originalFilename, suffix);
-        boolean aBoolean = ConfigHelper.getBoolean("app.oss.fetch.frame", false);
+        boolean aBoolean = ConfigHelper.getBoolean(Oss.FETCH_FRAME, false);
         if (aBoolean && isVideo(entity)) {
 //            String tempPath = getClass().getClassLoader().getResource("").getPath();
             String tempPath = makePublicFileDir("temp");

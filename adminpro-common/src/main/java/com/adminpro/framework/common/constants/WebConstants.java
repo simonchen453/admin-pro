@@ -3,16 +3,23 @@ package com.adminpro.framework.common.constants;
 import com.adminpro.core.base.IConstants;
 import com.adminpro.framework.common.helper.ConfigHelper;
 
-import static com.adminpro.framework.common.constants.ConfigKeys.*;
+import static com.adminpro.framework.common.constants.ConfigKeys.App;
+import static com.adminpro.framework.common.constants.ConfigKeys.User;
 
 /**
+ * Web 相关常量
+ * 
  * @author simon
  */
 public class WebConstants extends IConstants {
-    //服务器地址
+    
+    /**
+     * 获取服务器地址
+     * 
+     * @return 服务器地址，从配置中读取
+     */
     public static String getServerAddress() {
-        // 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
-        return ConfigHelper.getString(APP_SERVER_ADDRESS);
+        return ConfigHelper.getString(App.SERVER_ADDRESS);
     }
 
 
@@ -57,9 +64,13 @@ public class WebConstants extends IConstants {
     public static final String CODE_CHANGE_MOBILE = "changemobile";
     public static final String[] CODE_TYPES = {CODE_REGISTER, CODE_RESETPWD, CODE_RESET_PAY_PWD, CODE_CHANGE_MOBILE};
 
+    /**
+     * 获取用户头像上传路径
+     * 
+     * @return 头像上传路径，默认 "/avatar/"
+     */
     public static String getUploadAvatarPath() {
-        // 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
-        return ConfigHelper.getString(APP_USER_AVATAR_DIR, "/avatar/");
+        return ConfigHelper.getString(User.AVATAR_DIR, "/avatar/");
     }
 
 }

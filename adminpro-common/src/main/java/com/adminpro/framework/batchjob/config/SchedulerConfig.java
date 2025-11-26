@@ -18,7 +18,7 @@ import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Properties;
 
-import static com.adminpro.framework.common.constants.ConfigKeys.*;
+import static com.adminpro.framework.common.constants.ConfigKeys.Quartz;
 
 @Configuration
 @DependsOn({"springQuartzJobFactory", "configPreloader"})
@@ -85,7 +85,7 @@ public class SchedulerConfig {
             return factory;
         }
         factory.setQuartzProperties(quartzProperties);
-        factory.setSchedulerName(quartzProperties.getProperty(QUARTZ_SCHEDULER_INSTANCE_NAME));
+        factory.setSchedulerName(quartzProperties.getProperty(Quartz.SCHEDULER_INSTANCE_NAME));
         return factory;
     }
 
@@ -96,28 +96,50 @@ public class SchedulerConfig {
     private Properties buildQuartzProperties() throws IOException {
         PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
         Properties prop = new Properties();
-        prop.setProperty("org.quartz.dataSource.myDS.connectionProvider.class", "com.adminpro.framework.batchjob.config.HikariConnectionProvider");
-        prop.setProperty(QUARTZ_JOBSTORE_DRIVER_DELEGATE_CLASS, ConfigHelper.getString(QUARTZ_JOBSTORE_DRIVER_DELEGATE_CLASS, "org.quartz.impl.jdbcjobstore.StdJDBCDelegate"));
-
-        prop.put(QUARTZ_SCHEDULER_INSTANCE_NAME, ConfigHelper.getString(QUARTZ_SCHEDULER_INSTANCE_NAME, "AdminProScheduler"));
-        prop.put(QUARTZ_SCHEDULER_INSTANCE_ID, ConfigHelper.getString(QUARTZ_SCHEDULER_INSTANCE_ID, "AUTO"));
-        //线程池配置
-        prop.put(QUARTZ_THREADPOOL_CLASS, ConfigHelper.getString(QUARTZ_THREADPOOL_CLASS, "org.quartz.simpl.SimpleThreadPool"));
-        prop.put(QUARTZ_THREADPOOL_THREAD_COUNT, ConfigHelper.getString(QUARTZ_THREADPOOL_THREAD_COUNT, "20"));
-        prop.put(QUARTZ_THREADPOOL_THREAD_PRIORITY, ConfigHelper.getString(QUARTZ_THREADPOOL_THREAD_PRIORITY, "5"));
-        //JobStore配置
-        prop.put(QUARTZ_JOBSTORE_CLASS, ConfigHelper.getString(QUARTZ_JOBSTORE_CLASS, "org.quartz.impl.jdbcjobstore.JobStoreTX"));
-        //集群配置
-        prop.put(QUARTZ_JOBSTORE_IS_CLUSTERED, ConfigHelper.getString(QUARTZ_JOBSTORE_IS_CLUSTERED, "true"));
-        prop.put(QUARTZ_JOBSTORE_CLUSTER_CHECKIN_INTERVAL, ConfigHelper.getString(QUARTZ_JOBSTORE_CLUSTER_CHECKIN_INTERVAL, "15000"));
-        prop.put(QUARTZ_JOBSTORE_MAX_MISFIRES_TO_HANDLE_AT_A_TIME, ConfigHelper.getString(QUARTZ_JOBSTORE_MAX_MISFIRES_TO_HANDLE_AT_A_TIME, "1"));
-
-        prop.put(QUARTZ_JOBSTORE_MISFIRE_THRESHOLD, ConfigHelper.getString(QUARTZ_JOBSTORE_MISFIRE_THRESHOLD, "12000"));
-        prop.put(QUARTZ_JOBSTORE_TABLE_PREFIX, ConfigHelper.getString(QUARTZ_JOBSTORE_TABLE_PREFIX, "QRTZ_"));
-
-        prop.put(QUARTZ_JOBSTORE_DATASOURCE, ConfigHelper.getString(QUARTZ_JOBSTORE_DATASOURCE, "myDS"));
-        prop.put(QUARTZ_THREADPOOL_THREADS_INHERIT_CONTEXT_CLASSLOADER, ConfigHelper.getString(QUARTZ_THREADPOOL_THREADS_INHERIT_CONTEXT_CLASSLOADER, "true"));
-        prop.put(QUARTZ_JOBSTORE_USE_PROPERTIES, ConfigHelper.getString(QUARTZ_JOBSTORE_USE_PROPERTIES, "true"));
+        
+        // 数据源配置
+        prop.setProperty("org.quartz.dataSource.myDS.connectionProvider.class", 
+                "com.adminpro.framework.batchjob.config.HikariConnectionProvider");
+        
+        // 调度器配置
+        prop.put(Quartz.SCHEDULER_INSTANCE_NAME, 
+                ConfigHelper.getString(Quartz.SCHEDULER_INSTANCE_NAME, "AdminProScheduler"));
+        prop.put(Quartz.SCHEDULER_INSTANCE_ID, 
+                ConfigHelper.getString(Quartz.SCHEDULER_INSTANCE_ID, "AUTO"));
+        
+        // 线程池配置
+        prop.put(Quartz.THREADPOOL_CLASS, 
+                ConfigHelper.getString(Quartz.THREADPOOL_CLASS, "org.quartz.simpl.SimpleThreadPool"));
+        prop.put(Quartz.THREADPOOL_THREAD_COUNT, 
+                ConfigHelper.getString(Quartz.THREADPOOL_THREAD_COUNT, "20"));
+        prop.put(Quartz.THREADPOOL_THREAD_PRIORITY, 
+                ConfigHelper.getString(Quartz.THREADPOOL_THREAD_PRIORITY, "5"));
+        prop.put(Quartz.THREADPOOL_THREADS_INHERIT_CONTEXT_CLASSLOADER, 
+                ConfigHelper.getString(Quartz.THREADPOOL_THREADS_INHERIT_CONTEXT_CLASSLOADER, "true"));
+        
+        // JobStore 配置
+        prop.put(Quartz.JOBSTORE_CLASS, 
+                ConfigHelper.getString(Quartz.JOBSTORE_CLASS, "org.quartz.impl.jdbcjobstore.JobStoreTX"));
+        prop.put(Quartz.JOBSTORE_DRIVER_DELEGATE_CLASS, 
+                ConfigHelper.getString(Quartz.JOBSTORE_DRIVER_DELEGATE_CLASS, "org.quartz.impl.jdbcjobstore.StdJDBCDelegate"));
+        
+        // 集群配置
+        prop.put(Quartz.JOBSTORE_IS_CLUSTERED, 
+                ConfigHelper.getString(Quartz.JOBSTORE_IS_CLUSTERED, "true"));
+        prop.put(Quartz.JOBSTORE_CLUSTER_CHECKIN_INTERVAL, 
+                ConfigHelper.getString(Quartz.JOBSTORE_CLUSTER_CHECKIN_INTERVAL, "15000"));
+        prop.put(Quartz.JOBSTORE_MAX_MISFIRES_TO_HANDLE_AT_A_TIME, 
+                ConfigHelper.getString(Quartz.JOBSTORE_MAX_MISFIRES_TO_HANDLE_AT_A_TIME, "1"));
+        prop.put(Quartz.JOBSTORE_MISFIRE_THRESHOLD, 
+                ConfigHelper.getString(Quartz.JOBSTORE_MISFIRE_THRESHOLD, "12000"));
+        
+        // 数据源和表配置
+        prop.put(Quartz.JOBSTORE_TABLE_PREFIX, 
+                ConfigHelper.getString(Quartz.JOBSTORE_TABLE_PREFIX, "QRTZ_"));
+        prop.put(Quartz.JOBSTORE_DATASOURCE, 
+                ConfigHelper.getString(Quartz.JOBSTORE_DATASOURCE, "myDS"));
+        prop.put(Quartz.JOBSTORE_USE_PROPERTIES, 
+                ConfigHelper.getString(Quartz.JOBSTORE_USE_PROPERTIES, "true"));
 
         propertiesFactoryBean.setProperties(prop);
         try {

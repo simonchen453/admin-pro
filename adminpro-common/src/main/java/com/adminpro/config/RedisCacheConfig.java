@@ -2,6 +2,8 @@ package com.adminpro.config;
 
 import com.adminpro.framework.common.helper.ConfigHelper;
 import com.adminpro.tools.lock.CacheKeyGenerator;
+
+import static com.adminpro.framework.common.constants.ConfigKeys.Cache;
 import com.adminpro.tools.lock.LockKeyGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -45,7 +47,7 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
         RedisCacheWriter writer = RedisCacheWriter.lockingRedisCacheWriter(connectionFactory);
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
         ConcurrentHashMap configMap = new ConcurrentHashMap<>();
-        String[] ttls = ConfigHelper.getStringArray("app.cache.ttls");
+        String[] ttls = ConfigHelper.getStringArray(Cache.TTLS);
         Set cacheNames = new HashSet();
         for (int i = 0; i < ttls.length; i++) {
             String ttl = ttls[i];

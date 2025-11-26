@@ -15,9 +15,8 @@ import {
   SafetyOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { getSystemInfoApi, getStatisticsApi } from '../api/common';
-import { getSysLogListApi } from '../api/syslog';
-import type { SystemInfo, SysLogEntity } from '../types';
+import { getSystemInfoApi, getStatisticsApi, getRecentActivitiesApi, type RecentActivity as ApiRecentActivity } from '../api/common';
+import type { SystemInfo } from '../types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
@@ -81,31 +80,17 @@ function Home() {
     };
   }, [navigate]);
 
-  const convertSysLogToActivity = (log: SysLogEntity): RecentActivity => {
-    const operation = log.operation || '系统操作';
-    const method = log.method || '';
-    let type: 'login' | 'operation' | 'system' = 'operation';
-    let title = operation;
-    
-    if (operation.includes('登录') || operation.includes('login')) {
-      type = 'login';
-      title = '用户登录';
-    } else if (operation.includes('系统') || method.includes('system')) {
-      type = 'system';
-      title = '系统操作';
-    }
-
-    const description = log.params ? `${operation} - ${log.params}` : operation;
-    const createdDate = log.createdDate || '';
+  const convertApiActivityToActivity = (apiActivity: ApiRecentActivity): RecentActivity => {
+    const createdDate = apiActivity.time || '';
     const time = createdDate ? dayjs(createdDate).fromNow() : '未知时间';
 
     return {
-      id: log.id || '',
-      type,
-      title,
-      description: description.length > 50 ? description.substring(0, 50) + '...' : description,
+      id: apiActivity.id,
+      type: apiActivity.type,
+      title: apiActivity.title,
+      description: apiActivity.description.length > 50 ? apiActivity.description.substring(0, 50) + '...' : apiActivity.description,
       time,
-      user: log.loginName || log.userId || undefined,
+      user: apiActivity.user,
     };
   };
 
@@ -113,10 +98,10 @@ function Home() {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [statisticsRes, systemInfoRes, sysLogRes] = await Promise.allSettled([
+        const [statisticsRes, systemInfoRes, activitiesRes] = await Promise.allSettled([
           getStatisticsApi(),
           getSystemInfoApi(),
-          getSysLogListApi({ pageNo: 1, pageSize: 10 }),
+          getRecentActivitiesApi(10),
         ]);
 
         const stats: StatisticCard[] = [];
@@ -157,19 +142,11 @@ function Home() {
           setSystemInfo(systemInfoRes.value.data);
         }
 
-        if (sysLogRes.status === 'fulfilled') {
-          const responseData = sysLogRes.value as any;
-          const logList = responseData?.data?.records || responseData?.records || [];
-          
-          if (Array.isArray(logList) && logList.length > 0) {
-            const activities = logList
-              .slice(0, 10)
-              .map(convertSysLogToActivity)
-              .filter(activity => activity.id);
-            setRecentActivities(activities);
-          } else {
-            setRecentActivities([]);
-          }
+        if (activitiesRes.status === 'fulfilled' && activitiesRes.value.data) {
+          const activities = activitiesRes.value.data
+            .map(convertApiActivityToActivity)
+            .filter(activity => activity.id);
+          setRecentActivities(activities);
         } else {
           setRecentActivities([]);
         }

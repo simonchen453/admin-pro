@@ -130,8 +130,11 @@ const SysLogView: React.FC = () => {
           <Descriptions.Item label="访问方法">
             {sysLog.method || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="操作">
-            {sysLog.operation || '-'}
+          <Descriptions.Item label="操作系统">
+            {sysLog.os || '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="操作描述">
+            {sysLog.description || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="访问参数">
             <pre style={{ 

@@ -55,6 +55,7 @@ public class WebHelper {
     private static final String CONF_LOCALE_ENCODING_PREFIX = "app.locale.encoding.";
 
     public static final String UNKNOWN_BROWSER = "Unknown browser";
+    public static final String UNKNOWN_OS = "Unknown OS";
     // browser[search name, display name, search version]
     public static final String[] BROWSER_IE = {"MSIE", "Internet Explorer", "MSIE"};
     public static final String[] BROWSER_FIREFOX = {"Firefox", "Firefox", "Firefox"};
@@ -63,6 +64,13 @@ public class WebHelper {
     public static final String[] BROWSER_SAFARI = {"Safari", "Safari", "Version"};
     public static final String[] BROWSER_EDG = {"Edge", "Edge", "Edge"};
     public static final String[][] BROWSERS = {BROWSER_IE, BROWSER_FIREFOX, BROWSER_OPERA, BROWSER_CHROME, BROWSER_SAFARI};
+    // OS[search name, display name]
+    public static final String[] OS_WINDOWS = {"Windows", "Windows"};
+    public static final String[] OS_MAC = {"Mac", "Mac OS"};
+    public static final String[] OS_LINUX = {"Linux", "Linux"};
+    public static final String[] OS_ANDROID = {"Android", "Android"};
+    public static final String[] OS_IOS = {"iPhone", "iOS"};
+    public static final String[][] OSES = {OS_WINDOWS, OS_MAC, OS_LINUX, OS_ANDROID, OS_IOS};
     public static final String LOGIN_CONTINUE_URL = "continueUrl";
 
     public static void setCurrentMenuId(HttpServletResponse response, String menuId) {
@@ -602,6 +610,25 @@ public class WebHelper {
         }
 
         return UNKNOWN_BROWSER;
+    }
+
+    /**
+     * 获取操作系统信息
+     */
+    public static final String getOsInfo(HttpServletRequest request) {
+        String agent = getUserAgent(request);
+
+        if (!StringHelper.isEmpty(agent)) {
+            agent = agent.replaceAll(";", " ").replaceAll("/", " ") + " ";
+            for (int i = 0; i < OSES.length; i++) {
+                if (!agent.contains(OSES[i][0])) {
+                    continue;
+                }
+                return OSES[i][1];
+            }
+        }
+
+        return UNKNOWN_OS;
     }
 
     /**

@@ -60,7 +60,7 @@ public class SysLogAspect {
         SysLog syslog = method.getAnnotation(SysLog.class);
         if (syslog != null) {
             //注解上的描述
-            sysLog.setOperation(syslog.value());
+            sysLog.setDescription(syslog.value());
         }
 
         //请求的方法名
@@ -89,6 +89,7 @@ public class SysLogAspect {
         //设置IP地址
         sysLog.setIp(WebHelper.getIpAddr(request));
         sysLog.setBrowser(WebHelper.getBrowserInfo(request));
+        sysLog.setOs(WebHelper.getOsInfo(request));
         //用户名
         LoginUser loginUser = LoginHelper.getInstance().getLoginUser();
         if (loginUser != null) {

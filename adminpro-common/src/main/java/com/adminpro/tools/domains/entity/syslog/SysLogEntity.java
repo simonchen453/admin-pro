@@ -53,7 +53,11 @@ public class SysLogEntity extends BaseAuditEntity {
     /**
      * 操作系统
      */
-    public static final String COL_OPERATION = "COL_OPERATION";
+    public static final String COL_OS = "COL_OS";
+    /**
+     * 操作描述
+     */
+    public static final String COL_DESCRIPTION = "COL_DESCRIPTION";
     /**
      * 访问参数
      */
@@ -66,6 +70,18 @@ public class SysLogEntity extends BaseAuditEntity {
      * 消耗时间
      */
     public static final String COL_TIME = "COL_TIME";
+    /**
+     * 分类
+     */
+    public static final String COL_CATEGORY = "COL_CATEGORY";
+    /**
+     * 模块
+     */
+    public static final String COL_MODULE = "COL_MODULE";
+    /**
+     * 状态
+     */
+    public static final String COL_STATUS = "COL_STATUS";
 
     /**
      * ID
@@ -110,8 +126,14 @@ public class SysLogEntity extends BaseAuditEntity {
      * 操作系统
      */
     @Size(max = 255)
-    @Column(name = COL_OPERATION, type = Column.Type.STRING)
-    private String operation;
+    @Column(name = COL_OS, type = Column.Type.STRING)
+    private String os;
+    /**
+     * 操作描述
+     */
+    @Size(max = 255)
+    @Column(name = COL_DESCRIPTION, type = Column.Type.STRING)
+    private String description;
     /**
      * 访问参数
      */
@@ -127,4 +149,22 @@ public class SysLogEntity extends BaseAuditEntity {
      */
     @Column(name = COL_TIME, type = Column.Type.LONG)
     private Long time;
+    /**
+     * 分类
+     */
+    @Size(max = 64)
+    @Column(name = COL_CATEGORY, type = Column.Type.STRING)
+    private String category;
+    /**
+     * 模块
+     */
+    @Size(max = 64)
+    @Column(name = COL_MODULE, type = Column.Type.STRING)
+    private String module;
+    /**
+     * 状态
+     */
+    @Size(max = 32)
+    @Column(name = COL_STATUS, type = Column.Type.STRING)
+    private String status;
 }

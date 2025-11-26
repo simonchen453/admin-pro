@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 系统日志 服务层实现
  *
@@ -32,6 +34,20 @@ public class SysLogService extends BaseService<SysLogEntity, String> {
 
     public QueryResultSet<SysLogDTO> search(SearchParam param) {
         return dao.search(param);
+    }
+
+    /**
+     * 获取最近的系统日志（用于首页最近活动）
+     * 
+     * @param limit 返回的记录数，默认 10
+     * @return 最近的系统日志列表
+     */
+    public List<SysLogDTO> findRecentLogs(int limit) {
+        SearchParam param = new SearchParam();
+        param.setPageNo(1);
+        param.setPageSize(limit);
+        QueryResultSet<SysLogDTO> resultSet = dao.search(param);
+        return resultSet.getRecords();
     }
 
     @Transactional

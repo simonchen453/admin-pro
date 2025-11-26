@@ -133,7 +133,7 @@ const SysLogList: React.FC = () => {
       onOk: async () => {
         try {
           const response = await deleteManySysLogApi(ids);
-          if (response.restCode === '200' || response.restCode === 200) {
+          if (response.restCode === '200') {
             setSelectedLogs([]);
             setSelectedRowKeys([]);
             fetchSysLogList(searchForm);
@@ -208,10 +208,17 @@ const SysLogList: React.FC = () => {
       ellipsis: true
     },
     {
-      title: '操作',
-      dataIndex: 'operation',
-      key: 'operation',
+      title: '操作系统',
+      dataIndex: 'os',
+      key: 'os',
       width: 120,
+      ellipsis: true
+    },
+    {
+      title: '操作描述',
+      dataIndex: 'description',
+      key: 'description',
+      width: 150,
       ellipsis: true
     },
     {

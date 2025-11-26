@@ -899,7 +899,8 @@ export interface SysLogEntity {
   ip?: string;
   browser?: string;
   method?: string;
-  operation?: string;
+  os?: string;
+  description?: string;
   params?: string;
   response?: string;
   time?: number;

@@ -39,7 +39,8 @@ public class SysLogDao extends BaseDao<SysLogEntity, String> {
         if (StringUtils.isNotEmpty(condition)) {
             select.addWhereAnd(SysLogEntity.COL_PARAMS + " like ?", "%" + condition + "%");
             select.addWhereOr(SysLogEntity.COL_RESPONSE + " like ?", "%" + condition + "%");
-            select.addWhereOr(SysLogEntity.COL_OPERATION + " like ?", "%" + condition + "%");
+            select.addWhereOr(SysLogEntity.COL_DESCRIPTION + " like ?", "%" + condition + "%");
+            select.addWhereOr(SysLogEntity.COL_OS + " like ?", "%" + condition + "%");
         }
 
         if (startTime != null) {
@@ -71,12 +72,16 @@ public class SysLogDao extends BaseDao<SysLogEntity, String> {
                 dto.setUserId(resultSet.getString(SysLogEntity.COL_USER_ID));
                 dto.setIp(resultSet.getString(SysLogEntity.COL_IP));
                 dto.setMethod(resultSet.getString(SysLogEntity.COL_METHOD));
-                dto.setOperation(resultSet.getString(SysLogEntity.COL_OPERATION));
+                dto.setOs(resultSet.getString(SysLogEntity.COL_OS));
+                dto.setDescription(resultSet.getString(SysLogEntity.COL_DESCRIPTION));
                 dto.setParams(resultSet.getString(SysLogEntity.COL_PARAMS));
                 dto.setResponse(resultSet.getString(SysLogEntity.COL_RESPONSE));
                 dto.setTime(resultSet.getLong(SysLogEntity.COL_TIME));
                 dto.setBrowser(resultSet.getString(SysLogEntity.COL_BROWSER));
                 dto.setLoginName(resultSet.getString("col_login_name"));
+                dto.setCategory(resultSet.getString(SysLogEntity.COL_CATEGORY));
+                dto.setModule(resultSet.getString(SysLogEntity.COL_MODULE));
+                dto.setStatus(resultSet.getString(SysLogEntity.COL_STATUS));
 
                 //处理日志字段
                 retrieveAuditField(dto, resultSet);
@@ -97,11 +102,15 @@ public class SysLogDao extends BaseDao<SysLogEntity, String> {
                 entity.setUserId(resultSet.getString(SysLogEntity.COL_USER_ID));
                 entity.setIp(resultSet.getString(SysLogEntity.COL_IP));
                 entity.setMethod(resultSet.getString(SysLogEntity.COL_METHOD));
-                entity.setOperation(resultSet.getString(SysLogEntity.COL_OPERATION));
+                entity.setOs(resultSet.getString(SysLogEntity.COL_OS));
+                entity.setDescription(resultSet.getString(SysLogEntity.COL_DESCRIPTION));
                 entity.setParams(resultSet.getString(SysLogEntity.COL_PARAMS));
                 entity.setResponse(resultSet.getString(SysLogEntity.COL_RESPONSE));
                 entity.setTime(resultSet.getLong(SysLogEntity.COL_TIME));
                 entity.setBrowser(resultSet.getString(SysLogEntity.COL_BROWSER));
+                entity.setCategory(resultSet.getString(SysLogEntity.COL_CATEGORY));
+                entity.setModule(resultSet.getString(SysLogEntity.COL_MODULE));
+                entity.setStatus(resultSet.getString(SysLogEntity.COL_STATUS));
 
                 //处理日志字段
                 retrieveAuditField(entity, resultSet);

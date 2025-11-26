@@ -29,10 +29,13 @@ import com.adminpro.rbac.domains.vo.oss.FileUploadVo;
 import com.adminpro.rbac.domains.vo.tree.TreeSelect;
 import com.adminpro.rbac.domains.vo.user.ChangePwdVo;
 import com.adminpro.tools.domains.entity.session.SessionService;
+import com.adminpro.tools.domains.entity.syslog.SysLogDTO;
+import com.adminpro.tools.domains.entity.syslog.SysLogService;
 import com.adminpro.tools.domains.enums.SessionStatus;
 import com.adminpro.tools.domains.entity.oss.OSSEntity;
 import com.adminpro.tools.domains.entity.oss.OSSService;
 import com.adminpro.web.vo.ServerInfo;
+import com.adminpro.web.vo.RecentActivityVO;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -73,6 +76,9 @@ public class CommonController extends BaseRoutingController {
     @Autowired
     private SessionService sessionService;
 
+    @Autowired
+    private SysLogService sysLogService;
+
     /**
      * 获取首页统计数据
      *
@@ -100,6 +106,89 @@ public class CommonController extends BaseRoutingController {
         stats.put("sessionCount", sessionCount);
         
         return R.ok(stats);
+    }
+
+    /**
+     * 获取最近活动
+     * 
+     * @param limit 返回的记录数，默认 10
+     * @return 最近活动列表
+     */
+    @ResponseBody
+    @RequestMapping(value = "/recent-activities", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public R<List<RecentActivityVO>> recentActivities(@RequestParam(value = "limit", defaultValue = "10") int limit) {
+        try {
+            List<SysLogDTO> recentLogs = sysLogService.findRecentLogs(limit);
+            List<RecentActivityVO> activities = new ArrayList<>();
+            
+            for (SysLogDTO log : recentLogs) {
+                RecentActivityVO activity = new RecentActivityVO();
+                activity.setId(log.getId());
+                activity.setType(determineActivityType(log.getDescription(), log.getMethod()));
+                activity.setTitle(determineActivityTitle(log.getDescription()));
+                activity.setDescription(buildActivityDescription(log));
+                activity.setTime(log.getCreatedDate());
+                activity.setUser(log.getLoginName());
+                activities.add(activity);
+            }
+            
+            return R.ok(activities);
+        } catch (Exception e) {
+            logger.error("获取最近活动失败", e);
+            return R.error("获取最近活动失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 确定活动类型
+     */
+    private String determineActivityType(String operation, String method) {
+        if (operation != null) {
+            String op = operation.toLowerCase();
+            if (op.contains("登录") || op.contains("login")) {
+                return "login";
+            } else if (op.contains("系统") || (method != null && method.toLowerCase().contains("system"))) {
+                return "system";
+            }
+        }
+        return "operation";
+    }
+
+    /**
+     * 确定活动标题
+     */
+    private String determineActivityTitle(String operation) {
+        if (operation == null) {
+            return "系统操作";
+        }
+        if (operation.contains("登录") || operation.contains("login")) {
+            return "用户登录";
+        } else if (operation.contains("系统")) {
+            return "系统操作";
+        }
+        return operation;
+    }
+
+    /**
+     * 构建活动描述
+     */
+    private String buildActivityDescription(com.adminpro.tools.domains.entity.syslog.SysLogDTO log) {
+        StringBuilder desc = new StringBuilder();
+        if (log.getDescription() != null) {
+            desc.append(log.getDescription());
+        }
+        if (log.getParams() != null && !log.getParams().isEmpty()) {
+            if (desc.length() > 0) {
+                desc.append(" - ");
+            }
+            String params = log.getParams();
+            // 限制参数长度
+            if (params.length() > 50) {
+                params = params.substring(0, 50) + "...";
+            }
+            desc.append(params);
+        }
+        return desc.length() > 0 ? desc.toString() : "系统操作";
     }
 
     /**

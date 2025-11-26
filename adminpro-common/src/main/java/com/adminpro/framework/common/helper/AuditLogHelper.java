@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +30,20 @@ public class AuditLogHelper {
      * @param after
      */
     public static void log(String category, String module, String eventName, String status, String before, String after) {
+        logWithExecutionTime(category, module, eventName, status, before, after, null);
+    }
+
+    /**
+     *
+     * @param category
+     * @param module
+     * @param eventName
+     * @param status
+     * @param before
+     * @param after
+     * @param executionTime 执行时间（毫秒），如果为 null 则不设置
+     */
+    public static void logWithExecutionTime(String category, String module, String eventName, String status, String before, String after, Long executionTime) {
 
         try {
             AuditLogEntity auditLogEntity = new AuditLogEntity();
@@ -38,9 +51,11 @@ public class AuditLogHelper {
             auditLogEntity.setAfterData(after);
             auditLogEntity.setEvent(eventName);
             auditLogEntity.setModule(module);
-            auditLogEntity.setLogDate(new Date());
             auditLogEntity.setStatus(status);
             auditLogEntity.setCategory(category);
+            if (executionTime != null) {
+                auditLogEntity.setExecutionTime(executionTime);
+            }
             //获取request
             HttpServletRequest request = WebHelper.getHttpRequest();
             if(request != null){
@@ -62,15 +77,29 @@ public class AuditLogHelper {
      * @param category  admin -- normal
      */
     public static void log(String category, String module, String eventName, String status, String after) {
+        logWithExecutionTime(category, module, eventName, status, null, after, null);
+    }
+
+    /**
+     * @param category
+     * @param module
+     * @param eventName
+     * @param status    success--failed
+     * @param after    params from request
+     * @param executionTime 执行时长（毫秒），如果为 null 则不设置
+     */
+    public static void logWithExecutionTime(String category, String module, String eventName, String status, String after, Long executionTime) {
 
         try {
             AuditLogEntity auditLogEntity = new AuditLogEntity();
             auditLogEntity.setAfterData(after);
             auditLogEntity.setEvent(eventName);
             auditLogEntity.setModule(module);
-            auditLogEntity.setLogDate(new Date());
             auditLogEntity.setStatus(status);
             auditLogEntity.setCategory(category);
+            if (executionTime != null) {
+                auditLogEntity.setExecutionTime(executionTime);
+            }
             //获取request
             HttpServletRequest request = WebHelper.getHttpRequest();
             if(request != null) {

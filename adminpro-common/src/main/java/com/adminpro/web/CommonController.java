@@ -3,7 +3,6 @@ package com.adminpro.web;
 import com.adminpro.core.base.entity.R;
 import com.adminpro.core.base.enums.UploadImageType;
 import com.adminpro.core.base.util.DateUtil;
-import java.text.SimpleDateFormat;
 import com.adminpro.core.base.util.IdGenerator;
 import com.adminpro.core.exceptions.BaseRuntimeException;
 import com.adminpro.core.jdbc.SearchParam;
@@ -174,7 +173,7 @@ public class CommonController extends BaseRoutingController {
     /**
      * 构建活动描述
      */
-    private String buildActivityDescription(com.adminpro.tools.domains.entity.syslog.SysLogDTO log) {
+    private String buildActivityDescription(SysLogDTO log) {
         StringBuilder desc = new StringBuilder();
         if (log.getDescription() != null) {
             desc.append(log.getDescription());
@@ -183,12 +182,7 @@ public class CommonController extends BaseRoutingController {
             if (desc.length() > 0) {
                 desc.append(" - ");
             }
-            String params = log.getParams();
-            // 限制参数长度
-            if (params.length() > 50) {
-                params = params.substring(0, 50) + "...";
-            }
-            desc.append(params);
+            desc.append(log.getParams());
         }
         return desc.length() > 0 ? desc.toString() : "系统操作";
     }

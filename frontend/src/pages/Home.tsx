@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Row, Col, Statistic, Button, List, Avatar, Tag, Space, Typography, Empty, Spin, Descriptions } from 'antd';
+import { Card, Row, Col, Statistic, Button, List, Avatar, Tag, Space, Typography, Empty, Spin, Descriptions, Tooltip } from 'antd';
 import { 
   UserOutlined, 
   TeamOutlined, 
@@ -93,7 +93,7 @@ function Home() {
       id: apiActivity.id,
       type: apiActivity.type,
       title: apiActivity.title,
-      description: apiActivity.description.length > 50 ? apiActivity.description.substring(0, 50) + '...' : apiActivity.description,
+      description: apiActivity.description,
       time,
       user: apiActivity.user,
     };
@@ -217,25 +217,43 @@ function Home() {
                 </Space>
               }
               className="quick-actions-card"
+              style={{ height: '100%' }}
             >
-              <Row gutter={[12, 12]}>
+              <Row gutter={[16, 16]}>
                 {quickActions.map((action, index) => (
-                  <Col xs={12} sm={8} md={6} key={index}>
+                  <Col xs={12} sm={8} md={6} lg={4} key={index}>
                     <Button
                       type="text"
                       block
                       className="quick-action-btn"
-                      icon={action.icon}
                       onClick={handleQuickActionClick(action.path)}
                       style={{ 
-                        height: '80px',
+                        height: '90px',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        padding: '12px 8px',
                       }}
                     >
-                      <span style={{ marginTop: 8 }}>{action.title}</span>
+                      <div style={{ 
+                        fontSize: '24px', 
+                        marginBottom: '10px',
+                        color: action.color,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {action.icon}
+                      </div>
+                      <span style={{ 
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        lineHeight: '1.4',
+                        color: '#333'
+                      }}>
+                        {action.title}
+                      </span>
                     </Button>
                   </Col>
                 ))}
@@ -252,37 +270,71 @@ function Home() {
                 </Space>
               }
               className="recent-activities-card"
+              style={{ height: '100%' }}
             >
               {recentActivities.length > 0 ? (
                 <List
                   dataSource={recentActivities}
-                  renderItem={(item) => (
-                    <List.Item className="activity-item">
-                      <List.Item.Meta
-                        avatar={<Avatar icon={getActivityIcon(item.type)} />}
-                        title={
-                          <Space>
-                            <Text strong>{item.title}</Text>
-                            {item.user && (
-                              <Tag color="blue">{item.user}</Tag>
-                            )}
-                          </Space>
-                        }
-                        description={
-                          <div>
-                            <Text type="secondary" style={{ fontSize: 12 }}>
-                              {item.description}
-                            </Text>
-                            <div style={{ marginTop: 4 }}>
-                              <Text type="secondary" style={{ fontSize: 11 }}>
-                                {item.time}
-                              </Text>
+                  style={{ maxHeight: '600px', overflowY: 'auto' }}
+                  renderItem={(item) => {
+                    const displayDescription = item.description.length > 50 
+                      ? item.description.substring(0, 50) + '...' 
+                      : item.description;
+                    const needTooltip = item.description.length > 50;
+                    
+                    return (
+                      <List.Item className="activity-item">
+                        <List.Item.Meta
+                          avatar={<Avatar icon={getActivityIcon(item.type)} />}
+                          title={
+                            <Space>
+                              <Text strong>{item.title}</Text>
+                              {item.user && (
+                                <Tag color="blue">{item.user}</Tag>
+                              )}
+                            </Space>
+                          }
+                          description={
+                            <div>
+                              {needTooltip ? (
+                                <Tooltip 
+                                  title={
+                                    <div style={{ 
+                                      maxWidth: '500px', 
+                                      wordBreak: 'break-word',
+                                      whiteSpace: 'pre-wrap'
+                                    }}>
+                                      {item.description}
+                                    </div>
+                                  } 
+                                  placement="topLeft"
+                                  overlayStyle={{ maxWidth: '500px' }}
+                                  overlayInnerStyle={{ 
+                                    maxWidth: '500px',
+                                    wordBreak: 'break-word',
+                                    whiteSpace: 'pre-wrap'
+                                  }}
+                                >
+                                  <Text type="secondary" style={{ fontSize: 12, cursor: 'help' }}>
+                                    {displayDescription}
+                                  </Text>
+                                </Tooltip>
+                              ) : (
+                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                  {displayDescription}
+                                </Text>
+                              )}
+                              <div style={{ marginTop: 4 }}>
+                                <Text type="secondary" style={{ fontSize: 11 }}>
+                                  {item.time}
+                                </Text>
+                              </div>
                             </div>
-                          </div>
-                        }
-                      />
-                    </List.Item>
-                  )}
+                          }
+                        />
+                      </List.Item>
+                    );
+                  }}
                 />
               ) : (
                 <Empty description="暂无活动记录" image={Empty.PRESENTED_IMAGE_SIMPLE} />

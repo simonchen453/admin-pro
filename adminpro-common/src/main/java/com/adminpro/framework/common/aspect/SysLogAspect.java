@@ -1,5 +1,6 @@
 package com.adminpro.framework.common.aspect;
 
+import com.adminpro.core.base.entity.BaseEntity;
 import com.adminpro.core.base.entity.BaseVO;
 import com.adminpro.core.base.util.JsonUtil;
 import com.adminpro.framework.common.annotation.SysLog;
@@ -74,7 +75,7 @@ public class SysLogAspect {
         Object[] args = joinPoint.getArgs();
         if (ArrayUtils.isNotEmpty(args)) {
             for (int i = 0; i < args.length; i++) {
-                if (args[i] instanceof BaseVO) {
+                if (args[i] instanceof BaseVO || args[i] instanceof BaseEntity) {
                     try {
                         String params = JsonUtil.toJson(args[i]);
                         params = filterSensitiveFields(params);

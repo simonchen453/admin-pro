@@ -20,24 +20,38 @@
 }
 
 .quick-actions-card .ant-card-body {
-  padding: 20px;
+  padding: 24px;
 }
 
 .quick-action-btn {
-  border: 1px solid #f0f0f0;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fafafa;
 }
 
 .quick-action-btn:hover {
   border-color: #1890ff;
-  background-color: #f0f8ff;
+  background: linear-gradient(135deg, #f0f8ff 0%, #e6f7ff 100%);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+}
+
+.quick-action-btn:active {
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(24, 144, 255, 0.2);
 }
 
 .recent-activities-card .ant-card-body {
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 57px);
+}
+
+.recent-activities-card .ant-list {
+  flex: 1;
+  overflow: hidden;
 }
 
 .activity-item {
@@ -47,6 +61,16 @@
 
 .activity-item:last-child {
   border-bottom: none;
+}
+
+.quick-actions-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.quick-actions-card .ant-card-body {
+  flex: 1;
+  padding: 20px;
 }
 
 .system-info-card .ant-descriptions-item-label {

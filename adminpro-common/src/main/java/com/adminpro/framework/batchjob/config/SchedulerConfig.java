@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +26,18 @@ public class SchedulerConfig {
     @Qualifier(value = "springQuartzJobFactory")
     private JobFactory jobFactory;
 
+    /**
+     * Quartz 启动延迟时间（秒），可通过配置 app.quartz.startup-delay 设置，默认 5 秒
+     */
+    @Value("${app.quartz.startup-delay:5}")
+    private int startupDelay;
+
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() throws IOException {
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
         factory.setJobFactory(jobFactory);
-        factory.setStartupDelay(30);
+        // 优化：使用可配置的启动延迟，默认从 30 秒减少到 5 秒
+        factory.setStartupDelay(startupDelay);
         factory.setApplicationContextSchedulerContextKey("applicationContextKey");
         factory.setOverwriteExistingJobs(true);
         factory.setAutoStartup(true);

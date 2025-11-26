@@ -137,6 +137,9 @@ app:
     password:
         validate:
             reg: ^([A-Z]|[a-z]|[0-9]){6,20}$
+    quartz:
+        # Quartz 启动延迟时间（秒），默认 5 秒（从原来的 30 秒优化）
+        startup-delay: ${APP_QUARTZ_STARTUP_DELAY:5}
 gen:
     # 作者
     author: ${GEN_AUTHOR:AdminPro}

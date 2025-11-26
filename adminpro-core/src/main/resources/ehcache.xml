@@ -3,7 +3,7 @@
         xmlns='http://www.ehcache.org/v3'
         xsi:schemaLocation='http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.10.xsd'>
 
-    <!-- 默认模板 -->
+    <!-- 默认模板 - 优化：减少内存使用，从 20MB 降低到 10MB -->
     <cache-template name="defaultTemplate">
         <key-type>java.lang.String</key-type>
         <value-type>java.lang.Object</value-type>
@@ -12,7 +12,7 @@
         </expiry>
         <resources>
             <heap unit="entries">10000</heap>
-            <offheap unit="MB">20</offheap>
+            <offheap unit="MB">10</offheap>
         </resources>
     </cache-template>
 

@@ -7,6 +7,7 @@ import com.adminpro.core.base.web.BaseSearchForm;
 import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.core.jdbc.query.QueryResultSet;
 import com.adminpro.framework.common.BaseRoutingController;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.rbac.domains.entity.domain.DomainCreateValidator;
 import com.adminpro.rbac.domains.entity.domain.DomainEntity;
 import com.adminpro.rbac.domains.entity.domain.DomainService;
@@ -76,6 +77,7 @@ public class DomainController extends BaseRoutingController {
     /**
      * 新增保存用户域
      */
+    @SysLog("创建用户域")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public R create(@RequestBody DomainEntity userDomain) {
@@ -102,6 +104,7 @@ public class DomainController extends BaseRoutingController {
     /**
      * 修改保存用户域
      */
+    @SysLog("更新用户域")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
     @ResponseBody
     public R editSave(@RequestBody DomainEntity userDomain) {

@@ -21,7 +21,7 @@ export interface RecentActivity {
   type: 'login' | 'operation' | 'system';
   title: string;
   description: string;
-  time: string;
+  time: string | Date | null;
   user?: string;
 }
 

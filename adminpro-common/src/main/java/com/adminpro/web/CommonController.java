@@ -3,6 +3,7 @@ package com.adminpro.web;
 import com.adminpro.core.base.entity.R;
 import com.adminpro.core.base.enums.UploadImageType;
 import com.adminpro.core.base.util.DateUtil;
+import java.text.SimpleDateFormat;
 import com.adminpro.core.base.util.IdGenerator;
 import com.adminpro.core.exceptions.BaseRuntimeException;
 import com.adminpro.core.jdbc.SearchParam;
@@ -36,6 +37,7 @@ import com.adminpro.tools.domains.entity.oss.OSSEntity;
 import com.adminpro.tools.domains.entity.oss.OSSService;
 import com.adminpro.web.vo.ServerInfo;
 import com.adminpro.web.vo.RecentActivityVO;
+import com.adminpro.framework.common.annotation.SysLog;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -197,6 +199,7 @@ public class CommonController extends BaseRoutingController {
      * @param vo
      * @return
      */
+    @SysLog("修改密码")
     @PreAuthorize("@ss.hasPermission('common:changepwd')")
     @ResponseBody
     @RequestMapping(value = "/changepwd", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -375,6 +378,7 @@ public class CommonController extends BaseRoutingController {
     /**
      * OSS文件上传
      */
+    @SysLog("OSS文件上传")
     @PreAuthorize("@ss.hasPermission('common:oss:upload')")
     @RequestMapping(value = "/oss/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
@@ -405,8 +409,9 @@ public class CommonController extends BaseRoutingController {
     }
 
     /**
-     * OSS文件上传
+     * OSS文件删除
      */
+    @SysLog("OSS文件删除")
     @PreAuthorize("@ss.hasPermission('common:oss:upload')")
     @RequestMapping(value = "/oss/delete/{id}", method = RequestMethod.DELETE)
     @ResponseBody
@@ -423,6 +428,7 @@ public class CommonController extends BaseRoutingController {
     /**
      * 本地文件上传
      */
+    @SysLog("本地文件上传")
     @PreAuthorize("@ss.hasPermission('common:file:upload')")
     @RequestMapping(value = "/file/upload/{type}", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
@@ -455,6 +461,7 @@ public class CommonController extends BaseRoutingController {
     /**
      * 本地文件上传
      */
+    @SysLog("本地文件上传")
     @PreAuthorize("@ss.hasPermission('common:file:upload')")
     @RequestMapping(value = "/file/upload2/{type}", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody

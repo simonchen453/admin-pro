@@ -6,6 +6,7 @@ import com.adminpro.core.base.util.BeanUtil;
 import com.adminpro.core.base.web.BaseSearchForm;
 import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.framework.common.BaseRoutingController;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.rbac.domains.entity.menu.MenuCreateValidator;
 import com.adminpro.rbac.domains.entity.menu.MenuEntity;
 import com.adminpro.rbac.domains.entity.menu.MenuService;
@@ -97,6 +98,7 @@ public class MenuController extends BaseRoutingController {
     /**
      * 查询菜单权限列表
      */
+    @SysLog("删除菜单")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
     @ResponseBody
     public R<List<MenuEntity>> delete(@PathVariable String id) {
@@ -111,6 +113,7 @@ public class MenuController extends BaseRoutingController {
     /**
      * 新增保存菜单权限
      */
+    @SysLog("创建菜单")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public R create(@RequestBody MenuEntity menu) {
@@ -155,6 +158,7 @@ public class MenuController extends BaseRoutingController {
     /**
      * 修改保存菜单权限
      */
+    @SysLog("更新菜单")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
     @ResponseBody
     public R editSave(@RequestBody MenuEntity menu) {
@@ -201,6 +205,7 @@ public class MenuController extends BaseRoutingController {
     /**
      * 删除菜单权限
      */
+    @SysLog("批量删除菜单")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @ResponseBody
     public R remove(@RequestParam("ids") String ids) {

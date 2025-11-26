@@ -8,6 +8,7 @@ import com.adminpro.core.base.web.BaseSearchForm;
 import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.core.jdbc.query.QueryResultSet;
 import com.adminpro.framework.common.BaseRoutingController;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.tools.domains.entity.dict.*;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -82,6 +83,7 @@ public class DictController extends BaseRoutingController {
     /**
      * 新增保存字典类型
      */
+    @SysLog("创建字典")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public R create(@RequestBody DictEntity dict) {
@@ -111,6 +113,7 @@ public class DictController extends BaseRoutingController {
     /**
      * 修改保存字典类型
      */
+    @SysLog("更新字典")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
     @ResponseBody
     public R editSave(@RequestBody DictEntity dict) {
@@ -160,6 +163,7 @@ public class DictController extends BaseRoutingController {
     /**
      * 删除字典类型
      */
+    @SysLog("删除字典")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @ResponseBody
     public R remove(@RequestParam("ids") String ids) {
@@ -173,6 +177,7 @@ public class DictController extends BaseRoutingController {
      * @param id
      * @return
      */
+    @SysLog("激活字典")
     @RequestMapping(value = "/active/{id}", method = RequestMethod.PATCH)
     @ResponseBody
     public R<DictEntity> active(@PathVariable String id) {
@@ -192,6 +197,7 @@ public class DictController extends BaseRoutingController {
      * @param id
      * @return
      */
+    @SysLog("停用字典")
     @RequestMapping(value = "/inactive/{id}", method = RequestMethod.PATCH)
     @ResponseBody
     public R<DictEntity> inactive(@PathVariable String id) {

@@ -81,8 +81,13 @@ function Home() {
   }, [navigate]);
 
   const convertApiActivityToActivity = (apiActivity: ApiRecentActivity): RecentActivity => {
-    const createdDate = apiActivity.time || '';
-    const time = createdDate ? dayjs(createdDate).fromNow() : '未知时间';
+    let time = '未知时间';
+    if (apiActivity.time) {
+      const date = dayjs(apiActivity.time);
+      if (date.isValid()) {
+        time = date.fromNow();
+      }
+    }
 
     return {
       id: apiActivity.id,

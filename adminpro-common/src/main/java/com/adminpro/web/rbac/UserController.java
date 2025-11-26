@@ -9,6 +9,7 @@ import com.adminpro.core.base.web.BaseSearchForm;
 import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.core.jdbc.query.QueryResultSet;
 import com.adminpro.framework.common.BaseRoutingController;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.framework.common.helper.UploadDownloadHelper;
 import com.adminpro.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.rbac.domains.entity.dept.DeptService;
@@ -132,6 +133,7 @@ public class UserController extends BaseRoutingController {
         return R.ok(search);
     }
 
+    @SysLog("停用用户")
     @RequestMapping(value = "/inactive/{userDomain}/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
     @ResponseBody
     public R inactive(@PathVariable String userDomain, @PathVariable String userId) {
@@ -145,6 +147,7 @@ public class UserController extends BaseRoutingController {
         }
     }
 
+    @SysLog("激活用户")
     @RequestMapping(value = "/active/{userDomain}/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
     @ResponseBody
     public R active(@PathVariable("userDomain") String userDomain, @PathVariable("userId") String userId) {
@@ -158,6 +161,7 @@ public class UserController extends BaseRoutingController {
         }
     }
 
+    @SysLog("重置用户密码")
     @RequestMapping(value = "/resetpwd", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public R resetPwd(@RequestBody UserResetPwdRequestVo userResetPwdRequestVo) {
@@ -239,6 +243,7 @@ public class UserController extends BaseRoutingController {
         return R.ok(sysUserResponseVo);
     }
 
+    @SysLog("删除用户")
     @RequestMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
     @ResponseBody
     public R deleteMany(@RequestParam String users) {
@@ -265,6 +270,7 @@ public class UserController extends BaseRoutingController {
         return R.ok(map);
     }
 
+    @SysLog("创建用户")
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     @ResponseBody
     @Transactional
@@ -325,6 +331,7 @@ public class UserController extends BaseRoutingController {
         }
     }
 
+    @SysLog("更新用户")
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
     @ResponseBody
     @Transactional
@@ -384,6 +391,7 @@ public class UserController extends BaseRoutingController {
         }
     }
 
+    @SysLog("用户头像上传")
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public R uploadFile(@RequestParam MultipartFile file, MultipartHttpServletRequest multipartRequest) {

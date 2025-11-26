@@ -3,6 +3,7 @@ package com.adminpro.framework.common.aspect;
 import com.adminpro.core.base.entity.BaseVO;
 import com.adminpro.core.base.util.JsonUtil;
 import com.adminpro.framework.common.annotation.SysLog;
+import com.adminpro.framework.common.helper.ConfigHelper;
 import com.adminpro.framework.common.helper.WebHelper;
 import com.adminpro.framework.security.auth.LoginUser;
 import com.adminpro.rbac.api.LoginHelper;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Map;
 
 
 /**
@@ -75,6 +77,7 @@ public class SysLogAspect {
                 if (args[i] instanceof BaseVO) {
                     try {
                         String params = JsonUtil.toJson(args[i]);
+                        params = filterSensitiveFields(params);
                         sysLog.setParams(params);
                         break;
                     } catch (Exception e) {
@@ -97,9 +100,10 @@ public class SysLogAspect {
             sysLog.setUserId(loginUser.getUsername());
         }
         sysLog.setTime(time);
-        sysLog.setCreatedDate(new Date());
 
-        sysLog.setResponse(JsonUtil.toJson(result));
+        String responseJson = JsonUtil.toJson(result);
+        responseJson = filterSensitiveFields(responseJson);
+        sysLog.setResponse(responseJson);
 
         //保存系统日志
         if (sysLogService != null) {
@@ -109,5 +113,34 @@ public class SysLogAspect {
                 // 忽略日志保存失败，避免影响主流程
             }
         }
+    }
+
+    /**
+     * 过滤敏感字段
+     *
+     * @param jsonStr JSON字符串
+     * @return 过滤后的JSON字符串
+     */
+    @SuppressWarnings("unchecked")
+    private String filterSensitiveFields(String jsonStr) {
+        if (jsonStr == null || jsonStr.isEmpty()) {
+            return jsonStr;
+        }
+        try {
+            String[] excludeFields = ConfigHelper.getStringArray("app.log.exclude.fields");
+            if (ArrayUtils.isEmpty(excludeFields)) {
+                excludeFields = new String[]{"password", "pwd", "oldPwd", "newPwd", "confirmPwd", "confirmPassword", "confirmNewPwd", "payPwd"};
+            }
+            Map<String, Object> map = JsonUtil.fromJson(jsonStr, Map.class);
+            if (map != null) {
+                for (String field : excludeFields) {
+                    map.remove(field);
+                }
+                return JsonUtil.toJson(map);
+            }
+        } catch (Exception e) {
+            // 如果解析失败，返回原字符串
+        }
+        return jsonStr;
     }
 }

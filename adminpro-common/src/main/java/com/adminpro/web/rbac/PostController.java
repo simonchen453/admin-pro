@@ -7,6 +7,7 @@ import com.adminpro.core.base.web.BaseSearchForm;
 import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.core.jdbc.query.QueryResultSet;
 import com.adminpro.framework.common.BaseRoutingController;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.rbac.domains.entity.post.PostCreateValidator;
 import com.adminpro.rbac.domains.entity.post.PostEntity;
 import com.adminpro.rbac.domains.entity.post.PostService;
@@ -99,6 +100,7 @@ public class PostController extends BaseRoutingController {
     /**
      * 新增保存职位
      */
+    @SysLog("创建职位")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public R create(@RequestBody PostEntity post) {
@@ -129,6 +131,7 @@ public class PostController extends BaseRoutingController {
     /**
      * 修改保存职位
      */
+    @SysLog("更新职位")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
     @ResponseBody
     public R editSave(@RequestBody PostEntity post) {
@@ -161,6 +164,7 @@ public class PostController extends BaseRoutingController {
     /**
      * 删除职位
      */
+    @SysLog("删除职位")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @ResponseBody
     public R remove(@RequestParam("ids") String ids) {

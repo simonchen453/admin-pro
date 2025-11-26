@@ -10,6 +10,7 @@ import com.adminpro.framework.common.helper.ConfigHelper;
 import static com.adminpro.framework.common.constants.ConfigKeys.User;
 import com.adminpro.framework.common.helper.WebHelper;
 import com.adminpro.framework.common.web.BaseController;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.rbac.api.Device;
 import com.adminpro.rbac.api.LoginHelper;
 import com.adminpro.rbac.common.RbacCacheConstants;
@@ -61,6 +62,7 @@ public class AuthController extends BaseController {
     @Resource(name = "captchaProducerMath")
     private Producer captchaProducerMath;
 
+    @SysLog("用户登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R<LoginResponse> login(HttpServletRequest request, @RequestBody LoginUserVo loginUserVo) {
         BeanUtil.beanAttributeValueTrim(loginUserVo);

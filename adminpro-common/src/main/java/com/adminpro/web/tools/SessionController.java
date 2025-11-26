@@ -6,6 +6,7 @@ import com.adminpro.core.base.web.BaseSearchForm;
 import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.core.jdbc.query.QueryResultSet;
 import com.adminpro.framework.common.BaseRoutingController;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.framework.common.helper.StringHelper;
 import com.adminpro.framework.common.helper.WebHelper;
 import com.adminpro.rbac.domains.entity.domain.DomainEntity;
@@ -110,6 +111,7 @@ public class SessionController extends BaseRoutingController {
         }
     }
 
+    @SysLog("暂停会话")
     @RequestMapping(value = "/suspend/{id}", method = RequestMethod.PATCH)
     @ResponseBody
     public R<SessionEntity> suspend(@PathVariable String id) {
@@ -126,6 +128,7 @@ public class SessionController extends BaseRoutingController {
         }
     }
 
+    @SysLog("恢复会话")
     @RequestMapping(value = "/unsuspend/{id}", method = RequestMethod.PATCH)
     @ResponseBody
     public R<SessionEntity> unsuspend(@PathVariable String id) {
@@ -142,6 +145,7 @@ public class SessionController extends BaseRoutingController {
         }
     }
 
+    @SysLog("终止会话")
     @RequestMapping(value = "/kill/{id}", method = RequestMethod.PATCH)
     @ResponseBody
     public R<SessionEntity> kill(@PathVariable String id) {

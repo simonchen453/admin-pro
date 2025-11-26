@@ -9,6 +9,7 @@ import com.adminpro.core.base.web.BaseSearchForm;
 import com.adminpro.core.exceptions.BaseRuntimeException;
 import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.framework.common.BaseRoutingController;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.framework.common.helper.UploadDownloadHelper;
 import com.adminpro.rbac.domains.entity.dept.DeptCreateValidator;
 import com.adminpro.rbac.domains.entity.dept.DeptEntity;
@@ -93,6 +94,7 @@ public class DeptController extends BaseRoutingController {
     /**
      * 新增保存部门
      */
+    @SysLog("创建部门")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public R create(@RequestBody DeptEntity dept) {
@@ -137,6 +139,7 @@ public class DeptController extends BaseRoutingController {
     /**
      * 修改保存部门
      */
+    @SysLog("更新部门")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
     @ResponseBody
     public R editSave(@RequestBody DeptEntity dept) {
@@ -182,6 +185,7 @@ public class DeptController extends BaseRoutingController {
     /**
      * 删除部门
      */
+    @SysLog("删除部门")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @ResponseBody
     @Transactional
@@ -193,6 +197,7 @@ public class DeptController extends BaseRoutingController {
         return R.ok();
     }
 
+    @SysLog("部门Logo上传")
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public R uploadFile(@RequestParam("file") MultipartFile file) throws Exception {

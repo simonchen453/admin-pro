@@ -7,6 +7,7 @@ import com.adminpro.core.base.web.BaseSearchForm;
 import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.core.jdbc.query.QueryResultSet;
 import com.adminpro.framework.common.BaseRoutingController;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.tools.domains.entity.config.ConfigCreateValidator;
 import com.adminpro.tools.domains.entity.config.ConfigEntity;
 import com.adminpro.tools.domains.entity.config.ConfigService;
@@ -90,6 +91,7 @@ public class ConfigController extends BaseRoutingController {
     /**
      * 新增保存参数配置
      */
+    @SysLog("创建配置")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public R create(@RequestBody ConfigEntity config) {
@@ -131,6 +133,7 @@ public class ConfigController extends BaseRoutingController {
     /**
      * 修改保存参数配置
      */
+    @SysLog("更新配置")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
     @ResponseBody
     public R editSave(@RequestBody ConfigEntity config) {
@@ -181,6 +184,7 @@ public class ConfigController extends BaseRoutingController {
     /**
      * 删除参数配置
      */
+    @SysLog("删除配置")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @ResponseBody
     public R remove(@RequestParam("ids") String ids) {

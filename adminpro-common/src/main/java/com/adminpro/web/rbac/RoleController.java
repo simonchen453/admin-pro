@@ -7,6 +7,7 @@ import com.adminpro.core.base.web.BaseSearchForm;
 import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.core.jdbc.query.QueryResultSet;
 import com.adminpro.framework.common.BaseRoutingController;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.rbac.domains.entity.role.RoleCreateValidator;
 import com.adminpro.rbac.domains.entity.role.RoleEntity;
 import com.adminpro.rbac.domains.entity.role.RoleService;
@@ -88,6 +89,7 @@ public class RoleController extends BaseRoutingController {
     /**
      * 新增保存角色
      */
+    @SysLog("创建角色")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @ResponseBody
     public R create(@RequestBody RoleEntity role) {
@@ -116,6 +118,7 @@ public class RoleController extends BaseRoutingController {
     /**
      * 修改保存角色
      */
+    @SysLog("更新角色")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
     @ResponseBody
     public R editSave(@RequestBody RoleEntity role) {
@@ -163,6 +166,7 @@ public class RoleController extends BaseRoutingController {
     /**
      * 删除角色
      */
+    @SysLog("删除角色")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @ResponseBody
     public R remove(@RequestParam("ids") String ids) {

@@ -188,7 +188,7 @@ const AuditLogList: React.FC = () => {
       ellipsis: true
     },
     {
-      title: '生成日期',
+      title: '日期',
       dataIndex: 'logDate',
       key: 'logDate',
       width: 160,

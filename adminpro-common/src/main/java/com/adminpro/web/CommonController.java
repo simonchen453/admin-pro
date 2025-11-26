@@ -360,7 +360,7 @@ public class CommonController extends BaseRoutingController {
         } else {
             Thumbnails.of(bis).size(900, 900).outputFormat(fileType).toFile(f);
         }
-        return R.ok(WebConstants.SERVER_ADDRESS + request.getContextPath() + "/upload" + url);
+        return R.ok(WebConstants.getServerAddress() + request.getContextPath() + "/upload" + url);
     }
 
     /**
@@ -394,7 +394,7 @@ public class CommonController extends BaseRoutingController {
         }
         FileUploadVo vo = new FileUploadVo();
         vo.setRelativePath("/upload" + url);
-        vo.setAbsolutePath(WebConstants.SERVER_ADDRESS + request.getContextPath() + "/upload" + url);
+        vo.setAbsolutePath(WebConstants.getServerAddress() + request.getContextPath() + "/upload" + url);
         return R.ok(vo);
     }
 }

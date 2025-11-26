@@ -3,12 +3,18 @@ package com.adminpro.framework.common.constants;
 import com.adminpro.core.base.IConstants;
 import com.adminpro.framework.common.helper.ConfigHelper;
 
+import static com.adminpro.framework.common.constants.ConfigKeys.*;
+
 /**
  * @author simon
  */
 public class WebConstants extends IConstants {
     //服务器地址
-    public static final String SERVER_ADDRESS = ConfigHelper.getString("app.server.address");
+    public static String getServerAddress() {
+        // 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+        return ConfigHelper.getString(APP_SERVER_ADDRESS);
+    }
+
 
     public static final String ENCODING = "UTF8";
     public static final String DOMAIN_SYSTEM = "system";
@@ -50,5 +56,10 @@ public class WebConstants extends IConstants {
     //我的-个人信息-更换手机号
     public static final String CODE_CHANGE_MOBILE = "changemobile";
     public static final String[] CODE_TYPES = {CODE_REGISTER, CODE_RESETPWD, CODE_RESET_PAY_PWD, CODE_CHANGE_MOBILE};
-    public static final String UPLOAD_AVATAR_PATH = ConfigHelper.getString("app.user.avatar.dir", "/avatar/");
+
+    public static String getUploadAvatarPath() {
+        // 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+        return ConfigHelper.getString(APP_USER_AVATAR_DIR, "/avatar/");
+    }
+
 }

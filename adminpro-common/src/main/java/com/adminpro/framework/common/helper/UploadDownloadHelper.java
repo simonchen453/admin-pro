@@ -59,7 +59,7 @@ public class UploadDownloadHelper {
         } else {
             FileUtils.copyInputStreamToFile(bis, f);
         }
-        return WebConstants.SERVER_ADDRESS + WebHelper.getContextPath() + "/upload" + url;
+        return WebConstants.getServerAddress() + WebHelper.getContextPath() + "/upload" + url;
     }
 
     /**
@@ -84,7 +84,7 @@ public class UploadDownloadHelper {
         ByteArrayInputStream bis = new ByteArrayInputStream(multipartFile.getBytes());
         File f = new File(filePath);
         FileUtils.copyInputStreamToFile(bis, f);
-        return WebConstants.SERVER_ADDRESS + WebHelper.getContextPath() + "/upload" + url;
+        return WebConstants.getServerAddress() + WebHelper.getContextPath() + "/upload" + url;
     }
 
     public String getSuffix(String fileName) {
@@ -198,7 +198,7 @@ public class UploadDownloadHelper {
      * @return
      */
     public String getFilePath(String dir, File file) {
-        String filePath = WebConstants.SERVER_ADDRESS + "/upload" + dir + file.getName();
+        String filePath = WebConstants.getServerAddress() + "/upload" + dir + file.getName();
         return filePath;
     }
 

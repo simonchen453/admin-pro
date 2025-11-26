@@ -11,13 +11,17 @@ import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Properties;
 
+import static com.adminpro.framework.common.constants.ConfigKeys.*;
+
 @Configuration
-@DependsOn({"springQuartzJobFactory"})
+@DependsOn({"springQuartzJobFactory", "configPreloader"})
 public class SchedulerConfig {
 
     public static final Logger logger = LoggerFactory.getLogger(SchedulerConfig.class);
@@ -32,7 +36,33 @@ public class SchedulerConfig {
     @Value("${app.quartz.startup-delay:5}")
     private int startupDelay;
 
+    /**
+     * Quartz 配置属性，在 @PostConstruct 中加载，确保配置已预加载到缓存
+     */
+    private Properties quartzPropertiesCache;
+
+    /**
+     * 在 @PostConstruct 中加载 Quartz 配置
+     * 此时 ConfigPreloader 的 afterPropertiesSet() 已经执行，配置已预加载到缓存
+     * 查询配置时会从缓存中获取，避免重复查询数据库
+     */
+    @PostConstruct
+    public void initQuartzProperties() {
+        try {
+            logger.debug("开始加载 Quartz 配置属性（@PostConstruct）...");
+            quartzPropertiesCache = buildQuartzProperties();
+            logger.debug("Quartz 配置属性加载完成");
+        } catch (Exception e) {
+            logger.warn("加载 Quartz 配置属性失败: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 创建 SchedulerFactoryBean
+     * 使用 @Lazy 延迟执行，确保 @PostConstruct 已经执行，配置已预加载到缓存
+     */
     @Bean
+    @Lazy
     public SchedulerFactoryBean schedulerFactoryBean() throws IOException {
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
         factory.setJobFactory(jobFactory);
@@ -41,40 +71,53 @@ public class SchedulerConfig {
         factory.setApplicationContextSchedulerContextKey("applicationContextKey");
         factory.setOverwriteExistingJobs(true);
         factory.setAutoStartup(true);
-        Properties quartzProperties = quartzProperties();
+        
+        // 使用在 @PostConstruct 中预加载的配置
+        // 如果 @PostConstruct 还未执行（理论上不应该），则延迟加载
+        // 此时 ConfigPreloader 应该已经预加载配置到缓存，查询会从缓存中获取
+        Properties quartzProperties = quartzPropertiesCache;
+        if (quartzProperties == null) {
+            logger.debug("quartzPropertiesCache 为 null，延迟加载配置（此时配置应已预加载到缓存）");
+            quartzProperties = buildQuartzProperties();
+        }
+        
         if (quartzProperties == null) {
             return factory;
         }
         factory.setQuartzProperties(quartzProperties);
-        factory.setSchedulerName(quartzProperties.getProperty("org.quartz.scheduler.instanceName"));
+        factory.setSchedulerName(quartzProperties.getProperty(QUARTZ_SCHEDULER_INSTANCE_NAME));
         return factory;
     }
 
-    private Properties quartzProperties() throws IOException {
+    /**
+     * 构建 Quartz 配置属性
+     * 此时配置应该已经预加载到缓存，查询会从缓存中获取
+     */
+    private Properties buildQuartzProperties() throws IOException {
         PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
         Properties prop = new Properties();
         prop.setProperty("org.quartz.dataSource.myDS.connectionProvider.class", "com.adminpro.framework.batchjob.config.HikariConnectionProvider");
-        prop.setProperty("org.quartz.jobStore.driverDelegateClass", ConfigHelper.getString("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate"));
+        prop.setProperty(QUARTZ_JOBSTORE_DRIVER_DELEGATE_CLASS, ConfigHelper.getString(QUARTZ_JOBSTORE_DRIVER_DELEGATE_CLASS, "org.quartz.impl.jdbcjobstore.StdJDBCDelegate"));
 
-        prop.put("org.quartz.scheduler.instanceName", ConfigHelper.getString("org.quartz.scheduler.instanceName", "AdminProScheduler"));
-        prop.put("org.quartz.scheduler.instanceId", ConfigHelper.getString("org.quartz.scheduler.instanceId", "AUTO"));
+        prop.put(QUARTZ_SCHEDULER_INSTANCE_NAME, ConfigHelper.getString(QUARTZ_SCHEDULER_INSTANCE_NAME, "AdminProScheduler"));
+        prop.put(QUARTZ_SCHEDULER_INSTANCE_ID, ConfigHelper.getString(QUARTZ_SCHEDULER_INSTANCE_ID, "AUTO"));
         //线程池配置
-        prop.put("org.quartz.threadPool.class", ConfigHelper.getString("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool"));
-        prop.put("org.quartz.threadPool.threadCount", ConfigHelper.getString("org.quartz.threadPool.threadCount", "20"));
-        prop.put("org.quartz.threadPool.threadPriority", ConfigHelper.getString("org.quartz.threadPool.threadPriority", "5"));
+        prop.put(QUARTZ_THREADPOOL_CLASS, ConfigHelper.getString(QUARTZ_THREADPOOL_CLASS, "org.quartz.simpl.SimpleThreadPool"));
+        prop.put(QUARTZ_THREADPOOL_THREAD_COUNT, ConfigHelper.getString(QUARTZ_THREADPOOL_THREAD_COUNT, "20"));
+        prop.put(QUARTZ_THREADPOOL_THREAD_PRIORITY, ConfigHelper.getString(QUARTZ_THREADPOOL_THREAD_PRIORITY, "5"));
         //JobStore配置
-        prop.put("org.quartz.jobStore.class", ConfigHelper.getString("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX"));
+        prop.put(QUARTZ_JOBSTORE_CLASS, ConfigHelper.getString(QUARTZ_JOBSTORE_CLASS, "org.quartz.impl.jdbcjobstore.JobStoreTX"));
         //集群配置
-        prop.put("org.quartz.jobStore.isClustered", ConfigHelper.getString("org.quartz.jobStore.isClustered", "true"));
-        prop.put("org.quartz.jobStore.clusterCheckinInterval", ConfigHelper.getString("org.quartz.jobStore.clusterCheckinInterval", "15000"));
-        prop.put("org.quartz.jobStore.maxMisfiresToHandleAtATime", ConfigHelper.getString("org.quartz.jobStore.maxMisfiresToHandleAtATime", "1"));
+        prop.put(QUARTZ_JOBSTORE_IS_CLUSTERED, ConfigHelper.getString(QUARTZ_JOBSTORE_IS_CLUSTERED, "true"));
+        prop.put(QUARTZ_JOBSTORE_CLUSTER_CHECKIN_INTERVAL, ConfigHelper.getString(QUARTZ_JOBSTORE_CLUSTER_CHECKIN_INTERVAL, "15000"));
+        prop.put(QUARTZ_JOBSTORE_MAX_MISFIRES_TO_HANDLE_AT_A_TIME, ConfigHelper.getString(QUARTZ_JOBSTORE_MAX_MISFIRES_TO_HANDLE_AT_A_TIME, "1"));
 
-        prop.put("org.quartz.jobStore.misfireThreshold", ConfigHelper.getString("org.quartz.jobStore.misfireThreshold", "12000"));
-        prop.put("org.quartz.jobStore.tablePrefix", ConfigHelper.getString("org.quartz.jobStore.tablePrefix", "QRTZ_"));
+        prop.put(QUARTZ_JOBSTORE_MISFIRE_THRESHOLD, ConfigHelper.getString(QUARTZ_JOBSTORE_MISFIRE_THRESHOLD, "12000"));
+        prop.put(QUARTZ_JOBSTORE_TABLE_PREFIX, ConfigHelper.getString(QUARTZ_JOBSTORE_TABLE_PREFIX, "QRTZ_"));
 
-        prop.put("org.quartz.jobStore.dataSource", ConfigHelper.getString("org.quartz.jobStore.dataSource", "myDS"));
-        prop.put("org.quartz.threadPool.threadsInheritContextClassLoaderOfInitializingThread", ConfigHelper.getString("org.quartz.threadPool.threadsInheritContextClassLoaderOfInitializingThread", "true"));
-        prop.put("org.quartz.jobStore.useProperties", ConfigHelper.getString("org.quartz.jobStore.useProperties", "true"));
+        prop.put(QUARTZ_JOBSTORE_DATASOURCE, ConfigHelper.getString(QUARTZ_JOBSTORE_DATASOURCE, "myDS"));
+        prop.put(QUARTZ_THREADPOOL_THREADS_INHERIT_CONTEXT_CLASSLOADER, ConfigHelper.getString(QUARTZ_THREADPOOL_THREADS_INHERIT_CONTEXT_CLASSLOADER, "true"));
+        prop.put(QUARTZ_JOBSTORE_USE_PROPERTIES, ConfigHelper.getString(QUARTZ_JOBSTORE_USE_PROPERTIES, "true"));
 
         propertiesFactoryBean.setProperties(prop);
         try {

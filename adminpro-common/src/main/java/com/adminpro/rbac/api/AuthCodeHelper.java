@@ -16,8 +16,13 @@ import java.util.Date;
 public class AuthCodeHelper {
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    //一分钟后过期
-    private final static int EXPIRE = 1000 * 60 * RbacConstants.AUTH_CODE_EXPIRE_PERIOD;
+    /**
+     * 获取验证码过期时间（毫秒）
+     * 直接调用 RbacConstants.getAuthCodeExpirePeriod()，利用 ConfigHelper 的缓存机制
+     */
+    private static int getExpire() {
+        return 1000 * 60 * RbacConstants.getAuthCodeExpirePeriod();
+    }
 
     public static AuthCodeHelper getInstance() {
         return SpringUtil.getBean(AuthCodeHelper.class);
@@ -30,7 +35,7 @@ public class AuthCodeHelper {
             String code = StringHelper.getRandStr(6);
             entity.setCode(code);
             Date now = new Date();
-            Date expireTime = new Date(now.getTime() + EXPIRE);
+            Date expireTime = new Date(now.getTime() + getExpire());
             entity.setExpireTime(expireTime);
             entity.setMobileNo(mobileNo);
             logger.debug("send register code, " + "mobileNo(" + mobileNo + "), code(" + code + ");");
@@ -59,7 +64,7 @@ public class AuthCodeHelper {
             String code = StringHelper.getRandStr(6);
             entity.setCode(code);
             Date now = new Date();
-            Date expireTime = new Date(now.getTime() + EXPIRE);
+            Date expireTime = new Date(now.getTime() + getExpire());
             entity.setExpireTime(expireTime);
             entity.setMobileNo(mobileNo);
             logger.debug("send resetpwd code, " + "mobileNo(" + mobileNo + "), code(" + code + ");");
@@ -89,7 +94,7 @@ public class AuthCodeHelper {
             String code = StringHelper.getRandStr(6);
             entity.setCode(code);
             Date now = new Date();
-            Date expireTime = new Date(now.getTime() + EXPIRE);
+            Date expireTime = new Date(now.getTime() + getExpire());
             entity.setExpireTime(expireTime);
             entity.setMobileNo(mobileNo);
             entity.setType(type);

@@ -2,6 +2,8 @@ package com.adminpro.rbac.common;
 
 import com.adminpro.framework.common.helper.ConfigHelper;
 
+import static com.adminpro.framework.common.constants.ConfigKeys.*;
+
 /**
  * Created by simon on 2017/5/31.
  */
@@ -31,48 +33,105 @@ public class RbacConstants {
 
     /**
      * 默认的民族
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
      */
-    public static final String DEFAULT_NATION = ConfigHelper.getString("app.default.nation", "01");
+    public static String getDefaultNation() {
+        return ConfigHelper.getString(APP_DEFAULT_NATION, "01");
+    }
 
-    public static final String[] NEED_CHECK_CAPTURE_DOMAINS = ConfigHelper.getStringArray("app.check.capture.domains");
+    /**
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     */
+    public static String[] getNeedCheckCaptureDomains() {
+        return ConfigHelper.getStringArray(APP_CHECK_CAPTURE_DOMAINS);
+    }
 
     /**
      * 默认的国家
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
      */
-    public static final String DEFAULT_NATIONALITY = ConfigHelper.getString("app.default.nationality", "156");
+    public static String getDefaultNationality() {
+        return ConfigHelper.getString(APP_DEFAULT_NATIONALITY, "156");
+    }
+
     /**
      * 默认省
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
      */
-    public static final String DEFAULT_PROVINCE = ConfigHelper.getString("app.default.province", "320000");
+    public static String getDefaultProvince() {
+        return ConfigHelper.getString(APP_DEFAULT_PROVINCE, "320000");
+    }
+
     /**
      * 默认市
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
      */
-    public static final String DEFAULT_CITY = ConfigHelper.getString("app.default.city", "320500");
+    public static String getDefaultCity() {
+        return ConfigHelper.getString(APP_DEFAULT_CITY, "320500");
+    }
+
     /**
      * 默认区
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
      */
-    public static final String DEFAULT_DISTRICT = ConfigHelper.getString("app.default.district", "320506");
+    public static String getDefaultDistrict() {
+        return ConfigHelper.getString(APP_DEFAULT_DISTRICT, "320506");
+    }
+
     /**
      * 默认婚姻状态
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
      */
-    public static final String DEFAULT_MARITALSTATUS = ConfigHelper.getString("app.default.maritalstatus", "10");
+    public static String getDefaultMaritalstatus() {
+        return ConfigHelper.getString(APP_DEFAULT_MARITALSTATUS, "10");
+    }
+
     /**
      * 默认证件类型
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
      */
-    public static final String DEFAULT_CERTTYPE = ConfigHelper.getString("app.default.certtype", "1");
+    public static String getDefaultCerttype() {
+        return ConfigHelper.getString(APP_DEFAULT_CERTTYPE, "1");
+    }
+
     /**
      * 默认身份类别
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
      */
-    public static final String DEFAULT_IDTYPE = ConfigHelper.getString("app.default.idtype", "1");
+    public static String getDefaultIdtype() {
+        return ConfigHelper.getString(APP_DEFAULT_IDTYPE, "1");
+    }
 
     public static final String CLOUD_STORAGE_CONFIG = "ossconfig";
 
-    public static final String UPLOAD_PATH = ConfigHelper.getString("app.upload.dir", "/upload/");
+    /**
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     */
+    public static String getUploadPath() {
+        return ConfigHelper.getString(APP_UPLOAD_DIR, "/upload/");
+    }
 
-    public static final String DEPLOYMENT_MODE = ConfigHelper.getString("app.deployment.mode", "prod");
-    public static final int AUTH_CODE_EXPIRE_PERIOD = ConfigHelper.getInt("app.auth.code.expire.period", 5);
+    /**
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     */
+    public static String getDeploymentMode() {
+        return ConfigHelper.getString(APP_DEPLOYMENT_MODE, "prod");
+    }
 
-    public static final String DEPT_SUPER_PARENT_ID = ConfigHelper.getString("app.dept.super.parent.id", "0");
+    /**
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     */
+    public static int getAuthCodeExpirePeriod() {
+        return ConfigHelper.getInt(APP_AUTH_CODE_EXPIRE_PERIOD, 5);
+    }
+
+    /**
+     * 直接调用 ConfigHelper，利用其内部的缓存机制（@Cacheable）
+     */
+    public static String getDeptSuperParentId() {
+        return ConfigHelper.getString(APP_DEPT_SUPER_PARENT_ID, "0");
+    }
+
 
     /**
      * 云服务商

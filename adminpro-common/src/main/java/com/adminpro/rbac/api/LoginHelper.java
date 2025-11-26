@@ -196,7 +196,7 @@ public class LoginHelper {
     }
 
     public boolean needCheckCapture(String userDomain) {
-        return ArrayUtils.contains(RbacConstants.NEED_CHECK_CAPTURE_DOMAINS, userDomain);
+        return ArrayUtils.contains(RbacConstants.getNeedCheckCaptureDomains(), userDomain);
     }
 
     public LoginUser getLoginUser() {

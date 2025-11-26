@@ -167,7 +167,7 @@ public class DeptService extends BaseService<DeptEntity, String> {
         if (parent != null) {
             entity.setAncestors(parent.getAncestors() + "," + entity.getParentId());
         } else {
-            entity.setAncestors(RbacConstants.DEPT_SUPER_PARENT_ID);
+            entity.setAncestors(RbacConstants.getDeptSuperParentId());
         }
         super.create(entity);
     }

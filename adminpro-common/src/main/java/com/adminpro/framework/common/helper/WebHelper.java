@@ -532,7 +532,7 @@ public class WebHelper {
     }
 
     public static boolean isDevModel() {
-        return StringUtils.equalsIgnoreCase(RbacConstants.DEPLOYMENT_MODE, "dev");
+        return StringUtils.equalsIgnoreCase(RbacConstants.getDeploymentMode(), "dev");
     }
 
     public static final String getUserAgent(HttpServletRequest request) {

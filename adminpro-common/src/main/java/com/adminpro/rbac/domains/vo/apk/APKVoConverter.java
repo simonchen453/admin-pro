@@ -22,7 +22,7 @@ public class APKVoConverter implements IModelConverter<APKEntity, APKVO> {
         aPKVo.setVerCode(apk.getVerCode());
         aPKVo.setOsVersion(apk.getOsVersion());
         HttpServletRequest request = WebHelper.getHttpRequest();
-        aPKVo.setDownloadUrl(WebConstants.SERVER_ADDRESS + request.getContextPath() + "/upload/" + apk.getDownloadUrl());
+        aPKVo.setDownloadUrl(WebConstants.getServerAddress() + request.getContextPath() + "/upload/" + apk.getDownloadUrl());
         aPKVo.setMessage(apk.getMessage());
         return aPKVo;
     }

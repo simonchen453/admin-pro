@@ -361,7 +361,8 @@ const UserForm: React.FC<UserFormProps> = ({
           >
             <Select placeholder="请选择状态" allowClear>
               <Option value={UserStatus.ACTIVE}>正常</Option>
-              <Option value={UserStatus.LOCK}>锁定</Option>
+              <Option value={UserStatus.INACTIVE}>停用</Option>
+              <Option value={UserStatus.LOCKED}>锁定</Option>
             </Select>
           </Form.Item>
         </Col>

@@ -9,17 +9,17 @@ import java.util.*;
  */
 public enum UserStatus {
     /**
-     * 注册中
-     */
-    NEW("0", "注册中"),
-    /**
      * 正常
      */
-    ACTIVE("20", "正常"),
+    ACTIVE("active", "正常"),
     /**
      * 停用
      */
-    LOCK("30", "停用");
+    INACTIVE("inactive", "停用"),
+    /**
+     * 锁定
+     */
+    LOCKED("locked", "锁定");
 
     private String code;
     private String desc;

@@ -92,13 +92,13 @@ public class LoginHelper {
         if (authentication == null || userDetails == null) {
             return "no_match";
         }
-        if (StringHelper.equals(userDetails.getStatus(), UserStatus.NEW.getCode())) {
-            logger.error("用户{0}, 账户等待激活", userIden.toSecurityUsername());
-            return "pending_active";
-        }
-        if (StringHelper.equals(userDetails.getStatus(), UserStatus.LOCK.getCode())) {
+        if (StringHelper.equals(userDetails.getStatus(), UserStatus.LOCKED.getCode())) {
             logger.error("用户{0}, 账户锁定", userIden.toSecurityUsername());
             return "user_locked";
+        }
+        if (StringHelper.equals(userDetails.getStatus(), UserStatus.INACTIVE.getCode())) {
+            logger.error("用户{0}, 账户停用", userIden.toSecurityUsername());
+            return "user_inactive";
         }
 
         if (UserLoginPlatform.INTERNET.getCode().equals(platform) && !isInternetUser(userIden.getUserDomain())

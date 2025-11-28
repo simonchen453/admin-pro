@@ -110,3 +110,92 @@ export const getDomainListApi = async (): Promise<Array<{ id: string; name: stri
   const response = await request.get<ApiResponse<Array<{ id: string; name: string;display: string }>>>('/common/domains');
   return response.data;
 };
+
+// 导入用户
+export const importUserApi = async (file: File): Promise<ApiResponse> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await request.post<ApiResponse>('/admin/user/import', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response;
+};
+
+// 导出用户（根据选中的用户ID）
+export const exportUserApi = async (userIds: string): Promise<void> => {
+  const axios = (await import('axios')).default;
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE || '/api'}/admin/user/export?ids=${userIds}`, {
+      responseType: 'blob',
+      withCredentials: true,
+    });
+    
+    if (response.data.type === 'application/json') {
+      const text = await response.data.text();
+      const errorData = JSON.parse(text);
+      throw new Error(errorData.message || '导出失败');
+    }
+    
+    const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `用户数据_${new Date().getTime()}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error: any) {
+    if (error.response?.data?.type === 'application/json') {
+      const text = await error.response.data.text();
+      const errorData = JSON.parse(text);
+      throw new Error(errorData.message || '导出失败');
+    }
+    throw error;
+  }
+};
+
+// 导出所有用户（根据当前搜索条件）
+export const exportAllUserApi = async (searchForm: UserSearchForm): Promise<void> => {
+  const axios = (await import('axios')).default;
+  const params = new URLSearchParams();
+  if (searchForm.userDomain) params.append('userDomain', searchForm.userDomain);
+  if (searchForm.loginName) params.append('loginName', searchForm.loginName);
+  if (searchForm.realName) params.append('realName', searchForm.realName);
+  if (searchForm.status) params.append('status', searchForm.status);
+  if (searchForm.deptId) params.append('deptId', searchForm.deptId);
+  if (searchForm.page) params.append('page', searchForm.page.toString());
+  if (searchForm.pageSize) params.append('pageSize', searchForm.pageSize.toString());
+  
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE || '/api'}/admin/user/excelAll?${params.toString()}`, {
+      responseType: 'blob',
+      withCredentials: true,
+    });
+    
+    if (response.data.type === 'application/json') {
+      const text = await response.data.text();
+      const errorData = JSON.parse(text);
+      throw new Error(errorData.message || '导出失败');
+    }
+    
+    const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `用户数据_${new Date().getTime()}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error: any) {
+    if (error.response?.data?.type === 'application/json') {
+      const text = await error.response.data.text();
+      const errorData = JSON.parse(text);
+      throw new Error(errorData.message || '导出失败');
+    }
+    throw error;
+  }
+};

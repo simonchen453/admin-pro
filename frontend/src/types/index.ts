@@ -325,8 +325,9 @@ export const PostStatus = {
 
 // 用户状态常量
 export const UserStatus = {
-  ACTIVE: '20',
-  LOCK: '30'
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  LOCKED: 'locked'
 } as const;
 
 // 角色状态常量

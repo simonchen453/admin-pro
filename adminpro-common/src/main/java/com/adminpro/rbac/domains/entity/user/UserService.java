@@ -1,6 +1,7 @@
 package com.adminpro.rbac.domains.entity.user;
 
 import com.adminpro.core.base.entity.BaseService;
+import com.adminpro.core.base.util.IdGenerator;
 import com.adminpro.core.base.util.SpringUtil;
 import com.adminpro.core.exceptions.BaseRuntimeException;
 import com.adminpro.core.jdbc.SearchParam;
@@ -8,6 +9,9 @@ import com.adminpro.core.jdbc.query.QueryResultSet;
 import com.adminpro.framework.cache.AppCache;
 import com.adminpro.framework.common.helper.ConfigHelper;
 import com.adminpro.framework.common.helper.WebHelper;
+import com.adminpro.rbac.domains.vo.user.UserExportVo;
+import com.adminpro.rbac.domains.vo.user.UserImportVo;
+import com.adminpro.rbac.enums.UserStatus;
 import com.adminpro.framework.security.auth.TokenGenerator;
 import com.adminpro.rbac.api.PasswordHelper;
 import com.adminpro.rbac.common.RbacCacheConstants;
@@ -16,6 +20,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
+import org.apache.poi.ss.usermodel.Workbook;
+
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import java.util.List;
 
@@ -181,5 +194,140 @@ public class UserService extends BaseService<UserEntity, UserIden> {
         UserEntity userEntity = UserService.getInstance().findById(userIden);
         String encryptPwd = PasswordHelper.encryptPwd(userIden, password);
         return StringUtils.equals(encryptPwd, userEntity.getPassword());
+    }
+
+    @Transactional
+    public void importExcel(List<UserImportVo> importList) {
+        for (UserImportVo importVo : importList) {
+            if (StringUtils.isEmpty(importVo.getUserDomain()) || StringUtils.isEmpty(importVo.getLoginName())) {
+                continue;
+            }
+            UserEntity existingUser = findByUserDomainAndLoginName(importVo.getUserDomain(), importVo.getLoginName());
+            if (existingUser == null) {
+                UserEntity user = new UserEntity();
+                user.setUserIden(new UserIden(importVo.getUserDomain(), IdGenerator.getInstance().nextStringId()));
+                user.setUserDomain(importVo.getUserDomain());
+                user.setLoginName(importVo.getLoginName());
+                user.setRealName(importVo.getRealName());
+                user.setDisplay(StringUtils.isNotEmpty(importVo.getDisplay()) ? importVo.getDisplay() : importVo.getRealName());
+                user.setEmail(importVo.getEmail());
+                user.setMobileNo(importVo.getMobileNo());
+                user.setStatus(StringUtils.isNotEmpty(importVo.getStatus()) ? importVo.getStatus() : UserStatus.ACTIVE.getCode());
+                user.setSex(importVo.getSex());
+                user.setDescription(importVo.getDescription());
+                user.setDeptNo(importVo.getDeptNo());
+                user.setJobNo(importVo.getJobNo());
+                user.setAddress(importVo.getAddress());
+                user.setBirthday(importVo.getBirthday());
+                user.setIdNo(importVo.getIdNo());
+                
+                if (StringUtils.isNotEmpty(importVo.getPassword())) {
+                    user.setPassword(importVo.getPassword());
+                } else {
+                    user.setPassword(ConfigHelper.getString(RbacConstants.USER_DEFAULT_PASSWORD));
+                }
+                create(user);
+            } else {
+                if (StringUtils.isNotEmpty(importVo.getRealName())) {
+                    existingUser.setRealName(importVo.getRealName());
+                }
+                if (StringUtils.isNotEmpty(importVo.getDisplay())) {
+                    existingUser.setDisplay(importVo.getDisplay());
+                }
+                if (StringUtils.isNotEmpty(importVo.getEmail())) {
+                    existingUser.setEmail(importVo.getEmail());
+                }
+                if (StringUtils.isNotEmpty(importVo.getMobileNo())) {
+                    existingUser.setMobileNo(importVo.getMobileNo());
+                }
+                if (StringUtils.isNotEmpty(importVo.getStatus())) {
+                    existingUser.setStatus(importVo.getStatus());
+                }
+                if (StringUtils.isNotEmpty(importVo.getDescription())) {
+                    existingUser.setDescription(importVo.getDescription());
+                }
+                if (StringUtils.isNotEmpty(importVo.getSex())) {
+                    existingUser.setSex(importVo.getSex());
+                }
+                if (StringUtils.isNotEmpty(importVo.getDeptNo())) {
+                    existingUser.setDeptNo(importVo.getDeptNo());
+                }
+                if (StringUtils.isNotEmpty(importVo.getJobNo())) {
+                    existingUser.setJobNo(importVo.getJobNo());
+                }
+                if (StringUtils.isNotEmpty(importVo.getAddress())) {
+                    existingUser.setAddress(importVo.getAddress());
+                }
+                if (importVo.getBirthday() != null) {
+                    existingUser.setBirthday(importVo.getBirthday());
+                }
+                if (StringUtils.isNotEmpty(importVo.getIdNo())) {
+                    existingUser.setIdNo(importVo.getIdNo());
+                }
+                if (StringUtils.isNotEmpty(importVo.getPassword())) {
+                    String encryptPwd = PasswordHelper.encryptPwd(existingUser.getUserIden(), importVo.getPassword());
+                    existingUser.setPassword(encryptPwd);
+                }
+                update(existingUser);
+            }
+        }
+    }
+
+    public void exportExcel(HttpServletResponse response, List<UserEntity> list) throws Exception {
+        Workbook book = generateWorkbook(list);
+
+        response.reset();
+        response.setContentType("application/x-msdownload");
+        String fileName = "用户数据";
+        fileName = fileName + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        response.setHeader("Content-disposition", "attachment; filename=" + new String(fileName.getBytes("gb2312"), "ISO-8859-1") + ".xls");
+        ServletOutputStream outStream = null;
+        try {
+            outStream = response.getOutputStream();
+            book.write(outStream);
+        } finally {
+            book.close();
+            if (outStream != null) {
+                outStream.close();
+            }
+        }
+    }
+
+    private Workbook generateWorkbook(List<UserEntity> list) {
+        List<UserExportVo> exportList = convertToExportVo(list);
+        ExportParams params = new ExportParams();
+        params.setSheetName("用户数据");
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("title", params);
+        dataMap.put("entity", UserExportVo.class);
+        dataMap.put("data", exportList);
+        List<Map<String, Object>> sheetsList = new ArrayList<>();
+        sheetsList.add(dataMap);
+        return ExcelExportUtil.exportExcel(sheetsList, ExcelType.HSSF);
+    }
+
+    private List<UserExportVo> convertToExportVo(List<UserEntity> list) {
+        List<UserExportVo> exportList = new ArrayList<>();
+        for (UserEntity user : list) {
+            UserExportVo vo = new UserExportVo();
+            vo.setUserDomain(user.getUserDomain());
+            vo.setLoginName(user.getLoginName());
+            vo.setRealName(user.getRealName());
+            vo.setDisplay(user.getDisplay());
+            vo.setMobileNo(user.getMobileNo());
+            vo.setEmail(user.getEmail());
+            vo.setStatus(user.getStatus());
+            vo.setSex(user.getSex());
+            vo.setDescription(user.getDescription());
+            vo.setDeptNo(user.getDeptNo());
+            vo.setJobNo(user.getJobNo());
+            vo.setAddress(user.getAddress());
+            vo.setBirthday(user.getBirthday());
+            vo.setIdNo(user.getIdNo());
+            vo.setLatestLoginTime(user.getLatestLoginTime());
+            vo.setCreatedDate(user.getCreatedDate());
+            exportList.add(vo);
+        }
+        return exportList;
     }
 }

@@ -71,8 +71,8 @@ const UserDetail: React.FC = () => {
   const getStatusTag = (status: string) => {
     const statusMap = {
       [UserStatus.ACTIVE]: { color: 'green', text: '正常' },
-      [UserStatus.LOCK]: { color: 'red', text: '锁定' },
-      [UserStatus.INACTIVE]: { color: 'orange', text: '停用' }
+      [UserStatus.INACTIVE]: { color: 'orange', text: '停用' },
+      [UserStatus.LOCKED]: { color: 'red', text: '锁定' }
     };
     const statusInfo = statusMap[status as UserStatus] || { color: 'default', text: status };
     return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>;

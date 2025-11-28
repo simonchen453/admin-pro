@@ -26,7 +26,9 @@ import {
   SearchOutlined,
   ClearOutlined,
   DeleteOutlined,
-  HomeOutlined
+  HomeOutlined,
+  UploadOutlined,
+  DownloadOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +40,10 @@ import {
   getDeptTreeSelectApi,
   getDomainListApi,
   deleteUserApi,
-  resetPasswordApi
+  resetPasswordApi,
+  importUserApi,
+  exportUserApi,
+  exportAllUserApi
 } from '../../api/user';
 import type {
   UserEntity,
@@ -71,6 +76,7 @@ const UserList: React.FC = () => {
   const [resetModalVisible, setResetModalVisible] = useState(false);
   const [resetTargetUser, setResetTargetUser] = useState<UserEntity | null>(null);
   const [resetLoading, setResetLoading] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
   
   // 下拉选项数据
   const [deptTreeData, setDeptTreeData] = useState<DeptTreeNode[]>([]);
@@ -370,6 +376,69 @@ const UserList: React.FC = () => {
     });
   };
 
+  // 导入用户
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xls,.xlsx';
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) {
+        return;
+      }
+      setImportLoading(true);
+      try {
+        const response = await importUserApi(file);
+        if (response.restCode === '200' || response.restCode === '0') {
+          message.success('用户导入成功');
+          fetchUserList(searchForm);
+        } else {
+          message.error(response.message || '用户导入失败');
+        }
+      } catch (error: any) {
+        console.error('导入失败:', error);
+        const errorMessage = error?.response?.data?.message || '用户导入失败';
+        message.error(errorMessage);
+      } finally {
+        setImportLoading(false);
+      }
+    };
+    input.click();
+  };
+
+  // 导出用户（选中）
+  const handleExport = async () => {
+    if (selectedUsers.length === 0) {
+      message.warning('请选择要导出的用户');
+      return;
+    }
+    try {
+      let ids = '';
+      for (let i = 0; i < selectedUsers.length; i++) {
+        ids += selectedUsers[i].userIden.userDomain + '_' + selectedUsers[i].userIden.userId + ',';
+      }
+      if (ids.indexOf(',') !== -1) {
+        ids = ids.slice(0, ids.length - 1);
+      }
+      await exportUserApi(ids);
+      message.success('用户导出成功');
+    } catch (error) {
+      console.error('导出失败:', error);
+      message.error('用户导出失败');
+    }
+  };
+
+  // 导出所有用户
+  const handleExportAll = async () => {
+    try {
+      await exportAllUserApi(searchForm);
+      message.success('用户导出成功');
+    } catch (error) {
+      console.error('导出失败:', error);
+      message.error('用户导出失败');
+    }
+  };
+
   // 行选择
   const rowSelection = {
     selectedRowKeys,
@@ -386,7 +455,8 @@ const UserList: React.FC = () => {
   const getStatusTag = (status: string) => {
     const statusMap: Record<string, { color: string; text: string }> = {
       [UserStatus.ACTIVE]: { color: 'green', text: '正常' },
-      [UserStatus.LOCK]: { color: 'red', text: '锁定' },
+      [UserStatus.INACTIVE]: { color: 'orange', text: '停用' },
+      [UserStatus.LOCKED]: { color: 'red', text: '锁定' },
     };
     const statusInfo = statusMap[status] || { color: 'default', text: status };
     return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>;
@@ -473,7 +543,16 @@ const UserList: React.FC = () => {
           >
             重置密码
           </Button>
-          {record.status === UserStatus.LOCK ? (
+          {record.status === UserStatus.LOCKED ? (
+            <Button
+              size="small"
+              icon={<UserAddOutlined />}
+              onClick={() => handleActive(record)}
+              type="primary"
+            >
+              启用
+            </Button>
+          ) : record.status === UserStatus.INACTIVE ? (
             <Button
               size="small"
               icon={<UserAddOutlined />}
@@ -645,7 +724,8 @@ const UserList: React.FC = () => {
                     <Form.Item name="status" label="状态">
                       <Select placeholder="请选择状态" allowClear style={{ width: '100%' }}>
                         <Option value={UserStatus.ACTIVE}>正常</Option>
-                        <Option value={UserStatus.LOCK}>锁定</Option>
+                        <Option value={UserStatus.INACTIVE}>停用</Option>
+                        <Option value={UserStatus.LOCKED}>锁定</Option>
                       </Select>
                     </Form.Item>
                   </Col>
@@ -679,6 +759,26 @@ const UserList: React.FC = () => {
                   onClick={handleBatchDelete}
                 >
                   删除
+                </Button>
+                <Button 
+                  icon={<UploadOutlined />} 
+                  onClick={handleImport}
+                  loading={importLoading}
+                >
+                  导入
+                </Button>
+                <Button 
+                  icon={<DownloadOutlined />} 
+                  disabled={selectedUsers.length === 0}
+                  onClick={handleExport}
+                >
+                  导出选中
+                </Button>
+                <Button 
+                  icon={<DownloadOutlined />} 
+                  onClick={handleExportAll}
+                >
+                  导出全部
                 </Button>
               </Space>
               <div>

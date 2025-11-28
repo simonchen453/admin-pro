@@ -10,6 +10,7 @@ import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.core.jdbc.query.QueryResultSet;
 import com.adminpro.framework.common.BaseRoutingController;
 import com.adminpro.framework.common.annotation.SysLog;
+import com.adminpro.framework.common.helper.ExcelHelper;
 import com.adminpro.framework.common.helper.UploadDownloadHelper;
 import com.adminpro.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.rbac.domains.entity.dept.DeptService;
@@ -28,6 +29,7 @@ import com.adminpro.rbac.domains.entity.userrole.UserRoleAssignEntity;
 import com.adminpro.rbac.domains.entity.userrole.UserRoleAssignService;
 import com.adminpro.rbac.domains.vo.user.*;
 import com.adminpro.rbac.enums.UserStatus;
+import com.adminpro.rbac.domains.vo.user.UserImportVo;
 import com.adminpro.tools.domains.entity.oss.OSSEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import cn.afterturn.easypoi.excel.entity.ImportParams;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -139,7 +143,7 @@ public class UserController extends BaseRoutingController {
     public R inactive(@PathVariable String userDomain, @PathVariable String userId) {
         UserEntity userEntity = userService.findByUserDomainAndUserId(userDomain, userId);
         if (userEntity != null) {
-            userEntity.setStatus(UserStatus.LOCK.getCode());
+            userEntity.setStatus(UserStatus.INACTIVE.getCode());
             userService.update(userEntity);
             return R.ok();
         } else {
@@ -402,6 +406,76 @@ public class UserController extends BaseRoutingController {
             logger.error(e.getMessage(), e);
             return R.error(e);
         }
+    }
+
+    @SysLog("导入用户")
+    @RequestMapping(value = "/import", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
+    public R importUser(@RequestParam("file") MultipartFile file) {
+        try {
+            ImportParams params = new ImportParams();
+            params.setTitleRows(0);
+            params.setHeadRows(1);
+            List<UserImportVo> importList = ExcelHelper.importExcel(file.getInputStream(), UserImportVo.class, params);
+            userService.importExcel(importList);
+            return R.ok();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return R.error("导入失败：" + e.getMessage());
+        }
+    }
+
+    @SysLog("导出用户")
+    @RequestMapping(value = "/export", method = RequestMethod.GET)
+    @ResponseBody
+    public void exportUser(@RequestParam(required = false) String ids, HttpServletResponse response) throws Exception {
+        List<UserEntity> list = new ArrayList<>();
+        if (StringUtils.isNotEmpty(ids)) {
+            String[] userDomainIdArray = StringUtils.split(ids, ",");
+            for (String userDomainId : userDomainIdArray) {
+                String[] split = userDomainId.split("_");
+                if (split.length == 2) {
+                    UserEntity userEntity = userService.findByUserDomainAndUserId(split[0], split[1]);
+                    if (userEntity != null) {
+                        list.add(userEntity);
+                    }
+                }
+            }
+        }
+        userService.exportExcel(response, list);
+    }
+
+    @SysLog("导出所有用户")
+    @RequestMapping(value = "/excelAll", method = RequestMethod.GET)
+    @ResponseBody
+    public void exportAllUser(SearchForm searchForm, HttpServletResponse response) throws Exception {
+        BeanUtil.beanAttributeValueTrim(searchForm);
+        String status = searchForm.getStatus();
+        String loginName = searchForm.getLoginName();
+        String realName = searchForm.getRealName();
+        String userDomain = searchForm.getUserDomain();
+        String deptId = searchForm.getDeptId();
+
+        SearchParam param = startPaging(searchForm);
+        setSearchForm(request, searchForm);
+        if (StringUtils.isNotEmpty(userDomain)) {
+            param.addFilter("userDomain", userDomain);
+        }
+        if (StringUtils.isNotEmpty(loginName)) {
+            param.addFilter("loginName", loginName);
+        }
+        if (StringUtils.isNotEmpty(realName)) {
+            param.addFilter("realName", realName);
+        }
+        if (StringUtils.isNotEmpty(status)) {
+            param.addFilter("status", status);
+        }
+        if (StringUtils.isNotEmpty(deptId)) {
+            param.addFilter("deptId", deptId);
+        }
+
+        List<UserEntity> list = userService.findByParam(param);
+        userService.exportExcel(response, list);
     }
 
     public static class SearchForm extends BaseSearchForm {

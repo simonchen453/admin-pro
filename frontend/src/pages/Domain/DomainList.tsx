@@ -130,7 +130,7 @@ const DomainList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 120,
       render: (_, record: DomainEntity) => (
         <Space size="small">
           <Button

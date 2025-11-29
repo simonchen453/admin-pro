@@ -288,7 +288,7 @@ const RoleList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 180,
       render: (_, record: RoleEntity) => (
         <Space size="small">
           <Button

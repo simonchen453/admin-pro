@@ -286,7 +286,7 @@ const SessionList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 180,
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">

@@ -337,7 +337,7 @@ const JobList: React.FC = () => {
       title: '操作',
       key: 'action',
       fixed: 'right',
-      width: 300,
+      width: 280,
       render: (_, record: JobEntity) => (
         <Space size="small">
           {record.status === JobStatus.NORMAL && (

@@ -238,7 +238,7 @@ const SysLogList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 100,
+      width: 150,
       fixed: 'right',
       render: (_, record: SysLogEntity) => (
         <Space size="small">

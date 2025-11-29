@@ -251,7 +251,7 @@ const PostList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 150,
       render: (_, record: PostEntity) => (
         <Space size="small">
           <Button

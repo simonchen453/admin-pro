@@ -19,13 +19,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
 
-@Controller
+@RestController
 @RequestMapping("/admin/job")
 @PreAuthorize("@ss.hasPermission('system:job')")
 public class JobController extends BaseRoutingController {
@@ -49,20 +48,7 @@ public class JobController extends BaseRoutingController {
     @Autowired
     private JobUpdateValidator jobUpdateValidator;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public String jobList() {
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public String list() {
-        prepareData();
-        getSearchForm(request);
-        return PREFIX + "/list";
-    }
-
     @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R<QueryResultSet<ListRoleVo>> paging(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String condition = searchForm.getCondition();
@@ -76,7 +62,6 @@ public class JobController extends BaseRoutingController {
     }
 
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R create(@RequestBody JobVo jobVo) {
         BeanUtil.beanAttributeValueTrim(jobVo);
         MessageBundle bundle = getMessageBundle();
@@ -94,7 +79,6 @@ public class JobController extends BaseRoutingController {
     }
 
     @RequestMapping(method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R update(@RequestBody JobVo jobVo) {
         BeanUtil.beanAttributeValueTrim(jobVo);
         MessageBundle bundle = getMessageBundle();
@@ -114,7 +98,6 @@ public class JobController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R deleteMany(@RequestParam String ids) {
         try {
             scheduleJobService.deleteMany(ids);
@@ -125,7 +108,6 @@ public class JobController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/detail/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    @ResponseBody
     public R detail(@PathVariable String id) {
         ScheduleJobEntity entity = scheduleJobService.findById(id);
         JobVo convert = jobVoConverter.convert(entity);
@@ -133,7 +115,6 @@ public class JobController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/run", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R run(@RequestBody String ids) {
         try {
             String[] split = ids.split(",");
@@ -147,7 +128,6 @@ public class JobController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/pause", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R pause(@RequestBody String ids) {
         try {
             String[] split = ids.split(",");
@@ -161,7 +141,6 @@ public class JobController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/resume", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R resume(@RequestBody String ids) {
         try {
             String[] split = ids.split(",");
@@ -174,15 +153,7 @@ public class JobController extends BaseRoutingController {
         return R.ok();
     }
 
-    @RequestMapping(value = "/log", method = RequestMethod.GET)
-    public String jobLogs() {
-        prepareData();
-        getSearchForm(request);
-        return PREFIX + "/log";
-    }
-
     @RequestMapping(value = "/log/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R<QueryResultSet<ListRoleVo>> logs(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String condition = searchForm.getCondition();
@@ -196,7 +167,6 @@ public class JobController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/log/delete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R deleteManyLogs(@RequestParam String ids) {
         try {
             scheduleJobLogService.deleteMany(ids);
@@ -207,7 +177,6 @@ public class JobController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/log/delete/all", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R deleteAllLogs() {
         try {
             scheduleJobLogService.deleteByBeanName("");
@@ -218,7 +187,6 @@ public class JobController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/nextTime", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R<Date> getNextValidTime() {
         String cronExpression = request.getParameter("cronExpression");
         Date nextExecution = CronUtils.getNextExecution(cronExpression);

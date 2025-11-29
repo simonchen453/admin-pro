@@ -14,7 +14,6 @@ import com.adminpro.rbac.domains.entity.menu.MenuUpdateValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +24,7 @@ import java.util.List;
  * @author simon
  * @date 2020-05-21
  */
-@Controller
+@RestController
 @RequestMapping("/admin/menu")
 @PreAuthorize("@ss.hasPermission('system:menu')")
 public class MenuController extends BaseRoutingController {
@@ -42,24 +41,10 @@ public class MenuController extends BaseRoutingController {
     @Autowired
     private MenuUpdateValidator menuUpdateValidator;
 
-    @GetMapping()
-    public String prepareList() {
-        cleanSearchForm();
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String menu() {
-        prepareData();
-        getSearchForm();
-        return PREFIX + "/list";
-    }
-
     /**
      * 查询菜单权限列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<List<MenuEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -84,7 +69,6 @@ public class MenuController extends BaseRoutingController {
      * 查询菜单详情
      */
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @ResponseBody
     public R<List<MenuEntity>> detail(@PathVariable String id) {
         MenuEntity entity = menuService.findById(id);
         if (entity != null) {
@@ -100,7 +84,6 @@ public class MenuController extends BaseRoutingController {
      */
     @SysLog("删除菜单")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    @ResponseBody
     public R<List<MenuEntity>> delete(@PathVariable String id) {
         MenuEntity entity = menuService.findById(id);
         if (entity != null) {
@@ -115,7 +98,6 @@ public class MenuController extends BaseRoutingController {
      */
     @SysLog("创建菜单")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    @ResponseBody
     public R create(@RequestBody MenuEntity menu) {
         BeanUtil.beanAttributeValueTrim(menu);
         MessageBundle messageBundle = getMessageBundle();
@@ -160,7 +142,6 @@ public class MenuController extends BaseRoutingController {
      */
     @SysLog("更新菜单")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    @ResponseBody
     public R editSave(@RequestBody MenuEntity menu) {
         BeanUtil.beanAttributeValueTrim(menu);
         MessageBundle messageBundle = getMessageBundle();
@@ -207,7 +188,6 @@ public class MenuController extends BaseRoutingController {
      */
     @SysLog("批量删除菜单")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @ResponseBody
     public R remove(@RequestParam("ids") String ids) {
         menuService.deleteByIds(ids);
         return R.ok();

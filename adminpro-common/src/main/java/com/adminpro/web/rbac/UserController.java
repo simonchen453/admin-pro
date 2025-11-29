@@ -35,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Controller
+@RestController
 @RequestMapping("/admin/user")
 @PreAuthorize("@ss.hasPermission('system:user')")
 public class UserController extends BaseRoutingController {
@@ -87,23 +86,7 @@ public class UserController extends BaseRoutingController {
     @Autowired
     private DomainService domainService;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public String user() {
-        cleanSearchForm(request);
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public String user_list() {
-        prepareData();
-        getSearchForm(request);
-        List<DomainEntity> all = domainService.findAll();
-        request.setAttribute("domains", all);
-        return PREFIX + "/list";
-    }
-
     @RequestMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-    @ResponseBody
     public R<QueryResultSet<UserListResponseVo>> search(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String status = searchForm.getStatus();
@@ -139,7 +122,6 @@ public class UserController extends BaseRoutingController {
 
     @SysLog("停用用户")
     @RequestMapping(value = "/inactive/{userDomain}/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
-    @ResponseBody
     public R inactive(@PathVariable String userDomain, @PathVariable String userId) {
         UserEntity userEntity = userService.findByUserDomainAndUserId(userDomain, userId);
         if (userEntity != null) {
@@ -153,7 +135,6 @@ public class UserController extends BaseRoutingController {
 
     @SysLog("激活用户")
     @RequestMapping(value = "/active/{userDomain}/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
-    @ResponseBody
     public R active(@PathVariable("userDomain") String userDomain, @PathVariable("userId") String userId) {
         UserEntity userEntity = userService.findByUserDomainAndUserId(userDomain, userId);
         if (userEntity != null) {
@@ -167,7 +148,6 @@ public class UserController extends BaseRoutingController {
 
     @SysLog("重置用户密码")
     @RequestMapping(value = "/resetpwd", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R resetPwd(@RequestBody UserResetPwdRequestVo userResetPwdRequestVo) {
         BeanUtil.beanAttributeValueTrim(userResetPwdRequestVo);
         String userId = userResetPwdRequestVo.getUserId();
@@ -201,7 +181,6 @@ public class UserController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/detail/{userDomain}/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    @ResponseBody
     public R<UserDetailVO> view(@PathVariable String userDomain, @PathVariable String userId) {
         UserEntity userEntity = userService.findByUserDomainAndUserId(userDomain, userId);
         UserDetailVO sysUserResponseVo = new UserDetailVO();
@@ -249,7 +228,6 @@ public class UserController extends BaseRoutingController {
 
     @SysLog("删除用户")
     @RequestMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
-    @ResponseBody
     public R deleteMany(@RequestParam String users) {
         try {
             userService.deleteMany(users);
@@ -260,7 +238,6 @@ public class UserController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/prepare", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    @ResponseBody
     public R<Map<String, Object>> prepare() {
         Map<String, Object> map = new HashMap<>();
         SearchParam postSearchParam = startPaging();
@@ -276,7 +253,6 @@ public class UserController extends BaseRoutingController {
 
     @SysLog("创建用户")
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
-    @ResponseBody
     @Transactional
     public R create(@RequestBody UserCreateVo userRequestVo) {
         BeanUtil.beanAttributeValueTrim(userRequestVo);
@@ -337,7 +313,6 @@ public class UserController extends BaseRoutingController {
 
     @SysLog("更新用户")
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
-    @ResponseBody
     @Transactional
     public R update(@RequestBody UserCreateVo userRequestVo) {
         BeanUtil.beanAttributeValueTrim(userRequestVo);
@@ -397,7 +372,6 @@ public class UserController extends BaseRoutingController {
 
     @SysLog("用户头像上传")
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
     public R uploadFile(@RequestParam MultipartFile file, MultipartHttpServletRequest multipartRequest) {
         try {
             OSSEntity upload = uploadDownloadHelper.uploadOssFile(file);
@@ -410,7 +384,6 @@ public class UserController extends BaseRoutingController {
 
     @SysLog("导入用户")
     @RequestMapping(value = "/import", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
     public R importUser(@RequestParam("file") MultipartFile file) {
         try {
             ImportParams params = new ImportParams();
@@ -427,7 +400,6 @@ public class UserController extends BaseRoutingController {
 
     @SysLog("导出用户")
     @RequestMapping(value = "/export", method = RequestMethod.GET)
-    @ResponseBody
     public void exportUser(@RequestParam(required = false) String ids, HttpServletResponse response) throws Exception {
         List<UserEntity> list = new ArrayList<>();
         if (StringUtils.isNotEmpty(ids)) {
@@ -447,7 +419,6 @@ public class UserController extends BaseRoutingController {
 
     @SysLog("导出所有用户")
     @RequestMapping(value = "/excelAll", method = RequestMethod.GET)
-    @ResponseBody
     public void exportAllUser(SearchForm searchForm, HttpServletResponse response) throws Exception {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String status = searchForm.getStatus();

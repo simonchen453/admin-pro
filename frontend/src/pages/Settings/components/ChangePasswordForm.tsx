@@ -9,15 +9,17 @@ import {
   message, 
   Space,
   Typography,
-  Divider,
+  Card,
   Row,
-  Col
+  Col,
+  Alert
 } from 'antd';
 import { 
   LockOutlined, 
   EyeInvisibleOutlined, 
   EyeTwoTone,
-  CheckCircleOutlined
+  CheckCircleOutlined,
+  SafetyOutlined
 } from '@ant-design/icons';
 import { changePasswordApi } from '../../../api/auth';
 
@@ -114,117 +116,144 @@ const ChangePasswordForm: React.FC = () => {
   return (
     <div>
       {contextHolder}
-      <Form
-        layout="vertical"
-        onFinish={handleSubmit(onSubmit)}
-      >
-        <Row gutter={[16, 16]}>
-          <Col span={24}>
-            <Form.Item
-              label="当前密码"
-              validateStatus={errors.currentPassword ? 'error' : ''}
-              help={errors.currentPassword?.message}
-            >
-              <Input.Password
-                {...register('currentPassword')}
-                placeholder="请输入当前密码"
-                prefix={<LockOutlined />}
-                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                size="large"
-              />
-            </Form.Item>
-          </Col>
-          
-          <Col span={24}>
-            <Form.Item
-              label="新密码"
-              validateStatus={errors.newPassword ? 'error' : ''}
-              help={errors.newPassword?.message}
-            >
-              <Input.Password
-                {...register('newPassword')}
-                placeholder="请输入新密码"
-                prefix={<LockOutlined />}
-                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                size="large"
-              />
-              {newPassword && (
-                <div style={{ marginTop: 8 }}>
-                  <div style={{ 
-                    height: 4, 
-                    backgroundColor: '#f0f0f0', 
-                    borderRadius: 2,
-                    overflow: 'hidden'
-                  }}>
-                    <div 
-                      style={{ 
-                        height: '100%',
-                        width: `${(strength.score / 5) * 100}%`,
-                        backgroundColor: strength.color,
-                        transition: 'all 0.3s'
-                      }}
-                    />
-                  </div>
-                  <Text 
-                    style={{ color: strength.color, fontSize: '12px', marginTop: 4, display: 'block' }}
-                  >
-                    密码强度: {strength.text}
-                  </Text>
-                </div>
-              )}
-            </Form.Item>
-          </Col>
-          
-          <Col span={24}>
-            <Form.Item
-              label="确认新密码"
-              validateStatus={errors.confirmPassword ? 'error' : ''}
-              help={errors.confirmPassword?.message}
-            >
-              <Input.Password
-                {...register('confirmPassword')}
-                placeholder="请再次输入新密码"
-                prefix={<LockOutlined />}
-                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                size="large"
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-        
-        <Divider />
-        
-        <div style={{ marginBottom: 24 }}>
-          <Typography.Text strong>密码要求：</Typography.Text>
-          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
-            <li>至少8位字符</li>
-            <li>包含大写字母</li>
-            <li>包含小写字母</li>
-            <li>包含数字</li>
-            <li>包含特殊字符 (@$!%*?&)</li>
-          </ul>
-        </div>
-        
-        <Form.Item>
-          <Space size="middle">
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              loading={isLoading}
-              icon={<CheckCircleOutlined />}
-              size="large"
-            >
-              确认修改
-            </Button>
-            <Button 
-              onClick={() => reset()}
-              size="large"
-            >
-              重置
-            </Button>
+      <Card 
+        title={
+          <Space>
+            <SafetyOutlined />
+            <span>修改密码</span>
           </Space>
-        </Form.Item>
-      </Form>
+        }
+      >
+        <Alert
+          message="密码安全提示"
+          description="为了您的账户安全，请定期更换密码，并使用强密码。"
+          type="info"
+          icon={<SafetyOutlined />}
+          showIcon
+          style={{ marginBottom: 24 }}
+        />
+
+        <Form
+          layout="vertical"
+          onFinish={handleSubmit(onSubmit)}
+          style={{ maxWidth: 600 }}
+        >
+          <Row gutter={[0, 16]}>
+            <Col span={24}>
+              <Form.Item
+                label="当前密码"
+                validateStatus={errors.currentPassword ? 'error' : ''}
+                help={errors.currentPassword?.message}
+                required
+              >
+                <Input.Password
+                  {...register('currentPassword')}
+                  placeholder="请输入当前密码"
+                  prefix={<LockOutlined />}
+                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+            
+            <Col span={24}>
+              <Form.Item
+                label="新密码"
+                validateStatus={errors.newPassword ? 'error' : ''}
+                help={errors.newPassword?.message}
+                required
+              >
+                <Input.Password
+                  {...register('newPassword')}
+                  placeholder="请输入新密码"
+                  prefix={<LockOutlined />}
+                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                  size="large"
+                />
+                {newPassword && (
+                  <div style={{ marginTop: 8 }}>
+                    <div style={{ 
+                      height: 4, 
+                      backgroundColor: '#f0f0f0', 
+                      borderRadius: 2,
+                      overflow: 'hidden'
+                    }}>
+                      <div 
+                        style={{ 
+                          height: '100%',
+                          width: `${(strength.score / 5) * 100}%`,
+                          backgroundColor: strength.color,
+                          transition: 'all 0.3s'
+                        }}
+                      />
+                    </div>
+                    <Text 
+                      style={{ color: strength.color, fontSize: '12px', marginTop: 4, display: 'block' }}
+                    >
+                      密码强度: {strength.text}
+                    </Text>
+                  </div>
+                )}
+              </Form.Item>
+            </Col>
+            
+            <Col span={24}>
+              <Form.Item
+                label="确认新密码"
+                validateStatus={errors.confirmPassword ? 'error' : ''}
+                help={errors.confirmPassword?.message}
+                required
+              >
+                <Input.Password
+                  {...register('confirmPassword')}
+                  placeholder="请再次输入新密码"
+                  prefix={<LockOutlined />}
+                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                  size="large"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          
+          <Card 
+            size="small" 
+            style={{ 
+              marginTop: 16, 
+              marginBottom: 24,
+              backgroundColor: '#fafafa'
+            }}
+            title={<Text strong>密码要求</Text>}
+          >
+            <ul style={{ margin: 0, paddingLeft: 20 }}>
+              <li>至少8位字符</li>
+              <li>包含大写字母</li>
+              <li>包含小写字母</li>
+              <li>包含数字</li>
+              <li>包含特殊字符 (@$!%*?&)</li>
+            </ul>
+          </Card>
+          
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Space size="middle">
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={isLoading}
+                icon={<CheckCircleOutlined />}
+                size="large"
+              >
+                确认修改
+              </Button>
+              <Button 
+                onClick={() => reset()}
+                size="large"
+              >
+                重置
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Card>
     </div>
   );
 };

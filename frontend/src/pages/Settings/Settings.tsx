@@ -1,17 +1,18 @@
 import { useState } from 'react';
-import { Card, Tabs, Space, Typography, Divider } from 'antd';
+import { Card, Tabs, Space, Breadcrumb, Button, Divider } from 'antd';
 import { 
   SafetyOutlined, 
-  UserOutlined
+  UserOutlined,
+  HomeOutlined
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import ChangePasswordForm from './components/ChangePasswordForm';
 import ProfileView from './components/ProfileView';
 import ProfileEditForm from './components/ProfileEditForm';
 import './Settings.css';
 
-const { Title } = Typography;
-
 function Settings() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileRefreshKey, setProfileRefreshKey] = useState(0);
@@ -27,8 +28,6 @@ function Settings() {
       ),
       children: (
         <div className="settings-tab-content">
-          <Title level={4}>个人资料</Title>
-          <Divider />
           {isEditingProfile ? (
             <ProfileEditForm
               onSuccess={() => {
@@ -60,8 +59,6 @@ function Settings() {
       ),
       children: (
         <div className="settings-tab-content">
-          <Title level={4}>账户安全</Title>
-          <Divider />
           <ChangePasswordForm />
         </div>
       ),
@@ -69,7 +66,32 @@ function Settings() {
   ];
 
   return (
-    <div className="settings-container">
+    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
+      {/* 面包屑导航 */}
+      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
+        <Breadcrumb
+          items={[
+            {
+              title: (
+                <Button
+                  type="link"
+                  icon={<HomeOutlined />}
+                  onClick={() => navigate('/')}
+                  style={{ padding: 0, height: 'auto', lineHeight: 1 }}
+                >
+                  首页
+                </Button>
+              )
+            },
+            {
+              title: '个人资料'
+            }
+          ]}
+        />
+      </div>
+      
+      <Divider />
+
       <Card>
         <Tabs
           activeKey={activeTab}

@@ -403,7 +403,7 @@ const MenuList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 250,
+      width: 240,
       render: (_, record: MenuEntity) => (
         <Space size="small">
           <Button

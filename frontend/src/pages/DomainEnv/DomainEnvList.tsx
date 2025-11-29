@@ -211,7 +211,7 @@ const DomainEnvList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 180,
       render: (_, record: DomainEnvEntity) => (
         <Space size="small">
           <Button
@@ -226,6 +226,7 @@ const DomainEnvList: React.FC = () => {
             size="small"
             icon={<DeleteOutlined />}
             onClick={() => handleDelete(record)}
+            type="primary"
             danger
           >
             删除

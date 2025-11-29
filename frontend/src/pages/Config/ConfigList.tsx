@@ -216,7 +216,7 @@ const ConfigList: React.FC = () => {
       title: '操作',
       key: 'action',
       fixed: 'right',
-      width: 200,
+      width: 180,
       render: (_, record: ConfigEntity) => (
         <Space size="small">
           <Button

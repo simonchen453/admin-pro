@@ -27,6 +27,7 @@ const AuditLogList = lazy(() => import('../pages/AuditLog/AuditLogList'));
 const GeneratorList = lazy(() => import('../pages/Generator'));
 const Swagger = lazy(() => import('../pages/Swagger'));
 const ChangePassword = lazy(() => import('../pages/ChangePassword/ChangePassword'));
+const Profile = lazy(() => import('../pages/Profile'));
 const NoPermission = lazy(() => import('../pages/NoPermission'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
@@ -227,6 +228,14 @@ function AppRouter() {
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <ChangePassword />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="profile"
+                        element={
+                            <Suspense fallback={<LoadingSpinner />}>
+                                <Profile />
                             </Suspense>
                         }
                     />

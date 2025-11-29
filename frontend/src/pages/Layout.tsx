@@ -259,6 +259,12 @@ function MainLayout() {
 
     const handleUserMenuClick = ({ key }: { key: string }) => {
         switch (key) {
+            case 'profile':
+                navigate('/profile');
+                break;
+            case 'settings':
+                navigate('/changepwd');
+                break;
             case 'logout':
                 logout();
                 navigate('/login', { replace: true });
@@ -402,8 +408,11 @@ function MainLayout() {
                             placement="bottomRight"
                         >
                             <Space style={{ cursor: 'pointer' }}>
-                                <Avatar icon={<UserOutlined />} />
-                                <Text>{currentUser?.name || '管理员'}</Text>
+                                <Avatar 
+                                    src={currentUser?.avatarUrl || currentUser?.avatar} 
+                                    icon={<UserOutlined />} 
+                                />
+                                <Text>{currentUser?.realName || currentUser?.name || '管理员'}</Text>
                             </Space>
                         </Dropdown>
                     </Space>

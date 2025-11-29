@@ -28,6 +28,12 @@ export const getUserInfoApi = async (): Promise<UserInfo> => {
   return respData.data;
 };
 
+// 获取当前登录用户详细信息
+export const getCurrentUserInfoApi = async (): Promise<any> => {
+  const respData = await request.get<ApiResponse<any>>('/rest/auth/userinfo');
+  return respData.data;
+};
+
 // 修改密码接口
 export interface ChangePasswordRequest {
   currentPassword: string;

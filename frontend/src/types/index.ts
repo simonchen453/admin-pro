@@ -2,14 +2,22 @@ import type {ReactNode} from 'react';
 
 // 用户相关类型
 export interface User {
-  id: number;
-  name: string;
-  email: string;
+  id?: number;
+  name?: string;
+  realName?: string;
+  email?: string;
   avatar?: string;
+  avatarUrl?: string;
   role?: string;
   status?: 'active' | 'inactive';
   createdAt?: string;
   updatedAt?: string;
+  loginName?: string;
+  mobileNo?: string;
+  userIden?: {
+    userDomain: string;
+    userId: string;
+  };
 }
 
 // 登录请求类型

@@ -164,6 +164,26 @@ public class AuthController extends BaseController {
         }
     }
 
+    @RequestMapping(value = "/userinfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public R<UserEntity> getUserInfo() {
+        try {
+            com.adminpro.rbac.api.LoginHelper loginHelper = LoginHelper.getInstance();
+            com.adminpro.framework.security.auth.LoginUser loginUser = loginHelper.getLoginUser();
+            if (loginUser == null) {
+                return R.error("未登录");
+            }
+            com.adminpro.rbac.domains.entity.user.UserIden userIden = loginUser.getUserIden();
+            UserEntity userEntity = userService.findByUserDomainAndUserId(userIden.getUserDomain(), userIden.getUserId());
+            if (userEntity == null) {
+                return R.error("用户不存在");
+            }
+            return R.ok(userEntity);
+        } catch (Exception e) {
+            logger.error("获取用户信息失败", e);
+            return R.error("获取用户信息失败: " + e.getMessage());
+        }
+    }
+
     @RequestMapping(value = "/captcha.jpg", method = RequestMethod.GET)
     public void captcha(HttpServletResponse response) throws ServletException, IOException {
         response.setHeader("Cache-Control", "no-store, no-cache");

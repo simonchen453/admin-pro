@@ -254,11 +254,6 @@ function MainLayout() {
             label: '个人资料',
         },
         {
-            key: 'settings',
-            icon: <SettingOutlined />,
-            label: '设置',
-        },
-        {
             type: 'divider' as const,
         },
         {
@@ -271,10 +266,7 @@ function MainLayout() {
     const handleUserMenuClick = ({ key }: { key: string }) => {
         switch (key) {
             case 'profile':
-                navigate('/profile');
-                break;
-            case 'settings':
-                navigate('/changepwd');
+                navigate('/settings');
                 break;
             case 'logout':
                 logout();

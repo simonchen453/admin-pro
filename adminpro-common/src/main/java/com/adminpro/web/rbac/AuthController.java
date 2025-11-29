@@ -20,6 +20,7 @@ import com.adminpro.rbac.domains.entity.user.UserEntity;
 import com.adminpro.rbac.domains.entity.user.UserService;
 import com.adminpro.rbac.domains.vo.login.LoginResponse;
 import com.adminpro.rbac.domains.vo.login.LoginUserVo;
+import com.adminpro.rbac.domains.vo.user.UpdateProfileVo;
 import com.adminpro.rbac.enums.UserLoginPlatform;
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.io.IOUtils;
@@ -181,6 +182,49 @@ public class AuthController extends BaseController {
         } catch (Exception e) {
             logger.error("获取用户信息失败", e);
             return R.error("获取用户信息失败: " + e.getMessage());
+        }
+    }
+
+    @SysLog("更新个人资料")
+    @RequestMapping(value = "/profile", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public R updateProfile(@RequestBody UpdateProfileVo updateProfileVo) {
+        try {
+            com.adminpro.rbac.api.LoginHelper loginHelper = LoginHelper.getInstance();
+            com.adminpro.framework.security.auth.LoginUser loginUser = loginHelper.getLoginUser();
+            if (loginUser == null) {
+                return R.error("未登录");
+            }
+            com.adminpro.rbac.domains.entity.user.UserIden userIden = loginUser.getUserIden();
+            UserEntity userEntity = userService.findByUserDomainAndUserId(userIden.getUserDomain(), userIden.getUserId());
+            if (userEntity == null) {
+                return R.error("用户不存在");
+            }
+
+            BeanUtil.beanAttributeValueTrim(updateProfileVo);
+            if (StringUtils.isNotEmpty(updateProfileVo.getRealName())) {
+                userEntity.setRealName(updateProfileVo.getRealName());
+            }
+            if (StringUtils.isNotEmpty(updateProfileVo.getMobileNo())) {
+                userEntity.setMobileNo(updateProfileVo.getMobileNo());
+            }
+            if (StringUtils.isNotEmpty(updateProfileVo.getEmail())) {
+                userEntity.setEmail(updateProfileVo.getEmail());
+            }
+            if (StringUtils.isNotEmpty(updateProfileVo.getAvatarUrl())) {
+                userEntity.setAvatarUrl(updateProfileVo.getAvatarUrl());
+            }
+            if (StringUtils.isNotEmpty(updateProfileVo.getSex())) {
+                userEntity.setSex(updateProfileVo.getSex());
+            }
+            if (StringUtils.isNotEmpty(updateProfileVo.getDescription())) {
+                userEntity.setDescription(updateProfileVo.getDescription());
+            }
+
+            userService.update(userEntity);
+            return R.ok("个人资料更新成功");
+        } catch (Exception e) {
+            logger.error("更新个人资料失败", e);
+            return R.error("更新个人资料失败: " + e.getMessage());
         }
     }
 

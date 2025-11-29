@@ -14,7 +14,6 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * @author simon
  * @date 2020-08-22
  */
-@Controller
+@RestController
 @RequestMapping("/admin/dict")
 @PreAuthorize("@ss.hasPermission('system:dict')")
 public class DictController extends BaseRoutingController {
@@ -43,23 +42,10 @@ public class DictController extends BaseRoutingController {
     @Autowired
     private DictUpdateValidator dictUpdateValidator;
 
-    @GetMapping()
-    public String prepareList() {
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String dict() {
-        prepareData();
-        getSearchForm();
-        return PREFIX + "/list";
-    }
-
     /**
      * 查询字典类型列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<QueryResultSet<DictEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -85,7 +71,6 @@ public class DictController extends BaseRoutingController {
      */
     @SysLog("创建字典")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    @ResponseBody
     public R create(@RequestBody DictEntity dict) {
         BeanUtil.beanAttributeValueTrim(dict);
         MessageBundle messageBundle = getMessageBundle();
@@ -115,7 +100,6 @@ public class DictController extends BaseRoutingController {
      */
     @SysLog("更新字典")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    @ResponseBody
     public R editSave(@RequestBody DictEntity dict) {
         BeanUtil.beanAttributeValueTrim(dict);
         MessageBundle messageBundle = getMessageBundle();
@@ -149,7 +133,6 @@ public class DictController extends BaseRoutingController {
      * @return
      */
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @ResponseBody
     public R<DictEntity> detail(@PathVariable String id) {
         DictEntity entity = dictService.findById(id);
         if (entity != null) {
@@ -165,7 +148,6 @@ public class DictController extends BaseRoutingController {
      */
     @SysLog("删除字典")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @ResponseBody
     public R remove(@RequestParam("ids") String ids) {
         dictService.deleteByIds(ids);
         return R.ok();
@@ -179,7 +161,6 @@ public class DictController extends BaseRoutingController {
      */
     @SysLog("激活字典")
     @RequestMapping(value = "/active/{id}", method = RequestMethod.PATCH)
-    @ResponseBody
     public R<DictEntity> active(@PathVariable String id) {
         DictEntity entity = dictService.findById(id);
         if (entity != null) {
@@ -199,7 +180,6 @@ public class DictController extends BaseRoutingController {
      */
     @SysLog("停用字典")
     @RequestMapping(value = "/inactive/{id}", method = RequestMethod.PATCH)
-    @ResponseBody
     public R<DictEntity> inactive(@PathVariable String id) {
         DictEntity entity = dictService.findById(id);
         if (entity != null) {

@@ -18,7 +18,6 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * @author simon
  * @date 2020-06-08
  */
-@Controller
+@RestController
 @RequestMapping("/admin/role")
 @PreAuthorize("@ss.hasPermission('system:role')")
 public class RoleController extends BaseRoutingController {
@@ -44,23 +43,10 @@ public class RoleController extends BaseRoutingController {
     @Autowired
     private RoleUpdateValidator roleUpdateValidator;
 
-    @GetMapping()
-    public String prepareList() {
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String role() {
-        prepareData();
-        getSearchForm();
-        return PREFIX + "/list";
-    }
-
     /**
      * 查询角色列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<QueryResultSet<ListRoleVo>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -91,7 +77,6 @@ public class RoleController extends BaseRoutingController {
      */
     @SysLog("创建角色")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    @ResponseBody
     public R create(@RequestBody RoleEntity role) {
         BeanUtil.beanAttributeValueTrim(role);
         MessageBundle messageBundle = getMessageBundle();
@@ -120,7 +105,6 @@ public class RoleController extends BaseRoutingController {
      */
     @SysLog("更新角色")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    @ResponseBody
     public R editSave(@RequestBody RoleEntity role) {
         BeanUtil.beanAttributeValueTrim(role);
         MessageBundle messageBundle = getMessageBundle();
@@ -152,7 +136,6 @@ public class RoleController extends BaseRoutingController {
      * @return
      */
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @ResponseBody
     public R<RoleEntity> detail(@PathVariable String id) {
         RoleEntity entity = roleService.findById(id);
         if (entity != null) {
@@ -168,7 +151,6 @@ public class RoleController extends BaseRoutingController {
      */
     @SysLog("删除角色")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @ResponseBody
     public R remove(@RequestParam("ids") String ids) {
         roleService.deleteMany(ids);
         return R.ok();

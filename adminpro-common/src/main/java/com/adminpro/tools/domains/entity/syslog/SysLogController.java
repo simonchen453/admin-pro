@@ -9,7 +9,6 @@ import com.adminpro.framework.common.BaseRoutingController;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -20,7 +19,7 @@ import java.util.Date;
  * @author simon
  * @date 2018-11-29
  */
-@Controller
+@RestController
 @RequestMapping("/admin/syslog")
 public class SysLogController extends BaseRoutingController {
     protected static final String PREFIX = "admin/syslog";
@@ -29,24 +28,10 @@ public class SysLogController extends BaseRoutingController {
     @Autowired
     private SysLogService sysLogService;
 
-    @GetMapping()
-    public String prepareList() {
-        cleanSearchForm();
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String sysLog() {
-        prepareData();
-        getSearchForm();
-        return PREFIX + "/list";
-    }
-
     /**
      * 查询系统日志列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<QueryResultSet<SysLogEntity>> list(@RequestBody SearchForm searchForm) {
         String condition = searchForm.getCondition();
         String startTimeStr = searchForm.getStartTime();
@@ -78,19 +63,7 @@ public class SysLogController extends BaseRoutingController {
         return R.ok(resultSet);
     }
 
-    /**
-     * 修改系统日志
-     */
-    @GetMapping("/view")
-    public String edit(@RequestParam("id") String id) {
-        prepareData();
-        SysLogEntity sysLog = sysLogService.findById(id);
-        request.setAttribute("sysLog", sysLog);
-        return PREFIX + "/view";
-    }
-
     @RequestMapping(value = "/deletemany", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R deleteManyLogs(@RequestParam String ids) {
         try {
             sysLogService.deleteByIds(ids);

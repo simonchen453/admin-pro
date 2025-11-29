@@ -15,7 +15,6 @@ import com.adminpro.rbac.domains.entity.post.PostUpdateValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * @author simon
  * @date 2020-05-21
  */
-@Controller
+@RestController
 @RequestMapping("/admin/post")
 @PreAuthorize("@ss.hasPermission('system:post')")
 public class PostController extends BaseRoutingController {
@@ -41,24 +40,10 @@ public class PostController extends BaseRoutingController {
     @Autowired
     private PostUpdateValidator postUpdateValidator;
 
-    @GetMapping()
-    public String prepareList() {
-//        cleanSearchForm();
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String post() {
-        prepareData();
-        getSearchForm();
-        return PREFIX + "/list";
-    }
-
     /**
      * 查询职位列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<QueryResultSet<PostEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String code = searchForm.getCode();
@@ -86,7 +71,6 @@ public class PostController extends BaseRoutingController {
      * @return
      */
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @ResponseBody
     public R<PostEntity> detail(@PathVariable String id) {
         PostEntity entity = postService.findById(id);
         if (entity != null) {
@@ -102,7 +86,6 @@ public class PostController extends BaseRoutingController {
      */
     @SysLog("创建职位")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    @ResponseBody
     public R create(@RequestBody PostEntity post) {
         BeanUtil.beanAttributeValueTrim(post);
         MessageBundle messageBundle = getMessageBundle();
@@ -133,7 +116,6 @@ public class PostController extends BaseRoutingController {
      */
     @SysLog("更新职位")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    @ResponseBody
     public R editSave(@RequestBody PostEntity post) {
         BeanUtil.beanAttributeValueTrim(post);
         MessageBundle messageBundle = getMessageBundle();
@@ -166,7 +148,6 @@ public class PostController extends BaseRoutingController {
      */
     @SysLog("删除职位")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @ResponseBody
     public R remove(@RequestParam("ids") String ids) {
         postService.deleteByIds(ids);
         return R.ok();

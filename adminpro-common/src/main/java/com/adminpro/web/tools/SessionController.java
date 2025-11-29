@@ -17,7 +17,6 @@ import com.adminpro.tools.domains.enums.SessionStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +27,7 @@ import java.util.List;
  * @author simon
  * @date 2020-06-17
  */
-@Controller
+@RestController
 @RequestMapping("/admin/session")
 @PreAuthorize("@ss.hasPermission('system:session')")
 public class SessionController extends BaseRoutingController {
@@ -42,25 +41,10 @@ public class SessionController extends BaseRoutingController {
     @Autowired
     private DomainService domainService;
 
-    @GetMapping()
-    public String prepareList() {
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String session() {
-        prepareData();
-        getSearchForm();
-        List<DomainEntity> all = domainService.findAll();
-        request.setAttribute("domains", all);
-        return PREFIX + "/list";
-    }
-
     /**
      * 查询用户Session列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<QueryResultSet<SessionEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String sessionId = searchForm.getSessionId();
@@ -100,7 +84,6 @@ public class SessionController extends BaseRoutingController {
      * @return
      */
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @ResponseBody
     public R<SessionEntity> detail(@PathVariable String id) {
         SessionEntity entity = sessionService.findById(id);
         if (entity != null) {
@@ -113,7 +96,6 @@ public class SessionController extends BaseRoutingController {
 
     @SysLog("暂停会话")
     @RequestMapping(value = "/suspend/{id}", method = RequestMethod.PATCH)
-    @ResponseBody
     public R<SessionEntity> suspend(@PathVariable String id) {
         SessionEntity entity = sessionService.findById(id);
         if (StringHelper.equals(WebHelper.getSessionId(), entity.getSessionId())) {
@@ -130,7 +112,6 @@ public class SessionController extends BaseRoutingController {
 
     @SysLog("恢复会话")
     @RequestMapping(value = "/unsuspend/{id}", method = RequestMethod.PATCH)
-    @ResponseBody
     public R<SessionEntity> unsuspend(@PathVariable String id) {
         SessionEntity entity = sessionService.findById(id);
         if (StringHelper.equals(WebHelper.getSessionId(), entity.getSessionId())) {
@@ -147,7 +128,6 @@ public class SessionController extends BaseRoutingController {
 
     @SysLog("终止会话")
     @RequestMapping(value = "/kill/{id}", method = RequestMethod.PATCH)
-    @ResponseBody
     public R<SessionEntity> kill(@PathVariable String id) {
         SessionEntity entity = sessionService.findById(id);
         if (StringHelper.equals(WebHelper.getSessionId(), entity.getSessionId())) {

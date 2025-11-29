@@ -20,8 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +34,7 @@ import java.util.List;
  * @author simon
  * @date 2020-05-24
  */
-@Controller
+@RestController
 @RequestMapping("/admin/dept")
 @PreAuthorize("@ss.hasPermission('system:dept')")
 public class DeptController extends BaseRoutingController {
@@ -56,24 +54,10 @@ public class DeptController extends BaseRoutingController {
     @Autowired
     private DeptUpdateValidator deptUpdateValidator;
 
-    @GetMapping()
-    public String prepareList() {
-        cleanSearchForm();
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String dept() {
-        prepareData();
-        getSearchForm();
-        return PREFIX + "/list";
-    }
-
     /**
      * 查询部门列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<List<DeptEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String status = searchForm.getStatus();
@@ -96,7 +80,6 @@ public class DeptController extends BaseRoutingController {
      */
     @SysLog("创建部门")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    @ResponseBody
     public R create(@RequestBody DeptEntity dept) {
         MessageBundle messageBundle = getMessageBundle();
         BeanUtil.beanAttributeValueTrim(dept);
@@ -141,7 +124,6 @@ public class DeptController extends BaseRoutingController {
      */
     @SysLog("更新部门")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    @ResponseBody
     public R editSave(@RequestBody DeptEntity dept) {
         MessageBundle messageBundle = getMessageBundle();
         BeanUtil.beanAttributeValueTrim(dept);
@@ -187,8 +169,6 @@ public class DeptController extends BaseRoutingController {
      */
     @SysLog("删除部门")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @ResponseBody
-    @Transactional
     public R remove(@RequestParam("ids") String ids) {
         if (StringUtils.isEmpty(ids)) {
             return R.error("删除对象不能为空");
@@ -199,7 +179,6 @@ public class DeptController extends BaseRoutingController {
 
     @SysLog("部门Logo上传")
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
     public R uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw new BaseRuntimeException("上传文件不能为空");
@@ -229,7 +208,6 @@ public class DeptController extends BaseRoutingController {
      * @return
      */
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @ResponseBody
     public R<DeptEntity> detail(@PathVariable String id) {
         DeptEntity entity = deptService.findById(id);
         if (entity != null) {

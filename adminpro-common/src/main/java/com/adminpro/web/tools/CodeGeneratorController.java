@@ -10,7 +10,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import java.util.List;
  * @author simon
  * @date 2018-09-06
  */
-@Controller
+@RestController
 @RequestMapping("/admin/generator")
 @PreAuthorize("@ss.hasPermission('system:generator')")
 public class CodeGeneratorController extends BaseRoutingController {
@@ -32,14 +31,7 @@ public class CodeGeneratorController extends BaseRoutingController {
     @Autowired
     private GenService genService;
 
-    @GetMapping()
-    public String search() {
-        prepareData();
-        return PREFIX + "/list";
-    }
-
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ResponseBody
     public R<QueryResultSet<TableInfo>> list() {
         String tableName = request.getParameter("tableName");
         SearchParam param = startPaging();
@@ -54,7 +46,6 @@ public class CodeGeneratorController extends BaseRoutingController {
      * 批量生成代码
      */
     @GetMapping("/batchGenCode")
-    @ResponseBody
     public void batchGenCode(@RequestParam("tables") String tables) throws IOException {
         String[] tableNames = tables.split(",");
         byte[] data = genService.generatorCode(tableNames);
@@ -70,7 +61,6 @@ public class CodeGeneratorController extends BaseRoutingController {
      * 生成所有代码
      */
     @GetMapping("/genAll")
-    @ResponseBody
     public void genAll() throws IOException {
         List<TableInfo> tableInfos = genService.findAll();
         List<String> tableNames = new ArrayList<>();

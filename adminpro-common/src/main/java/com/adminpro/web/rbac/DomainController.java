@@ -15,7 +15,6 @@ import com.adminpro.rbac.domains.entity.domain.DomainUpdateValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * @author simon
  * @date 2020-06-14
  */
-@Controller
+@RestController
 @RequestMapping("/admin/domain")
 @PreAuthorize("@ss.hasPermission('system:domain')")
 public class DomainController extends BaseRoutingController {
@@ -41,23 +40,10 @@ public class DomainController extends BaseRoutingController {
     @Autowired
     private DomainUpdateValidator domainUpdateValidator;
 
-    @GetMapping()
-    public String prepareList() {
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String userDomain() {
-        prepareData();
-        getSearchForm();
-        return PREFIX + "/list";
-    }
-
     /**
      * 查询用户域列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<QueryResultSet<DomainEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -79,7 +65,6 @@ public class DomainController extends BaseRoutingController {
      */
     @SysLog("创建用户域")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    @ResponseBody
     public R create(@RequestBody DomainEntity userDomain) {
         BeanUtil.beanAttributeValueTrim(userDomain);
         MessageBundle messageBundle = getMessageBundle();
@@ -106,7 +91,6 @@ public class DomainController extends BaseRoutingController {
      */
     @SysLog("更新用户域")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    @ResponseBody
     public R editSave(@RequestBody DomainEntity userDomain) {
         BeanUtil.beanAttributeValueTrim(userDomain);
         MessageBundle messageBundle = getMessageBundle();
@@ -137,7 +121,6 @@ public class DomainController extends BaseRoutingController {
      * @return
      */
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @ResponseBody
     public R<DomainEntity> detail(@PathVariable String id) {
         DomainEntity entity = domainService.findById(id);
         if (entity != null) {

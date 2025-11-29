@@ -21,7 +21,10 @@ import {
     ClockCircleOutlined,
     DatabaseOutlined,
     CodeOutlined,
-    AppstoreOutlined
+    AppstoreOutlined,
+    IdcardOutlined,
+    SlidersOutlined,
+    BookOutlined
 } from '@ant-design/icons';
 import { useAuthStore } from '../stores/useUserStore';
 import { getMenuList } from '../api/menu';
@@ -61,30 +64,38 @@ function MainLayout() {
         return url.split('?')[0];
     };
 
-    // FontAwesome图标映射到Antd图标
-    const getIconComponent = (iconClass: string) => {
-        const iconMap: Record<string, React.ReactNode> = {
-            'fa fa-clone': <AppstoreOutlined />,
-            'fa fa-home': <HomeOutlined />,
-            'fa fa-key': <KeyOutlined />,
-            'fa fa-outdent': <LogoutOutlined />,
-            'fa fa-cog': <SettingOutlined />,
-            'fa fa-user': <UserOutlined />,
-            'fa fa-users': <TeamOutlined />,
-            'fa fa-bars': <BarsOutlined />,
-            'fa fa-tag': <TagOutlined />,
-            'fa fa-wrench': <ToolOutlined />,
-            'fa fa-sitemap': <ApartmentOutlined />,
-            'fa fa-clipboard': <FileTextOutlined />,
-            'fa fa-list-alt': <FileTextOutlined />,
-            'fa fa-desktop': <DesktopOutlined />,
-            'fa fa-wifi': <WifiOutlined />,
-            'fa fa-tasks': <ClockCircleOutlined />,
-            'fa fa-server': <DatabaseOutlined />,
-            'fa fa-code': <CodeOutlined />,
-            'fa fa-cube': <AppstoreOutlined />,
-        };
-        return iconMap[iconClass] || <UserOutlined />;
+    // Ant Design图标映射
+    const iconComponents: Record<string, React.ReactNode> = {
+        'AppstoreOutlined': <AppstoreOutlined />,
+        'HomeOutlined': <HomeOutlined />,
+        'KeyOutlined': <KeyOutlined />,
+        'LogoutOutlined': <LogoutOutlined />,
+        'SettingOutlined': <SettingOutlined />,
+        'UserOutlined': <UserOutlined />,
+        'TeamOutlined': <TeamOutlined />,
+        'BarsOutlined': <BarsOutlined />,
+        'TagOutlined': <TagOutlined />,
+        'ToolOutlined': <ToolOutlined />,
+        'ApartmentOutlined': <ApartmentOutlined />,
+        'FileTextOutlined': <FileTextOutlined />,
+        'DesktopOutlined': <DesktopOutlined />,
+        'WifiOutlined': <WifiOutlined />,
+        'ClockCircleOutlined': <ClockCircleOutlined />,
+        'DatabaseOutlined': <DatabaseOutlined />,
+        'CodeOutlined': <CodeOutlined />,
+        'IdcardOutlined': <IdcardOutlined />,
+        'SlidersOutlined': <SlidersOutlined />,
+        'BookOutlined': <BookOutlined />,
+    };
+
+    // 根据图标名称获取Ant Design图标组件
+    const getIconComponent = (iconName: string) => {
+        // 如果是图片路径，返回null，后续会处理
+        if (isImg(iconName)) {
+            return null;
+        }
+        // 直接使用Ant Design图标名称
+        return iconComponents[iconName] || <UserOutlined />;
     };
 
     // 转换后端菜单格式为Antd菜单格式

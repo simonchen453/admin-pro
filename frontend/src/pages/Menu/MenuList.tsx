@@ -23,7 +23,26 @@ import {
   ClearOutlined,
   HomeOutlined,
   ExpandOutlined,
-  CompressOutlined
+  CompressOutlined,
+  UserOutlined,
+  SettingOutlined,
+  KeyOutlined,
+  LogoutOutlined,
+  TeamOutlined,
+  BarsOutlined,
+  TagOutlined,
+  ToolOutlined,
+  ApartmentOutlined,
+  FileTextOutlined,
+  DesktopOutlined,
+  WifiOutlined,
+  ClockCircleOutlined,
+  DatabaseOutlined,
+  CodeOutlined,
+  AppstoreOutlined,
+  IdcardOutlined,
+  SlidersOutlined,
+  BookOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -48,6 +67,46 @@ const MenuList: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [menuList, setMenuList] = useState<MenuEntity[]>([]);
+
+  // 判断是否为图片路径
+  const isImg = (icon: string): boolean => {
+    return Boolean(icon && (icon.endsWith('.png') || icon.endsWith('.jpg') || icon.endsWith('.jpeg') || icon.endsWith('.gif')));
+  };
+
+  // Ant Design图标映射
+  const iconComponents: Record<string, React.ReactNode> = {
+    'AppstoreOutlined': <AppstoreOutlined />,
+    'HomeOutlined': <HomeOutlined />,
+    'KeyOutlined': <KeyOutlined />,
+    'LogoutOutlined': <LogoutOutlined />,
+    'SettingOutlined': <SettingOutlined />,
+    'UserOutlined': <UserOutlined />,
+    'TeamOutlined': <TeamOutlined />,
+    'BarsOutlined': <BarsOutlined />,
+    'TagOutlined': <TagOutlined />,
+    'ToolOutlined': <ToolOutlined />,
+    'ApartmentOutlined': <ApartmentOutlined />,
+    'FileTextOutlined': <FileTextOutlined />,
+    'DesktopOutlined': <DesktopOutlined />,
+    'WifiOutlined': <WifiOutlined />,
+    'ClockCircleOutlined': <ClockCircleOutlined />,
+    'DatabaseOutlined': <DatabaseOutlined />,
+    'CodeOutlined': <CodeOutlined />,
+    'IdcardOutlined': <IdcardOutlined />,
+    'SlidersOutlined': <SlidersOutlined />,
+    'BookOutlined': <BookOutlined />,
+  };
+
+  // 根据图标名称获取Ant Design图标组件
+  const getIconComponent = (iconName: string) => {
+    if (!iconName) return null;
+    // 如果是图片路径，返回null，后续会处理
+    if (isImg(iconName)) {
+      return null;
+    }
+    // 直接使用Ant Design图标名称
+    return iconComponents[iconName] || null;
+  };
   const [searchForm, setSearchForm] = useState<MenuSearchForm>({});
   
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -292,7 +351,20 @@ const MenuList: React.FC = () => {
       key: 'icon',
       align: 'center',
       width: 100,
-      render: (icon: string) => icon ? <i className={icon} /> : '-'
+      render: (icon: string) => {
+        if (!icon) return '-';
+        // 如果是图片路径，显示图片
+        if (isImg(icon)) {
+          return <img src={icon} alt="icon" style={{ width: 16, height: 16 }} />;
+        }
+        // 尝试获取Ant Design图标组件
+        const iconComponent = getIconComponent(icon);
+        if (iconComponent) {
+          return iconComponent;
+        }
+        // 如果都不匹配，显示原始文本（可能是旧的FontAwesome格式或其他格式）
+        return <span title={icon}>{icon}</span>;
+      }
     },
     {
       title: '排序',

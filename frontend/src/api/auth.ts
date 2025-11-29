@@ -54,3 +54,17 @@ export const changePasswordApi = async (data: ChangePasswordRequest): Promise<Ch
     throw error;
   }
 };
+
+export interface UpdateProfileRequest {
+  realName?: string;
+  mobileNo?: string;
+  email?: string;
+  avatarUrl?: string;
+  sex?: string;
+  description?: string;
+}
+
+export const updateProfileApi = async (data: UpdateProfileRequest): Promise<ApiResponse<any>> => {
+  const response = await request.patch<ApiResponse<any>>('/rest/auth/profile', data);
+  return response;
+};

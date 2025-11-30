@@ -3,6 +3,7 @@ package com.adminpro.rbac.domains.vo.user;
 import com.adminpro.core.base.message.MessageBundle;
 import com.adminpro.core.base.util.ValidationUtil;
 import com.adminpro.core.base.validator.BaseValidator;
+import com.adminpro.rbac.api.PasswordValidator;
 import com.adminpro.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.rbac.domains.entity.dept.DeptService;
 import com.adminpro.rbac.domains.entity.user.UserEntity;
@@ -12,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 @Component
 public class UserCreateValidator extends BaseValidator<UserCreateVo> {
@@ -29,8 +32,9 @@ public class UserCreateValidator extends BaseValidator<UserCreateVo> {
             if (!StringUtils.equals(password, confirmPassword)) {
                 msgBundle.addErrorMessage("confirmPassword", "两次输入的密码不一致");
             } else {
-                if (!ValidationUtil.isValidatePassword(password)) {
-                    msgBundle.addErrorMessage("password", "密码格式错误");
+                List<String> passwordErrors = PasswordValidator.validatePassword(password);
+                if (passwordErrors != null && !passwordErrors.isEmpty()) {
+                    msgBundle.addErrorMessage("password", String.join("；", passwordErrors));
                 }
             }
         }

@@ -12,6 +12,7 @@ import com.adminpro.framework.common.BaseRoutingController;
 import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.framework.common.helper.ExcelHelper;
 import com.adminpro.framework.common.helper.UploadDownloadHelper;
+import com.adminpro.rbac.api.PasswordValidator;
 import com.adminpro.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.rbac.domains.entity.dept.DeptService;
 import com.adminpro.rbac.domains.entity.domain.DomainEntity;
@@ -166,8 +167,9 @@ public class UserController extends BaseRoutingController {
             messageBundle.addErrorMessage("confirmPassword", "两次密码不一致");
         }
         try {
-            if (!ValidationUtil.isValidatePassword(newPassword)) {
-                messageBundle.addErrorMessage("newPassword", "密码格式或强度不正确");
+            List<String> passwordErrors = PasswordValidator.validatePassword(newPassword);
+            if (passwordErrors != null && !passwordErrors.isEmpty()) {
+                messageBundle.addErrorMessage("newPassword", String.join("；", passwordErrors));
             }
             if (!messageBundle.hasErrorMessage()) {
                 userService.resetPwd(new UserIden(userDomain, userId), newPassword);

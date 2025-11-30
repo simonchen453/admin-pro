@@ -20,6 +20,7 @@ import com.adminpro.rbac.domains.entity.user.UserEntity;
 import com.adminpro.rbac.domains.entity.user.UserService;
 import com.adminpro.rbac.domains.vo.login.LoginResponse;
 import com.adminpro.rbac.domains.vo.login.LoginUserVo;
+import com.adminpro.rbac.domains.vo.user.PasswordRuleVo;
 import com.adminpro.rbac.domains.vo.user.UpdateProfileVo;
 import com.adminpro.rbac.domains.vo.user.UserInfoResponseVo;
 import com.adminpro.rbac.enums.UserLoginPlatform;
@@ -207,6 +208,17 @@ public class AuthController extends BaseController {
         } catch (Exception e) {
             logger.error("获取用户信息失败", e);
             return R.error("获取用户信息失败: " + e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/password-rule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public R<PasswordRuleVo> getPasswordRule() {
+        try {
+            PasswordRuleVo rule = com.adminpro.rbac.api.PasswordValidator.getPasswordRule();
+            return R.ok(rule);
+        } catch (Exception e) {
+            logger.error("获取密码规则失败", e);
+            return R.error("获取密码规则失败: " + e.getMessage());
         }
     }
 

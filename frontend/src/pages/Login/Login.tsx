@@ -154,7 +154,6 @@ const Login: React.FC = () => {
                 placeholder="请输入用户ID"
                 className={`form-input ${errors.userId ? 'error' : ''}`}
                 autoComplete="new-password"
-                name="userId_new_no_autofill"
               />
             </div>
             {errors.userId && (
@@ -171,7 +170,6 @@ const Login: React.FC = () => {
                 placeholder="请输入密码"
                 className={`form-input ${errors.password ? 'error' : ''}`}
                 autoComplete="new-password"
-                name="password_new_no_autofill"
               />
               <button
                 type="button"

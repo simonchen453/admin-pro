@@ -2,7 +2,7 @@ import axios, { AxiosError, type AxiosResponse } from 'axios';
 import { useAuthStore } from '../stores/useUserStore';
 
 const request = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE || '/api',
+    baseURL: import.meta.env.VITE_API_BASE || '/adminpro',
     timeout: 10000,
     withCredentials: true,
     headers: {

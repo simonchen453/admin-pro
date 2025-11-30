@@ -26,7 +26,7 @@ services:
       
       # 应用配置
       - APP_JDBC_SHOW_SQL=${APP_JDBC_SHOW_SQL:-false}
-      - APP_CORS_ORIGINS=${APP_CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      - APP_CORS_ORIGINS=${APP_CORS_ORIGINS:-http://localhost:8080,http://localhost:3000,http://localhost:5173}
       - APP_SWAGGER_ENABLED=${APP_SWAGGER_ENABLED:-true}
       - APP_QUARTZ_STARTUP_DELAY=${APP_QUARTZ_STARTUP_DELAY:-5}
       

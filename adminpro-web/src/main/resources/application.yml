@@ -100,7 +100,7 @@ spring:
 #                min-idle: 0
     web:
         resources:
-            static-locations: classpath:/config/
+            static-locations: classpath:/static/,classpath:/config/
             chain:
                 compressed: true
                 cache: false

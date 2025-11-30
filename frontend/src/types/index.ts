@@ -29,14 +29,10 @@ export interface LoginRequest {
   captchaKey: string;
 }
 
-// 修改密码请求类型
-export interface ChangePasswordRequest {
-  oldPwd?: string;
-  currentPassword?: string;
-  newPwd?: string;
-  newPassword?: string;
-  confirmNewPwd?: string;
-  confirmPassword?: string;
+// 登录响应类型
+export interface LoginResponse {
+  user: User;
+  message?: string;
 }
 
 // API响应类型

@@ -133,10 +133,8 @@ export interface UserSearchForm {
 }
 
 export interface UserEntity {
-  userIden: {
-    userDomain: string;
-    userId: string;
-  };
+  userDomain: string;
+  userId: string;
   loginName: string;
   realName: string;
   mobileNo?: string;
@@ -146,6 +144,7 @@ export interface UserEntity {
   sex?: string;
   description?: string;
   deptNo?: string;
+  deptName?: string;
   latestLoginTime?: string;
   password?: string;
 }

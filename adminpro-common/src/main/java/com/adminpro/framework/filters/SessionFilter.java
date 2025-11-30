@@ -83,13 +83,13 @@ public class SessionFilter implements Filter {
     }
 
     private boolean isNewSession() {
-        HttpServletRequest request = WebHelper.getHttpRequest();
+        /*HttpServletRequest request = WebHelper.getHttpRequest();
         if (request != null) {
             HttpSession session = request.getSession();
             if (session != null) {
                 return session.isNew();
             }
-        }
+        }*/
 
         return false;
     }

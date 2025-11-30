@@ -18,7 +18,6 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
-  ReloadOutlined,
   SearchOutlined,
   ClearOutlined,
   HomeOutlined

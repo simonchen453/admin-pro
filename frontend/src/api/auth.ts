@@ -25,7 +25,7 @@ export interface UserInfo {
 // 获取用户信息接口
 export const getUserInfoApi = async (): Promise<UserInfo> => {
   const respData = await request.get<ApiResponse<UserInfo>>('/rest/auth/userinfo');
-  return respData.data;
+  return (respData as unknown as ApiResponse<UserInfo>).data;
 };
 
 // 获取当前登录用户详细信息
@@ -44,7 +44,7 @@ export interface ChangePasswordRequest {
 export const changePasswordApi = async (data: ChangePasswordRequest): Promise<ApiResponse<any>> => {
   try {
     const response = await request.patch<ApiResponse<any>>('/common/changepwd', data);
-    return response;
+    return response as unknown as ApiResponse<any>;
   } catch (error) {
     console.error('修改密码失败:', error);
     throw error;
@@ -62,7 +62,7 @@ export interface UpdateProfileRequest {
 
 export const updateProfileApi = async (data: UpdateProfileRequest): Promise<ApiResponse<any>> => {
   const response = await request.patch<ApiResponse<any>>('/rest/auth/profile', data);
-  return response;
+  return response as unknown as ApiResponse<any>;
 };
 
 // 密码规则类型
@@ -80,5 +80,5 @@ export interface PasswordRule {
 // 获取密码规则接口
 export const getPasswordRuleApi = async (): Promise<PasswordRule> => {
   const respData = await request.get<ApiResponse<PasswordRule>>('/rest/auth/password-rule');
-  return respData.data;
+  return (respData as unknown as ApiResponse<PasswordRule>).data;
 };

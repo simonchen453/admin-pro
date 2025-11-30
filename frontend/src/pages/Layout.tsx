@@ -29,7 +29,8 @@ import {
 import { useAuthStore } from '../stores/useUserStore';
 import { getMenuList } from '../api/menu';
 import { getSystemInfoApi } from '../api/common';
-import type { MenuItem, BackendMenuItem, SystemInfo } from '../types/index';
+import { getCurrentUserInfoApi } from '../api/auth';
+import type { MenuItem, BackendMenuItem, SystemInfo, UserEntity } from '../types/index';
 import './Layout.css';
 
 const { Header, Sider, Content, Footer } = AntLayout;
@@ -42,6 +43,7 @@ function MainLayout() {
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
     const [, setLoading] = useState(true);
     const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
+    const [currentUserInfo, setCurrentUserInfo] = useState<UserEntity | null>(null);
     const navigate = useNavigate();
     const { logout, currentUser } = useAuthStore();
     const {
@@ -169,6 +171,32 @@ function MainLayout() {
             }
         };
         loadSystemInfo();
+    }, []);
+
+    // 加载当前用户详细信息
+    useEffect(() => {
+        const loadCurrentUserInfo = async () => {
+            try {
+                const response = await getCurrentUserInfoApi();
+                console.log('获取到的用户信息响应:', response);
+                // getCurrentUserInfoApi 返回的是 data 字段，即 UserEntity
+                // 但根据响应拦截器，实际返回的可能是整个响应对象
+                const userInfo = (response as any)?.data || response;
+                console.log('解析后的用户信息:', userInfo);
+                if (userInfo) {
+                    setCurrentUserInfo(userInfo as unknown as UserEntity);
+                }
+            } catch (error) {
+                console.error('获取用户信息失败:', error);
+                // 如果获取失败，尝试使用 currentUser 中的数据
+                if (currentUser) {
+                    console.log('使用 currentUser 作为备用数据:', currentUser);
+                    setCurrentUserInfo(currentUser as unknown as UserEntity);
+                }
+            }
+        };
+        // 无论currentUser是否存在，都尝试加载用户信息（因为可能通过session认证）
+        loadCurrentUserInfo();
     }, []);
 
     // 加载菜单数据
@@ -412,10 +440,27 @@ function MainLayout() {
                         >
                             <Space style={{ cursor: 'pointer' }}>
                                 <Avatar 
-                                    src={currentUser?.avatarUrl || currentUser?.avatar} 
+                                    src={currentUserInfo?.avatarUrl || currentUser?.avatarUrl || currentUser?.avatar} 
                                     icon={<UserOutlined />} 
                                 />
-                                <Text>{currentUser?.realName || currentUser?.name || '管理员'}</Text>
+                                <Text>
+                                    {(() => {
+                                        const displayName = currentUserInfo?.realName || 
+                                                           currentUser?.realName || 
+                                                           currentUser?.name || 
+                                                           currentUserInfo?.loginName ||
+                                                           '管理员';
+                                        // 开发环境下打印调试信息
+                                        if (import.meta.env.DEV) {
+                                            console.log('当前用户信息显示:', {
+                                                currentUserInfo,
+                                                currentUser,
+                                                displayName
+                                            });
+                                        }
+                                        return displayName;
+                                    })()}
+                                </Text>
                             </Space>
                         </Dropdown>
                     </Space>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Descriptions, Avatar, Tag, Space, Spin, message, Button } from 'antd';
+import { Descriptions, Avatar, Tag, Spin, message, Button } from 'antd';
 import { UserOutlined, EditOutlined } from '@ant-design/icons';
 import { getCurrentUserInfoApi } from '../../../api/auth';
 import type { UserEntity } from '../../../types';
@@ -81,10 +81,7 @@ function ProfileView({ onEdit, refreshTrigger }: ProfileViewProps) {
               {userInfo.realName || '-'}
             </Descriptions.Item>
             <Descriptions.Item label="用户域">
-              {userInfo.userIden?.userDomain || '-'}
-            </Descriptions.Item>
-            <Descriptions.Item label="用户ID">
-              {userInfo.userIden?.userId || '-'}
+              {userInfo.userDomain || '-'}
             </Descriptions.Item>
             <Descriptions.Item label="手机号码">
               {userInfo.mobileNo || '-'}
@@ -98,14 +95,11 @@ function ProfileView({ onEdit, refreshTrigger }: ProfileViewProps) {
             <Descriptions.Item label="状态">
               {getStatusTag(userInfo.status)}
             </Descriptions.Item>
-            <Descriptions.Item label="部门编号">
-              {userInfo.deptNo || '-'}
+            <Descriptions.Item label="部门">
+              {userInfo.deptName || userInfo.deptNo || '-'}
             </Descriptions.Item>
             <Descriptions.Item label="最后登录时间" span={2}>
               {formatDate(userInfo.latestLoginTime)}
-            </Descriptions.Item>
-            <Descriptions.Item label="备注" span={2}>
-              {userInfo.description || '-'}
             </Descriptions.Item>
           </Descriptions>
         </div>

@@ -21,6 +21,7 @@ import com.adminpro.rbac.domains.entity.user.UserService;
 import com.adminpro.rbac.domains.vo.login.LoginResponse;
 import com.adminpro.rbac.domains.vo.login.LoginUserVo;
 import com.adminpro.rbac.domains.vo.user.UpdateProfileVo;
+import com.adminpro.rbac.domains.vo.user.UserInfoResponseVo;
 import com.adminpro.rbac.enums.UserLoginPlatform;
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.io.IOUtils;
@@ -166,7 +167,7 @@ public class AuthController extends BaseController {
     }
 
     @RequestMapping(value = "/userinfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public R<UserEntity> getUserInfo() {
+    public R<UserInfoResponseVo> getUserInfo() {
         try {
             com.adminpro.rbac.api.LoginHelper loginHelper = LoginHelper.getInstance();
             com.adminpro.framework.security.auth.LoginUser loginUser = loginHelper.getLoginUser();
@@ -178,7 +179,31 @@ public class AuthController extends BaseController {
             if (userEntity == null) {
                 return R.error("用户不存在");
             }
-            return R.ok(userEntity);
+            
+            // 构建响应VO
+            UserInfoResponseVo userInfoVo = new UserInfoResponseVo();
+            userInfoVo.setUserId(userEntity.getUserIden().getUserId());
+            userInfoVo.setUserDomain(userEntity.getUserIden().getUserDomain());
+            userInfoVo.setLoginName(userEntity.getLoginName());
+            userInfoVo.setRealName(userEntity.getRealName());
+            userInfoVo.setMobileNo(userEntity.getMobileNo());
+            userInfoVo.setEmail(userEntity.getEmail());
+            userInfoVo.setAvatarUrl(userEntity.getAvatarUrl());
+            userInfoVo.setSex(userEntity.getSex());
+            userInfoVo.setStatus(userEntity.getStatus());
+            userInfoVo.setDeptNo(userEntity.getDeptNo());
+            userInfoVo.setLatestLoginTime(userEntity.getLatestLoginTime());
+            
+            // 根据部门编号查询部门名称
+            String deptNo = userEntity.getDeptNo();
+            if (StringUtils.isNotEmpty(deptNo)) {
+                DeptEntity deptEntity = deptService.findByNo(deptNo);
+                if (deptEntity != null) {
+                    userInfoVo.setDeptName(deptEntity.getName());
+                }
+            }
+            
+            return R.ok(userInfoVo);
         } catch (Exception e) {
             logger.error("获取用户信息失败", e);
             return R.error("获取用户信息失败: " + e.getMessage());

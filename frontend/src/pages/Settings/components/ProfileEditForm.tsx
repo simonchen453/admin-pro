@@ -80,17 +80,40 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
   };
 
   const handleAvatarChange = (info: any) => {
+    if (info.file.status === 'uploading') {
+      return;
+    }
+    
     if (info.file.status === 'done') {
       const response = info.file.response;
       let url = '';
-      if (response?.data) {
-        url = typeof response.data === 'string' ? response.data : response.data.relativePath || response.data.absolutePath;
-      } else if (typeof response === 'string') {
-        url = response;
-      } else if (response?.relativePath) {
-        url = response.relativePath;
-      } else if (response?.absolutePath) {
-        url = response.absolutePath;
+      
+      // 处理响应数据，可能的结构：
+      // 1. { restCode: '200', data: { relativePath: '...', absolutePath: '...' } }
+      // 2. { data: { relativePath: '...', absolutePath: '...' } }
+      // 3. { relativePath: '...', absolutePath: '...' }
+      // 4. 直接是字符串URL
+      
+      if (response) {
+        // 优先使用 absolutePath（完整URL），如果没有则使用 relativePath
+        if (response.data) {
+          if (typeof response.data === 'string') {
+            url = response.data;
+          } else if (response.data.absolutePath) {
+            url = response.data.absolutePath;
+          } else if (response.data.relativePath) {
+            // 如果是相对路径，需要拼接baseURL
+            const baseURL = import.meta.env.VITE_API_BASE || '/api';
+            url = baseURL.replace('/api', '') + response.data.relativePath;
+          }
+        } else if (response.absolutePath) {
+          url = response.absolutePath;
+        } else if (response.relativePath) {
+          const baseURL = import.meta.env.VITE_API_BASE || '/api';
+          url = baseURL.replace('/api', '') + response.relativePath;
+        } else if (typeof response === 'string') {
+          url = response;
+        }
       }
       
       if (url) {
@@ -98,9 +121,11 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
         form.setFieldsValue({ avatarUrl: url });
         message.success('头像上传成功');
       } else {
+        console.error('上传响应数据:', response);
         message.error('头像上传成功，但未获取到URL');
       }
     } else if (info.file.status === 'error') {
+      console.error('上传失败:', info.file.error);
       message.error('头像上传失败');
     }
   };
@@ -132,6 +157,20 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
             showUploadList={false}
             onChange={handleAvatarChange}
             withCredentials
+            accept="image/*"
+            beforeUpload={(file) => {
+              const isImage = file.type.startsWith('image/');
+              if (!isImage) {
+                message.error('只能上传图片文件！');
+                return Upload.LIST_IGNORE;
+              }
+              const isLt5M = file.size / 1024 / 1024 < 5;
+              if (!isLt5M) {
+                message.error('图片大小不能超过 5MB！');
+                return Upload.LIST_IGNORE;
+              }
+              return true;
+            }}
           >
             <Button icon={<UploadOutlined />}>上传头像</Button>
           </Upload>

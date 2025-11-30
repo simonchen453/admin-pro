@@ -95,4 +95,13 @@ request.interceptors.response.use(
     }
 );
 
-export default request;
+// 定义一个与拦截器行为一致的类型（直接返回数据T，而不是AxiosResponse<T>）
+type CustomAxiosInstance = Omit<import('axios').AxiosInstance, 'get' | 'post' | 'put' | 'delete' | 'patch'> & {
+    get<T = any, R = T>(url: string, config?: import('axios').AxiosRequestConfig): Promise<R>;
+    post<T = any, R = T>(url: string, data?: any, config?: import('axios').AxiosRequestConfig): Promise<R>;
+    put<T = any, R = T>(url: string, data?: any, config?: import('axios').AxiosRequestConfig): Promise<R>;
+    delete<T = any, R = T>(url: string, config?: import('axios').AxiosRequestConfig): Promise<R>;
+    patch<T = any, R = T>(url: string, data?: any, config?: import('axios').AxiosRequestConfig): Promise<R>;
+};
+
+export default request as unknown as CustomAxiosInstance;

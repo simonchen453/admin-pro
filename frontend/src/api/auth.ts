@@ -36,7 +36,8 @@ export const getCurrentUserInfoApi = async (): Promise<any> => {
 
 // 修改密码接口
 export interface ChangePasswordRequest {
-  oldPwd: string;
+  oldPwd?: string;
+  currentPassword?: string;
   newPwd: string;
   confirmNewPwd: string;
 }

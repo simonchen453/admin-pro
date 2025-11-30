@@ -1,0 +1,13 @@
+**/node_modules
+**/target
+**/.git
+**/.idea
+**/.vscode
+**/dist
+**/logs
+upload/
+.DS_Store
+adminpro.log
+adminpro-error.log
+terminals
+

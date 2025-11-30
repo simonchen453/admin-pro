@@ -12,8 +12,9 @@ import type {
 // 获取菜单列表（用于导航）
 export const getMenuList = async (): Promise<BackendMenuItem[]> => {
   try {
-    const response = await request.get<BackendMenuItem[]>('/common/menus');
-    return response.data || [];
+    const response = await request.get<ApiResponse<BackendMenuItem[]>>('/common/menus');
+    // @ts-ignore 兼容可能返回的直接数组或ApiResponse结构
+    return Array.isArray(response) ? response : (response.data || []);
   } catch (error) {
     console.error('获取菜单列表失败:', error);
     return [];

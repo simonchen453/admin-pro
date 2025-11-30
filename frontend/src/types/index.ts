@@ -29,10 +29,14 @@ export interface LoginRequest {
   captchaKey: string;
 }
 
-// 登录响应类型
-export interface LoginResponse {
-  user: User;
-  message?: string;
+// 修改密码请求类型
+export interface ChangePasswordRequest {
+  oldPwd?: string;
+  currentPassword?: string;
+  newPwd?: string;
+  newPassword?: string;
+  confirmNewPwd?: string;
+  confirmPassword?: string;
 }
 
 // API响应类型
@@ -73,6 +77,7 @@ export interface BackendMenuItem {
   icon: string;
   url: string;
   subs: BackendMenuItem[];
+  data?: unknown; // 添加可选的 data 属性以兼容
 }
 
 // 菜单响应类型
@@ -135,6 +140,10 @@ export interface UserSearchForm {
 export interface UserEntity {
   userDomain: string;
   userId: string;
+  userIden?: {
+    userDomain: string;
+    userId: string;
+  };
   loginName: string;
   realName: string;
   mobileNo?: string;

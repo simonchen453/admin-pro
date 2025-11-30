@@ -106,7 +106,7 @@ const DomainForm: React.FC<DomainFormProps> = ({ domain, onSuccess, onCancel }) 
 
   return (
     <div>
-      <Form
+      <Form autoComplete="off"
         form={form}
         layout="vertical"
       >

@@ -348,7 +348,7 @@ const RoleList: React.FC = () => {
       <Card>
         {/* 搜索表单 */}
         <Card size="small" style={{ marginBottom: 16 }}>
-          <Form
+          <Form autoComplete="off"
             form={form}
             layout="inline"
             onFinish={handleSearch}

@@ -693,7 +693,7 @@ const UserList: React.FC = () => {
           <Card>
             {/* 搜索表单 */}
             <Card size="small" style={{ marginBottom: 16 }}>
-              <Form
+              <Form autoComplete="off"
                 form={form}
                 layout="inline"
                 onFinish={handleSearch}
@@ -867,7 +867,7 @@ const UserList: React.FC = () => {
         okText="确定"
         cancelText="取消"
       >
-        <Form
+        <Form autoComplete="off"
           form={resetForm}
           layout="vertical"
         >

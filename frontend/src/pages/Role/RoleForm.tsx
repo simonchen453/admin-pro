@@ -154,7 +154,7 @@ const RoleForm: React.FC<RoleFormProps> = ({ role, menuOptions, onSuccess, onCan
 
   return (
     <div>
-        <Form
+        <Form autoComplete="off"
           form={form}
           layout="vertical"
         >

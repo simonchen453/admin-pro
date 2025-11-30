@@ -109,7 +109,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSuccess, onCancel }) => {
 
   return (
     <div>
-      <Form
+      <Form autoComplete="off"
         form={form}
         layout="vertical"
       >

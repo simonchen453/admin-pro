@@ -172,7 +172,7 @@ const DeptForm: React.FC<DeptFormProps> = ({
   };
 
   return (
-    <Form
+    <Form autoComplete="off"
       form={form}
       layout="vertical"
       onFinish={handleSubmit}

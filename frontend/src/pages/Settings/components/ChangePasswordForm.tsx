@@ -11,6 +11,7 @@ import {
   Col,
   Alert
 } from 'antd';
+import type { Rule } from 'antd/es/form';
 import { 
   LockOutlined, 
   EyeInvisibleOutlined, 
@@ -159,7 +160,7 @@ const ChangePasswordForm: React.FC = () => {
   const getPasswordValidationRules = () => {
     if (!passwordRule) {
       return [{
-        validator: (_, value: string) => {
+        validator: (_: Rule, value: string) => {
           if (!value) {
             return Promise.reject(new Error('请输入新密码'));
           }
@@ -170,7 +171,7 @@ const ChangePasswordForm: React.FC = () => {
 
     const rule = passwordRule;
     return [{
-      validator: (_, value: string) => {
+      validator: (_: Rule, value: string) => {
         if (!value) {
           return Promise.reject(new Error('请输入新密码'));
         }

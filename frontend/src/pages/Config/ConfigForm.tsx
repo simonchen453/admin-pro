@@ -7,7 +7,7 @@ import {
   message
 } from 'antd';
 import { createConfigApi, updateConfigApi, getConfigDetailApi } from '../../api/config';
-import type { ConfigEntity } from '../../types';
+import type { ConfigEntity, ConfigCreateResponse } from '../../types';
 
 const { TextArea } = Input;
 
@@ -54,13 +54,6 @@ const ConfigForm: React.FC<ConfigFormProps> = ({
     }
   };
 
-  interface ConfigFormData {
-    name: string;
-    key: string;
-    value: string;
-    remark?: string;
-  }
-
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
@@ -74,7 +67,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({
         remark: values.remark
       };
 
-      let response;
+      let response: ConfigCreateResponse;
       if (isEdit) {
         response = await updateConfigApi(formData);
         if (response.restCode === '200') {

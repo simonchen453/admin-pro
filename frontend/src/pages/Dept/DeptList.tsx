@@ -12,7 +12,6 @@ import {
   Modal,
   Breadcrumb,
   Divider,
-  Image,
   Row,
   Col
 } from 'antd';
@@ -54,8 +53,6 @@ const DeptList: React.FC = () => {
   const [editingDept, setEditingDept] = useState<DeptEntity | null>(null);
   const [formKey, setFormKey] = useState(0);
   const [deptTreeOptions, setDeptTreeOptions] = useState<any[]>([]);
-  const [viewImageVisible, setViewImageVisible] = useState(false);
-  const [viewImageUrl, setViewImageUrl] = useState('');
   const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
 
   const handleTree = (data: DeptEntity[], parentId: string | number = '0'): DeptEntity[] => {
@@ -225,13 +222,6 @@ const DeptList: React.FC = () => {
       });
     } catch {
       return dateStr;
-    }
-  };
-
-  const handleViewImage = (url?: string) => {
-    if (url) {
-      setViewImageUrl(url.startsWith('http') ? url : `${import.meta.env.VITE_API_BASE || '/api'}${url}`);
-      setViewImageVisible(true);
     }
   };
 
@@ -442,22 +432,6 @@ const DeptList: React.FC = () => {
             setEditingDept(null);
           }}
         />
-      </Modal>
-
-      <Modal
-        title="查看图片"
-        open={viewImageVisible}
-        onCancel={() => setViewImageVisible(false)}
-        footer={[
-          <Button key="ok" type="primary" onClick={() => setViewImageVisible(false)}>
-            确定
-          </Button>
-        ]}
-        width={800}
-      >
-        <div style={{ textAlign: 'center' }}>
-          <Image src={viewImageUrl} alt="部门图标" style={{ maxWidth: '100%' }} />
-        </div>
       </Modal>
     </div>
   );

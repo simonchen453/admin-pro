@@ -1,0 +1,59 @@
+services:
+  admin-pro:
+    image: admin-pro:latest
+    container_name: admin-pro
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    # 如果需要使用 .env 文件，取消下面的注释并创建 .env 文件
+    # env_file:
+    #   - .env
+    environment:
+      # Spring 配置
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
+      
+      # 数据库配置（必须修改）
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-adminpro}
+      - DB_USERNAME=${DB_USERNAME:-adminpro}
+      - DB_PASSWORD=${DB_PASSWORD:-password$1}
+      - DB_USE_SSL=${DB_USE_SSL:-false}
+      
+      # 邮件配置（可选）
+      - MAIL_HOST=${MAIL_HOST:-smtp.example.com}
+      - MAIL_USERNAME=${MAIL_USERNAME:-}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-}
+      
+      # 应用配置
+      - APP_JDBC_SHOW_SQL=${APP_JDBC_SHOW_SQL:-false}
+      - APP_CORS_ORIGINS=${APP_CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      - APP_SWAGGER_ENABLED=${APP_SWAGGER_ENABLED:-true}
+      - APP_QUARTZ_STARTUP_DELAY=${APP_QUARTZ_STARTUP_DELAY:-5}
+      
+      # 管理端点配置
+      - MANAGEMENT_SECURITY_ENABLED=${MANAGEMENT_SECURITY_ENABLED:-true}
+      
+      # 时区
+      - TZ=Asia/Shanghai
+    volumes:
+      # 日志目录（持久化）
+      - ./logs:/app/logs
+      # 上传文件目录（持久化）
+      - ./upload:/app/upload
+    restart: unless-stopped
+    networks:
+      - admin-pro-network
+    # 资源限制（可选，根据 Mac 性能调整）
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+
+networks:
+  admin-pro-network:
+    driver: bridge
+

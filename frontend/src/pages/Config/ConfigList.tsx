@@ -356,7 +356,7 @@ const ConfigList: React.FC = () => {
       </Card>
 
       <Modal
-        title={editingConfig ? '修改配置配置' : '添加配置配置'}
+        title={editingConfig ? '修改配置' : '添加配置'}
         open={isModalVisible}
         onCancel={() => {
           setIsModalVisible(false);

@@ -206,6 +206,12 @@ public class CommonController extends BaseRoutingController {
             return R.error("两次输入的新密码不一致");
         }
 
+        // 校验密码规则
+        List<String> passwordErrors = com.adminpro.rbac.api.PasswordValidator.validatePassword(newPwd);
+        if (passwordErrors != null && !passwordErrors.isEmpty()) {
+            return R.error(String.join("；", passwordErrors));
+        }
+
         String oldPwd = vo.getOldPwd();
         UserEntity entity = UserService.getInstance().changePwd(userIden, oldPwd, newPwd);
         return R.ok(entity);

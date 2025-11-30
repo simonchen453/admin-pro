@@ -791,3 +791,19 @@ ALTER TABLE SYS_AUDIT_LOG_TBL
     DROP COLUMN COL_LOG_DATE,
     ADD COLUMN COL_EXECUTION_TIME BIGINT NULL COMMENT '执行时间（毫秒）';
 
+-- changeset simon:202511301748
+INSERT INTO `sys_config_tbl` VALUES (
+        CONCAT('PWD_RULE_', UNIX_TIMESTAMP(NOW()) * 1000),
+        'app.password.rule',
+        '密码规则配置',
+        '{"minLength":8,"maxLength":20,"requireLowerCase":true,"requireUpperCase":true,"requireDigit":true,"requireSpecialChar":true,"specialChars":"@$!%*?&"}',
+        0,
+        '密码规则配置，JSON格式。包含最小长度、最大长度、是否需要大小写字母、数字、特殊字符等规则',
+        'system',
+        '1068812449987166208',
+        NOW(),
+        'system',
+        '1068812449987166208',
+        NOW()
+    );
+

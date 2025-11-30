@@ -36,19 +36,15 @@ export const getCurrentUserInfoApi = async (): Promise<any> => {
 
 // 修改密码接口
 export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
+  oldPwd: string;
+  newPwd: string;
+  confirmNewPwd: string;
 }
 
-export interface ChangePasswordResponse {
-  success: boolean;
-  message: string;
-}
-
-export const changePasswordApi = async (data: ChangePasswordRequest): Promise<ChangePasswordResponse> => {
+export const changePasswordApi = async (data: ChangePasswordRequest): Promise<ApiResponse<any>> => {
   try {
-    const response = await request.post<ChangePasswordResponse>('/common/changepwd', data);
-    return response as unknown as ChangePasswordResponse;
+    const response = await request.patch<ApiResponse<any>>('/common/changepwd', data);
+    return response;
   } catch (error) {
     console.error('修改密码失败:', error);
     throw error;
@@ -67,4 +63,22 @@ export interface UpdateProfileRequest {
 export const updateProfileApi = async (data: UpdateProfileRequest): Promise<ApiResponse<any>> => {
   const response = await request.patch<ApiResponse<any>>('/rest/auth/profile', data);
   return response;
+};
+
+// 密码规则类型
+export interface PasswordRule {
+  minLength: number;
+  maxLength?: number;
+  requireLowerCase: boolean;
+  requireUpperCase: boolean;
+  requireDigit: boolean;
+  requireSpecialChar: boolean;
+  specialChars: string;
+  description?: string;
+}
+
+// 获取密码规则接口
+export const getPasswordRuleApi = async (): Promise<PasswordRule> => {
+  const respData = await request.get<ApiResponse<PasswordRule>>('/rest/auth/password-rule');
+  return respData.data;
 };

@@ -153,7 +153,9 @@ const Login: React.FC = () => {
                 type="text"
                 placeholder="请输入用户ID"
                 className={`form-input ${errors.userId ? 'error' : ''}`}
-                autoComplete="new-password"
+                autoComplete="off"
+                readOnly
+                onFocus={(e) => e.target.removeAttribute('readonly')}
               />
             </div>
             {errors.userId && (
@@ -169,7 +171,9 @@ const Login: React.FC = () => {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="请输入密码"
                 className={`form-input ${errors.password ? 'error' : ''}`}
-                autoComplete="new-password"
+                autoComplete="off"
+                readOnly
+                onFocus={(e) => e.target.removeAttribute('readonly')}
               />
               <button
                 type="button"

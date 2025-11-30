@@ -135,7 +135,7 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
   }
 
   return (
-    <Form
+    <Form autoComplete="off"
       form={form}
       layout="vertical"
       onFinish={handleSubmit}

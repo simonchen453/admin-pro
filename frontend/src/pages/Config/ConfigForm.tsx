@@ -104,7 +104,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({
   };
 
   return (
-    <Form
+    <Form autoComplete="off"
       form={form}
       layout="vertical"
     >

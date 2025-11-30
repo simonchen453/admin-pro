@@ -124,7 +124,7 @@ const ${className}Form: React.FC<${className}FormProps> = ({
   };
 
   return (
-    <Form
+    <Form autoComplete="off"
       form={form}
       layout="vertical"
       onFinish={handleSubmit}

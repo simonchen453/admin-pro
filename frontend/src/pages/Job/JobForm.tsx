@@ -147,7 +147,7 @@ const JobForm: React.FC<JobFormProps> = ({
   };
 
   return (
-    <Form
+    <Form autoComplete="off"
       form={form}
       layout="vertical"
       onFinish={handleSubmit}

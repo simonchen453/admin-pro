@@ -251,7 +251,7 @@ const DictForm: React.FC<DictFormProps> = ({
 
   return (
     <>
-      <Form
+      <Form autoComplete="off"
         form={form}
         layout="vertical"
       >
@@ -331,7 +331,7 @@ const DictForm: React.FC<DictFormProps> = ({
         }}
         width={600}
       >
-        <Form
+        <Form autoComplete="off"
           form={dataForm}
           layout="vertical"
         >

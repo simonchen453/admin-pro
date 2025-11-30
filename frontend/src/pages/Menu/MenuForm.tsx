@@ -172,7 +172,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
   const treeSelectData = convertMenuTreeToTreeSelect(menuOptions);
 
   return (
-    <Form
+    <Form autoComplete="off"
       form={form}
       layout="vertical"
       initialValues={{

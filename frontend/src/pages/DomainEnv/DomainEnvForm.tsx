@@ -120,7 +120,7 @@ const DomainEnvForm: React.FC<DomainEnvFormProps> = ({ domainEnv, domainList, on
 
   return (
     <div>
-      <Form
+      <Form autoComplete="off"
         form={form}
         layout="vertical"
       >

@@ -140,7 +140,11 @@ const Login: React.FC = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="login-form">
+        <form onSubmit={handleSubmit(onSubmit)} className="login-form" autoComplete="off">
+          {/* 添加隐藏的输入框，欺骗浏览器自动填充机制 */}
+          <input type="text" style={{ display: 'none' }} />
+          <input type="password" style={{ display: 'none' }} />
+          
           <div className="form-group">
             <div className="input-wrapper">
               <UserOutlined className="input-icon" />
@@ -149,7 +153,8 @@ const Login: React.FC = () => {
                 type="text"
                 placeholder="请输入用户ID"
                 className={`form-input ${errors.userId ? 'error' : ''}`}
-                autoComplete="username"
+                autoComplete="new-password"
+                name="userId_new_no_autofill"
               />
             </div>
             {errors.userId && (
@@ -165,7 +170,8 @@ const Login: React.FC = () => {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="请输入密码"
                 className={`form-input ${errors.password ? 'error' : ''}`}
-                autoComplete="current-password"
+                autoComplete="new-password"
+                name="password_new_no_autofill"
               />
               <button
                 type="button"

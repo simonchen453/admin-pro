@@ -287,7 +287,7 @@ const SysLogList: React.FC = () => {
 
       <Card>
         <Card size="small" style={{ marginBottom: 16 }}>
-          <Form
+          <Form autoComplete="off"
             form={form}
             layout="inline"
             onFinish={handleSearch}

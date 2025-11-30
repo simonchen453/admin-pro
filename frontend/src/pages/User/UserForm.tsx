@@ -210,7 +210,7 @@ const UserForm: React.FC<UserFormProps> = ({
   };
 
   return (
-    <Form
+    <Form autoComplete="off"
       form={form}
       layout="vertical"
       onFinish={handleSubmit}

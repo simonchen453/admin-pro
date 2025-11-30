@@ -135,7 +135,7 @@ const ChangePassword: React.FC = () => {
             </div>
           </div>
           
-          <Form
+          <Form autoComplete="off"
             layout="vertical"
             onFinish={handleSubmit(onSubmit)}
             className="change-password-form"

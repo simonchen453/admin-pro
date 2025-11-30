@@ -230,7 +230,7 @@ const ChangePasswordForm: React.FC = () => {
           style={{ marginBottom: 24 }}
         />
 
-        <Form
+        <Form autoComplete="off"
           form={form}
           layout="vertical"
           onFinish={handleSubmit}

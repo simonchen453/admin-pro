@@ -1,4 +1,5 @@
 import request from './request';
+import { config as appConfig } from '../config/env';
 import type { 
   UserSearchForm, 
   UserListResponse, 
@@ -127,7 +128,7 @@ export const importUserApi = async (file: File): Promise<ApiResponse> => {
 export const exportUserApi = async (userIds: string): Promise<void> => {
   const axios = (await import('axios')).default;
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_BASE || '/api'}/admin/user/export?ids=${userIds}`, {
+    const response = await axios.get(`${appConfig.API_BASE_URL}/admin/user/export?ids=${userIds}`, {
       responseType: 'blob',
       withCredentials: true,
     });
@@ -170,7 +171,7 @@ export const exportAllUserApi = async (searchForm: UserSearchForm): Promise<void
   if (searchForm.pageSize) params.append('pageSize', searchForm.pageSize.toString());
   
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_BASE || '/api'}/admin/user/excelAll?${params.toString()}`, {
+    const response = await axios.get(`${appConfig.API_BASE_URL}/admin/user/excelAll?${params.toString()}`, {
       responseType: 'blob',
       withCredentials: true,
     });

@@ -69,12 +69,12 @@ const UserDetail: React.FC = () => {
 
   // 获取状态标签
   const getStatusTag = (status: string) => {
-    const statusMap = {
+    const statusMap: Record<string, { color: string; text: string }> = {
       [UserStatus.ACTIVE]: { color: 'green', text: '正常' },
       [UserStatus.INACTIVE]: { color: 'orange', text: '停用' },
       [UserStatus.LOCKED]: { color: 'red', text: '锁定' }
     };
-    const statusInfo = statusMap[status as UserStatus] || { color: 'default', text: status };
+    const statusInfo = statusMap[status] || { color: 'default', text: status };
     return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>;
   };
 

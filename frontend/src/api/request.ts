@@ -1,8 +1,9 @@
 import axios, { AxiosError, type AxiosResponse } from 'axios';
 import { useAuthStore } from '../stores/useUserStore';
+import { config as appConfig } from '../config/env';
 
 const request = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE || '/adminpro',
+    baseURL: appConfig.API_BASE_URL,
     timeout: 10000,
     withCredentials: true,
     headers: {

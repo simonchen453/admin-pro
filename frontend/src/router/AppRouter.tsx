@@ -44,7 +44,7 @@ const LoadingSpinner = () => (
 
 function AppRouter() {
     return (
-        <BrowserRouter basename="/adminpro">
+        <BrowserRouter>
             <Routes>
                 <Route 
                     path="/login" 

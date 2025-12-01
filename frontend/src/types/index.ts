@@ -1017,3 +1017,14 @@ export interface SystemInfo {
   platformShortName: string;
   copyRight: string;
 }
+
+// 全局 Window 类型扩展
+declare global {
+  interface Window {
+    _env_?: {
+      API_BASE_URL?: string;
+      APP_TITLE?: string;
+      [key: string]: any;
+    };
+  }
+}

@@ -83,10 +83,10 @@ const UserForm: React.FC<UserFormProps> = ({
 
   // 获取用户详情（编辑时）
   useEffect(() => {
-    if (isEdit && user) {
+    if (isEdit && user && user.userIden) {
       const fetchUserDetail = async () => {
         try {
-          const detail = await getUserDetailApi(user.userIden.userDomain, user.userIden.userId);
+          const detail = await getUserDetailApi(user.userDomain, user.userId);
           form.setFieldsValue({
             ...detail,
             deptId: detail.deptId,
@@ -124,11 +124,11 @@ const UserForm: React.FC<UserFormProps> = ({
   const handleSubmit = async (values: UserFormData) => {
     setLoading(true);
     try {
-      if (isEdit) {
+      if (isEdit && user?.userIden) {
         // 更新用户
         const updateData: UserUpdateRequest = {
-          userDomain: user!.userIden.userDomain,
-          userId: user!.userIden.userId,
+          userDomain: user.userIden.userDomain,
+          userId: user.userIden.userId,
           loginName: values.loginName,
           realName: values.realName,
           mobileNo: values.mobileNo,

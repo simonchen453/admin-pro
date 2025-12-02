@@ -15,7 +15,7 @@ import {
   PlusOutlined
 } from '@ant-design/icons';
 import { createDictApi, updateDictApi, getDictDetailApi } from '../../api/dict';
-import type { DictEntity, DictDataEntity } from '../../types';
+import type { DictEntity, DictDataEntity, DictCreateResponse } from '../../types';
 import type { ColumnsType } from 'antd/es/table';
 
 const { TextArea } = Input;
@@ -150,7 +150,7 @@ const DictForm: React.FC<DictFormProps> = ({
         data: dataList
       };
 
-      let response;
+      let response: DictCreateResponse;
       if (isEdit) {
         response = await updateDictApi(formData);
         if (response.restCode === '200') {

@@ -8,7 +8,7 @@ import {
   Select
 } from 'antd';
 import { getDomainEnvDetailApi, createDomainEnvApi, updateDomainEnvApi } from '../../api/domainEnv';
-import type { DomainEnvEntity } from '../../types';
+import type { DomainEnvEntity, DomainEnvCreateResponse } from '../../types';
 
 interface DomainEnvFormProps {
   domainEnv?: DomainEnvEntity | null;
@@ -79,7 +79,7 @@ const DomainEnvForm: React.FC<DomainEnvFormProps> = ({ domainEnv, domainList, on
         description: values.description
       };
 
-      let response;
+      let response: DomainEnvCreateResponse;
       if (domainEnv?.id) {
         response = await updateDomainEnvApi(formData);
         if (response.restCode === '200') {

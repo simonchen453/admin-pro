@@ -10,7 +10,8 @@ import {
 } from 'antd';
 import { createJobApi, updateJobApi } from '../../api/job';
 import type {
-  JobEntity
+  JobEntity,
+  ApiResponse
 } from '../../types';
 
 const { TextArea } = Input;
@@ -66,8 +67,8 @@ const JobForm: React.FC<JobFormProps> = ({
           remark: values.remark,
           status: job!.status
         };
-        const response = await updateJobApi(updateData);
-        if (response.restCode === '200' || response.restCode === 200) {
+        const response: ApiResponse = await updateJobApi(updateData);
+        if (response.restCode === '200') {
           message.success('定时任务编辑成功');
           onSuccess();
         } else {
@@ -90,8 +91,8 @@ const JobForm: React.FC<JobFormProps> = ({
           remark: values.remark,
           status: '1'
         };
-        const response = await createJobApi(createData);
-        if (response.restCode === '200' || response.restCode === 200) {
+        const response: ApiResponse = await createJobApi(createData);
+        if (response.restCode === '200') {
           message.success('定时任务创建成功');
           onSuccess();
         } else {

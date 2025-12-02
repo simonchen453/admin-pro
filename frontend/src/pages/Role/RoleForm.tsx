@@ -9,7 +9,7 @@ import {
   message,
   Card
 } from 'antd';
-import { createRoleApi, updateRoleApi, getRoleMenuTreeApi, getRoleDetailApi } from '../../api/role';
+import { createRoleApi, updateRoleApi, getRoleMenuTreeApi, getRoleDetailApi, type RoleCreateResponse } from '../../api/role';
 import { RoleStatus, SystemConfig, type RoleEntity, type MenuTreeNode } from '../../types';
 
 interface RoleFormProps {
@@ -124,7 +124,7 @@ const RoleForm: React.FC<RoleFormProps> = ({ role, menuOptions, onSuccess, onCan
         menuNames: getAllCheckedKeys()
       };
 
-      let response;
+      let response: RoleCreateResponse;
       if (role?.id) {
         // 编辑模式
         response = await updateRoleApi(formData);

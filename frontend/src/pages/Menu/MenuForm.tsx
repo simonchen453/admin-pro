@@ -15,7 +15,8 @@ import {
 import { createMenuApi, updateMenuApi } from '../../api/menu';
 import type {
   MenuEntity,
-  MenuTreeSelectNode
+  MenuTreeSelectNode,
+  MenuCreateResponse
 } from '../../types';
 import { MenuType, MenuStatus, MenuVisible } from '../../types';
 
@@ -92,7 +93,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
         visible: values.visible
       };
 
-      let response;
+      let response: MenuCreateResponse;
       if (isEdit) {
         response = await updateMenuApi(formData);
         if (response.restCode === '200') {
@@ -277,7 +278,6 @@ const MenuForm: React.FC<MenuFormProps> = ({
             rules={[{ required: true, message: '菜单顺序不能为空' }]}
           >
             <InputNumber 
-              controls={{ position: 'right' }}
               min={0}
               style={{ width: '100%' }}
             />

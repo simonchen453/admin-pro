@@ -9,7 +9,7 @@ import {
   message
 } from 'antd';
 import { createPostApi, updatePostApi, getPostDetailApi } from '../../api/post';
-import { PostStatus, type PostEntity } from '../../types';
+import { PostStatus, type PostEntity, type PostCreateResponse } from '../../types';
 
 const { TextArea } = Input;
 
@@ -71,7 +71,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSuccess, onCancel }) => {
         remark: values.remark
       };
 
-      let response;
+      let response: PostCreateResponse;
       if (isEdit) {
         response = await updatePostApi(formData);
         if (response.restCode === '200') {
@@ -144,7 +144,6 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSuccess, onCancel }) => {
             placeholder="请输入岗位顺序"
             min={0}
             style={{ width: '100%' }}
-            controls={{ position: 'right' }}
           />
         </Form.Item>
 

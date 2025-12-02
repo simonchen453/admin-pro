@@ -18,7 +18,8 @@ import {
 } from '@ant-design/icons';
 import { createDeptApi, updateDeptApi, uploadDeptLogoApi } from '../../api/dept';
 import type {
-  DeptEntity
+  DeptEntity,
+  DeptCreateResponse
 } from '../../types';
 import { DeptStatus, SystemConfig } from '../../types';
 
@@ -92,9 +93,10 @@ const DeptForm: React.FC<DeptFormProps> = ({
         logoPath: logoPath || values.logoPath
       };
 
+      let response: DeptCreateResponse;
       if (isEdit && dept?.id) {
         formData.id = dept.id;
-        const response = await updateDeptApi(formData);
+        response = await updateDeptApi(formData);
         if (response.restCode === '200' || response.restCode === '0') {
           message.success('修改成功');
           onSuccess();
@@ -103,14 +105,14 @@ const DeptForm: React.FC<DeptFormProps> = ({
             Object.keys(response.errorsMap).forEach(field => {
               form.setFields([{
                 name: field,
-                errors: [response.errorsMap[field]]
+                errors: [response.errorsMap![field]]
               }]);
             });
           }
           message.error(response.message || '修改失败');
         }
       } else {
-        const response = await createDeptApi(formData);
+        response = await createDeptApi(formData);
         if (response.restCode === '200' || response.restCode === '0') {
           message.success('新增成功');
           onSuccess();
@@ -119,7 +121,7 @@ const DeptForm: React.FC<DeptFormProps> = ({
             Object.keys(response.errorsMap).forEach(field => {
               form.setFields([{
                 name: field,
-                errors: [response.errorsMap[field]]
+                errors: [response.errorsMap![field]]
               }]);
             });
           }
@@ -228,7 +230,6 @@ const DeptForm: React.FC<DeptFormProps> = ({
               placeholder="显示排序"
               min={0}
               style={{ width: '100%' }}
-              controls={{ position: 'right' }}
             />
           </Form.Item>
         </Col>

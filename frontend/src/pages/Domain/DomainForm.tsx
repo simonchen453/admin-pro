@@ -7,7 +7,7 @@ import {
   message
 } from 'antd';
 import { createDomainApi, updateDomainApi, getDomainDetailApi } from '../../api/domain';
-import type { DomainEntity } from '../../types';
+import type { DomainEntity, DomainCreateResponse } from '../../types';
 
 interface DomainFormProps {
   domain?: DomainEntity | null;
@@ -65,7 +65,7 @@ const DomainForm: React.FC<DomainFormProps> = ({ domain, onSuccess, onCancel }) 
         display: values.display || ''
       };
 
-      let response;
+      let response: DomainCreateResponse;
       if (domain?.id) {
         response = await updateDomainApi(formData);
         if (response.restCode === '200') {

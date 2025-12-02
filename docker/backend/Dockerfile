@@ -5,6 +5,9 @@ FROM maven:3.9.6-eclipse-temurin-21 AS backend-builder
 
 WORKDIR /app
 
+# Copy Maven settings.xml (配置镜像，将所有 HTTP 请求重定向到 HTTPS)
+COPY docker/backend/settings.xml /root/.m2/settings.xml
+
 # Copy Maven POMs first (for dependency caching)
 COPY pom.xml .
 COPY adminpro-common/pom.xml adminpro-common/
@@ -12,6 +15,7 @@ COPY adminpro-core/pom.xml adminpro-core/
 COPY adminpro-web/pom.xml adminpro-web/
 
 # Download dependencies (this layer will be cached if pom.xml doesn't change)
+# 使用自定义 settings.xml 配置镜像，避免 HTTP 仓库访问问题
 RUN mvn dependency:go-offline -B
 
 # Copy backend source code

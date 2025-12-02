@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 
+         http://maven.apache.org/xsd/settings-1.2.0.xsd">
+    
+    <!-- 配置镜像，将所有 HTTP 请求重定向到 HTTPS -->
+    <mirrors>
+        <!-- 阿里云镜像（优先） -->
+        <mirror>
+            <id>aliyun-public</id>
+            <mirrorOf>central</mirrorOf>
+            <name>Aliyun Maven Repository</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </mirror>
+        <!-- 将所有 HTTP 仓库请求重定向到 Maven Central HTTPS -->
+        <mirror>
+            <id>central-https</id>
+            <mirrorOf>*,!aliyun-public</mirrorOf>
+            <name>Maven Central HTTPS Mirror</name>
+            <url>https://repo1.maven.org/maven2</url>
+        </mirror>
+    </mirrors>
+    
+    <profiles>
+        <profile>
+            <id>default</id>
+            <repositories>
+                <repository>
+                    <id>aliyun-public</id>
+                    <name>Aliyun Maven Repository</name>
+                    <url>https://maven.aliyun.com/repository/public</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>central</id>
+                    <name>Maven Central</name>
+                    <url>https://repo1.maven.org/maven2</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>aliyun-public</id>
+                    <name>Aliyun Maven Repository</name>
+                    <url>https://maven.aliyun.com/repository/public</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>central</id>
+                    <name>Maven Central</name>
+                    <url>https://repo1.maven.org/maven2</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+    
+    <activeProfiles>
+        <activeProfile>default</activeProfile>
+    </activeProfiles>
+</settings>
+

@@ -46,12 +46,18 @@
             <version>3.10.8</version>
             <classifier>jakarta</classifier>
             <exclusions>
+                <!-- 排除所有 JAXB 相关依赖，使用显式声明的 Jakarta JAXB -->
                 <exclusion>
                     <groupId>org.glassfish.jaxb</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>javax.xml.bind</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <!-- 排除可能引用旧版本 JAXB 的传递依赖 -->
+                <exclusion>
+                    <groupId>com.sun.xml.bind</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>

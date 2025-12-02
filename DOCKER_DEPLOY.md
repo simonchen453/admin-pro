@@ -143,6 +143,17 @@ docker-compose logs -f frontend
 
 ## 🔧 配置说明
 
+### Docker Desktop 配置要点
+
+如果使用 Docker Desktop（Mac/Windows），建议配置以下资源：
+
+1. 打开 Docker Desktop
+2. 进入 Settings → Resources
+3. 建议配置：
+   - **Memory**: 至少 2GB（推荐 4GB）
+   - **CPUs**: 至少 2 核
+   - **Disk**: 至少 20GB
+
 ### 环境变量配置
 
 主要配置项在 `.env` 文件中（可选，也可直接使用环境变量）：
@@ -371,6 +382,12 @@ docker-compose exec backend sh
 
 # 检查 extra_hosts 配置（Mac/Windows）
 # 确保 docker-compose.yml 中包含 extra_hosts 配置
+
+# Mac/Windows 上使用 host.docker.internal 访问宿主机 MySQL
+# 确保 MySQL 允许 Docker 网络访问
+# 检查 MySQL 是否运行
+# macOS: brew services list | grep mysql
+# 或直接测试: mysql -h host.docker.internal -u adminpro -p
 ```
 
 ### 端口冲突
@@ -383,6 +400,23 @@ lsof -i :8080
 # 修改 .env 中的端口配置
 FRONTEND_PORT=8081
 BACKEND_PORT=8082
+
+# 或在 docker-compose.yml 中直接修改端口映射
+ports:
+  - "8081:80"    # 前端
+  - "8082:8080"  # 后端
+```
+
+### 内存不足
+
+如果遇到内存不足的问题：
+
+```bash
+# 在 Docker Desktop Settings 中增加内存分配
+# 或减少 docker-compose.yml 中的内存限制
+
+# 查看容器资源使用情况
+docker stats
 ```
 
 ## 📝 最佳实践

@@ -1,0 +1,32 @@
+version: '3.8'
+
+# 生产环境配置（覆盖 docker-compose.yml）
+# 使用方式: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  backend:
+    environment:
+      - APP_JDBC_SHOW_SQL=false
+      - APP_SWAGGER_ENABLED=false
+      - MANAGEMENT_SECURITY_ENABLED=true
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '2.0'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  frontend:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+

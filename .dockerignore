@@ -1,13 +1,52 @@
-**/node_modules
-**/target
-**/.git
-**/.idea
-**/.vscode
-**/dist
-**/logs
-upload/
-.DS_Store
-adminpro.log
-adminpro-error.log
-terminals
+# Git
+.git
+.gitignore
+.gitattributes
 
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Node
+node_modules
+npm-debug.log
+pnpm-debug.log
+
+# Build outputs
+dist
+target
+*.jar
+*.war
+
+# Logs
+logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Documentation
+*.md
+!README.md
+
+# Uploads
+upload
+
+# Maven
+.mvn
+mvnw
+mvnw.cmd

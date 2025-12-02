@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, Tabs, Space, Breadcrumb, Button, Divider } from 'antd';
-import { 
-  SafetyOutlined, 
+import {
+  SafetyOutlined,
   UserOutlined,
   HomeOutlined
 } from '@ant-design/icons';
@@ -66,7 +66,7 @@ function Settings() {
   ];
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
+    <div style={{ padding: '24px', minHeight: '100vh' }}>
       {/* 面包屑导航 */}
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
         <Breadcrumb
@@ -89,7 +89,7 @@ function Settings() {
           ]}
         />
       </div>
-      
+
       <Divider />
 
       <Card>

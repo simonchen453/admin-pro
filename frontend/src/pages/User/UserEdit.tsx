@@ -12,24 +12,29 @@ import {
   ReloadOutlined
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getUserDetailApi, getUserPrepareDataApi } from '../../api/user';
+import { getUserDetailApi, getUserPrepareDataApi, getDeptTreeSelectApi } from '../../api/user';
 import UserForm from './UserForm';
 import type {
   UserEntity,
-  UserDetailResponse,
-  DeptEntity,
   RoleEntity,
   PostEntity
 } from '../../types';
 
 const { Title } = Typography;
 
+interface DeptTreeNode {
+  key: string;
+  title: string;
+  value: string;
+  children?: DeptTreeNode[];
+}
+
 const UserEdit: React.FC = () => {
   const { userDomain, userId } = useParams<{ userDomain: string; userId: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<UserEntity | null>(null);
-  const [deptList, setDeptList] = useState<DeptEntity[]>([]);
+  const [deptTreeData, setDeptTreeData] = useState<DeptTreeNode[]>([]);
   const [roleList, setRoleList] = useState<RoleEntity[]>([]);
   const [postList, setPostList] = useState<PostEntity[]>([]);
 
@@ -42,6 +47,8 @@ const UserEdit: React.FC = () => {
       const detail = await getUserDetailApi(userDomain, userId);
       // 转换为UserEntity格式
       const userEntity: UserEntity = {
+        userDomain: detail.userDomain,
+        userId: detail.userId,
         userIden: {
           userDomain: detail.userDomain,
           userId: detail.userId
@@ -66,13 +73,30 @@ const UserEdit: React.FC = () => {
     }
   };
 
+  // 转换部门树数据
+  const convertDeptTree = (data: Array<{ id: string; label: string; children?: any[] }>): DeptTreeNode[] => {
+    if (!data || data.length === 0) {
+      return [];
+    }
+    return data.map(item => ({
+      key: item.id,
+      title: item.label,
+      value: item.id,
+      children: item.children ? convertDeptTree(item.children) : undefined
+    }));
+  };
+
   // 获取准备数据
   const fetchPrepareData = async () => {
     try {
-      const data = await getUserPrepareDataApi();
-      setDeptList(data.depts || []);
-      setRoleList(data.roles || []);
-      setPostList(data.posts || []);
+      const [deptData, prepareData] = await Promise.all([
+        getDeptTreeSelectApi(),
+        getUserPrepareDataApi()
+      ]);
+      const treeData = convertDeptTree(deptData as Array<{ id: string; label: string; children?: any[] }>);
+      setDeptTreeData(treeData);
+      setRoleList(prepareData.roles || []);
+      setPostList(prepareData.posts || []);
     } catch (error) {
       console.error('获取准备数据失败:', error);
     }
@@ -139,7 +163,7 @@ const UserEdit: React.FC = () => {
       >
         <UserForm
           user={user}
-          deptList={deptList}
+          deptTreeData={deptTreeData}
           roleList={roleList}
           postList={postList}
           onSuccess={handleSuccess}

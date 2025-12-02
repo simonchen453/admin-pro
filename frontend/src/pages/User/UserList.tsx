@@ -15,7 +15,8 @@ import {
   Pagination,
   Tree,
   Breadcrumb,
-  Divider
+  Divider,
+  Typography
 } from 'antd';
 import {
   PlusOutlined,
@@ -28,7 +29,9 @@ import {
   DeleteOutlined,
   HomeOutlined,
   UploadOutlined,
-  DownloadOutlined
+  DownloadOutlined,
+  ApartmentOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -55,6 +58,7 @@ import { UserStatus } from '../../types';
 import UserForm from './UserForm';
 
 const { Option } = Select;
+const { Title } = Typography;
 
 const UserList: React.FC = () => {
   const navigate = useNavigate();
@@ -68,7 +72,7 @@ const UserList: React.FC = () => {
   const [searchForm, setSearchForm] = useState<UserSearchForm>({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<UserEntity[]>([]);
-  
+
   // 模态框状态
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState<UserEntity | null>(null);
@@ -77,7 +81,7 @@ const UserList: React.FC = () => {
   const [resetTargetUser, setResetTargetUser] = useState<UserEntity | null>(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [importLoading, setImportLoading] = useState(false);
-  
+
   // 下拉选项数据
   const [deptTreeData, setDeptTreeData] = useState<DeptTreeNode[]>([]);
   const [roleList, setRoleList] = useState<RoleEntity[]>([]);
@@ -134,10 +138,10 @@ const UserList: React.FC = () => {
         getUserPrepareDataApi(),
         getDomainListApi()
       ]);
-      
+
       const apiDeptData = deptData as unknown as DeptTreeApiResponse[];
       const treeData = convertDeptTree(apiDeptData);
-      
+
       setDeptTreeData(treeData);
       setRoleList(prepareData.roles || []);
       setPostList(prepareData.posts || []);
@@ -154,21 +158,18 @@ const UserList: React.FC = () => {
   // 获取用户列表
   const fetchUserList = async (params: UserSearchForm = {}) => {
     setLoading(true);
-    
+
     try {
       const response = await getUserListApi({
         ...params,
         page: params.page ?? currentPage,
         pageSize: params.pageSize ?? pageSize
       });
-      
+
       const responseData = response as any;
       const list = responseData?.list || responseData?.records || responseData?.data?.list || responseData?.data?.records || [];
       const total = responseData?.pagination?.total || responseData?.totalCount || responseData?.data?.pagination?.total || responseData?.data?.totalCount || 0;
-      
-      console.log('提取后的list:', list);
-      console.log('提取后的total:', total);
-      
+
       if (Array.isArray(list)) {
         setUserList(list);
         setTotal(total);
@@ -211,6 +212,7 @@ const UserList: React.FC = () => {
 
   // 激活用户
   const handleActive = (user: UserEntity) => {
+    if (!user.userIden) return;
     Modal.confirm({
       title: '确认启用',
       content: `确定要启用用户 ${user.realName} 吗？`,
@@ -218,6 +220,7 @@ const UserList: React.FC = () => {
       cancelText: '取消',
       onOk: async () => {
         try {
+          if (!user.userIden) return;
           const result = await activeUserApi(user.userIden.userDomain, user.userIden.userId);
           if (result.success) {
             message.success('用户激活成功');
@@ -234,6 +237,7 @@ const UserList: React.FC = () => {
 
   // 停用用户
   const handleInactive = (user: UserEntity) => {
+    if (!user.userIden) return;
     Modal.confirm({
       title: '确认停用',
       content: `确定要停用用户 ${user.realName} 吗？`,
@@ -241,6 +245,7 @@ const UserList: React.FC = () => {
       cancelText: '取消',
       onOk: async () => {
         try {
+          if (!user.userIden) return;
           const result = await inactiveUserApi(user.userIden.userDomain, user.userIden.userId);
           if (result.success) {
             message.success('用户停用成功');
@@ -263,7 +268,7 @@ const UserList: React.FC = () => {
   };
 
   const handleResetPwdSubmit = async () => {
-    if (!resetTargetUser) {
+    if (!resetTargetUser || !resetTargetUser.userIden) {
       return;
     }
     try {
@@ -322,15 +327,18 @@ const UserList: React.FC = () => {
       message.warning('请选择要删除的用户');
       return;
     }
-    
+
     let ids = '';
     for (let i = 0; i < selectedUsers.length; i++) {
-      ids += selectedUsers[i].userIden.userDomain + '_' + selectedUsers[i].userIden.userId + ',';
+      const user = selectedUsers[i];
+      if (user.userIden) {
+        ids += user.userIden.userDomain + '_' + user.userIden.userId + ',';
+      }
     }
     if (ids.indexOf(',') !== -1) {
       ids = ids.slice(0, ids.length - 1);
     }
-    
+
     Modal.confirm({
       title: '确认删除',
       content: `确定要删除选中的 ${selectedUsers.length} 个用户吗？`,
@@ -355,11 +363,13 @@ const UserList: React.FC = () => {
 
   // 单个删除
   const handleDelete = (user: UserEntity) => {
+    if (!user.userIden) return;
     Modal.confirm({
       title: '确认删除',
       content: `是否删除用户(${user.realName})？`,
       onOk: async () => {
         try {
+          if (!user.userIden) return;
           const userId = user.userIden.userDomain + '_' + user.userIden.userId;
           const response = await deleteUserApi(userId);
           if (response.restCode === '200') {
@@ -415,7 +425,10 @@ const UserList: React.FC = () => {
     try {
       let ids = '';
       for (let i = 0; i < selectedUsers.length; i++) {
-        ids += selectedUsers[i].userIden.userDomain + '_' + selectedUsers[i].userIden.userId + ',';
+        const user = selectedUsers[i];
+        if (user.userIden) {
+          ids += user.userIden.userDomain + '_' + user.userIden.userId + ',';
+        }
       }
       if (ids.indexOf(',') !== -1) {
         ids = ids.slice(0, ids.length - 1);
@@ -480,8 +493,6 @@ const UserList: React.FC = () => {
         const domain = domainList.find(d => d.name === userDomain || d.id === userDomain);
         return domain ? domain.display : userDomain;
       },
-      // 可以去掉width，让其自动适应
-      // minWidth自定义class可以在table组件的columns上加className
     },
     {
       title: '登录名',
@@ -516,14 +527,13 @@ const UserList: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      width: 60,
+      width: 80,
       render: (status: string) => getStatusTag(status)
     },
     {
       title: '操作',
       key: 'action',
       fixed: 'right',
-      // 操作列可给最小宽
       width: 330,
       render: (_, record: UserEntity) => (
         <Space size="small">
@@ -532,6 +542,7 @@ const UserList: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             type="primary"
+            ghost
           >
             修改
           </Button>
@@ -539,7 +550,7 @@ const UserList: React.FC = () => {
             size="small"
             icon={<ReloadOutlined />}
             onClick={() => handleResetPassword(record)}
-            type="primary"
+            type="default"
           >
             重置密码
           </Button>
@@ -567,6 +578,7 @@ const UserList: React.FC = () => {
               icon={<UserDeleteOutlined />}
               onClick={() => handleInactive(record)}
               type="default"
+              danger
             >
               停用
             </Button>
@@ -586,47 +598,23 @@ const UserList: React.FC = () => {
   ];
 
   useEffect(() => {
-    // 先加载部门数据
     fetchPrepareData();
-    // 然后加载用户数据
     fetchUserList();
   }, []);
 
-  // 当部门数据加载完成后，确保树能正确显示
-  useEffect(() => {
-    if (deptTreeData.length > 0) {
-      console.log('部门树数据已加载:', deptTreeData);
-    } else {
-      console.log('部门树数据为空，长度:', deptTreeData.length);
-    }
-  }, [deptTreeData]);
-
-  // 监控userList变化，用于调试
-  useEffect(() => {
-    console.log('userList状态变化:', {
-      length: userList.length,
-      data: userList,
-      total: total,
-      loading: loading
-    });
-  }, [userList, total, loading]);
-
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      {/* 面包屑导航 */}
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+      {/* Page Header */}
+      <div className="page-header">
         <Breadcrumb
+          className="page-header-breadcrumb"
           items={[
             {
               title: (
-                <Button
-                  type="link"
-                  icon={<HomeOutlined />}
-                  onClick={() => navigate('/')}
-                  style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-                >
-                  首页
-                </Button>
+                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                  <HomeOutlined />
+                  <span>首页</span>
+                </Space>
               )
             },
             {
@@ -635,37 +623,43 @@ const UserList: React.FC = () => {
           ]}
         />
       </div>
-      
-      <Divider />
 
-      <Row gutter={20} wrap={false}>
+      <Row gutter={24} wrap={false}>
         {/* 部门树 */}
         <Col
-          flex="0 0 300px"
-          style={{ minWidth: 260, maxWidth: 350 }}
+          flex="0 0 280px"
+          style={{ minWidth: 260, maxWidth: 320 }}
         >
-          <Card title="部门列表" size="small" style={{ marginBottom: 16, height: '600px' }}>
+          <Card
+            title={
+              <Space>
+                <ApartmentOutlined style={{ color: '#6366f1' }} />
+                <span>部门列表</span>
+              </Space>
+            }
+            size="small"
+            className="modern-card"
+            style={{ marginBottom: 16, height: 'calc(100vh - 140px)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+            bodyStyle={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+          >
             <Input
-              placeholder="请输入部门名称"
+              placeholder="搜索部门"
               style={{ marginBottom: 16 }}
               allowClear
-              prefix={<SearchOutlined />}
+              prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
             />
-            <div style={{ 
-              height: '500px', 
-              overflow: 'auto', 
-              border: '1px solid #f0f0f0', 
-              borderRadius: '6px', 
-              padding: '12px', 
-              background: '#fafafa'
-            }}>
+            <div style={{
+              flex: 1,
+              overflow: 'auto',
+              padding: '4px',
+            }} className="custom-scrollbar">
               {deptTreeData.length > 0 ? (
                 <Tree
                   treeData={deptTreeData}
                   showLine={false}
                   defaultExpandAll
+                  blockNode
                   onSelect={(selectedKeys, info) => {
-                    console.log('选中部门:', selectedKeys, info);
                     if (selectedKeys.length > 0) {
                       const deptId = selectedKeys[0] as string;
                       setSearchForm(prev => ({ ...prev, deptId }));
@@ -678,116 +672,91 @@ const UserList: React.FC = () => {
                   }}
                 />
               ) : (
-                <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
+                <div style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
                   <div>暂无部门数据</div>
-                  <div style={{ fontSize: '12px', marginTop: '8px' }}>
-                    部门数量: {deptTreeData.length}
-                  </div>
                 </div>
               )}
             </div>
           </Card>
         </Col>
+
         {/* 用户数据 */}
         <Col flex="1 1 0" style={{ minWidth: 0 }}>
-          <Card>
+          <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
             {/* 搜索表单 */}
-            <Card size="small" style={{ marginBottom: 16 }}>
-              <Form autoComplete="off"
-                form={form}
-                layout="inline"
-                onFinish={handleSearch}
-              >
-                <Row gutter={[16, 16]} style={{ width: '100%' }}>
-                  <Col xs={24} sm={12} md={6}>
-                    <Form.Item name="userDomain" label="用户域">
-                      <Select placeholder="请选择用户域" allowClear style={{ width: '100%' }}>
-                        {domainList.map(domain => (
-                          <Option key={domain.name} value={domain.name}>
-                            {domain.display}
-                          </Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={12} md={6}>
-                    <Form.Item name="loginName" label="登录名">
-                      <Input placeholder="请输入登录名" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={12} md={6}>
-                    <Form.Item name="realName" label="用户姓名">
-                      <Input placeholder="请输入用户姓名" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={12} md={6}>
-                    <Form.Item name="status" label="状态">
-                      <Select placeholder="请选择状态" allowClear style={{ width: '100%' }}>
-                        <Option value={UserStatus.ACTIVE}>正常</Option>
-                        <Option value={UserStatus.INACTIVE}>停用</Option>
-                        <Option value={UserStatus.LOCKED}>锁定</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col span={24} style={{ textAlign: 'left', marginTop: 26, marginLeft: 2, marginBottom: 10 }}>
-                    <Space>
-                      <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                        搜索
-                      </Button>
-                      <Button onClick={handleReset} icon={<ClearOutlined />}>
-                        重置
-                      </Button>
-                    </Space>
-                  </Col>
-                </Row>
-              </Form>
-            </Card>
+            <Form autoComplete="off"
+              form={form}
+              layout="inline"
+              onFinish={handleSearch}
+              style={{ marginBottom: 24 }}
+            >
+              <Row gutter={[16, 16]} style={{ width: '100%' }}>
+                <Col xs={24} sm={12} md={6}>
+                  <Form.Item name="userDomain" style={{ marginBottom: 0 }}>
+                    <Select placeholder="用户域" allowClear style={{ width: '100%' }}>
+                      {domainList.map(domain => (
+                        <Option key={domain.name} value={domain.name}>
+                          {domain.display}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12} md={6}>
+                  <Form.Item name="loginName" style={{ marginBottom: 0 }}>
+                    <Input placeholder="登录名" prefix={<UserOutlined style={{ color: '#cbd5e1' }} />} />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12} md={6}>
+                  <Form.Item name="realName" style={{ marginBottom: 0 }}>
+                    <Input placeholder="用户姓名" prefix={<UserOutlined style={{ color: '#cbd5e1' }} />} />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12} md={6}>
+                  <Space>
+                    <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                      搜索
+                    </Button>
+                    <Button onClick={handleReset} icon={<ClearOutlined />}>
+                      重置
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
+            </Form>
 
             {/* 操作按钮 */}
-            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'white', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Space>
                 <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-                  新增
+                  新增用户
                 </Button>
-                <Button 
-                  type="primary" 
-                  danger 
-                  icon={<DeleteOutlined />} 
+                <Button
+                  danger
+                  icon={<DeleteOutlined />}
                   disabled={selectedUsers.length === 0}
                   onClick={handleBatchDelete}
                 >
-                  删除
+                  批量删除
                 </Button>
-                <Button 
-                  icon={<UploadOutlined />} 
+                <Button
+                  icon={<UploadOutlined />}
                   onClick={handleImport}
                   loading={importLoading}
                 >
                   导入
                 </Button>
-                <Button 
-                  icon={<DownloadOutlined />} 
-                  disabled={selectedUsers.length === 0}
-                  onClick={handleExport}
-                >
-                  导出选中
-                </Button>
-                <Button 
-                  icon={<DownloadOutlined />} 
+                <Button
+                  icon={<DownloadOutlined />}
                   onClick={handleExportAll}
                 >
-                  导出全部
+                  导出
                 </Button>
               </Space>
-              <div>
-                已选择 {selectedUsers.length} 项
-              </div>
             </div>
 
             {/* 用户表格 */}
-            <div style={{ background: 'white', borderRadius: '8px', overflow: 'hidden' }}>
+            <div className="modern-table">
               <Table
                 columns={columns}
                 dataSource={userList}
@@ -800,7 +769,7 @@ const UserList: React.FC = () => {
                 }}
                 rowSelection={rowSelection}
                 pagination={false}
-                size="small"
+                size="middle"
                 locale={{
                   emptyText: userList.length === 0 && !loading ? '暂无数据' : undefined
                 }}
@@ -808,7 +777,7 @@ const UserList: React.FC = () => {
             </div>
 
             {/* 分页 */}
-            <div style={{ marginTop: 16, textAlign: 'right', padding: '16px', background: 'white', borderRadius: '8px' }}>
+            <div style={{ marginTop: 24, textAlign: 'right' }}>
               <Pagination
                 current={currentPage}
                 pageSize={pageSize}
@@ -837,7 +806,7 @@ const UserList: React.FC = () => {
         width={800}
       >
         <UserForm
-          key={editingUser ? `edit-${editingUser.userIden.userDomain}-${editingUser.userIden.userId}` : `new-${formKey}`}
+          key={editingUser ? `edit-${editingUser.userIden?.userDomain}-${editingUser.userIden?.userId}` : `new-${formKey}`}
           user={editingUser}
           deptTreeData={convertToTreeSelectData(deptTreeData)}
           roleList={roleList}

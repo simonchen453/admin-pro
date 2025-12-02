@@ -14,7 +14,8 @@ import {
   Col,
   Pagination,
   Breadcrumb,
-  Divider
+  Divider,
+  Typography
 } from 'antd';
 import {
   PlusOutlined,
@@ -42,6 +43,7 @@ import {
 import RoleForm from './RoleForm';
 
 const { Option } = Select;
+const { Title } = Typography;
 
 const RoleList: React.FC = () => {
   const navigate = useNavigate();
@@ -57,7 +59,7 @@ const RoleList: React.FC = () => {
   // 模态框状态
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRole, setEditingRole] = useState<RoleEntity | null>(null);
-  
+
   // 菜单树数据
   const [menuOptions, setMenuOptions] = useState<MenuTreeNode[]>([]);
 
@@ -296,6 +298,7 @@ const RoleList: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             type="primary"
+            ghost
           >
             修改
           </Button>
@@ -321,106 +324,88 @@ const RoleList: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      {/* 面包屑导航 */}
-      <Breadcrumb
-        items={[
-          {
-            title: (
-              <Button
-                type="link"
-                icon={<HomeOutlined />}
-                onClick={() => navigate('/')}
-                style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-              >
-                首页
-              </Button>
-            )
-          },
-          {
-            title: '角色管理'
-          }
-        ]}
-      />
-      
-      <Divider />
-
-      <Card>
-        {/* 搜索表单 */}
-        <Card size="small" style={{ marginBottom: 16 }}>
-          <Form autoComplete="off"
-            form={form}
-            layout="inline"
-            onFinish={handleSearch}
-          >
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="name" label="编号">
-                  <Input placeholder="请输入编号" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="display" label="显示名称">
-                  <Input placeholder="请输入显示名称" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="status" label="状态">
-                  <Select placeholder="请选择状态" allowClear style={{ width: '100%' }}>
-                    <Option value={RoleStatus.ACTIVE}>正常</Option>
-                    <Option value={RoleStatus.INACTIVE}>停用</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="system" label="系统配置">
-                  <Select placeholder="请选择系统配置" allowClear style={{ width: '100%' }}>
-                    <Option value={SystemConfig.YES}>是</Option>
-                    <Option value={SystemConfig.NO}>否</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24} style={{ textAlign: 'left', marginTop: 26, marginLeft: 2, marginBottom: 10 }}>
-                <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                    搜索
-                  </Button>
-                  <Button onClick={handleReset} icon={<ClearOutlined />}>
-                    重置
-                  </Button>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+      {/* Page Header */}
+      <div className="page-header">
+        <Breadcrumb
+          className="page-header-breadcrumb"
+          items={[
+            {
+              title: (
+                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                  <HomeOutlined />
+                  <span>首页</span>
                 </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+              )
+            },
+            {
+              title: '角色管理'
+            }
+          ]}
+        />
+      </div>
+
+      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+        {/* 搜索表单 */}
+        <Form autoComplete="off"
+          form={form}
+          layout="inline"
+          onFinish={handleSearch}
+          style={{ marginBottom: 24 }}
+        >
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="name" style={{ marginBottom: 0 }}>
+                <Input placeholder="编号" prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="display" style={{ marginBottom: 0 }}>
+                <Input placeholder="显示名称" prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="status" style={{ marginBottom: 0 }}>
+                <Select placeholder="状态" allowClear style={{ width: '100%' }}>
+                  <Option value={RoleStatus.ACTIVE}>正常</Option>
+                  <Option value={RoleStatus.INACTIVE}>停用</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  重置
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Form>
 
         {/* 操作按钮 */}
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'white', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space>
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-              新增
+              新增角色
             </Button>
-            <Button 
-              type="primary" 
-              danger 
-              icon={<DeleteOutlined />} 
+            <Button
+              danger
+              icon={<DeleteOutlined />}
               disabled={selectedRoles.length === 0}
               onClick={() => {
                 handleBatchDelete();
               }}
             >
-              删除
+              批量删除
             </Button>
           </Space>
-          <div>
-            已选择 {selectedRoles.length} 项
-          </div>
         </div>
 
         {/* 角色表格 */}
-        <div style={{ background: 'white', borderRadius: '8px', overflow: 'hidden' }}>
+        <div className="modern-table">
           <Table
             columns={columns}
             dataSource={roleList}
@@ -428,13 +413,15 @@ const RoleList: React.FC = () => {
             rowKey={(record) => record.id || `role-${record.name}`}
             rowSelection={rowSelection}
             pagination={false}
-            scroll={{ x: 800 }}
-            size="small"
+            size="middle"
+            locale={{
+              emptyText: roleList.length === 0 && !loading ? '暂无数据' : undefined
+            }}
           />
         </div>
 
         {/* 分页 */}
-        <div style={{ marginTop: 16, textAlign: 'right', padding: '16px', background: 'white', borderRadius: '8px' }}>
+        <div style={{ marginTop: 24, textAlign: 'right' }}>
           <Pagination
             current={currentPage}
             pageSize={pageSize}

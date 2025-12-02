@@ -13,8 +13,7 @@ import {
   Row,
   Col,
   Pagination,
-  Breadcrumb,
-  Divider
+  Breadcrumb
 } from 'antd';
 import {
   PlusOutlined,
@@ -51,7 +50,7 @@ const DictList: React.FC = () => {
   const [searchForm, setSearchForm] = useState<DictSearchForm>({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedDicts, setSelectedDicts] = useState<DictEntity[]>([]);
-  
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingDict, setEditingDict] = useState<DictEntity | null>(null);
   const [formKey, setFormKey] = useState(0);
@@ -165,7 +164,7 @@ const DictList: React.FC = () => {
       message.warning('请选择要删除的字典');
       return;
     }
-    
+
     let ids = '';
     for (let i = 0; i < selectedDicts.length; i++) {
       ids += selectedDicts[i].id + ',';
@@ -173,7 +172,7 @@ const DictList: React.FC = () => {
     if (ids.indexOf(',') !== -1) {
       ids = ids.slice(0, ids.length - 1);
     }
-    
+
     Modal.confirm({
       title: '确认删除',
       content: `确定要删除选中的 ${selectedDicts.length} 个字典吗？`,
@@ -276,6 +275,7 @@ const DictList: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             type="primary"
+            ghost
           >
             修改
           </Button>
@@ -291,8 +291,9 @@ const DictList: React.FC = () => {
           {record.status === 'active' && (
             <Button
               size="small"
-              type="primary"
+              type="default"
               onClick={() => handleInactive(record)}
+              danger
             >
               停用
             </Button>
@@ -316,94 +317,82 @@ const DictList: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+      <div className="page-header">
         <Breadcrumb
+          className="page-header-breadcrumb"
           items={[
             {
               title: (
-                <Button
-                  type="link"
-                  icon={<HomeOutlined />}
-                  onClick={() => navigate('/')}
-                  style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-                >
-                  首页
-                </Button>
+                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                  <HomeOutlined />
+                  <span>首页</span>
+                </Space>
               )
             },
             {
-              title: '字典类型管理'
+              title: '字典管理'
             }
           ]}
         />
       </div>
-      
-      <Divider />
 
-      <Card>
-        <Card size="small" style={{ marginBottom: 16 }}>
-          <Form autoComplete="off"
-            form={form}
-            layout="inline"
-            onFinish={handleSearch}
-          >
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="name" label="字典名称">
-                  <Input placeholder="请输入字典名称" onPressEnter={() => form.submit()} />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="key" label="字典类型">
-                  <Input placeholder="请输入字典类型" onPressEnter={() => form.submit()} />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="status" label="状态">
-                  <Select placeholder="请选择状态" allowClear>
-                    <Option value="active">启用</Option>
-                    <Option value="inactive">停用</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24} style={{ textAlign: 'left', marginTop: 26, marginLeft: 2, marginBottom: 10 }}>
-                <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                    搜索
-                  </Button>
-                  <Button onClick={handleReset} icon={<ClearOutlined />}>
-                    重置
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+        <Form autoComplete="off"
+          form={form}
+          layout="inline"
+          onFinish={handleSearch}
+          style={{ marginBottom: 24 }}
+        >
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="name" style={{ marginBottom: 0 }}>
+                <Input placeholder="字典名称" onPressEnter={() => form.submit()} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="key" style={{ marginBottom: 0 }}>
+                <Input placeholder="字典类型" onPressEnter={() => form.submit()} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="status" style={{ marginBottom: 0 }}>
+                <Select placeholder="状态" allowClear>
+                  <Option value="active">启用</Option>
+                  <Option value="inactive">停用</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  重置
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Form>
 
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'white', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space>
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
               新增
             </Button>
-            <Button 
-              type="primary" 
-              danger 
-              icon={<DeleteOutlined />} 
+            <Button
+              danger
+              icon={<DeleteOutlined />}
               disabled={selectedDicts.length === 0}
               onClick={handleBatchDelete}
             >
               删除
             </Button>
           </Space>
-          <div>
-            已选择 {selectedDicts.length} 项
-          </div>
         </div>
 
-        <div style={{ background: 'white', borderRadius: '8px', overflow: 'hidden' }}>
+        <div className="modern-table">
           <Table
             columns={columns}
             dataSource={dictList}
@@ -411,14 +400,14 @@ const DictList: React.FC = () => {
             rowKey={(record, index) => record.id || `row-${index}`}
             rowSelection={rowSelection}
             pagination={false}
-            size="small"
+            size="middle"
             locale={{
               emptyText: dictList.length === 0 && !loading ? '暂无数据' : undefined
             }}
           />
         </div>
 
-        <div style={{ marginTop: 16, textAlign: 'right', padding: '16px', background: 'white', borderRadius: '8px' }}>
+        <div style={{ marginTop: 24, textAlign: 'right' }}>
           <Pagination
             current={currentPage}
             pageSize={pageSize}
@@ -462,4 +451,3 @@ const DictList: React.FC = () => {
 };
 
 export default DictList;
-

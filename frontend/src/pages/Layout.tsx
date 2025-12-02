@@ -1,12 +1,12 @@
-import { Layout as AntLayout, Menu, theme, Button, Avatar, Dropdown, Space, Typography } from 'antd';
+import { Layout as AntLayout, Menu, theme, Button, Avatar, Dropdown, Space, Typography, Tooltip } from 'antd';
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { 
-    UserOutlined, 
-    DashboardOutlined, 
-    MenuFoldOutlined, 
-    MenuUnfoldOutlined, 
-    LogoutOutlined, 
+import {
+    UserOutlined,
+    DashboardOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
+    LogoutOutlined,
     SettingOutlined,
     HomeOutlined,
     KeyOutlined,
@@ -47,7 +47,7 @@ function MainLayout() {
     const navigate = useNavigate();
     const { logout, currentUser } = useAuthStore();
     const {
-        token: { colorBgContainer },
+        token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
     const location = useLocation();
@@ -375,117 +375,139 @@ function MainLayout() {
 
     return (
         <AntLayout style={{ minHeight: '100vh' }}>
-            <Sider 
-                collapsible 
-                collapsed={collapsed} 
+            <Sider
+                collapsible
+                collapsed={collapsed}
                 onCollapse={(value) => setCollapsed(value)}
                 trigger={null}
                 breakpoint="lg"
                 collapsedWidth="0"
-                width={280}
+                width={260}
+                className="glass-effect-dark"
+                style={{
+                    position: 'fixed',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    zIndex: 1001,
+                    boxShadow: '4px 0 16px rgba(0,0,0,0.1)',
+                }}
             >
                 <div className="logo">
                     <div className="layout-logo-background">
                         <img src="/logo.svg" alt="Admin Pro" className="layout-logo-image" />
                     </div>
                     {!collapsed && (
-                        <div className="logo-text">
+                        <div className="logo-text fade-in">
                             <div className="logo-title">{systemInfo?.platformShortName || 'Admin Pro'}</div>
-                            <div className="logo-subtitle">管理系统</div>
+                            <div className="logo-subtitle">企业级管理系统</div>
                         </div>
                     )}
                 </div>
-                <Menu
-                    theme="dark"
-                    mode="inline"
-                    selectedKeys={selectedKeys}
-                    openKeys={openKeys}
-                    onClick={handleMenuClick}
-                    onOpenChange={handleOpenChange}
-                    items={menuItems.map(item => ({
-                        key: item.key,
-                        icon: item.icon,
-                        label: item.label,
-                        children: item.children?.map(child => ({
-                            key: child.key,
-                            icon: child.icon,
-                            label: child.label,
-                        })),
-                    }))}
-                />
+                <div style={{ height: 'calc(100vh - 64px)', overflowY: 'auto', overflowX: 'hidden' }} className="custom-scrollbar">
+                    <Menu
+                        theme="dark"
+                        mode="inline"
+                        selectedKeys={selectedKeys}
+                        openKeys={openKeys}
+                        onClick={handleMenuClick}
+                        onOpenChange={handleOpenChange}
+                        items={menuItems.map(item => ({
+                            key: item.key,
+                            icon: item.icon,
+                            label: item.label,
+                            children: item.children?.map(child => ({
+                                key: child.key,
+                                icon: child.icon,
+                                label: child.label,
+                            })),
+                        }))}
+                        style={{ background: 'transparent', borderRight: 0 }}
+                    />
+                </div>
             </Sider>
-            <AntLayout>
-                <Header style={{ 
-                    padding: '0 16px', 
-                    background: colorBgContainer,
+            <AntLayout style={{
+                marginLeft: collapsed ? 0 : 260,
+                transition: 'margin-left 0.2s',
+                background: '#f3f4f6'
+            }}>
+                <Header style={{
+                    padding: '0 24px',
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    boxShadow: '0 1px 4px rgba(0,21,41,.08)'
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1000,
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+                    height: 64,
+                    borderBottom: '1px solid rgba(0,0,0,0.03)'
                 }}>
                     <Button
                         type="text"
                         icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                         onClick={() => setCollapsed(!collapsed)}
-                        style={{ fontSize: '16px', width: 64, height: 64 }}
+                        style={{ fontSize: '18px', width: 48, height: 48 }}
                     />
-                    
-                    <Space>
+
+                    <Space size={24}>
+                        <Tooltip title="个人设置">
+                            <Button type="text" shape="circle" icon={<SettingOutlined />} onClick={() => navigate('/settings')} />
+                        </Tooltip>
                         <Dropdown
                             menu={{
                                 items: userMenuItems,
                                 onClick: handleUserMenuClick,
                             }}
                             placement="bottomRight"
+                            arrow
                         >
-                            <Space style={{ cursor: 'pointer' }}>
-                                <Avatar 
-                                    src={currentUserInfo?.avatarUrl || currentUser?.avatarUrl || currentUser?.avatar} 
-                                    icon={<UserOutlined />} 
+                            <Space style={{ cursor: 'pointer' }} className="user-dropdown">
+                                <Avatar
+                                    src={currentUserInfo?.avatarUrl || currentUser?.avatarUrl || currentUser?.avatar}
+                                    icon={<UserOutlined />}
+                                    style={{ backgroundColor: '#6366f1' }}
                                 />
-                                <Text>
-                                    {(() => {
-                                        const displayName = currentUserInfo?.realName || 
-                                                           currentUser?.realName || 
-                                                           currentUser?.name || 
-                                                           currentUserInfo?.loginName ||
-                                                           '管理员';
-                                        // 开发环境下打印调试信息
-                                        if (import.meta.env.DEV) {
-                                            console.log('当前用户信息显示:', {
-                                                currentUserInfo,
-                                                currentUser,
-                                                displayName
-                                            });
-                                        }
-                                        return displayName;
-                                    })()}
-                                </Text>
+                                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                                    <Text strong>
+                                        {(() => {
+                                            const displayName = currentUserInfo?.realName ||
+                                                currentUser?.realName ||
+                                                currentUser?.name ||
+                                                currentUserInfo?.loginName ||
+                                                '管理员';
+                                            return displayName;
+                                        })()}
+                                    </Text>
+                                    <Text type="secondary" style={{ fontSize: 12 }}>
+                                        {currentUserInfo?.roleName || '系统管理员'}
+                                    </Text>
+                                </div>
                             </Space>
                         </Dropdown>
                     </Space>
                 </Header>
-                <Content style={{ 
-                    margin: '16px', 
-                    padding: '24px', 
-                    background: colorBgContainer, 
-                    minHeight: 360,
-                    borderRadius: '8px',
-                    boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                <Content style={{
+                    margin: '24px',
+                    minHeight: 280,
                 }}>
-                    <Outlet />
-                </Content>
-                <Footer style={{ textAlign: 'center' }}>
-                    <div className="copyright-text">
-                        {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} Admin Pro 管理系统. All rights reserved.`}
+                    <div className="fade-in" style={{
+                        background: colorBgContainer,
+                        padding: 24,
+                        borderRadius: borderRadiusLG,
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
+                        minHeight: 'calc(100vh - 160px)'
+                    }}>
+                        <Outlet />
                     </div>
-                    {(systemInfo?.releaseVersion || systemInfo?.buildVersion) && (
-                        <div className="copyright-subtitle" style={{ marginTop: '8px' }}>
-                            {systemInfo.releaseVersion && <span>版本: {systemInfo.releaseVersion}</span>}
-                            {systemInfo.releaseVersion && systemInfo.buildVersion && <span style={{ margin: '0 8px' }}>|</span>}
-                            {systemInfo.buildVersion && <span>构建版本: {systemInfo.buildVersion}</span>}
-                        </div>
-                    )}
+                </Content>
+                <Footer style={{ textAlign: 'center', background: 'transparent', color: '#9ca3af' }}>
+                    <div className="copyright-text">
+                        {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} Admin Pro. All rights reserved.`}
+                    </div>
                 </Footer>
             </AntLayout>
         </AntLayout>

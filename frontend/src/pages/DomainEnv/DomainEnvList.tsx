@@ -11,7 +11,6 @@ import {
   Col,
   Pagination,
   Breadcrumb,
-  Divider,
   Select
 } from 'antd';
 import {
@@ -47,7 +46,7 @@ const DomainEnvList: React.FC = () => {
   const [searchForm, setSearchForm] = useState<DomainEnvSearchForm>({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [domainList, setDomainList] = useState<Array<{ id: string; name: string; display: string }>>([]);
-  
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingDomainEnv, setEditingDomainEnv] = useState<DomainEnvEntity | null>(null);
 
@@ -219,6 +218,7 @@ const DomainEnvList: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             type="primary"
+            ghost
           >
             修改
           </Button>
@@ -237,75 +237,68 @@ const DomainEnvList: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <Breadcrumb
-        items={[
-          {
-            title: (
-              <Button
-                type="link"
-                icon={<HomeOutlined />}
-                onClick={() => navigate('/')}
-                style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-              >
-                首页
-              </Button>
-            )
-          },
-          {
-            title: '用户域环境配置管理'
-          }
-        ]}
-      />
-      
-      <Divider />
-
-      <Card>
-        <Card size="small" style={{ marginBottom: 16 }}>
-          <Form autoComplete="off"
-            form={form}
-            layout="inline"
-            onFinish={handleSearch}
-          >
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="userDomain" label="用户域">
-                  <Select
-                    placeholder="请选择用户域"
-                    allowClear
-                    style={{ width: '100%' }}
-                  >
-                    {domainList.map(domain => (
-                      <Select.Option key={domain.name} value={domain.name}>
-                        {domain.display}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24} style={{ textAlign: 'left', marginTop: 26, marginLeft: 2, marginBottom: 10 }}>
-                <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                    搜索
-                  </Button>
-                  <Button onClick={handleReset} icon={<ClearOutlined />}>
-                    重置
-                  </Button>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+      <div className="page-header">
+        <Breadcrumb
+          className="page-header-breadcrumb"
+          items={[
+            {
+              title: (
+                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                  <HomeOutlined />
+                  <span>首页</span>
                 </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+              )
+            },
+            {
+              title: '用户域配置'
+            }
+          ]}
+        />
+      </div>
 
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'white', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+        <Form autoComplete="off"
+          form={form}
+          layout="inline"
+          onFinish={handleSearch}
+          style={{ marginBottom: 24 }}
+        >
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="userDomain" style={{ marginBottom: 0 }}>
+                <Select
+                  placeholder="用户域"
+                  allowClear
+                  style={{ width: '100%' }}
+                >
+                  {domainList.map(domain => (
+                    <Select.Option key={domain.name} value={domain.name}>
+                      {domain.display}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  重置
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Form>
+
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space>
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
               新增
             </Button>
             <Button
-              type="primary"
               danger
               icon={<DeleteOutlined />}
               onClick={handleDeleteMany}
@@ -316,15 +309,14 @@ const DomainEnvList: React.FC = () => {
           </Space>
         </div>
 
-        <div style={{ background: 'white', borderRadius: '8px', overflow: 'hidden' }}>
+        <div className="modern-table">
           <Table
             columns={columns}
             dataSource={domainEnvList}
             loading={loading}
             rowKey={(record) => record.id || `domainEnv-${record.userDomain}`}
             pagination={false}
-            scroll={{ x: 800 }}
-            size="small"
+            size="middle"
             rowSelection={{
               selectedRowKeys,
               onChange: (keys) => setSelectedRowKeys(keys)
@@ -332,7 +324,7 @@ const DomainEnvList: React.FC = () => {
           />
         </div>
 
-        <div style={{ marginTop: 16, textAlign: 'right', padding: '16px', background: 'white', borderRadius: '8px' }}>
+        <div style={{ marginTop: 24, textAlign: 'right' }}>
           <Pagination
             current={currentPage}
             pageSize={pageSize}
@@ -377,4 +369,3 @@ const DomainEnvList: React.FC = () => {
 };
 
 export default DomainEnvList;
-

@@ -7,7 +7,8 @@ import {
   Breadcrumb,
   Button,
   message,
-  Spin
+  Spin,
+  Space
 } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -117,70 +118,67 @@ const ServerInfo: React.FC = () => {
 
   const cpuData = serverInfo.cpu
     ? [
-        { key: '1', label: '核心数', value: serverInfo.cpu.cpuNum },
-        { key: '2', label: '用户使用率', value: `${serverInfo.cpu.used}%` },
-        { key: '3', label: '系统使用率', value: `${serverInfo.cpu.sys}%` },
-        { key: '4', label: '当前空闲率', value: `${serverInfo.cpu.free}%` },
-      ]
+      { key: '1', label: '核心数', value: serverInfo.cpu.cpuNum },
+      { key: '2', label: '用户使用率', value: `${serverInfo.cpu.used}%` },
+      { key: '3', label: '系统使用率', value: `${serverInfo.cpu.sys}%` },
+      { key: '4', label: '当前空闲率', value: `${serverInfo.cpu.free}%` },
+    ]
     : [];
 
   const memData = serverInfo.mem && serverInfo.jvm
     ? [
-        {
-          key: '1',
-          label: '总内存',
-          mem: `${serverInfo.mem.total}G`,
-          jvm: `${serverInfo.jvm.total}M`,
-        },
-        {
-          key: '2',
-          label: '已用内存',
-          mem: `${serverInfo.mem.used}G`,
-          jvm: `${serverInfo.jvm.used}M`,
-        },
-        {
-          key: '3',
-          label: '剩余内存',
-          mem: `${serverInfo.mem.free}G`,
-          jvm: `${serverInfo.jvm.free}M`,
-        },
-        {
-          key: '4',
-          label: '使用率',
-          mem: (
-            <span style={{ color: serverInfo.mem.usage > 80 ? '#ff4d4f' : undefined }}>
-              {serverInfo.mem.usage}%
-            </span>
-          ),
-          jvm: (
-            <span style={{ color: serverInfo.jvm.usage > 80 ? '#ff4d4f' : undefined }}>
-              {serverInfo.jvm.usage}%
-            </span>
-          ),
-        },
-      ]
+      {
+        key: '1',
+        label: '总内存',
+        mem: `${serverInfo.mem.total}G`,
+        jvm: `${serverInfo.jvm.total}M`,
+      },
+      {
+        key: '2',
+        label: '已用内存',
+        mem: `${serverInfo.mem.used}G`,
+        jvm: `${serverInfo.jvm.used}M`,
+      },
+      {
+        key: '3',
+        label: '剩余内存',
+        mem: `${serverInfo.mem.free}G`,
+        jvm: `${serverInfo.jvm.free}M`,
+      },
+      {
+        key: '4',
+        label: '使用率',
+        mem: (
+          <span style={{ color: serverInfo.mem.usage > 80 ? '#ff4d4f' : undefined }}>
+            {serverInfo.mem.usage}%
+          </span>
+        ),
+        jvm: (
+          <span style={{ color: serverInfo.jvm.usage > 80 ? '#ff4d4f' : undefined }}>
+            {serverInfo.jvm.usage}%
+          </span>
+        ),
+      },
+    ]
     : [];
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+      <div className="page-header">
         <Breadcrumb
+          className="page-header-breadcrumb"
           items={[
             {
               title: (
-                <Button
-                  type="link"
-                  icon={<HomeOutlined />}
-                  onClick={() => navigate('/')}
-                  style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-                >
-                  首页
-                </Button>
-              ),
+                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                  <HomeOutlined />
+                  <span>首页</span>
+                </Space>
+              )
             },
             {
-              title: '服务器信息',
-            },
+              title: '服务器监控'
+            }
           ]}
         />
       </div>
@@ -189,31 +187,33 @@ const ServerInfo: React.FC = () => {
         {!loading && (
           <Row gutter={[20, 20]}>
             <Col xs={24} sm={24} md={12}>
-              <Card title="CPU" size="small">
+              <Card title="CPU" size="small" className="modern-card">
                 <Table
                   columns={cpuColumns}
                   dataSource={cpuData}
                   pagination={false}
                   size="small"
                   bordered
+                  className="modern-table"
                 />
               </Card>
             </Col>
 
             <Col xs={24} sm={24} md={12}>
-              <Card title="内存" size="small">
+              <Card title="内存" size="small" className="modern-card">
                 <Table
                   columns={memColumns}
                   dataSource={memData}
                   pagination={false}
                   size="small"
                   bordered
+                  className="modern-table"
                 />
               </Card>
             </Col>
 
             <Col xs={24}>
-              <Card title="服务器信息" size="small">
+              <Card title="服务器信息" size="small" className="modern-card">
                 <Row gutter={[16, 16]}>
                   <Col xs={24} sm={12}>
                     <div style={{ marginBottom: 8 }}>
@@ -244,7 +244,7 @@ const ServerInfo: React.FC = () => {
             </Col>
 
             <Col xs={24}>
-              <Card title="Java虚拟机信息" size="small">
+              <Card title="Java虚拟机信息" size="small" className="modern-card">
                 <Row gutter={[16, 16]}>
                   <Col xs={24} sm={12}>
                     <div style={{ marginBottom: 8 }}>
@@ -287,14 +287,15 @@ const ServerInfo: React.FC = () => {
             </Col>
 
             <Col xs={24}>
-              <Card title="磁盘状态" size="small">
+              <Card title="磁盘状态" size="small" className="modern-card">
                 <Table
                   columns={diskColumns}
                   dataSource={serverInfo.sysFiles || []}
                   pagination={false}
                   size="small"
                   bordered
-                  rowKey={(record: ServerSysFileInfo, index: number) => 
+                  className="modern-table"
+                  rowKey={(record: ServerSysFileInfo, index?: number) =>
                     record.dirName || `disk-${index}`
                   }
                 />
@@ -308,4 +309,3 @@ const ServerInfo: React.FC = () => {
 };
 
 export default ServerInfo;
-

@@ -1,36 +1,227 @@
-/* 全局样式重置 */
-* {
-  box-sizing: border-box;
+:root {
+  --primary-color: #6366f1;
+  --primary-hover: #4f46e5;
+  --bg-color: #f8fafc;
+  /* Slightly cooler/brighter background */
+  --text-color: #1e293b;
+  /* Darker, sharper text */
+  --text-secondary: #64748b;
+  /* Clearer secondary text */
+  --border-color: #e2e8f0;
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  /* Less transparent for better readability */
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
 }
 
-html, body {
+body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* Critical for HD look */
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  /* More comfortable reading */
 }
 
-#root {
-  height: 100%;
-}
-
-/* 滚动条样式 */
+/* Scrollbar Styles */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: rgba(99, 102, 241, 0.2);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: rgba(99, 102, 241, 0.4);
+}
+
+/* Modern Card Style - HD Look */
+.modern-card {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--card-shadow) !important;
+  transition: all 0.3s ease;
+}
+
+.modern-card:hover {
+  box-shadow: var(--card-hover-shadow) !important;
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+/* Modern Table Style - HD Look */
+.modern-table .ant-table {
+  background: transparent !important;
+}
+
+.modern-table .ant-table-thead>tr>th {
+  background: rgba(248, 250, 252, 0.8) !important;
+  color: var(--text-secondary) !important;
+  font-weight: 600 !important;
+  /* Kept semi-bold for headers but not too heavy */
+  border-bottom: 1px solid var(--border-color) !important;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.modern-table .ant-table-tbody>tr>td {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
+  color: var(--text-color) !important;
+  font-weight: 400 !important;
+  /* Reduced to normal weight */
+}
+
+.modern-table .ant-table-tbody>tr:hover>td {
+  background: rgba(99, 102, 241, 0.04) !important;
+}
+
+/* Page Header Style */
+.page-header {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header-title {
+  font-size: 24px !important;
+  font-weight: 600 !important;
+  /* Reduced from 700 */
+  color: #0f172a !important;
+  /* Deep dark blue-grey for titles */
+  margin: 0 !important;
+  letter-spacing: -0.5px;
+}
+
+/* Utility Classes */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.bg-primary-gradient {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ant Design Overrides for HD Inputs */
+.ant-input,
+.ant-select-selector,
+.ant-picker,
+.ant-input-number,
+.ant-input-password,
+.ant-input-affix-wrapper {
+  border-radius: 8px !important;
+  border-color: #e2e8f0 !important;
+  background-color: #fff !important;
+  /* Clean white background */
+  box-shadow: none !important;
+  /* Removed inner shadow */
+  font-weight: 400 !important;
+  /* Reduced to normal weight */
+  color: #334155 !important;
+  /* Slate 700 for input text */
+  padding: 4px 11px !important;
+  /* Adjusted padding */
+  height: 36px !important;
+  /* Enforce consistent height */
+  line-height: 1.5 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Fix for input inside affix wrapper (e.g. password, search) */
+.ant-input-affix-wrapper .ant-input {
+  height: 100% !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-weight: 400 !important;
+  /* Ensure internal input is also normal weight */
+}
+
+.ant-select-selection-item {
+  line-height: 26px !important;
+  /* Vertically center select text */
+  font-weight: 400 !important;
+  /* Ensure select text is normal weight */
+}
+
+.ant-input:hover,
+.ant-select-selector:hover,
+.ant-picker:hover,
+.ant-input-affix-wrapper:hover {
+  border-color: #818cf8 !important;
+}
+
+.ant-input:focus,
+.ant-input-focused,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused,
+.ant-input-affix-wrapper-focused {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+  /* Soft focus ring */
+}
+
+.ant-btn-primary {
+  background: var(--primary-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3);
+  font-weight: 500;
+  /* Reduced from 600 */
+  letter-spacing: 0.3px;
+  border: none;
+}
+
+.ant-btn-primary:hover {
+  background: var(--primary-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px -1px rgba(99, 102, 241, 0.4);
+}
+
+/* Form Item Labels */
+.ant-form-item-label>label {
+  color: #475569 !important;
+  /* Slate 600 */
+  font-weight: 500 !important;
+  /* Reduced from 600 */
+  font-size: 13px !important;
 }

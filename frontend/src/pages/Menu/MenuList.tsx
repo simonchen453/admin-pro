@@ -13,7 +13,8 @@ import {
   Breadcrumb,
   Divider,
   Row,
-  Col
+  Col,
+  Typography
 } from 'antd';
 import {
   PlusOutlined,
@@ -61,6 +62,7 @@ import { MenuStatus, MenuType, MenuVisible } from '../../types';
 import MenuForm from './MenuForm';
 
 const { Option } = Select;
+const { Title } = Typography;
 
 const MenuList: React.FC = () => {
   const navigate = useNavigate();
@@ -108,7 +110,7 @@ const MenuList: React.FC = () => {
     return iconComponents[iconName] || null;
   };
   const [searchForm, setSearchForm] = useState<MenuSearchForm>({});
-  
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingMenu, setEditingMenu] = useState<MenuEntity | null>(null);
   const [menuOptions, setMenuOptions] = useState<MenuTreeSelectNode[]>([]);
@@ -317,8 +319,8 @@ const MenuList: React.FC = () => {
 
   const isAllExpanded = () => {
     const allKeys = getAllRowKeys(menuList);
-    return allKeys.length > 0 && allKeys.length === expandedRowKeys.length && 
-           allKeys.every(key => expandedRowKeys.includes(key));
+    return allKeys.length > 0 && allKeys.length === expandedRowKeys.length &&
+      allKeys.every(key => expandedRowKeys.includes(key));
   };
 
   const handleToggleExpand = () => {
@@ -411,6 +413,7 @@ const MenuList: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             type="primary"
+            ghost
           >
             修改
           </Button>
@@ -441,77 +444,72 @@ const MenuList: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <Breadcrumb
-        items={[
-          {
-            title: (
-              <Button
-                type="link"
-                icon={<HomeOutlined />}
-                onClick={() => navigate('/')}
-                style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-              >
-                首页
-              </Button>
-            )
-          },
-          {
-            title: '菜单管理'
-          }
-        ]}
-      />
-      
-      <Divider />
-
-      <Card>
-        <Card size="small" style={{ marginBottom: 16 }}>
-          <Form autoComplete="off"
-            form={form}
-            layout="inline"
-            onFinish={handleSearch}
-          >
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="name" label="菜单名称">
-                  <Input 
-                    placeholder="请输入菜单名称" 
-                    allowClear
-                    onPressEnter={() => form.submit()}
-                  />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="status" label="状态">
-                  <Select placeholder="菜单状态" allowClear style={{ width: '100%' }}>
-                    <Option value={MenuStatus.ACTIVE}>正常</Option>
-                    <Option value={MenuStatus.INACTIVE}>停用</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24} style={{ textAlign: 'left', marginTop: 26, marginLeft: 2, marginBottom: 10 }}>
-                <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                    搜索
-                  </Button>
-                  <Button onClick={handleReset} icon={<ClearOutlined />}>
-                    重置
-                  </Button>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+      <div className="page-header">
+        <Breadcrumb
+          className="page-header-breadcrumb"
+          items={[
+            {
+              title: (
+                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                  <HomeOutlined />
+                  <span>首页</span>
                 </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+              )
+            },
+            {
+              title: '菜单管理'
+            }
+          ]}
+        />
+      </div>
 
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'white', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+        <Form autoComplete="off"
+          form={form}
+          layout="inline"
+          onFinish={handleSearch}
+          style={{ marginBottom: 24 }}
+        >
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="name" style={{ marginBottom: 0 }}>
+                <Input
+                  placeholder="菜单名称"
+                  prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />}
+                  allowClear
+                  onPressEnter={() => form.submit()}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="status" style={{ marginBottom: 0 }}>
+                <Select placeholder="状态" allowClear style={{ width: '100%' }}>
+                  <Option value={MenuStatus.ACTIVE}>正常</Option>
+                  <Option value={MenuStatus.INACTIVE}>停用</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  重置
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Form>
+
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space>
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-              新增
+              新增菜单
             </Button>
-            <Button 
-              icon={isAllExpanded() ? <CompressOutlined /> : <ExpandOutlined />} 
+            <Button
+              icon={isAllExpanded() ? <CompressOutlined /> : <ExpandOutlined />}
               onClick={handleToggleExpand}
             >
               {isAllExpanded() ? '收起全部' : '展开全部'}
@@ -519,7 +517,7 @@ const MenuList: React.FC = () => {
           </Space>
         </div>
 
-        <div style={{ background: 'white', borderRadius: '8px', overflow: 'hidden' }}>
+        <div className="modern-table">
           <Table
             columns={columns}
             dataSource={menuList}
@@ -528,7 +526,7 @@ const MenuList: React.FC = () => {
             pagination={false}
             expandedRowKeys={expandedRowKeys}
             onExpandedRowsChange={setExpandedRowKeys}
-            size="small"
+            size="middle"
           />
         </div>
       </Card>

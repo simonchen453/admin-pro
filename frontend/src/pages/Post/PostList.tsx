@@ -13,8 +13,7 @@ import {
   Row,
   Col,
   Pagination,
-  Breadcrumb,
-  Divider
+  Breadcrumb
 } from 'antd';
 import {
   PlusOutlined,
@@ -259,6 +258,7 @@ const PostList: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             type="primary"
+            ghost
           >
             修改
           </Button>
@@ -281,92 +281,82 @@ const PostList: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <Breadcrumb
-        items={[
-          {
-            title: (
-              <Button
-                type="link"
-                icon={<HomeOutlined />}
-                onClick={() => navigate('/')}
-                style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-              >
-                首页
-              </Button>
-            )
-          },
-          {
-            title: '岗位管理'
-          }
-        ]}
-      />
-      
-      <Divider />
-
-      <Card>
-        <Card size="small" style={{ marginBottom: 16 }}>
-          <Form autoComplete="off"
-            form={form}
-            layout="inline"
-            onFinish={handleSearch}
-          >
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="code" label="岗位编码">
-                  <Input placeholder="请输入岗位编码" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="name" label="岗位名称">
-                  <Input placeholder="请输入岗位名称" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="status" label="状态">
-                  <Select placeholder="请选择状态" allowClear style={{ width: '100%' }}>
-                    <Option value={PostStatus.ACTIVE}>正常</Option>
-                    <Option value={PostStatus.INACTIVE}>停用</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24} style={{ textAlign: 'left', marginTop: 26, marginLeft: 2, marginBottom: 10 }}>
-                <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                    搜索
-                  </Button>
-                  <Button onClick={handleReset} icon={<ClearOutlined />}>
-                    重置
-                  </Button>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+      <div className="page-header">
+        <Breadcrumb
+          className="page-header-breadcrumb"
+          items={[
+            {
+              title: (
+                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                  <HomeOutlined />
+                  <span>首页</span>
                 </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+              )
+            },
+            {
+              title: '岗位管理'
+            }
+          ]}
+        />
+      </div>
 
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'white', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+        <Form autoComplete="off"
+          form={form}
+          layout="inline"
+          onFinish={handleSearch}
+          style={{ marginBottom: 24 }}
+        >
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="code" style={{ marginBottom: 0 }}>
+                <Input placeholder="岗位编码" allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="name" style={{ marginBottom: 0 }}>
+                <Input placeholder="岗位名称" allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="status" style={{ marginBottom: 0 }}>
+                <Select placeholder="状态" allowClear style={{ width: '100%' }}>
+                  <Option value={PostStatus.ACTIVE}>正常</Option>
+                  <Option value={PostStatus.INACTIVE}>停用</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  重置
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Form>
+
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space>
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
               新增
             </Button>
-            <Button 
-              type="primary" 
-              danger 
-              icon={<DeleteOutlined />} 
+            <Button
+              danger
+              icon={<DeleteOutlined />}
               disabled={selectedPosts.length === 0}
               onClick={handleBatchDelete}
             >
               删除
             </Button>
           </Space>
-          <div>
-            已选择 {selectedPosts.length} 项
-          </div>
         </div>
 
-        <div style={{ background: 'white', borderRadius: '8px', overflow: 'hidden' }}>
+        <div className="modern-table">
           <Table
             columns={columns}
             dataSource={postList}
@@ -374,12 +364,11 @@ const PostList: React.FC = () => {
             rowKey={(record) => record.id || `post-${record.code}`}
             rowSelection={rowSelection}
             pagination={false}
-            scroll={{ x: 800 }}
-            size="small"
+            size="middle"
           />
         </div>
 
-        <div style={{ marginTop: 16, textAlign: 'right', padding: '16px', background: 'white', borderRadius: '8px' }}>
+        <div style={{ marginTop: 24, textAlign: 'right' }}>
           <Pagination
             current={currentPage}
             pageSize={pageSize}
@@ -423,4 +412,3 @@ const PostList: React.FC = () => {
 };
 
 export default PostList;
-

@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react';
+import type { ReactNode } from 'react';
 
 // 用户相关类型
 export interface User {
@@ -152,6 +152,7 @@ export interface UserEntity {
   deptName?: string;
   latestLoginTime?: string;
   password?: string;
+  roleName?: string;
 }
 
 export interface UserListResponse {

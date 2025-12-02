@@ -13,8 +13,7 @@ import {
   Row,
   Col,
   Pagination,
-  Breadcrumb,
-  Divider
+  Breadcrumb
 } from 'antd';
 import {
   ReloadOutlined,
@@ -293,7 +292,8 @@ const SessionList: React.FC = () => {
           {record.status === 'active' && (
             <Button
               size="small"
-              type="primary"
+              type="default"
+              danger
               icon={<StopOutlined />}
               onClick={() => handleSuspend(record)}
             >
@@ -304,6 +304,7 @@ const SessionList: React.FC = () => {
             <Button
               size="small"
               type="primary"
+              ghost
               icon={<PlayCircleOutlined />}
               onClick={() => handleUnSuspend(record)}
             >
@@ -327,96 +328,88 @@ const SessionList: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+      <div className="page-header">
         <Breadcrumb
+          className="page-header-breadcrumb"
           items={[
             {
               title: (
-                <Button
-                  type="link"
-                  icon={<HomeOutlined />}
-                  onClick={() => navigate('/')}
-                  style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-                >
-                  首页
-                </Button>
+                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                  <HomeOutlined />
+                  <span>首页</span>
+                </Space>
               )
             },
             {
-              title: '在线用户管理'
+              title: '在线用户'
             }
           ]}
         />
       </div>
-      
-      <Divider />
 
-      <Card>
-        <Card size="small" style={{ marginBottom: 16 }}>
-          <Form autoComplete="off"
-            form={form}
-            layout="inline"
-            onFinish={handleSearch}
-          >
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="userDomain" label="用户域">
-                  <Select placeholder="请选择用户域" allowClear style={{ width: '100%' }}>
-                    {domainList.map(domain => (
-                      <Option key={domain.name} value={domain.name}>
-                        {domain.display}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="loginName" label="登陆名">
-                  <Input placeholder="请输入登陆名" allowClear/>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="status" label="状态">
-                  <Select placeholder="请选择" allowClear style={{ width: '100%' }}>
-                    <Option value="active">正常</Option>
-                    <Option value="suspend">限制</Option>
-                    <Option value="killed">已强退</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="deptNo" label="部门编号">
-                  <Input placeholder="请输入部门编号" />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24} style={{ textAlign: 'left', marginTop: 16 }}>
-                <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                    搜索
-                  </Button>
-                  <Button onClick={handleReset} icon={<ClearOutlined />}>
-                    重置
-                  </Button>
-                  <Button onClick={() => fetchSessionList()} icon={<ReloadOutlined />}>
-                    刷新
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+        <Form autoComplete="off"
+          form={form}
+          layout="inline"
+          onFinish={handleSearch}
+          style={{ marginBottom: 24 }}
+        >
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="userDomain" style={{ marginBottom: 0 }}>
+                <Select placeholder="用户域" allowClear style={{ width: '100%' }}>
+                  {domainList.map(domain => (
+                    <Option key={domain.name} value={domain.name}>
+                      {domain.display}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="loginName" style={{ marginBottom: 0 }}>
+                <Input placeholder="登陆名" allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="status" style={{ marginBottom: 0 }}>
+                <Select placeholder="状态" allowClear style={{ width: '100%' }}>
+                  <Option value="active">正常</Option>
+                  <Option value="suspend">限制</Option>
+                  <Option value="killed">已强退</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="deptNo" style={{ marginBottom: 0 }}>
+                <Input placeholder="部门编号" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={24}>
+              <Space>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  重置
+                </Button>
+                <Button onClick={() => fetchSessionList()} icon={<ReloadOutlined />}>
+                  刷新
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Form>
 
-        <div style={{ background: 'white', borderRadius: '8px', overflow: 'hidden' }}>
+        <div className="modern-table">
           <Table
             columns={columns}
             dataSource={sessionList}
             loading={loading}
             rowKey="id"
             pagination={false}
-            size="small"
+            size="middle"
             scroll={{ x: 1500 }}
             locale={{
               emptyText: sessionList.length === 0 && !loading ? '暂无数据' : undefined
@@ -424,7 +417,7 @@ const SessionList: React.FC = () => {
           />
         </div>
 
-        <div style={{ marginTop: 16, textAlign: 'right', padding: '16px', background: 'white', borderRadius: '8px' }}>
+        <div style={{ marginTop: 24, textAlign: 'right' }}>
           <Pagination
             current={currentPage}
             pageSize={pageSize}
@@ -443,4 +436,3 @@ const SessionList: React.FC = () => {
 };
 
 export default SessionList;
-

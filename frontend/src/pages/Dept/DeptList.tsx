@@ -11,7 +11,6 @@ import {
   message,
   Modal,
   Breadcrumb,
-  Divider,
   Row,
   Col
 } from 'antd';
@@ -48,7 +47,7 @@ const DeptList: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [deptList, setDeptList] = useState<DeptEntity[]>([]);
   const [searchForm, setSearchForm] = useState<DeptSearchForm>({});
-  
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingDept, setEditingDept] = useState<DeptEntity | null>(null);
   const [formKey, setFormKey] = useState(0);
@@ -227,8 +226,8 @@ const DeptList: React.FC = () => {
 
   const isAllExpanded = () => {
     const allKeys = getAllRowKeys(deptList);
-    return allKeys.length > 0 && allKeys.length === expandedRowKeys.length && 
-           allKeys.every(key => expandedRowKeys.includes(key));
+    return allKeys.length > 0 && allKeys.length === expandedRowKeys.length &&
+      allKeys.every(key => expandedRowKeys.includes(key));
   };
 
   const handleToggleExpand = () => {
@@ -245,19 +244,16 @@ const DeptList: React.FC = () => {
       title: '部门名称',
       dataIndex: 'name',
       key: 'name',
-      width: 200
     },
     {
       title: '部门编号',
       dataIndex: 'no',
       key: 'no',
-      width: 200
     },
     {
       title: '排序',
       dataIndex: 'orderNum',
       key: 'orderNum',
-      width: 100
     },
     {
       title: '状态',
@@ -277,7 +273,7 @@ const DeptList: React.FC = () => {
       title: '操作',
       key: 'action',
       fixed: 'right',
-      width: 240,
+      width: 120,
       render: (_, record: DeptEntity) => (
         <Space size="small">
           <Button
@@ -285,6 +281,7 @@ const DeptList: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
             type="primary"
+            ghost
           >
             修改
           </Button>
@@ -293,6 +290,7 @@ const DeptList: React.FC = () => {
             icon={<PlusOutlined />}
             onClick={() => handleAdd(record)}
             type="primary"
+            ghost
           >
             新增
           </Button>
@@ -315,20 +313,17 @@ const DeptList: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+      <div className="page-header">
         <Breadcrumb
+          className="page-header-breadcrumb"
           items={[
             {
               title: (
-                <Button
-                  type="link"
-                  icon={<HomeOutlined />}
-                  onClick={() => navigate('/')}
-                  style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-                >
-                  首页
-                </Button>
+                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                  <HomeOutlined />
+                  <span>首页</span>
+                </Space>
               )
             },
             {
@@ -337,53 +332,48 @@ const DeptList: React.FC = () => {
           ]}
         />
       </div>
-      
-      <Divider />
 
-      <Card>
-        <Card size="small" style={{ marginBottom: 16 }}>
-          <Form autoComplete="off"
-            form={form}
-            layout="inline"
-            onFinish={handleSearch}
-          >
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="name" label="部门名称">
-                  <Input placeholder="请输入部门名称" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="status" label="状态">
-                  <Select placeholder="部门状态" allowClear style={{ width: '100%' }}>
-                    <Option value={DeptStatus.ACTIVE}>正常</Option>
-                    <Option value={DeptStatus.INACTIVE}>停用</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24} style={{ textAlign: 'left', marginTop: 16, marginLeft: 2, marginBottom: 10 }}>
-                <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                    搜索
-                  </Button>
-                  <Button onClick={handleReset} icon={<ClearOutlined />}>
-                    重置
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+        <Form autoComplete="off"
+          form={form}
+          layout="inline"
+          onFinish={handleSearch}
+          style={{ marginBottom: 24 }}
+        >
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="name" style={{ marginBottom: 0 }}>
+                <Input placeholder="部门名称" allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="status" style={{ marginBottom: 0 }}>
+                <Select placeholder="状态" allowClear style={{ width: '100%' }}>
+                  <Option value={DeptStatus.ACTIVE}>正常</Option>
+                  <Option value={DeptStatus.INACTIVE}>停用</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  重置
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Form>
 
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'white', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space>
             <Button type="primary" icon={<PlusOutlined />} onClick={() => handleAdd()}>
               新增
             </Button>
-            <Button 
-              icon={isAllExpanded() ? <CompressOutlined /> : <ExpandOutlined />} 
+            <Button
+              icon={isAllExpanded() ? <CompressOutlined /> : <ExpandOutlined />}
               onClick={handleToggleExpand}
             >
               {isAllExpanded() ? '收起全部' : '展开全部'}
@@ -391,14 +381,14 @@ const DeptList: React.FC = () => {
           </Space>
         </div>
 
-        <div style={{ background: 'white', borderRadius: '8px', overflow: 'hidden' }}>
+        <div className="modern-table">
           <Table
             columns={columns}
             dataSource={deptList}
             loading={loading}
             rowKey="id"
             pagination={false}
-            size="small"
+            size="middle"
             expandedRowKeys={expandedRowKeys}
             onExpandedRowsChange={setExpandedRowKeys}
             locale={{
@@ -438,4 +428,3 @@ const DeptList: React.FC = () => {
 };
 
 export default DeptList;
-

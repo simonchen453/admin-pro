@@ -7,7 +7,8 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+  /* Deep Indigo/Violet Gradient Background */
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
 }
 
 /* 背景效果 */
@@ -20,23 +21,28 @@
   z-index: 1;
 }
 
-/* 科技网格背景 */
+/* 科技网格背景 - Adjusted for Indigo theme */
 .tech-grid {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
-    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
   background-size: 50px 50px;
   animation: gridMove 20s linear infinite;
 }
 
 @keyframes gridMove {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(50px, 50px); }
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(50px, 50px);
+  }
 }
 
 /* 浮动粒子效果 */
@@ -48,39 +54,47 @@
 
 .particle {
   position: absolute;
-  width: 2px;
-  height: 2px;
-  background: #00ffff;
+  width: 3px;
+  height: 3px;
+  background: #818cf8;
+  /* Indigo-400 */
   border-radius: 50%;
-  box-shadow: 0 0 6px #00ffff;
+  box-shadow: 0 0 8px #818cf8;
   animation: float 6s ease-in-out infinite;
 }
 
 .particle:nth-child(odd) {
-  background: #ff6b6b;
-  box-shadow: 0 0 6px #ff6b6b;
+  background: #c084fc;
+  /* Purple-400 */
+  box-shadow: 0 0 8px #c084fc;
   animation-duration: 8s;
 }
 
 .particle:nth-child(3n) {
-  background: #4ecdc4;
-  box-shadow: 0 0 6px #4ecdc4;
+  background: #6366f1;
+  /* Indigo-500 */
+  box-shadow: 0 0 8px #6366f1;
   animation-duration: 10s;
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px) translateX(0px);
-    opacity: 0.7;
+    opacity: 0.6;
   }
+
   25% {
     transform: translateY(-20px) translateX(10px);
     opacity: 1;
   }
+
   50% {
     transform: translateY(-10px) translateX(-10px);
     opacity: 0.8;
   }
+
   75% {
     transform: translateY(-30px) translateX(5px);
     opacity: 0.9;
@@ -88,48 +102,149 @@
 }
 
 /* 粒子位置 */
-.particle-1 { top: 10%; left: 10%; animation-delay: 0s; }
-.particle-2 { top: 20%; left: 80%; animation-delay: 1s; }
-.particle-3 { top: 30%; left: 30%; animation-delay: 2s; }
-.particle-4 { top: 40%; left: 70%; animation-delay: 3s; }
-.particle-5 { top: 50%; left: 20%; animation-delay: 4s; }
-.particle-6 { top: 60%; left: 90%; animation-delay: 5s; }
-.particle-7 { top: 70%; left: 40%; animation-delay: 6s; }
-.particle-8 { top: 80%; left: 60%; animation-delay: 7s; }
-.particle-9 { top: 15%; left: 50%; animation-delay: 8s; }
-.particle-10 { top: 25%; left: 15%; animation-delay: 9s; }
-.particle-11 { top: 35%; left: 85%; animation-delay: 10s; }
-.particle-12 { top: 45%; left: 45%; animation-delay: 11s; }
-.particle-13 { top: 55%; left: 75%; animation-delay: 12s; }
-.particle-14 { top: 65%; left: 25%; animation-delay: 13s; }
-.particle-15 { top: 75%; left: 95%; animation-delay: 14s; }
-.particle-16 { top: 85%; left: 35%; animation-delay: 15s; }
-.particle-17 { top: 5%; left: 65%; animation-delay: 16s; }
-.particle-18 { top: 95%; left: 5%; animation-delay: 17s; }
-.particle-19 { top: 12%; left: 95%; animation-delay: 18s; }
-.particle-20 { top: 88%; left: 55%; animation-delay: 19s; }
+.particle-1 {
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.particle-2 {
+  top: 20%;
+  left: 80%;
+  animation-delay: 1s;
+}
+
+.particle-3 {
+  top: 30%;
+  left: 30%;
+  animation-delay: 2s;
+}
+
+.particle-4 {
+  top: 40%;
+  left: 70%;
+  animation-delay: 3s;
+}
+
+.particle-5 {
+  top: 50%;
+  left: 20%;
+  animation-delay: 4s;
+}
+
+.particle-6 {
+  top: 60%;
+  left: 90%;
+  animation-delay: 5s;
+}
+
+.particle-7 {
+  top: 70%;
+  left: 40%;
+  animation-delay: 6s;
+}
+
+.particle-8 {
+  top: 80%;
+  left: 60%;
+  animation-delay: 7s;
+}
+
+.particle-9 {
+  top: 15%;
+  left: 50%;
+  animation-delay: 8s;
+}
+
+.particle-10 {
+  top: 25%;
+  left: 15%;
+  animation-delay: 9s;
+}
+
+.particle-11 {
+  top: 35%;
+  left: 85%;
+  animation-delay: 10s;
+}
+
+.particle-12 {
+  top: 45%;
+  left: 45%;
+  animation-delay: 11s;
+}
+
+.particle-13 {
+  top: 55%;
+  left: 75%;
+  animation-delay: 12s;
+}
+
+.particle-14 {
+  top: 65%;
+  left: 25%;
+  animation-delay: 13s;
+}
+
+.particle-15 {
+  top: 75%;
+  left: 95%;
+  animation-delay: 14s;
+}
+
+.particle-16 {
+  top: 85%;
+  left: 35%;
+  animation-delay: 15s;
+}
+
+.particle-17 {
+  top: 5%;
+  left: 65%;
+  animation-delay: 16s;
+}
+
+.particle-18 {
+  top: 95%;
+  left: 5%;
+  animation-delay: 17s;
+}
+
+.particle-19 {
+  top: 12%;
+  left: 95%;
+  animation-delay: 18s;
+}
+
+.particle-20 {
+  top: 88%;
+  left: 55%;
+  animation-delay: 19s;
+}
 
 /* 登录卡片 */
 .login-card {
   position: relative;
   z-index: 10;
   width: 420px;
-  padding: 40px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  animation: cardSlideIn 0.8s ease-out;
+  padding: 48px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: cardSlideIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes cardSlideIn {
   from {
     opacity: 0;
-    transform: translateY(30px) scale(0.95);
+    transform: translateY(40px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -139,15 +254,14 @@
 /* 登录头部 */
 .login-header {
   text-align: center;
-  margin-bottom: 48px;
-  padding: 20px 0;
+  margin-bottom: 40px;
 }
 
 .brand-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
 }
 
 .logo-wrapper {
@@ -155,19 +269,19 @@
 }
 
 .login-logo-background {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #1890ff, #40a9ff, #69c0ff);
-  border-radius: 20px;
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 
-    0 8px 32px rgba(24, 144, 255, 0.3),
+  box-shadow:
+    0 10px 25px rgba(99, 102, 241, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
-  animation: logoGlow 3s ease-in-out infinite;
+  animation: logoGlow 4s ease-in-out infinite;
 }
 
 .login-logo-background::before {
@@ -177,19 +291,22 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  animation: logoShine 3s ease-in-out infinite;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: logoShine 4s ease-in-out infinite;
 }
 
 @keyframes logoGlow {
-  0%, 100% {
-    box-shadow: 
-      0 8px 32px rgba(24, 144, 255, 0.3),
+
+  0%,
+  100% {
+    box-shadow:
+      0 10px 25px rgba(99, 102, 241, 0.4),
       0 0 0 1px rgba(255, 255, 255, 0.1);
   }
+
   50% {
-    box-shadow: 
-      0 12px 40px rgba(24, 144, 255, 0.5),
+    box-shadow:
+      0 15px 35px rgba(99, 102, 241, 0.6),
       0 0 0 1px rgba(255, 255, 255, 0.2);
   }
 }
@@ -198,17 +315,19 @@
   0% {
     transform: translateX(-100%) translateY(-100%) rotate(45deg);
   }
+
   50% {
     transform: translateX(100%) translateY(100%) rotate(45deg);
   }
+
   100% {
     transform: translateX(-100%) translateY(-100%) rotate(45deg);
   }
 }
 
 .logo-image {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   position: relative;
   z-index: 1;
@@ -219,28 +338,12 @@
 }
 
 .login-brand-title {
-  font-size: 36px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #ffffff, #e6f7ff, #bae7ff);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0 0 16px 0;
-  letter-spacing: 2px;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  position: relative;
-}
-
-.login-brand-title::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #1890ff, transparent);
-  border-radius: 2px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .brand-subtitle {
@@ -249,23 +352,10 @@
 }
 
 .subtitle-text {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: 1px;
-  position: relative;
-  z-index: 1;
-  padding: 0 20px;
-}
-
-.subtitle-line {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  z-index: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 
 /* 表单样式 */
@@ -286,22 +376,22 @@
 .input-icon {
   position: absolute;
   left: 16px;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 16px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
   z-index: 2;
+  transition: color 0.3s;
 }
 
 .form-input {
   width: 100%;
-  height: 50px;
-  padding: 0 16px 0 48px;
-  background: rgba(255, 255, 255, 0.05);
+  height: 52px;
+  padding: 0 16px 0 50px;
+  background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 15px;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
 }
 
 /* 修复 Chrome 自动填充背景变白 */
@@ -314,24 +404,28 @@
   transition-delay: 99999s;
   transition: color 99999s ease-out, background-color 99999s ease-out;
   -webkit-text-fill-color: #ffffff !important;
-  /* 确保背景保持透明 */
-  background-color: transparent !important; 
+  background-color: transparent !important;
 }
 
 .form-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #1890ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
+  border-color: #6366f1;
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.form-input:focus+.input-icon,
+.input-wrapper:focus-within .input-icon {
+  color: #818cf8;
 }
 
 .form-input.error {
-  border-color: #ff6b6b;
-  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
 }
 
 .password-toggle {
@@ -339,22 +433,22 @@
   right: 16px;
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
   z-index: 2;
   transition: color 0.3s ease;
 }
 
 .password-toggle:hover {
-  color: #00ffff;
+  color: #fff;
 }
 
 .error-message {
   display: block;
-  color: #ff6b6b;
-  font-size: 14px;
-  margin-top: 8px;
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: 6px;
   margin-left: 4px;
 }
 
@@ -372,6 +466,11 @@
   cursor: pointer;
   color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
+  transition: color 0.3s;
+}
+
+.remember-me:hover {
+  color: #fff;
 }
 
 .remember-me input[type="checkbox"] {
@@ -384,17 +483,17 @@
   height: 18px;
   margin-right: 8px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  border-radius: 5px;
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
 }
 
-.remember-me input[type="checkbox"]:checked + .checkbox-custom {
-  background: linear-gradient(45deg, #00ffff, #4ecdc4);
-  border-color: #00ffff;
+.remember-me input[type="checkbox"]:checked+.checkbox-custom {
+  background: #6366f1;
+  border-color: #6366f1;
 }
 
-.remember-me input[type="checkbox"]:checked + .checkbox-custom::after {
+.remember-me input[type="checkbox"]:checked+.checkbox-custom::after {
   content: '✓';
   position: absolute;
   top: 50%;
@@ -406,58 +505,56 @@
 }
 
 .forgot-password {
-  color: #1890ff;
+  color: #818cf8;
   text-decoration: none;
   font-size: 14px;
   transition: color 0.3s ease;
 }
 
 .forgot-password:hover {
-  color: #40a9ff;
+  color: #a5b4fc;
   text-decoration: underline;
 }
 
 /* 登录按钮 */
 .login-button {
   width: 100%;
-  height: 40px;
-  background: #1890ff;
-  border: 1px solid #1890ff;
-  border-radius: 2px;
+  height: 50px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border: none;
+  border-radius: 12px;
   color: #fff;
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .login-button:hover:not(:disabled) {
-  background: #40a9ff;
-  border-color: #40a9ff;
-  transform: none;
-  box-shadow: none;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+  background: linear-gradient(135deg, #818cf8, #6366f1);
 }
 
 .login-button:active:not(:disabled) {
-  background: #096dd9;
-  border-color: #096dd9;
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
 
 .login-button:disabled {
-  opacity: 1;
-  background: #f5f5f5;
-  border-color: #d9d9d9;
-  color: rgba(0, 0, 0, 0.25);
+  opacity: 0.7;
   cursor: not-allowed;
+  background: #4b5563;
+  color: #9ca3af;
+  box-shadow: none;
 }
 
 .login-button.loading {
-  background: #1890ff; /* 保持原色，因为通常会显示 loading spinner */
-  opacity: 0.65;
-  box-shadow: none;
+  opacity: 0.8;
+  pointer-events: none;
 }
 
 .loading-spinner {
@@ -471,8 +568,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 登录页脚 */
@@ -484,7 +586,7 @@
 }
 
 .copyright {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.4);
   font-size: 12px;
   margin: 0;
 }
@@ -493,42 +595,22 @@
 @media (max-width: 480px) {
   .login-card {
     width: 90%;
-    padding: 30px 20px;
+    padding: 32px 24px;
     margin: 20px;
   }
-  
-  .logo-text {
+
+  .login-brand-title {
     font-size: 24px;
   }
-  
-  .login-subtitle {
-    font-size: 14px;
-  }
-  
-  .form-input {
-    height: 45px;
-    font-size: 14px;
-  }
-  
-  .login-button {
-    height: 45px;
-    font-size: 14px;
-  }
-}
 
-@media (max-width: 360px) {
-  .login-card {
-    padding: 20px 15px;
+  .form-input {
+    height: 48px;
+    font-size: 14px;
   }
-  
-  .logo-container {
-    flex-direction: column;
-    margin-bottom: 15px;
-  }
-  
-  .logo-icon {
-    margin-right: 0;
-    margin-bottom: 10px;
+
+  .login-button {
+    height: 48px;
+    font-size: 15px;
   }
 }
 
@@ -553,7 +635,7 @@
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .captcha-component {
     align-self: center;
   }

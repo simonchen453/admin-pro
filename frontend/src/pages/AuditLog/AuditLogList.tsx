@@ -11,7 +11,6 @@ import {
   Col,
   Pagination,
   Breadcrumb,
-  Divider,
   DatePicker,
   Modal
 } from 'antd';
@@ -49,7 +48,7 @@ const AuditLogList: React.FC = () => {
 
   const fetchAuditLogList = async (params: AuditLogSearchForm = {}) => {
     setLoading(true);
-    
+
     try {
       const requestParams = {
         ...params,
@@ -58,11 +57,11 @@ const AuditLogList: React.FC = () => {
       };
 
       const response = await getAuditLogListApi(requestParams);
-      
+
       const responseData = response as any;
       const list = responseData?.data?.records || responseData?.records || [];
       const total = responseData?.data?.totalCount || responseData?.totalCount || 0;
-      
+
       if (Array.isArray(list)) {
         setAuditLogList(list);
         setTotal(total);
@@ -204,12 +203,13 @@ const AuditLogList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 150,
+      width: 100,
       fixed: 'right',
       render: (_, record: AuditLogEntity) => (
         <Button
           size="small"
           type="primary"
+          ghost
           icon={<EyeOutlined />}
           onClick={() => handleView(record)}
         >
@@ -224,99 +224,91 @@ const AuditLogList: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+      <div className="page-header">
         <Breadcrumb
+          className="page-header-breadcrumb"
           items={[
             {
               title: (
-                <Button
-                  type="link"
-                  icon={<HomeOutlined />}
-                  onClick={() => navigate('/')}
-                  style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-                >
-                  首页
-                </Button>
+                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+                  <HomeOutlined />
+                  <span>首页</span>
+                </Space>
               )
             },
             {
-              title: '审计日志管理'
+              title: '日志管理'
             }
           ]}
         />
       </div>
-      
-      <Divider />
 
-      <Card>
-        <Card size="small" style={{ marginBottom: 16 }}>
-          <Form autoComplete="off"
-            form={form}
-            layout="inline"
-            onFinish={handleSearch}
-          >
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="category" label="分类名称">
-                  <Input placeholder="分类名称" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="module" label="模块名称">
-                  <Input placeholder="模块名称" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="user" label="操作人员">
-                  <Input placeholder="操作人员" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="event" label="操作名称">
-                  <Input placeholder="操作名称" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="status" label="状态">
-                  <Input placeholder="状态" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={12}>
-                <Form.Item label="创建日期">
-                  <RangePicker
-                    showTime
-                    format="YYYY-MM-DD HH:mm:ss"
-                    value={dateRange}
-                    onChange={(dates) => setDateRange(dates as [Dayjs | null, Dayjs | null] | null)}
-                    style={{ width: '100%' }}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24} style={{ textAlign: 'left', marginTop: 16 }}>
-                <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                    搜索
-                  </Button>
-                  <Button onClick={handleReset} icon={<ClearOutlined />}>
-                    重置
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+        <Form autoComplete="off"
+          form={form}
+          layout="inline"
+          onFinish={handleSearch}
+          style={{ marginBottom: 24 }}
+        >
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Col xs={24} sm={12} md={6} lg={4}>
+              <Form.Item name="category" style={{ marginBottom: 0 }}>
+                <Input placeholder="分类名称" allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={4}>
+              <Form.Item name="module" style={{ marginBottom: 0 }}>
+                <Input placeholder="模块名称" allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={4}>
+              <Form.Item name="user" style={{ marginBottom: 0 }}>
+                <Input placeholder="操作人员" allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={4}>
+              <Form.Item name="event" style={{ marginBottom: 0 }}>
+                <Input placeholder="操作名称" allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={4}>
+              <Form.Item name="status" style={{ marginBottom: 0 }}>
+                <Input placeholder="状态" allowClear />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={8}>
+              <Form.Item style={{ marginBottom: 0 }}>
+                <RangePicker
+                  showTime
+                  format="YYYY-MM-DD HH:mm:ss"
+                  value={dateRange}
+                  onChange={(dates) => setDateRange(dates as [Dayjs | null, Dayjs | null] | null)}
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={4}>
+              <Space>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  重置
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Form>
 
-        <div style={{ background: 'white', borderRadius: '8px', overflow: 'hidden' }}>
+        <div className="modern-table">
           <Table
             columns={columns}
             dataSource={auditLogList}
             loading={loading}
             rowKey={(record) => record.id || `log-${record.logDate}-${record.userName}`}
             pagination={false}
-            size="small"
+            size="middle"
             scroll={{ x: 1200 }}
             locale={{
               emptyText: auditLogList.length === 0 && !loading ? '暂无数据' : undefined
@@ -324,7 +316,7 @@ const AuditLogList: React.FC = () => {
           />
         </div>
 
-        <div style={{ marginTop: 16, textAlign: 'right', padding: '16px', background: 'white', borderRadius: '8px' }}>
+        <div style={{ marginTop: 24, textAlign: 'right' }}>
           <Pagination
             current={currentPage}
             pageSize={pageSize}
@@ -411,4 +403,3 @@ const AuditLogList: React.FC = () => {
 };
 
 export default AuditLogList;
-

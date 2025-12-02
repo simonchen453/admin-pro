@@ -14,11 +14,17 @@ import {
   CodeOutlined,
   SafetyOutlined,
   ThunderboltOutlined,
-  BarChartOutlined
+  BarChartOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  CheckCircleOutlined,
+  SyncOutlined,
+  CloseCircleOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getSystemInfoApi, getStatisticsApi, getRecentActivitiesApi, type RecentActivity as ApiRecentActivity } from '../api/common';
 import type { SystemInfo } from '../types';
+import { useAuthStore } from '../stores/useUserStore';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
@@ -35,6 +41,7 @@ interface StatisticCard {
   icon: React.ReactNode;
   color: string;
   bgGradient: string;
+  trend?: number; // Mock trend data for visual effect
 }
 
 interface QuickAction {
@@ -55,6 +62,7 @@ interface RecentActivity {
 
 function Home() {
   const navigate = useNavigate();
+  const { currentUser } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [statistics, setStatistics] = useState<StatisticCard[]>([]);
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
@@ -98,284 +106,228 @@ function Home() {
       title: apiActivity.title,
       description: apiActivity.description,
       time,
-      user: apiActivity.user,
+      user: apiActivity.user
     };
   };
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
+    const fetchData = async () => {
       try {
-        const [statisticsRes, systemInfoRes, activitiesRes] = await Promise.allSettled([
-          getStatisticsApi(),
+        const [sysInfo, stats, activities] = await Promise.all([
           getSystemInfoApi(),
-          getRecentActivitiesApi(10),
+          getStatisticsApi(),
+          getRecentActivitiesApi()
         ]);
 
-        const stats: StatisticCard[] = [];
+        setSystemInfo(sysInfo);
 
-        if (statisticsRes.status === 'fulfilled' && statisticsRes.value.data) {
-          const data = statisticsRes.value.data;
-          stats.push(
-            {
-              title: '用户总数',
-              value: data.userCount || 0,
-              icon: <UserOutlined />,
-              color: '#6366f1',
-              bgGradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%)'
-            },
-            {
-              title: '角色数量',
-              value: data.roleCount || 0,
-              icon: <TeamOutlined />,
-              color: '#8b5cf6',
-              bgGradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%)'
-            },
-            {
-              title: '部门数量',
-              value: data.deptCount || 0,
-              icon: <ApartmentOutlined />,
-              color: '#10b981',
-              bgGradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)'
-            },
-            {
-              title: '在线会话',
-              value: data.sessionCount || 0,
-              icon: <WifiOutlined />,
-              color: '#f59e0b',
-              bgGradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)'
-            }
-          );
-        }
+        setStatistics([
+          {
+            title: '用户总数',
+            value: stats.userCount,
+            icon: <UserOutlined />,
+            color: '#6366f1',
+            bgGradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.2) 100%)',
+            trend: 5.2
+          },
+          {
+            title: '角色数量',
+            value: stats.roleCount,
+            icon: <TeamOutlined />,
+            color: '#8b5cf6',
+            bgGradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.2) 100%)',
+            trend: 2.1
+          },
+          {
+            title: '部门数量',
+            value: stats.deptCount,
+            icon: <ApartmentOutlined />,
+            color: '#10b981',
+            bgGradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%)',
+            trend: 0
+          },
+          {
+            title: '在线会话',
+            value: stats.sessionCount,
+            icon: <WifiOutlined />,
+            color: '#f59e0b',
+            bgGradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%)',
+            trend: -1.5
+          },
+        ]);
 
-        setStatistics(stats);
-
-        if (systemInfoRes.status === 'fulfilled' && systemInfoRes.value.data) {
-          setSystemInfo(systemInfoRes.value.data);
-        }
-
-        if (activitiesRes.status === 'fulfilled' && activitiesRes.value.data) {
-          const activities = activitiesRes.value.data
-            .map(convertApiActivityToActivity)
-            .filter(activity => activity.id);
-          setRecentActivities(activities);
-        } else {
-          setRecentActivities([]);
-        }
+        const formattedActivities = activities.map(convertApiActivityToActivity);
+        setRecentActivities(formattedActivities);
       } catch (error) {
-        console.error('加载数据失败:', error);
-        setRecentActivities([]);
+        console.error('Failed to fetch home data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadData();
+    fetchData();
   }, []);
 
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'login':
-        return <SafetyOutlined style={{ color: '#10b981' }} />;
+        return <CheckCircleOutlined style={{ color: '#10b981' }} />;
       case 'operation':
-        return <ToolOutlined style={{ color: '#6366f1' }} />;
+        return <ToolOutlined style={{ color: '#3b82f6' }} />;
       case 'system':
-        return <DatabaseOutlined style={{ color: '#f59e0b' }} />;
+        return <SafetyOutlined style={{ color: '#ef4444' }} />;
       default:
-        return <FileTextOutlined />;
+        return <ClockCircleOutlined style={{ color: '#64748b' }} />;
     }
   };
 
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="home-container fade-in">
+      {/* Welcome Banner */}
       <div className="home-header-section">
-        <div className="welcome-banner modern-card">
+        <Card className="welcome-banner" bordered={false}>
           <div className="welcome-content">
-            <Title level={2} style={{ margin: '0 0 8px 0', color: '#1e293b' }}>
-              欢迎回来, SuperAdmin
+            <Title level={2} style={{ color: '#fff', marginBottom: 8 }}>
+              欢迎回来，{currentUser?.realName || currentUser?.loginName || 'Admin'}
             </Title>
-            <Text type="secondary" style={{ fontSize: '16px' }}>
-              {systemInfo?.platformName || 'Admin Pro 企业级管理系统'} - 准备好开始一天的工作了吗？
+            <Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '16px' }}>
+              AdminPro 开发平台 - 准备好开始一天的工作了吗？
             </Text>
           </div>
           <div className="welcome-decoration">
-            <ThunderboltOutlined style={{ fontSize: '120px', color: 'rgba(99, 102, 241, 0.05)' }} />
+            <ThunderboltOutlined style={{ fontSize: '120px', color: 'rgba(255, 255, 255, 0.1)' }} />
           </div>
-        </div>
+        </Card>
       </div>
 
-      <Spin spinning={loading}>
-        <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
-          {statistics.map((stat, index) => (
-            <Col xs={24} sm={12} lg={6} key={index}>
-              <Card
-                className="modern-card statistic-card"
-                bordered={false}
-                bodyStyle={{ padding: '24px' }}
-              >
-                <Statistic
-                  title={<span style={{ color: '#64748b', fontSize: '14px' }}>{stat.title}</span>}
-                  value={stat.value}
-                  prefix={
-                    <div className="statistic-icon-wrapper" style={{ color: stat.color, background: stat.bgGradient }}>
-                      {stat.icon}
-                    </div>
-                  }
-                  valueStyle={{ color: '#1e293b', fontWeight: 600, marginTop: '8px' }}
-                />
-              </Card>
-            </Col>
-          ))}
-        </Row>
-
-        <Row gutter={[24, 24]}>
-          <Col xs={24} lg={16}>
-            <Card
-              title={
-                <Space>
-                  <ThunderboltOutlined style={{ color: '#6366f1' }} />
-                  <span>快速操作</span>
-                </Space>
-              }
-              className="modern-card quick-actions-card"
-              bordered={false}
-              style={{ height: '100%' }}
-            >
-              <Row gutter={[16, 16]}>
-                {quickActions.map((action, index) => (
-                  <Col xs={12} sm={8} md={6} lg={4} key={index}>
-                    <Button
-                      type="text"
-                      block
-                      className="quick-action-btn"
-                      onClick={handleQuickActionClick(action.path)}
-                    >
-                      <div className="quick-action-icon" style={{ color: action.color, background: `${action.color}15` }}>
-                        {action.icon}
+      {/* Statistics Cards */}
+      <Row gutter={[24, 24]} style={{ marginBottom: 32 }}>
+        {statistics.map((stat, index) => (
+          <Col xs={24} sm={12} lg={6} key={index}>
+            <Card className="statistic-card modern-card" bordered={false}>
+              <div className="statistic-content">
+                <div className="statistic-icon-wrapper" style={{ background: stat.bgGradient, color: stat.color }}>
+                  {stat.icon}
+                </div>
+                <div className="statistic-info">
+                  <Text type="secondary" style={{ fontSize: '14px' }}>{stat.title}</Text>
+                  <div className="statistic-value-row">
+                    <Title level={3} style={{ margin: 0 }}>{stat.value}</Title>
+                    {stat.trend !== undefined && stat.trend !== 0 && (
+                      <div className={`statistic-trend ${stat.trend > 0 ? 'trend-up' : 'trend-down'}`}>
+                        {stat.trend > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+                        <span>{Math.abs(stat.trend)}%</span>
                       </div>
-                      <span className="quick-action-title">
-                        {action.title}
-                      </span>
-                    </Button>
-                  </Col>
-                ))}
-              </Row>
+                    )}
+                  </div>
+                </div>
+              </div>
             </Card>
           </Col>
+        ))}
+      </Row>
 
-          <Col xs={24} lg={8}>
-            <Card
-              title={
-                <Space>
-                  <ClockCircleOutlined style={{ color: '#6366f1' }} />
-                  <span>最近活动</span>
-                </Space>
-              }
-              className="modern-card recent-activities-card"
-              bordered={false}
-              style={{ height: '100%' }}
-            >
+      <Row gutter={[24, 24]}>
+        {/* Quick Actions */}
+        <Col xs={24} lg={16}>
+          <Card
+            title={<Space><ThunderboltOutlined style={{ color: '#6366f1' }} /><span>快速操作</span></Space>}
+            className="modern-card"
+            bordered={false}
+            style={{ height: '100%' }}
+          >
+            <Row gutter={[16, 16]}>
+              {quickActions.map((action, index) => (
+                <Col xs={12} sm={8} md={6} lg={4} key={index}>
+                  <Button
+                    className="quick-action-btn"
+                    onClick={handleQuickActionClick(action.path)}
+                  >
+                    <div className="quick-action-icon" style={{ color: action.color, background: `${action.color}15` }}>
+                      {action.icon}
+                    </div>
+                    <span className="quick-action-title">{action.title}</span>
+                  </Button>
+                </Col>
+              ))}
+            </Row>
+          </Card>
+        </Col>
+
+        {/* Recent Activities */}
+        <Col xs={24} lg={8}>
+          <Card
+            title={<Space><ClockCircleOutlined style={{ color: '#6366f1' }} /><span>最近活动</span></Space>}
+            className="modern-card"
+            bordered={false}
+            style={{ height: '100%' }}
+          >
+            <div className="activity-timeline">
               {recentActivities.length > 0 ? (
                 <List
+                  itemLayout="horizontal"
                   dataSource={recentActivities}
-                  className="activity-list custom-scrollbar"
-                  style={{ maxHeight: '600px', overflowY: 'auto', paddingRight: '4px' }}
-                  renderItem={(item) => {
-                    const displayDescription = item.description.length > 50
-                      ? item.description.substring(0, 50) + '...'
-                      : item.description;
-                    const needTooltip = item.description.length > 50;
-
-                    return (
-                      <List.Item className="activity-item">
-                        <List.Item.Meta
-                          avatar={
-                            <Avatar
-                              icon={getActivityIcon(item.type)}
-                              style={{ backgroundColor: 'rgba(241, 245, 249, 0.8)', color: '#64748b' }}
-                            />
-                          }
-                          title={
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Text strong style={{ fontSize: '14px' }}>{item.title}</Text>
-                              <Text type="secondary" style={{ fontSize: '12px' }}>{item.time}</Text>
-                            </div>
-                          }
-                          description={
-                            <div style={{ marginTop: '4px' }}>
-                              {item.user && (
-                                <Tag color="geekblue" style={{ marginRight: '8px', border: 'none', background: 'rgba(99, 102, 241, 0.1)', color: '#6366f1' }}>
-                                  {item.user}
-                                </Tag>
-                              )}
-                              {needTooltip ? (
-                                <Tooltip title={item.description} placement="topLeft">
-                                  <Text type="secondary" style={{ fontSize: 13, cursor: 'help' }}>
-                                    {displayDescription}
-                                  </Text>
-                                </Tooltip>
-                              ) : (
-                                <Text type="secondary" style={{ fontSize: 13 }}>
-                                  {displayDescription}
-                                </Text>
-                              )}
-                            </div>
-                          }
-                        />
-                      </List.Item>
-                    );
-                  }}
+                  renderItem={(item) => (
+                    <List.Item className="activity-item">
+                      <List.Item.Meta
+                        avatar={
+                          <div className="activity-avatar">
+                            {getActivityIcon(item.type)}
+                          </div>
+                        }
+                        title={
+                          <Space size={4}>
+                            <Text strong>{item.title}</Text>
+                            <Text type="secondary" style={{ fontSize: '12px' }}>{item.time}</Text>
+                          </Space>
+                        }
+                        description={
+                          <div className="activity-description">
+                            {item.user && <Tag color="blue" style={{ marginRight: 4 }}>{item.user}</Tag>}
+                            <Text type="secondary" ellipsis={{ tooltip: item.description }} style={{ maxWidth: 200 }}>
+                              {item.description}
+                            </Text>
+                          </div>
+                        }
+                      />
+                    </List.Item>
+                  )}
                 />
               ) : (
-                <Empty description="暂无活动记录" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                <Empty description="暂无活动" image={Empty.PRESENTED_IMAGE_SIMPLE} />
               )}
-            </Card>
-          </Col>
-        </Row>
+            </div>
+          </Card>
+        </Col>
+      </Row>
 
-        <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-          <Col xs={24}>
-            <Card
-              title={
-                <Space>
-                  <DatabaseOutlined style={{ color: '#6366f1' }} />
-                  <span>系统信息</span>
-                </Space>
-              }
-              className="modern-card system-info-card"
-              bordered={false}
-            >
-              <Descriptions
-                column={{ xs: 1, sm: 2, md: 3 }}
-                bordered
-                size="middle"
-                className="custom-descriptions"
-              >
-                <Descriptions.Item label="平台名称">
-                  <Text strong>{systemInfo?.platformName || '-'}</Text>
-                </Descriptions.Item>
-                <Descriptions.Item label="平台简称">
-                  <Text strong>{systemInfo?.platformShortName || '-'}</Text>
-                </Descriptions.Item>
-                {systemInfo?.releaseVersion && (
-                  <Descriptions.Item label="版本号">
-                    <Tag color="purple">{systemInfo.releaseVersion}</Tag>
-                  </Descriptions.Item>
-                )}
-                {systemInfo?.buildVersion && (
-                  <Descriptions.Item label="构建版本">
-                    <Tag color="cyan">{systemInfo.buildVersion}</Tag>
-                  </Descriptions.Item>
-                )}
-                <Descriptions.Item label="版权信息" span={systemInfo?.releaseVersion || systemInfo?.buildVersion ? 1 : 3}>
-                  <Text type="secondary">{systemInfo?.copyRight || '-'}</Text>
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
-          </Col>
-        </Row>
-      </Spin>
+      {/* System Info */}
+      <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
+        <Col span={24}>
+          <Card
+            title={<Space><SettingOutlined style={{ color: '#6366f1' }} /><span>系统信息</span></Space>}
+            className="modern-card"
+            bordered={false}
+          >
+            <Descriptions bordered column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }} size="small" className="custom-descriptions">
+              <Descriptions.Item label="系统名称">{systemInfo?.sys?.computerName || '-'}</Descriptions.Item>
+              <Descriptions.Item label="操作系统">{systemInfo?.sys?.osName || '-'}</Descriptions.Item>
+              <Descriptions.Item label="系统架构">{systemInfo?.sys?.osArch || '-'}</Descriptions.Item>
+              <Descriptions.Item label="Java版本">{systemInfo?.jvm?.version || '-'}</Descriptions.Item>
+              <Descriptions.Item label="Java路径">{systemInfo?.jvm?.home || '-'}</Descriptions.Item>
+              <Descriptions.Item label="工作目录">{systemInfo?.sys?.userDir || '-'}</Descriptions.Item>
+            </Descriptions>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 }

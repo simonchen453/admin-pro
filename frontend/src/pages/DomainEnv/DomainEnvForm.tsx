@@ -170,7 +170,7 @@ const DomainEnvForm: React.FC<DomainEnvFormProps> = ({ domainEnv, domainList, on
           label="描述"
           name="description"
         >
-          <Input.TextArea placeholder="请输入描述" rows={4} allowClear />
+          <Input.TextArea placeholder="请输入描述" autoSize={{ minRows: 4, maxRows: 8 }} allowClear />
         </Form.Item>
       </Form>
 

@@ -108,29 +108,29 @@ const JobForm: React.FC<JobFormProps> = ({
       }
     } catch (error: unknown) {
       console.error('保存定时任务失败:', error);
-      
+
       let errorMessage = '保存定时任务失败';
       let fieldErrors: Record<string, string> = {};
-      
+
       if (error && typeof error === 'object' && 'response' in error) {
-        const errorResponse = error as { 
-          response?: { 
-            data?: { 
+        const errorResponse = error as {
+          response?: {
+            data?: {
               message?: string;
               errorsMap?: Record<string, string>;
-            } 
-          } 
+            }
+          }
         };
-        
+
         if (errorResponse.response?.data?.message) {
           errorMessage = errorResponse.response.data.message;
         }
-        
+
         if (errorResponse.response?.data?.errorsMap) {
           fieldErrors = errorResponse.response.data.errorsMap;
         }
       }
-      
+
       if (Object.keys(fieldErrors).length > 0) {
         Object.keys(fieldErrors).forEach(field => {
           form.setFields([{
@@ -139,7 +139,7 @@ const JobForm: React.FC<JobFormProps> = ({
           }]);
         });
       }
-      
+
       message.error(errorMessage);
     } finally {
       setLoading(false);
@@ -157,7 +157,7 @@ const JobForm: React.FC<JobFormProps> = ({
         label="Bean名称"
         rules={[{ required: true, message: 'Bean名称不能为空' }]}
       >
-        <Input placeholder="请输入Bean名称" disabled={isEdit} />
+        <Input placeholder="请输入Bean名称" disabled={isEdit} allowClear />
       </Form.Item>
 
       <Form.Item
@@ -165,14 +165,14 @@ const JobForm: React.FC<JobFormProps> = ({
         label="方法名称"
         rules={[{ required: true, message: '方法名称不能为空' }]}
       >
-        <Input placeholder="请输入方法名称" />
+        <Input placeholder="请输入方法名称" allowClear />
       </Form.Item>
 
       <Form.Item
         name="params"
         label="参数"
       >
-        <Input placeholder="请输入参数" />
+        <Input placeholder="请输入参数" allowClear />
       </Form.Item>
 
       <Form.Item
@@ -180,7 +180,7 @@ const JobForm: React.FC<JobFormProps> = ({
         label="Cron表达式"
         rules={[{ required: true, message: 'Cron表达式不能为空' }]}
       >
-        <Input placeholder="请输入Cron表达式" />
+        <Input placeholder="请输入Cron表达式" allowClear />
       </Form.Item>
 
       <Form.Item
@@ -188,9 +188,10 @@ const JobForm: React.FC<JobFormProps> = ({
         label="备注"
       >
         <TextArea
-          rows={3}
+          autoSize={{ minRows: 3, maxRows: 6 }}
           placeholder="请输入备注"
           maxLength={200}
+          allowClear
         />
       </Form.Item>
 

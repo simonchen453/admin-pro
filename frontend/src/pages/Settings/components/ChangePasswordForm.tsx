@@ -251,6 +251,7 @@ const ChangePasswordForm: React.FC = () => {
                   prefix={<LockOutlined />}
                   iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                   size="large"
+                  allowClear
                 />
               </Form.Item>
             </Col>
@@ -266,6 +267,7 @@ const ChangePasswordForm: React.FC = () => {
                   prefix={<LockOutlined />}
                   iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                   size="large"
+                  allowClear
                   onChange={(e) => {
                     // 确保 Form.useWatch 能监听到变化
                     // 不在这里设置值，让 Form 自己管理
@@ -336,6 +338,7 @@ const ChangePasswordForm: React.FC = () => {
                   prefix={<LockOutlined />}
                   iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                   size="large"
+                  allowClear
                   onChange={(e) => {
                     // 确保 Form.useWatch 能监听到变化
                     // 不在这里设置值，让 Form 自己管理

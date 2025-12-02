@@ -113,7 +113,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({
         label="配置名称"
         rules={[{ required: true, message: '配置名称不能为空' }]}
       >
-        <Input placeholder="请输入配置名称" />
+        <Input placeholder="请输入配置名称" allowClear />
       </Form.Item>
 
       <Form.Item
@@ -121,7 +121,7 @@ const ConfigForm: React.FC<ConfigFormProps> = ({
         label="Key"
         rules={[{ required: true, message: 'Key不能为空' }]}
       >
-        <Input placeholder="请输入配置键名" disabled={isEdit} />
+        <Input placeholder="请输入配置键名" disabled={isEdit} allowClear />
       </Form.Item>
 
       <Form.Item
@@ -130,8 +130,9 @@ const ConfigForm: React.FC<ConfigFormProps> = ({
         rules={[{ required: true, message: 'Value不能为空' }]}
       >
         <TextArea
-          rows={4}
+          autoSize={{ minRows: 4, maxRows: 8 }}
           placeholder="请输入配置键值"
+          allowClear
         />
       </Form.Item>
 
@@ -140,8 +141,9 @@ const ConfigForm: React.FC<ConfigFormProps> = ({
         label="备注"
       >
         <TextArea
-          rows={3}
+          autoSize={{ minRows: 3, maxRows: 6 }}
           placeholder="请输入备注"
+          allowClear
         />
       </Form.Item>
 

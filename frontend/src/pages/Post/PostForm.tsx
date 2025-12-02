@@ -167,7 +167,7 @@ const PostForm: React.FC<PostFormProps> = ({ post, onSuccess, onCancel }) => {
         >
           <TextArea
             placeholder="请输入备注"
-            rows={3}
+            autoSize={{ minRows: 3, maxRows: 6 }}
             allowClear
           />
         </Form.Item>

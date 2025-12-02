@@ -140,12 +140,12 @@ body {
 }
 
 /* Ant Design Overrides for HD Inputs */
-.ant-input,
+.ant-input:not(textarea),
 .ant-select-selector,
 .ant-picker,
 .ant-input-number,
 .ant-input-password,
-.ant-input-affix-wrapper {
+.ant-input-affix-wrapper:not(:has(textarea)) {
   border-radius: 8px !important;
   border-color: #e2e8f0 !important;
   background-color: #fff !important;
@@ -163,6 +163,21 @@ body {
   line-height: 1.5 !important;
   display: flex !important;
   align-items: center !important;
+}
+
+/* Override for TextArea to support resizing and auto height */
+textarea.ant-input {
+  /* height: auto !important; */
+  min-height: 36px !important;
+  padding: 8px 11px !important;
+  display: block !important;
+  resize: vertical !important;
+}
+
+/* Reset height for affix wrapper containing textarea */
+.ant-input-affix-wrapper:has(textarea) {
+  height: auto !important;
+  padding: 0 !important;
 }
 
 /* Fix for input inside affix wrapper (e.g. password, search) */
@@ -224,4 +239,13 @@ body {
   font-weight: 500 !important;
   /* Reduced from 600 */
   font-size: 13px !important;
+}
+
+/* Fix Select arrow and clear icon vertical alignment */
+.ant-select .ant-select-arrow,
+.ant-select .ant-select-clear {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin-top: 0 !important;
+  inset-block-start: 50% !important;
 }

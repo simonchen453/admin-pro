@@ -110,7 +110,7 @@ const DictForm: React.FC<DictFormProps> = ({
     try {
       const values = await dataForm.validateFields();
       const key = form.getFieldValue('key');
-      
+
       const dataItem: DictDataEntity = {
         key: key,
         value: values.value,
@@ -127,7 +127,7 @@ const DictForm: React.FC<DictFormProps> = ({
       } else {
         setDataList([...dataList, dataItem]);
       }
-      
+
       setDataModalVisible(false);
       setEditingDataIndex(null);
       dataForm.resetFields();
@@ -260,7 +260,7 @@ const DictForm: React.FC<DictFormProps> = ({
           label="字典名称"
           rules={[{ required: true, message: '字典名称不能为空' }]}
         >
-          <Input placeholder="请输入字典名称" />
+          <Input placeholder="请输入字典名称" allowClear />
         </Form.Item>
 
         <Form.Item
@@ -268,7 +268,7 @@ const DictForm: React.FC<DictFormProps> = ({
           label="字典键值"
           rules={[{ required: true, message: '字典键值不能为空' }]}
         >
-          <Input placeholder="请输入字典键值" disabled={isEdit} />
+          <Input placeholder="请输入字典键值" disabled={isEdit} allowClear />
         </Form.Item>
 
         <Form.Item
@@ -287,8 +287,9 @@ const DictForm: React.FC<DictFormProps> = ({
           label="备注"
         >
           <TextArea
-            rows={3}
+            autoSize={{ minRows: 3, maxRows: 6 }}
             placeholder="请输入备注"
+            allowClear
           />
         </Form.Item>
 
@@ -339,7 +340,7 @@ const DictForm: React.FC<DictFormProps> = ({
             name="key"
             label="唯一键"
           >
-            <Input disabled />
+            <Input disabled allowClear />
           </Form.Item>
 
           <Form.Item
@@ -347,7 +348,7 @@ const DictForm: React.FC<DictFormProps> = ({
             label="配置值"
             rules={[{ required: true, message: '配置值不能为空' }]}
           >
-            <Input placeholder="请输入配置值" />
+            <Input placeholder="请输入配置值" allowClear />
           </Form.Item>
 
           <Form.Item
@@ -355,7 +356,7 @@ const DictForm: React.FC<DictFormProps> = ({
             label="显示值"
             rules={[{ required: true, message: '显示值不能为空' }]}
           >
-            <Input placeholder="请输入显示值" />
+            <Input placeholder="请输入显示值" allowClear />
           </Form.Item>
 
           <Form.Item
@@ -363,14 +364,14 @@ const DictForm: React.FC<DictFormProps> = ({
             label="顺序"
             rules={[{ required: true, message: '顺序不能为空' }]}
           >
-            <Input placeholder="请输入顺序" />
+            <Input placeholder="请输入顺序" allowClear />
           </Form.Item>
 
           <Form.Item
             name="cssClass"
             label="样式"
           >
-            <Input placeholder="请输入样式" />
+            <Input placeholder="请输入样式" allowClear />
           </Form.Item>
 
           <Form.Item

@@ -383,7 +383,7 @@ const SessionList: React.FC = () => {
             </Col>
             <Col xs={24} sm={12} md={6}>
               <Form.Item name="deptNo" style={{ marginBottom: 0 }}>
-                <Input placeholder="部门编号" />
+                <Input placeholder="部门编号" allowClear />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={24}>

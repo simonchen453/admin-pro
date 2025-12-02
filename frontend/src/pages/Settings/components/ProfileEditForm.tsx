@@ -62,7 +62,7 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
     } catch (error: any) {
       console.error('更新个人信息失败:', error);
       let errorMessage = '更新个人信息失败';
-      
+
       if (error && typeof error === 'object' && 'response' in error) {
         const errorResponse = error as { response?: { data?: { message?: string } } };
         if (errorResponse.response?.data?.message) {
@@ -72,7 +72,7 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
         const errorWithMessage = error as { message: string };
         errorMessage = errorWithMessage.message;
       }
-      
+
       message.error(errorMessage);
     } finally {
       setLoading(false);
@@ -83,17 +83,17 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
     if (info.file.status === 'uploading') {
       return;
     }
-    
+
     if (info.file.status === 'done') {
       const response = info.file.response;
       let url = '';
-      
+
       // 处理响应数据，可能的结构：
       // 1. { restCode: '200', data: { relativePath: '...', absolutePath: '...' } }
       // 2. { data: { relativePath: '...', absolutePath: '...' } }
       // 3. { relativePath: '...', absolutePath: '...' }
       // 4. 直接是字符串URL
-      
+
       if (response) {
         // 优先使用 absolutePath（完整URL），如果没有则使用 relativePath
         if (response.data) {
@@ -115,7 +115,7 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
           url = response;
         }
       }
-      
+
       if (url) {
         setAvatarUrl(url);
         form.setFieldsValue({ avatarUrl: url });
@@ -182,7 +182,7 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
         label="真实姓名"
         rules={[{ required: true, message: '请输入真实姓名' }]}
       >
-        <Input placeholder="请输入真实姓名" />
+        <Input placeholder="请输入真实姓名" allowClear />
       </Form.Item>
 
       <Form.Item
@@ -193,7 +193,7 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
           { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' }
         ]}
       >
-        <Input placeholder="请输入手机号码" maxLength={11} />
+        <Input placeholder="请输入手机号码" maxLength={11} allowClear />
       </Form.Item>
 
       <Form.Item
@@ -204,7 +204,7 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
           { type: 'email', message: '请输入正确的邮箱格式' }
         ]}
       >
-        <Input placeholder="请输入邮箱" maxLength={50} />
+        <Input placeholder="请输入邮箱" maxLength={50} allowClear />
       </Form.Item>
 
       <Form.Item
@@ -225,10 +225,11 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
         label="备注"
       >
         <TextArea
-          rows={3}
+          autoSize={{ minRows: 3, maxRows: 16 }}
           placeholder="请输入备注信息"
           maxLength={200}
           showCount
+          allowClear
         />
       </Form.Item>
 

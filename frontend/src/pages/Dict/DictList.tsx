@@ -347,12 +347,12 @@ const DictList: React.FC = () => {
           <Row gutter={[16, 16]} style={{ width: '100%' }}>
             <Col xs={24} sm={12} md={6}>
               <Form.Item name="name" style={{ marginBottom: 0 }}>
-                <Input placeholder="字典名称" onPressEnter={() => form.submit()} />
+                <Input placeholder="字典名称" allowClear onPressEnter={() => form.submit()} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={6}>
               <Form.Item name="key" style={{ marginBottom: 0 }}>
-                <Input placeholder="字典类型" onPressEnter={() => form.submit()} />
+                <Input placeholder="字典类型" allowClear onPressEnter={() => form.submit()} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={6}>

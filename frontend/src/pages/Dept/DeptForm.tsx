@@ -203,7 +203,7 @@ const DeptForm: React.FC<DeptFormProps> = ({
             label="部门名称"
             rules={[{ required: true, message: '部门名称不能为空' }]}
           >
-            <Input placeholder="请输入部门名称" />
+            <Input placeholder="请输入部门名称" allowClear />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -212,7 +212,7 @@ const DeptForm: React.FC<DeptFormProps> = ({
             label="部门编号"
             rules={[{ required: true, message: '部门编号不能为空' }]}
           >
-            <Input placeholder="请输入部门编号" />
+            <Input placeholder="请输入部门编号" allowClear />
           </Form.Item>
         </Col>
       </Row>
@@ -237,7 +237,7 @@ const DeptForm: React.FC<DeptFormProps> = ({
             name="linkman"
             label="联系人"
           >
-            <Input placeholder="请输入联系人" maxLength={20} />
+            <Input placeholder="请输入联系人" maxLength={20} allowClear />
           </Form.Item>
         </Col>
       </Row>
@@ -254,7 +254,7 @@ const DeptForm: React.FC<DeptFormProps> = ({
               }
             ]}
           >
-            <Input placeholder="请输入联系电话" maxLength={11} />
+            <Input placeholder="请输入联系电话" maxLength={11} allowClear />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -268,7 +268,7 @@ const DeptForm: React.FC<DeptFormProps> = ({
               }
             ]}
           >
-            <Input placeholder="请输入邮箱" maxLength={50} />
+            <Input placeholder="请输入邮箱" maxLength={50} allowClear />
           </Form.Item>
         </Col>
       </Row>

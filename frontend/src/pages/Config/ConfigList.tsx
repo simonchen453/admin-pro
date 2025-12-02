@@ -279,12 +279,12 @@ const ConfigList: React.FC = () => {
           <Row gutter={[16, 16]} style={{ width: '100%' }}>
             <Col xs={24} sm={12} md={6}>
               <Form.Item name="name" style={{ marginBottom: 0 }}>
-                <Input placeholder="配置名称" prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} onPressEnter={() => form.submit()} />
+                <Input placeholder="配置名称" allowClear prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} onPressEnter={() => form.submit()} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={6}>
               <Form.Item name="key" style={{ marginBottom: 0 }}>
-                <Input placeholder="配置键名" prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} onPressEnter={() => form.submit()} />
+                <Input placeholder="配置键名" allowClear prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} onPressEnter={() => form.submit()} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={6}>

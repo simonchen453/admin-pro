@@ -704,12 +704,12 @@ const UserList: React.FC = () => {
                 </Col>
                 <Col xs={24} sm={12} md={6}>
                   <Form.Item name="loginName" style={{ marginBottom: 0 }}>
-                    <Input placeholder="登录名" prefix={<UserOutlined style={{ color: '#cbd5e1' }} />} />
+                    <Input placeholder="登录名" allowClear prefix={<UserOutlined style={{ color: '#cbd5e1' }} />} />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={12} md={6}>
                   <Form.Item name="realName" style={{ marginBottom: 0 }}>
-                    <Input placeholder="用户姓名" prefix={<UserOutlined style={{ color: '#cbd5e1' }} />} />
+                    <Input placeholder="用户姓名" allowClear prefix={<UserOutlined style={{ color: '#cbd5e1' }} />} />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={12} md={6}>
@@ -848,7 +848,7 @@ const UserList: React.FC = () => {
               { min: 6, message: '密码至少6个字符' }
             ]}
           >
-            <Input.Password placeholder="请输入新密码" maxLength={50} />
+            <Input.Password placeholder="请输入新密码" maxLength={50} allowClear />
           </Form.Item>
           <Form.Item
             name="confirmPassword"
@@ -866,7 +866,7 @@ const UserList: React.FC = () => {
               })
             ]}
           >
-            <Input.Password placeholder="请再次输入新密码" maxLength={50} />
+            <Input.Password placeholder="请再次输入新密码" maxLength={50} allowClear />
           </Form.Item>
         </Form>
       </Modal>

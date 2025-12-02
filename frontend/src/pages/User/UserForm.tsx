@@ -53,7 +53,7 @@ const UserForm: React.FC<UserFormProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = React.useState(false);
-  const [domainList, setDomainList] = React.useState<Array<{ id: string; name: string;display: string }>>([]);
+  const [domainList, setDomainList] = React.useState<Array<{ id: string; name: string; display: string }>>([]);
 
   const isEdit = !!user;
 
@@ -169,30 +169,30 @@ const UserForm: React.FC<UserFormProps> = ({
       onSuccess();
     } catch (error: unknown) {
       console.error('保存用户失败:', error);
-      
+
       // 获取错误消息和字段错误
       let errorMessage = '保存用户失败';
       let fieldErrors: Record<string, string> = {};
-      
+
       if (error && typeof error === 'object' && 'response' in error) {
-        const errorResponse = error as { 
-          response?: { 
-            data?: { 
+        const errorResponse = error as {
+          response?: {
+            data?: {
               message?: string;
               errorsMap?: Record<string, string>;
-            } 
-          } 
+            }
+          }
         };
-        
+
         if (errorResponse.response?.data?.message) {
           errorMessage = errorResponse.response.data.message;
         }
-        
+
         if (errorResponse.response?.data?.errorsMap) {
           fieldErrors = errorResponse.response.data.errorsMap;
         }
       }
-      
+
       // 显示字段级错误
       if (Object.keys(fieldErrors).length > 0) {
         Object.keys(fieldErrors).forEach(field => {
@@ -202,7 +202,7 @@ const UserForm: React.FC<UserFormProps> = ({
           }]);
         });
       }
-      
+
       message.error(errorMessage);
     } finally {
       setLoading(false);
@@ -244,7 +244,7 @@ const UserForm: React.FC<UserFormProps> = ({
               { min: 3, message: '登录名至少3个字符' }
             ]}
           >
-            <Input placeholder="请输入用户登录名称" />
+            <Input placeholder="请输入用户登录名称" allowClear />
           </Form.Item>
         </Col>
       </Row>
@@ -256,7 +256,7 @@ const UserForm: React.FC<UserFormProps> = ({
             label="真实姓名"
             rules={[{ required: true, message: '请输入真实姓名' }]}
           >
-            <Input placeholder="请输入用户真实姓名" />
+            <Input placeholder="请输入用户真实姓名" allowClear />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -287,7 +287,7 @@ const UserForm: React.FC<UserFormProps> = ({
               { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' }
             ]}
           >
-            <Input placeholder="请输入手机号码" maxLength={11} />
+            <Input placeholder="请输入手机号码" maxLength={11} allowClear />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -299,7 +299,7 @@ const UserForm: React.FC<UserFormProps> = ({
               { type: 'email', message: '请输入正确的邮箱格式' }
             ]}
           >
-            <Input placeholder="请输入邮箱" maxLength={50} />
+            <Input placeholder="请输入邮箱" maxLength={50} allowClear />
           </Form.Item>
         </Col>
       </Row>
@@ -315,7 +315,7 @@ const UserForm: React.FC<UserFormProps> = ({
                 { min: 6, message: '密码至少6个字符' }
               ]}
             >
-              <Input.Password placeholder="请输入密码" maxLength={50} />
+              <Input.Password placeholder="请输入密码" maxLength={50} allowClear />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -334,7 +334,7 @@ const UserForm: React.FC<UserFormProps> = ({
                 })
               ]}
             >
-              <Input.Password placeholder="请再次输入密码" maxLength={50} />
+              <Input.Password placeholder="请再次输入密码" maxLength={50} allowClear />
             </Form.Item>
           </Col>
         </Row>
@@ -446,9 +446,10 @@ const UserForm: React.FC<UserFormProps> = ({
             label="备注"
           >
             <TextArea
-              rows={3}
+              autoSize={{ minRows: 3, maxRows: 6 }}
               placeholder="请输入内容"
               maxLength={200}
+              allowClear
             />
           </Form.Item>
         </Col>

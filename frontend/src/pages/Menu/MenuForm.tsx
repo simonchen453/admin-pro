@@ -228,7 +228,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
               name="icon"
               label="菜单图标"
             >
-              <Input placeholder="请输入菜单图标" />
+              <Input placeholder="请输入菜单图标" allowClear />
             </Form.Item>
           </Col>
         </Row>
@@ -241,7 +241,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
             label="菜单名称"
             rules={[{ required: true, message: '请输入菜单名称' }]}
           >
-            <Input placeholder="请输入菜单名称" />
+            <Input placeholder="请输入菜单名称" allowClear />
           </Form.Item>
         </Col>
         <Col span={12}>
@@ -250,7 +250,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
             label="显示名称"
             rules={[{ required: true, message: '菜单名称不能为空' }]}
           >
-            <Input placeholder="请输入显示名称" />
+            <Input placeholder="请输入显示名称" allowClear />
           </Form.Item>
         </Col>
       </Row>
@@ -263,7 +263,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
               label="链接路径"
               rules={[{ required: true, message: '请输入链接路径' }]}
             >
-              <Input placeholder="请输入链接路径" />
+              <Input placeholder="请输入链接路径" allowClear />
             </Form.Item>
           </Col>
         </Row>
@@ -295,6 +295,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
                 placeholder="请输入权限标识" 
                 maxLength={50}
                 style={{ width: '100%' }}
+                allowClear
               />
             </Form.Item>
           </Col>

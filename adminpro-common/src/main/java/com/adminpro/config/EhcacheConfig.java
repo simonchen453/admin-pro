@@ -1,17 +1,16 @@
 package com.adminpro.config;
 
-import javax.cache.CacheManager;
-import javax.cache.Caching;
-import javax.cache.spi.CachingProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.ehcache.jsr107.EhcacheCachingProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cache.Cache;
 import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import javax.cache.CacheManager;
+import javax.cache.Caching;
+import javax.cache.spi.CachingProvider;
 import java.net.URI;
 
 /**

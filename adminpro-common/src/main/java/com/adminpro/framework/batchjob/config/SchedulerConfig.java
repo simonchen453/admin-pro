@@ -1,6 +1,7 @@
 package com.adminpro.framework.batchjob.config;
 
 import com.adminpro.framework.common.helper.ConfigHelper;
+import jakarta.annotation.PostConstruct;
 import org.quartz.spi.JobFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
-import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Properties;
 

@@ -4,6 +4,7 @@ import com.adminpro.framework.security.auth.AuthToken;
 import com.adminpro.framework.security.auth.LoginUser;
 import com.adminpro.rbac.domains.entity.user.UserIden;
 import com.adminpro.rbac.domains.entity.user.UserService;
+import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -13,8 +14,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-
-import jakarta.annotation.Resource;
 
 /**
  * 自定义身份认证验证组件

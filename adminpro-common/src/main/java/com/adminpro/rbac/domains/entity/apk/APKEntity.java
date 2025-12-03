@@ -5,9 +5,8 @@ import com.adminpro.core.jdbc.annotation.Column;
 import com.adminpro.core.jdbc.annotation.PrimaryKey;
 import com.adminpro.core.jdbc.annotation.Table;
 import com.adminpro.framework.common.entity.BaseAuditEntity;
-import lombok.Data;
-
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 /**
  * APK版本管理表 sys_apk_tbl

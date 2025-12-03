@@ -9,11 +9,11 @@ import com.adminpro.tools.gen.ColumnInfo;
 import com.adminpro.tools.gen.TableInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import java.util.Map;
-import java.util.HashMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 代码生成器 工具类

@@ -1,7 +1,6 @@
 package com.adminpro.core.jdbc.sqlbuilder;
 
 import com.adminpro.core.base.util.IdGenerator;
-import com.adminpro.core.jdbc.utils.DbUtil;
 import com.adminpro.core.tools.seq.SequenceService;
 import org.apache.commons.lang3.StringUtils;
 

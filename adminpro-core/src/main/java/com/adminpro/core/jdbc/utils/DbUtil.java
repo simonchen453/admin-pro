@@ -2,7 +2,6 @@ package com.adminpro.core.jdbc.utils;
 
 import com.adminpro.core.base.util.SpringUtil;
 import com.adminpro.core.base.util.StringUtil;
-
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;

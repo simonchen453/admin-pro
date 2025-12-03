@@ -7,11 +7,11 @@ import com.adminpro.core.jdbc.annotation.Column;
 import com.adminpro.core.jdbc.annotation.PrimaryKey;
 import com.adminpro.core.jdbc.annotation.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import java.util.Date;
 
 

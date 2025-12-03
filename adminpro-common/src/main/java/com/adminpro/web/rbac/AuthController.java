@@ -4,13 +4,11 @@ import com.adminpro.core.base.entity.R;
 import com.adminpro.core.base.util.BeanUtil;
 import com.adminpro.core.base.util.DateUtil;
 import com.adminpro.core.exceptions.APIException;
+import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.framework.common.constants.WebConstants;
 import com.adminpro.framework.common.helper.ConfigHelper;
-
-import static com.adminpro.framework.common.constants.ConfigKeys.User;
 import com.adminpro.framework.common.helper.WebHelper;
 import com.adminpro.framework.common.web.BaseController;
-import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.rbac.api.Device;
 import com.adminpro.rbac.api.LoginHelper;
 import com.adminpro.rbac.common.RbacCacheConstants;
@@ -25,6 +23,11 @@ import com.adminpro.rbac.domains.vo.user.UpdateProfileVo;
 import com.adminpro.rbac.domains.vo.user.UserInfoResponseVo;
 import com.adminpro.rbac.enums.UserLoginPlatform;
 import com.google.code.kaptcha.Producer;
+import jakarta.annotation.Resource;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.javasimon.aop.Monitored;
@@ -38,15 +41,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.annotation.Resource;
 import javax.imageio.ImageIO;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Date;
+
+import static com.adminpro.framework.common.constants.ConfigKeys.User;
 
 @RestController
 @RequestMapping("/rest/auth")

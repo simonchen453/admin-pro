@@ -10,12 +10,10 @@ import com.adminpro.tools.ueditor.define.BaseState;
 import com.adminpro.tools.ueditor.define.FileType;
 import com.adminpro.tools.ueditor.define.State;
 import com.adminpro.web.BaseConstants;
-// commons-fileupload 已移除，使用 Spring Boot 内置的 multipart 支持
-// import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;

@@ -2,8 +2,6 @@ package com.adminpro.config;
 
 import com.adminpro.framework.common.helper.ConfigHelper;
 import com.adminpro.tools.lock.CacheKeyGenerator;
-
-import static com.adminpro.framework.common.constants.ConfigKeys.Cache;
 import com.adminpro.tools.lock.LockKeyGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -28,6 +26,8 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.adminpro.framework.common.constants.ConfigKeys.Cache;
 
 /**
  * @author simon

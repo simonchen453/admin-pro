@@ -3,10 +3,10 @@ package com.adminpro.core.jdbc;
 import com.adminpro.core.base.entity.BaseAuditEntity;
 import com.adminpro.core.base.util.ReflectUtil;
 import com.adminpro.core.base.util.StringUtil;
-import com.adminpro.core.jdbc.utils.ClassUtil;
 import com.adminpro.core.jdbc.annotation.Column;
-
+import com.adminpro.core.jdbc.utils.ClassUtil;
 import org.springframework.jdbc.core.RowMapper;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;

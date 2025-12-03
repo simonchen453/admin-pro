@@ -9,14 +9,13 @@ import com.adminpro.rbac.domains.entity.domain.UserDomainEnvEntity;
 import com.adminpro.rbac.domains.entity.domain.UserDomainEnvService;
 import com.adminpro.rbac.domains.entity.user.UserEntity;
 import com.adminpro.web.BaseConstants;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * 自定义退出处理类 返回成功

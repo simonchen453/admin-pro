@@ -1,7 +1,6 @@
 package com.adminpro.rbac.domains.vo.user;
 
 import com.adminpro.core.base.message.MessageBundle;
-import com.adminpro.core.base.util.ValidationUtil;
 import com.adminpro.core.base.validator.BaseValidator;
 import com.adminpro.rbac.api.PasswordValidator;
 import com.adminpro.rbac.domains.entity.dept.DeptEntity;

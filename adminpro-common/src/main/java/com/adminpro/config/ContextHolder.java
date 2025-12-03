@@ -6,9 +6,8 @@ import com.adminpro.core.base.util.CommonUtil;
 import com.adminpro.core.base.util.ParamUtil;
 import com.adminpro.framework.security.auth.LoginUser;
 import com.adminpro.rbac.api.LoginHelper;
-import org.springframework.stereotype.Component;
-
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Component;
 
 /**
  * @author simon

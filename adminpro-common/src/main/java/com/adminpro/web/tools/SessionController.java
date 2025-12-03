@@ -9,7 +9,6 @@ import com.adminpro.framework.common.BaseRoutingController;
 import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.framework.common.helper.StringHelper;
 import com.adminpro.framework.common.helper.WebHelper;
-import com.adminpro.rbac.domains.entity.domain.DomainEntity;
 import com.adminpro.rbac.domains.entity.domain.DomainService;
 import com.adminpro.tools.domains.entity.session.SessionEntity;
 import com.adminpro.tools.domains.entity.session.SessionService;
@@ -18,8 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * 用户Session 信息操作处理

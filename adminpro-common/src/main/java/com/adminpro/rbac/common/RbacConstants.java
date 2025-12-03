@@ -2,10 +2,7 @@ package com.adminpro.rbac.common;
 
 import com.adminpro.framework.common.helper.ConfigHelper;
 
-import static com.adminpro.framework.common.constants.ConfigKeys.App;
-import static com.adminpro.framework.common.constants.ConfigKeys.Auth;
-import static com.adminpro.framework.common.constants.ConfigKeys.Default;
-import static com.adminpro.framework.common.constants.ConfigKeys.Dept;
+import static com.adminpro.framework.common.constants.ConfigKeys.*;
 
 /**
  * Created by simon on 2017/5/31.

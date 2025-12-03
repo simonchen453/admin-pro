@@ -7,6 +7,7 @@ import com.adminpro.core.jdbc.SearchParam;
 import com.adminpro.core.jdbc.query.QueryResultSet;
 import com.adminpro.framework.batchjob.ScheduleStatus;
 import com.adminpro.framework.batchjob.utils.ScheduleUtils;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronTrigger;
 import org.quartz.Scheduler;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
 import java.util.Date;
 import java.util.List;
 

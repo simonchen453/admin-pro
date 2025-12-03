@@ -6,13 +6,12 @@ import com.adminpro.rbac.common.RbacCacheConstants;
 import com.adminpro.rbac.common.RbacConstants;
 import com.adminpro.rbac.domains.entity.user.UserEntity;
 import com.adminpro.rbac.domains.entity.user.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import jakarta.servlet.http.HttpSession;
 
 @Service
 public class AuthUserDetailServiceImpl implements UserDetailsService {

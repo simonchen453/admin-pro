@@ -3,6 +3,8 @@ package com.adminpro.config;
 import com.adminpro.core.base.entity.R;
 import com.adminpro.core.exceptions.BaseRuntimeException;
 import com.adminpro.rbac.common.RbacConstants;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -13,8 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

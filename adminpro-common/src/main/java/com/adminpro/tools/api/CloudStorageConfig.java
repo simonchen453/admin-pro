@@ -3,10 +3,10 @@ package com.adminpro.tools.api;
 import com.adminpro.tools.api.validator.AliyunGroup;
 import com.adminpro.tools.api.validator.QcloudGroup;
 import com.adminpro.tools.api.validator.QiniuGroup;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.URL;
 
-import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**

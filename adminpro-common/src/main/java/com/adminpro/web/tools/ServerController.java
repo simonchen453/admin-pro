@@ -4,10 +4,9 @@ import com.adminpro.core.base.entity.R;
 import com.adminpro.framework.common.BaseRoutingController;
 import com.adminpro.tools.domains.entity.server.Server;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 服务器监控

@@ -8,6 +8,11 @@ import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -95,6 +100,23 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 处理权限不足异常
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<R<?>> handleAccessDeniedException(AccessDeniedException e) {
+        // 判断是否是匿名用户
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth instanceof AnonymousAuthenticationToken) {
+            logger.warn("认证失败: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(R.error("401", "认证失败，请重新登录"));
+        }
+        logger.warn("权限不足: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(R.error("403", "权限不足，无法访问系统资源"));
+    }
+
+    /**
      * 处理其他异常
      */
     @ExceptionHandler(Exception.class)
@@ -104,4 +126,3 @@ public class GlobalExceptionHandler {
         return R.error(RbacConstants.MSG_SYSTEM_ERROR);
     }
 }
-

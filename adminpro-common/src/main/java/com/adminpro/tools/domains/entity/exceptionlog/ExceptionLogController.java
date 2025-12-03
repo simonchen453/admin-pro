@@ -112,6 +112,15 @@ public class ExceptionLogController extends BaseRoutingController {
         public void setEndTime(String endTime) {
             this.endTime = endTime;
         }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "condition='" + condition + '\'' +
+                    ", startTime='" + startTime + '\'' +
+                    ", endTime='" + endTime + '\'' +
+                    '}';
+        }
     }
 
     private SearchForm getSearchForm() {

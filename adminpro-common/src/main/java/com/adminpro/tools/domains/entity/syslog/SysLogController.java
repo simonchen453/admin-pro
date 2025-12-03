@@ -73,7 +73,6 @@ public class SysLogController extends BaseRoutingController {
         return R.ok();
     }
 
-
     public static class SearchForm extends BaseSearchForm {
         private String condition;
         private String startTime;
@@ -101,6 +100,15 @@ public class SysLogController extends BaseRoutingController {
 
         public void setEndTime(String endTime) {
             this.endTime = endTime;
+        }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "condition='" + condition + '\'' +
+                    ", startTime='" + startTime + '\'' +
+                    ", endTime='" + endTime + '\'' +
+                    '}';
         }
     }
 

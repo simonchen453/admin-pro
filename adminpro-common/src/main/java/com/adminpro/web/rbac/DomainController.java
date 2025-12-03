@@ -150,6 +150,14 @@ public class DomainController extends BaseRoutingController {
         public void setDisplay(String display) {
             this.display = display;
         }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "name='" + name + '\'' +
+                    ", display='" + display + '\'' +
+                    '}';
+        }
     }
 
     private SearchForm getSearchForm() {

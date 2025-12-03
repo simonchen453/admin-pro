@@ -220,6 +220,15 @@ public class ConfigController extends BaseRoutingController {
         public void setValue(String value) {
             this.value = value;
         }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "name='" + name + '\'' +
+                    ", key='" + key + '\'' +
+                    ", value='" + value + '\'' +
+                    '}';
+        }
     }
 
     private SearchForm getSearchForm() {

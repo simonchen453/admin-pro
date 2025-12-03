@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 @PreAuthorize("@ss.hasPermission('system:user')")
 public class UserController extends BaseRoutingController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    
+
     protected static final String PREFIX = "admin/user";
     protected static final String PREFIX_URL = "/admin/user";
     protected static final String SEARCH_FORM_KEY = "userSearchForm";
@@ -179,7 +179,7 @@ public class UserController extends BaseRoutingController {
             logger.warn("用户不存在: userDomain={}, userId={}", userDomain, userId);
             return R.error(RbacConstants.MSG_USER_NOT_FOUND);
         }
-        
+
         UserDetailVO sysUserResponseVo = new UserDetailVO();
         sysUserResponseVo.setLoginName(userEntity.getLoginName());
         sysUserResponseVo.setAvatarUrl(userEntity.getAvatarUrl());
@@ -194,7 +194,7 @@ public class UserController extends BaseRoutingController {
         sysUserResponseVo.setStatus(userEntity.getStatus());
         sysUserResponseVo.setEmail(userEntity.getEmail());
         sysUserResponseVo.setSex(userEntity.getSex());
-        
+
         String deptNo = userEntity.getDeptNo();
         sysUserResponseVo.setDeptNo(deptNo);
         if (StringUtils.isNotEmpty(deptNo)) {
@@ -243,7 +243,7 @@ public class UserController extends BaseRoutingController {
         } else {
             sysUserResponseVo.setPostIds(new ArrayList<>());
         }
-        
+
         logger.debug("查询用户详情成功: userDomain={}, userId={}", userDomain, userId);
         return R.ok(sysUserResponseVo);
     }
@@ -290,8 +290,8 @@ public class UserController extends BaseRoutingController {
 
             assignRolesToUser(user, userRequestVo.getRoleIds());
             assignPostsToUser(user, userRequestVo.getPostIds());
-            
-            logger.info("创建用户成功: loginName={}, userDomain={}, userId={}", 
+
+            logger.info("创建用户成功: loginName={}, userDomain={}, userId={}",
                     userRequestVo.getLoginName(), userRequestVo.getUserDomain(), user.getUserId());
             return R.ok();
         } else {
@@ -314,7 +314,7 @@ public class UserController extends BaseRoutingController {
                 logger.warn("更新用户失败，用户不存在: userDomain={}, userId={}", userRequestVo.getUserDomain(), userRequestVo.getUserId());
                 return R.error(RbacConstants.MSG_USER_NOT_FOUND);
             }
-            
+
             updateUserEntity(userEntity, userRequestVo);
             userService.update(userEntity);
 
@@ -323,11 +323,11 @@ public class UserController extends BaseRoutingController {
 
             userPostAssignService.deleteByUserIden(userEntity.getUserIden());
             assignPostsToUser(userEntity, userRequestVo.getPostIds());
-            
+
             logger.info("更新用户成功: userDomain={}, userId={}", userRequestVo.getUserDomain(), userRequestVo.getUserId());
             return R.ok();
         } else {
-            logger.warn("更新用户验证失败: userDomain={}, userId={}, errors={}", 
+            logger.warn("更新用户验证失败: userDomain={}, userId={}, errors={}",
                     userRequestVo.getUserDomain(), userRequestVo.getUserId(), messageBundle.getErrorMessages());
             return R.error(messageBundle);
         }
@@ -399,7 +399,7 @@ public class UserController extends BaseRoutingController {
         BeanUtil.beanAttributeValueTrim(searchForm);
         SearchParam param = startPaging(searchForm);
         setSearchForm(request, searchForm);
-        
+
         if (StringUtils.isNotEmpty(searchForm.getUserDomain())) {
             param.addFilter("userDomain", searchForm.getUserDomain());
         }
@@ -433,7 +433,7 @@ public class UserController extends BaseRoutingController {
         user.setPassword(userRequestVo.getPassword());
         user.setSex(userRequestVo.getSex());
         user.setEmail(userRequestVo.getEmail());
-        
+
         String deptId = userRequestVo.getDeptId();
         if (StringUtils.isNotEmpty(deptId)) {
             DeptEntity deptEntity = deptService.findById(deptId);
@@ -456,7 +456,7 @@ public class UserController extends BaseRoutingController {
         userEntity.setStatus(userRequestVo.getStatus());
         userEntity.setSex(userRequestVo.getSex());
         userEntity.setEmail(userRequestVo.getEmail());
-        
+
         String deptId = userRequestVo.getDeptId();
         if (StringUtils.isNotEmpty(deptId)) {
             DeptEntity deptEntity = deptService.findById(deptId);
@@ -473,11 +473,11 @@ public class UserController extends BaseRoutingController {
         if (roleIds == null || roleIds.isEmpty()) {
             return;
         }
-        
+
         List<RoleEntity> roleEntities = roleService.findByIds(roleIds);
         Map<String, RoleEntity> roleMap = roleEntities.stream()
                 .collect(Collectors.toMap(RoleEntity::getId, role -> role));
-        
+
         for (String roleId : roleIds) {
             RoleEntity roleEntity = roleMap.get(roleId);
             if (roleEntity != null) {
@@ -497,11 +497,11 @@ public class UserController extends BaseRoutingController {
         if (postIds == null || postIds.isEmpty()) {
             return;
         }
-        
+
         List<PostEntity> postEntities = postService.findByIds(postIds);
         Map<String, PostEntity> postMap = postEntities.stream()
                 .collect(Collectors.toMap(PostEntity::getId, post -> post));
-        
+
         for (String postId : postIds) {
             PostEntity postEntity = postMap.get(postId);
             if (postEntity != null) {
@@ -577,6 +577,19 @@ public class UserController extends BaseRoutingController {
 
         public void setDeptId(String deptId) {
             this.deptId = deptId;
+        }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "userDomain='" + userDomain + '\'' +
+                    ", userId='" + userId + '\'' +
+                    ", display='" + display + '\'' +
+                    ", status='" + status + '\'' +
+                    ", loginName='" + loginName + '\'' +
+                    ", realName='" + realName + '\'' +
+                    ", deptId='" + deptId + '\'' +
+                    '}';
         }
     }
 

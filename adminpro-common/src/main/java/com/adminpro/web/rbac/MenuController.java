@@ -221,6 +221,15 @@ public class MenuController extends BaseRoutingController {
         public void setVisible(Boolean visible) {
             this.visible = visible;
         }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "name='" + name + '\'' +
+                    ", status='" + status + '\'' +
+                    ", visible=" + visible +
+                    '}';
+        }
     }
 
     private SearchForm getSearchForm() {

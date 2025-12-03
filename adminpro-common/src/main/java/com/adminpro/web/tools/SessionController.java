@@ -212,6 +212,18 @@ public class SessionController extends BaseRoutingController {
         public void setDeptNo(String deptNo) {
             this.deptNo = deptNo;
         }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "sessionId='" + sessionId + '\'' +
+                    ", status='" + status + '\'' +
+                    ", userDomain='" + userDomain + '\'' +
+                    ", loginName='" + loginName + '\'' +
+                    ", ipAddr='" + ipAddr + '\'' +
+                    ", deptNo='" + deptNo + '\'' +
+                    '}';
+        }
     }
 
     private SearchForm getSearchForm() {

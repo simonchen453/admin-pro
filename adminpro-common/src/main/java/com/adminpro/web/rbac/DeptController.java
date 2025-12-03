@@ -201,6 +201,7 @@ public class DeptController extends BaseRoutingController {
 
         return R.ok("/upload" + url);
     }
+
     /**
      * 获取详细信息
      *
@@ -236,6 +237,14 @@ public class DeptController extends BaseRoutingController {
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "status='" + status + '\'' +
+                    ", name='" + name + '\'' +
+                    '}';
         }
     }
 

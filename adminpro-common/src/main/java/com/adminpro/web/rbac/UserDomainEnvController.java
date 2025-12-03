@@ -200,6 +200,13 @@ public class UserDomainEnvController extends BaseRoutingController {
         public void setUserDomain(String userDomain) {
             this.userDomain = userDomain;
         }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "userDomain='" + userDomain + '\'' +
+                    '}';
+        }
     }
 
     private SearchForm getSearchForm() {

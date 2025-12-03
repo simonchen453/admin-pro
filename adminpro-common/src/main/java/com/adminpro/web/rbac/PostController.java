@@ -181,6 +181,15 @@ public class PostController extends BaseRoutingController {
         public void setStatus(String status) {
             this.status = status;
         }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "code='" + code + '\'' +
+                    ", name='" + name + '\'' +
+                    ", status='" + status + '\'' +
+                    '}';
+        }
     }
 
     private SearchForm getSearchForm() {

@@ -203,6 +203,13 @@ public class JobController extends BaseRoutingController {
         public void setCondition(String condition) {
             this.condition = condition;
         }
+
+        @Override
+        public String toString() {
+            return "SearchForm{" +
+                    "condition='" + condition + '\'' +
+                    '}';
+        }
     }
 
     public static SearchForm getSearchForm(HttpServletRequest request) {

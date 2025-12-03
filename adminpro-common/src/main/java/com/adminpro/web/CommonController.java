@@ -89,23 +89,23 @@ public class CommonController extends BaseRoutingController {
     @RequestMapping(value = "/statistics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<Map<String, Long>> statistics() {
         Map<String, Long> stats = new HashMap<>();
-        
+
         SearchParam userParam = startPaging();
         long userCount = userService.search(userParam).getTotalCount();
         stats.put("userCount", userCount);
-        
+
         SearchParam roleParam = startPaging();
         long roleCount = roleService.findAll().size();
         stats.put("roleCount", roleCount);
-        
+
         List<DeptEntity> deptList = deptService.findAll();
         stats.put("deptCount", (long) deptList.size());
-        
+
         SearchParam sessionParam = startPaging();
         sessionParam.addFilter("status", SessionStatus.ACTIVE.getCode());
         long sessionCount = sessionService.search(sessionParam).getTotalCount();
         stats.put("sessionCount", sessionCount);
-        
+
         return R.ok(stats);
     }
 
@@ -121,7 +121,7 @@ public class CommonController extends BaseRoutingController {
         try {
             List<SysLogDTO> recentLogs = sysLogService.findRecentLogs(limit);
             List<RecentActivityVO> activities = new ArrayList<>();
-            
+
             for (SysLogDTO log : recentLogs) {
                 RecentActivityVO activity = new RecentActivityVO();
                 activity.setId(log.getId());
@@ -132,7 +132,7 @@ public class CommonController extends BaseRoutingController {
                 activity.setUser(log.getLoginName());
                 activities.add(activity);
             }
-            
+
             return R.ok(activities);
         } catch (Exception e) {
             logger.error("获取最近活动失败", e);
@@ -245,6 +245,8 @@ public class CommonController extends BaseRoutingController {
         serverInfo.setPlatformName(platformName);
         serverInfo.setPlatformShortName(platformShortName);
 
+        copyRight = copyRight.replace("{year}", String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
+        copyRight = copyRight.replace("{platformShortName}", platformShortName);
         serverInfo.setCopyRight(copyRight);
 
         return R.ok(serverInfo);
@@ -272,7 +274,7 @@ public class CommonController extends BaseRoutingController {
     public R menuTreeSelect() {
         UserIden loginUserIden = LoginHelper.getInstance().getLoginUserIden();
         SearchParam param = startPaging();
-//        param.addFilter("userIden", loginUserIden);
+        // param.addFilter("userIden", loginUserIden);
         List<MenuEntity> list = menuService.findByParam(param);
         List<TreeSelect> treeSelects = menuService.buildMenuTreeSelect(list);
         return R.ok(treeSelects);
@@ -286,7 +288,8 @@ public class CommonController extends BaseRoutingController {
         UserEntity userEntity = LoginHelper.getInstance().getUserEntity();
         if (userEntity != null) {
             List<MenuTreeVo> res = (List<MenuTreeVo>) session.getAttribute(RbacCacheConstants.SESSION_MENU_CACHE);
-            List<String> parentMenuIds = (List<String>) session.getAttribute(RbacCacheConstants.SESSION_MENU_PARENT_CACHE);
+            List<String> parentMenuIds = (List<String>) session
+                    .getAttribute(RbacCacheConstants.SESSION_MENU_PARENT_CACHE);
 
             if (res == null || parentMenuIds == null) {
                 List<MenuEntity> menuEntityList = menuService.findMenuTreeByUserIden(userEntity.getUserIden());
@@ -305,7 +308,7 @@ public class CommonController extends BaseRoutingController {
             request.setAttribute("menus", res);
             request.setAttribute("avatarUrl", avatarUrl);
             String activeMenuId = (String) request.getSession().getAttribute(RbacConstants.MENU_SESSION_KEY);
-            request.setAttribute("default_opened", new String[]{getTopParentMenuId(activeMenuId, res)});
+            request.setAttribute("default_opened", new String[] { getTopParentMenuId(activeMenuId, res) });
             if (userEntity != null) {
                 if (userEntity.getLatestLoginTime() != null) {
                     request.setAttribute("latest_login_time", DateUtil.formatDateTime(userEntity.getLatestLoginTime()));

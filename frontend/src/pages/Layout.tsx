@@ -1,4 +1,4 @@
-import { Layout as AntLayout, Menu, theme, Button, Avatar, Dropdown, Space, Typography, Tooltip } from 'antd';
+import { Layout as AntLayout, Menu, theme, Button, Avatar, Dropdown, Space, Typography, Tooltip, ConfigProvider } from 'antd';
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -375,57 +375,64 @@ function MainLayout() {
 
     return (
         <AntLayout style={{ minHeight: '100vh' }}>
-            <Sider
-                collapsible
-                collapsed={collapsed}
-                onCollapse={(value) => setCollapsed(value)}
-                trigger={null}
-                breakpoint="lg"
-                collapsedWidth="0"
-                width={260}
-                className="glass-effect-dark"
-                style={{
-                    position: 'fixed',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    zIndex: 1001,
-                    boxShadow: '4px 0 16px rgba(0,0,0,0.1)',
-                }}
-            >
-                <div className="logo">
-                    <div className="layout-logo-background">
-                        <img src="/logo.svg" alt="Admin Pro" className="layout-logo-image" />
-                    </div>
-                    {!collapsed && (
-                        <div className="logo-text fade-in">
-                            <div className="logo-title">{systemInfo?.platformShortName || 'Admin Pro'}</div>
-                            <div className="logo-subtitle">企业级管理系统</div>
+            <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
+                <Sider
+                    collapsible
+                    collapsed={collapsed}
+                    onCollapse={(value) => setCollapsed(value)}
+                    trigger={null}
+                    breakpoint="lg"
+                    collapsedWidth="0"
+                    width={260}
+                    className="glass-effect-dark"
+                    style={{
+                        position: 'fixed',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        zIndex: 1001,
+                        boxShadow: '4px 0 16px rgba(0,0,0,0.1)',
+                    }}
+                >
+                    <div className="logo">
+                        <div className="layout-logo-background">
+                            <img src="/logo.svg" alt="Admin Pro" className="layout-logo-image" />
                         </div>
-                    )}
-                </div>
-                <div style={{ height: 'calc(100vh - 64px)', overflowY: 'auto', overflowX: 'hidden' }} className="custom-scrollbar">
-                    <Menu
-                        theme="dark"
-                        mode="inline"
-                        selectedKeys={selectedKeys}
-                        openKeys={openKeys}
-                        onClick={handleMenuClick}
-                        onOpenChange={handleOpenChange}
-                        items={menuItems.map(item => ({
-                            key: item.key,
-                            icon: item.icon,
-                            label: item.label,
-                            children: item.children?.map(child => ({
-                                key: child.key,
-                                icon: child.icon,
-                                label: child.label,
-                            })),
-                        }))}
-                        style={{ background: 'transparent', borderRight: 0 }}
-                    />
-                </div>
-            </Sider>
+                        {!collapsed && (
+                            <div className="logo-text fade-in">
+                                <div className="logo-title">{systemInfo?.platformShortName || 'Admin Pro'}</div>
+                                <div className="logo-subtitle">企业级管理系统</div>
+                            </div>
+                        )}
+                    </div>
+                    <div style={{ height: 'calc(100vh - 64px)', overflowY: 'auto', overflowX: 'hidden' }} className="custom-scrollbar">
+                        <Menu
+                            theme="dark"
+                            mode="inline"
+                            selectedKeys={selectedKeys}
+                            openKeys={openKeys}
+                            onClick={handleMenuClick}
+                            onOpenChange={handleOpenChange}
+                            items={menuItems.map(item => ({
+                                key: item.key,
+                                icon: item.icon,
+                                label: item.label,
+                                children: item.children?.map(child => ({
+                                    key: child.key,
+                                    icon: child.icon,
+                                    label: child.label,
+                                    children: child.children?.map(subChild => ({
+                                        key: subChild.key,
+                                        icon: subChild.icon,
+                                        label: subChild.label,
+                                    }))
+                                })),
+                            }))}
+                            style={{ background: 'transparent', borderRight: 0 }}
+                        />
+                    </div>
+                </Sider>
+            </ConfigProvider>
             <AntLayout style={{
                 marginLeft: collapsed ? 0 : 260,
                 transition: 'margin-left 0.2s',

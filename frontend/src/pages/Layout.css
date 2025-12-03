@@ -193,6 +193,13 @@
   border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.glass-effect-dark {
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
 /* 自定义滚动条 */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;

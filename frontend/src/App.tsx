@@ -1,7 +1,7 @@
 import './App.css'
 import AppRouter from './router/AppRouter';
 import ErrorBoundary from './components/ErrorBoundary';
-import { ConfigProvider, App as AntdApp } from 'antd';
+import { ConfigProvider, App as AntdApp, theme } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 
 import StaticAntd from './components/StaticAntd';

@@ -52,7 +52,7 @@ spring:
         master:
             type: com.zaxxer.hikari.HikariDataSource
             driver-class-name: com.mysql.cj.jdbc.Driver
-            jdbc-url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:adminpro}?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=${DB_USE_SSL:false}&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
+            jdbc-url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:adminpro}?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&useSSL=${DB_USE_SSL:false}&allowPublicKeyRetrieval=true&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
             username: ${DB_USERNAME:adminpro}
             password: ${DB_PASSWORD:password$1}
             min-idle: 10

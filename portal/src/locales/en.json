@@ -1,0 +1,50 @@
+{
+    "meta": {
+        "title": "Admin Pro - Enterprise-Level Admin System Solution"
+    },
+    "hero": {
+        "badge": "v2.0 Now Available",
+        "title": {
+            "prefix": "Build",
+            "highlight": "Premium",
+            "suffix": "Admin Dashboards Faster"
+        },
+        "description": "Admin Pro is a comprehensive enterprise-grade admin template based on React 18, Vite, Ant Design 5, and Spring Boot 3. It provides a complete solution for building modern, secure, and scalable web applications. Open source and free to use.",
+        "demo": "Live Demo",
+        "github": "View on GitHub"
+    },
+    "features": {
+        "title": "Packed with <1>Awesome</1> Features",
+        "subtitle": "Everything you need to build a modern admin application, from frontend to backend.",
+        "rbac": {
+            "title": "RBAC Permission",
+            "desc": "A robust Role-Based Access Control system supporting dynamic menu generation, button-level permissions, and API security integration."
+        },
+        "codegen": {
+            "title": "Code Generator",
+            "desc": "Instantly generate full-stack CRUD code (Controller, Service, Mapper, React Components) from your database schema, saving 80% of development time."
+        },
+        "docker": {
+            "title": "Docker Support",
+            "desc": "Complete Docker and Docker Compose configuration for one-click deployment. Includes optimized multi-stage builds for both frontend and backend."
+        },
+        "monitor": {
+            "title": "Monitor & Logs",
+            "desc": "Integrated system monitoring dashboard, real-time operation logs, and login audit trails to ensure system security and observability."
+        },
+        "i18n": {
+            "title": "Internationalization",
+            "desc": "Built-in multi-language support using i18next. Easily switch between English and Chinese, with a scalable structure for adding more languages."
+        },
+        "responsive": {
+            "title": "Responsive Design",
+            "desc": "Meticulously crafted responsive layout ensuring a seamless experience across all devices, from large desktop monitors to mobile phones."
+        }
+    },
+    "techStack": {
+        "title": "Built with Modern <1>Tech Stack</1>"
+    },
+    "footer": {
+        "copyright": "© 2024 Admin Pro. Open Source Project."
+    }
+}

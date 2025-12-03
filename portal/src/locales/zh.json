@@ -1,0 +1,50 @@
+{
+    "meta": {
+        "title": "Admin Pro - 企业级后台管理系统解决方案"
+    },
+    "hero": {
+        "badge": "v2.0 现已发布",
+        "title": {
+            "prefix": "更快构建",
+            "highlight": "高级",
+            "suffix": "后台管理系统"
+        },
+        "description": "Admin Pro 是基于 React 18, Vite, Ant Design 5 和 Spring Boot 3 的企业级后台管理模板。它为构建现代、安全且可扩展的 Web 应用提供了完整的解决方案。开源且免费。",
+        "demo": "在线演示",
+        "github": "查看 GitHub"
+    },
+    "features": {
+        "title": "包含 <1>强大</1> 的功能",
+        "subtitle": "构建现代后台应用所需的一切，从前端到后端。",
+        "rbac": {
+            "title": "RBAC 权限系统",
+            "desc": "强大的基于角色的访问控制系统，支持动态菜单生成、按钮级权限控制以及 API 安全集成。"
+        },
+        "codegen": {
+            "title": "代码生成器",
+            "desc": "从数据库表一键生成全栈 CRUD 代码（Controller, Service, Mapper, React 组件），节省 80% 的开发时间。"
+        },
+        "docker": {
+            "title": "Docker 支持",
+            "desc": "完整的 Docker 和 Docker Compose 配置，支持一键部署。包含针对前端和后端优化的多阶段构建配置。"
+        },
+        "monitor": {
+            "title": "监控与日志",
+            "desc": "集成系统监控仪表盘、实时操作日志和登录审计追踪，确保系统安全性和可观测性。"
+        },
+        "i18n": {
+            "title": "国际化支持",
+            "desc": "基于 i18next 的内置多语言支持。轻松切换中英文，并具备易于扩展的结构以支持更多语言。"
+        },
+        "responsive": {
+            "title": "响应式设计",
+            "desc": "精心设计的响应式布局，确保在所有设备（从大屏桌面到手机）上都能获得流畅的体验。"
+        }
+    },
+    "techStack": {
+        "title": "基于现代 <1>技术栈</1> 构建"
+    },
+    "footer": {
+        "copyright": "© 2024 Admin Pro. 开源项目。"
+    }
+}

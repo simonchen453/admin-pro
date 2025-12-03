@@ -4,6 +4,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { ConfigProvider, App as AntdApp } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 
+import StaticAntd from './components/StaticAntd';
+
 function App() {
     return (
         <ConfigProvider
@@ -27,13 +29,14 @@ function App() {
                         controlHeight: 36,
                     },
                     Layout: {
-                        colorBgBody: '#f3f4f6', // Very light gray for background
-                        colorBgHeader: '#ffffff',
+                        bodyBg: '#f3f4f6', // Very light gray for background
+                        headerBg: '#ffffff',
                     }
                 }
             }}
         >
             <AntdApp>
+                <StaticAntd />
                 <ErrorBoundary>
                     <AppRouter />
                 </ErrorBoundary>

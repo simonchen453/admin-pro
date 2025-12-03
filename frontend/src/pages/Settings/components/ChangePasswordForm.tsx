@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
-import { 
-  Form, 
-  Input, 
-  Button, 
-  message, 
+import {
+  Form,
+  Input,
+  Button,
   Space,
   Typography,
   Card,
   Row,
   Col,
-  Alert
+  Alert,
+  App
 } from 'antd';
 import type { Rule } from 'antd/es/form';
-import { 
-  LockOutlined, 
-  EyeInvisibleOutlined, 
+import {
+  LockOutlined,
+  EyeInvisibleOutlined,
   EyeTwoTone,
   CheckCircleOutlined,
   SafetyOutlined
@@ -25,9 +25,10 @@ const { Text } = Typography;
 
 const ChangePasswordForm: React.FC = () => {
   const [form] = Form.useForm();
+  const { message } = App.useApp();
   const [isLoading, setIsLoading] = useState(false);
   const [passwordRule, setPasswordRule] = useState<PasswordRule | null>(null);
-  
+
   // 使用 Form.useWatch 监听字段值的变化
   const newPasswordValue = Form.useWatch('newPassword', form);
   const confirmPasswordValue = Form.useWatch('confirmPassword', form);
@@ -99,14 +100,14 @@ const ChangePasswordForm: React.FC = () => {
         newPwd: values.newPassword,
         confirmNewPwd: values.confirmPassword
       });
-      
+
       message.success('密码修改成功！');
       form.resetFields();
     } catch (error: unknown) {
       console.error('修改密码失败:', error);
-      
+
       let errorMessage = '修改密码失败，请重试';
-      
+
       if (error && typeof error === 'object' && 'response' in error) {
         const errorResponse = error as { response?: { data?: { message?: string } } };
         if (errorResponse.response?.data?.message) {
@@ -116,7 +117,7 @@ const ChangePasswordForm: React.FC = () => {
         const errorWithMessage = error as { message: string };
         errorMessage = errorWithMessage.message;
       }
-      
+
       message.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -131,24 +132,24 @@ const ChangePasswordForm: React.FC = () => {
 
   const passwordStrength = (password: string): PasswordStrength => {
     if (!password || !passwordRule) return { score: 0, text: '', color: '' };
-    
+
     let score = 0;
     const rule = passwordRule;
-    
+
     if (password.length >= rule.minLength) score++;
     if (rule.requireLowerCase && /[a-z]/.test(password)) score++;
     if (rule.requireUpperCase && /[A-Z]/.test(password)) score++;
     if (rule.requireDigit && /\d/.test(password)) score++;
     if (rule.requireSpecialChar) {
-      const specialCharsPattern = rule.specialChars.split('').map(char => 
+      const specialCharsPattern = rule.specialChars.split('').map(char =>
         char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       ).join('');
       if (new RegExp(`[${specialCharsPattern}]`).test(password)) score++;
     }
-    
-    const maxScore = 1 + (rule.requireLowerCase ? 1 : 0) + (rule.requireUpperCase ? 1 : 0) + 
-                     (rule.requireDigit ? 1 : 0) + (rule.requireSpecialChar ? 1 : 0);
-    
+
+    const maxScore = 1 + (rule.requireLowerCase ? 1 : 0) + (rule.requireUpperCase ? 1 : 0) +
+      (rule.requireDigit ? 1 : 0) + (rule.requireSpecialChar ? 1 : 0);
+
     if (score <= maxScore * 0.4) return { score, text: '弱', color: '#ff4d4f' };
     if (score <= maxScore * 0.7) return { score, text: '中', color: '#faad14' };
     return { score, text: '强', color: '#52c41a' };
@@ -175,9 +176,9 @@ const ChangePasswordForm: React.FC = () => {
         if (!value) {
           return Promise.reject(new Error('请输入新密码'));
         }
-        
+
         const errors: string[] = [];
-        
+
         if (value.length < rule.minLength) {
           errors.push(`新密码至少${rule.minLength}位`);
         }
@@ -194,18 +195,18 @@ const ChangePasswordForm: React.FC = () => {
           errors.push('密码必须包含数字');
         }
         if (rule.requireSpecialChar) {
-          const specialCharsPattern = rule.specialChars.split('').map(char => 
+          const specialCharsPattern = rule.specialChars.split('').map(char =>
             char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
           ).join('');
           if (!new RegExp(`[${specialCharsPattern}]`).test(value)) {
             errors.push(`密码必须包含特殊字符 (${rule.specialChars})`);
           }
         }
-        
+
         if (errors.length > 0) {
           return Promise.reject(new Error(errors[0]));
         }
-        
+
         return Promise.resolve();
       }
     }];
@@ -213,7 +214,7 @@ const ChangePasswordForm: React.FC = () => {
 
   return (
     <div>
-      <Card 
+      <Card
         title={
           <Space>
             <SafetyOutlined />
@@ -255,7 +256,7 @@ const ChangePasswordForm: React.FC = () => {
                 />
               </Form.Item>
             </Col>
-            
+
             <Col span={24}>
               <Form.Item
                 name="newPassword"
@@ -286,14 +287,14 @@ const ChangePasswordForm: React.FC = () => {
               </Form.Item>
               {newPasswordValue && (
                 <div style={{ marginTop: -16, marginBottom: 16 }}>
-                  <div style={{ 
-                    height: 4, 
-                    backgroundColor: '#f0f0f0', 
+                  <div style={{
+                    height: 4,
+                    backgroundColor: '#f0f0f0',
                     borderRadius: 2,
                     overflow: 'hidden'
                   }}>
-                    <div 
-                      style={{ 
+                    <div
+                      style={{
                         height: '100%',
                         width: `${(strength.score / 5) * 100}%`,
                         backgroundColor: strength.color,
@@ -301,7 +302,7 @@ const ChangePasswordForm: React.FC = () => {
                       }}
                     />
                   </div>
-                  <Text 
+                  <Text
                     style={{ color: strength.color, fontSize: '12px', marginTop: 4, display: 'block' }}
                   >
                     密码强度: {strength.text}
@@ -309,7 +310,7 @@ const ChangePasswordForm: React.FC = () => {
                 </div>
               )}
             </Col>
-            
+
             <Col span={24}>
               <Form.Item
                 name="confirmPassword"
@@ -370,11 +371,11 @@ const ChangePasswordForm: React.FC = () => {
               )}
             </Col>
           </Row>
-          
-          <Card 
-            size="small" 
-            style={{ 
-              marginTop: 16, 
+
+          <Card
+            size="small"
+            style={{
+              marginTop: 16,
               marginBottom: 24,
               backgroundColor: '#fafafa'
             }}
@@ -394,19 +395,19 @@ const ChangePasswordForm: React.FC = () => {
               </ul>
             )}
           </Card>
-          
+
           <Form.Item style={{ marginBottom: 0 }}>
             <Space size="middle">
-              <Button 
-                type="primary" 
-                htmlType="submit" 
+              <Button
+                type="primary"
+                htmlType="submit"
                 loading={isLoading}
                 icon={<CheckCircleOutlined />}
                 size="large"
               >
                 确认修改
               </Button>
-              <Button 
+              <Button
                 onClick={() => form.resetFields()}
                 size="large"
               >

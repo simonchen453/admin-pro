@@ -189,9 +189,10 @@ const DictForm: React.FC<DictFormProps> = ({
   const dataColumns: ColumnsType<DictDataEntity> = [
     {
       title: 'NO.',
+      dataIndex: 'index',
       key: 'index',
       width: 50,
-      render: (_, __, index) => index + 1
+      render: (value: number) => value + 1
     },
     {
       title: '配置值',
@@ -302,7 +303,7 @@ const DictForm: React.FC<DictFormProps> = ({
         <Form.Item>
           <Table
             columns={dataColumns}
-            dataSource={dataList}
+            dataSource={dataList.map((item, index) => ({ ...item, index }))}
             rowKey={(record, index) => `data-${index}`}
             pagination={false}
             size="small"

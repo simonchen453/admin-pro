@@ -211,6 +211,7 @@ const UserForm: React.FC<UserFormProps> = ({
 
   return (
     <Form autoComplete="off"
+      name="userEditForm"
       form={form}
       layout="vertical"
       onFinish={handleSubmit}
@@ -414,7 +415,11 @@ const UserForm: React.FC<UserFormProps> = ({
           <Form.Item
             name="avatarUrl"
             label="头像"
+            hidden
           >
+            <Input />
+          </Form.Item>
+          <Form.Item label="头像">
             <Upload
               name="file"
               listType="picture-card"

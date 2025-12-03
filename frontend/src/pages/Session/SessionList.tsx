@@ -78,7 +78,7 @@ const SessionList: React.FC = () => {
       const response = await getSessionListApi(params);
 
       if (response.restCode === '200') {
-        setSessionList(response.data.records || []);
+        setSessionList((response.data.records || []).map((item: any, index: number) => ({ ...item, index })));
         setTotal(response.data.totalCount || 0);
       } else {
         message.error(response.message || '加载数据失败');
@@ -206,9 +206,10 @@ const SessionList: React.FC = () => {
   const columns: ColumnsType<SessionEntity> = [
     {
       title: 'NO.',
+      dataIndex: 'index',
       key: 'index',
       width: 60,
-      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1
+      render: (value: number) => (currentPage - 1) * pageSize + value + 1
     },
     {
       title: 'Session ID',
@@ -348,7 +349,7 @@ const SessionList: React.FC = () => {
         />
       </div>
 
-      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
           form={form}
           layout="inline"

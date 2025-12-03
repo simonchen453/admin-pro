@@ -113,51 +113,58 @@ function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [sysInfo, stats, activities] = await Promise.all([
+        const [sysInfoRes, statsRes, activitiesRes] = await Promise.all([
           getSystemInfoApi(),
           getStatisticsApi(),
           getRecentActivitiesApi()
         ]);
 
-        setSystemInfo(sysInfo);
+        if (sysInfoRes.success) {
+          setSystemInfo(sysInfoRes.data);
+        }
 
-        setStatistics([
-          {
-            title: '用户总数',
-            value: stats.userCount,
-            icon: <UserOutlined />,
-            color: '#6366f1',
-            bgGradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.2) 100%)',
-            trend: 5.2
-          },
-          {
-            title: '角色数量',
-            value: stats.roleCount,
-            icon: <TeamOutlined />,
-            color: '#8b5cf6',
-            bgGradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.2) 100%)',
-            trend: 2.1
-          },
-          {
-            title: '部门数量',
-            value: stats.deptCount,
-            icon: <ApartmentOutlined />,
-            color: '#10b981',
-            bgGradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%)',
-            trend: 0
-          },
-          {
-            title: '在线会话',
-            value: stats.sessionCount,
-            icon: <WifiOutlined />,
-            color: '#f59e0b',
-            bgGradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%)',
-            trend: -1.5
-          },
-        ]);
+        if (statsRes.success) {
+          const stats = statsRes.data;
+          setStatistics([
+            {
+              title: '用户总数',
+              value: stats.userCount,
+              icon: <UserOutlined />,
+              color: '#6366f1',
+              bgGradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.2) 100%)',
+              trend: 5.2
+            },
+            {
+              title: '角色数量',
+              value: stats.roleCount,
+              icon: <TeamOutlined />,
+              color: '#8b5cf6',
+              bgGradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.2) 100%)',
+              trend: 2.1
+            },
+            {
+              title: '部门数量',
+              value: stats.deptCount,
+              icon: <ApartmentOutlined />,
+              color: '#10b981',
+              bgGradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%)',
+              trend: 0
+            },
+            {
+              title: '在线会话',
+              value: stats.sessionCount,
+              icon: <WifiOutlined />,
+              color: '#f59e0b',
+              bgGradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%)',
+              trend: -1.5
+            },
+          ]);
+        }
 
-        const formattedActivities = activities.map(convertApiActivityToActivity);
-        setRecentActivities(formattedActivities);
+        if (activitiesRes.success && Array.isArray(activitiesRes.data)) {
+          const formattedActivities = activitiesRes.data.map(convertApiActivityToActivity);
+          setRecentActivities(formattedActivities);
+        }
       } catch (error) {
         console.error('Failed to fetch home data:', error);
       } finally {
@@ -193,7 +200,7 @@ function Home() {
     <div className="home-container fade-in">
       {/* Welcome Banner */}
       <div className="home-header-section">
-        <Card className="welcome-banner" bordered={false}>
+        <Card className="welcome-banner" variant="borderless">
           <div className="welcome-content">
             <Title level={2} style={{ color: '#fff', marginBottom: 8 }}>
               欢迎回来，{currentUser?.realName || currentUser?.loginName || 'Admin'}
@@ -212,7 +219,7 @@ function Home() {
       <Row gutter={[24, 24]} style={{ marginBottom: 32 }}>
         {statistics.map((stat, index) => (
           <Col xs={24} sm={12} lg={6} key={index}>
-            <Card className="statistic-card modern-card" bordered={false}>
+            <Card className="statistic-card modern-card" variant="borderless">
               <div className="statistic-content">
                 <div className="statistic-icon-wrapper" style={{ background: stat.bgGradient, color: stat.color }}>
                   {stat.icon}
@@ -241,7 +248,7 @@ function Home() {
           <Card
             title={<Space><ThunderboltOutlined style={{ color: '#6366f1' }} /><span>快速操作</span></Space>}
             className="modern-card"
-            bordered={false}
+            variant="borderless"
             style={{ height: '100%' }}
           >
             <Row gutter={[16, 16]}>
@@ -267,7 +274,7 @@ function Home() {
           <Card
             title={<Space><ClockCircleOutlined style={{ color: '#6366f1' }} /><span>最近活动</span></Space>}
             className="modern-card"
-            bordered={false}
+            variant="borderless"
             style={{ height: '100%' }}
           >
             <div className="activity-timeline">
@@ -315,7 +322,7 @@ function Home() {
           <Card
             title={<Space><SettingOutlined style={{ color: '#6366f1' }} /><span>系统信息</span></Space>}
             className="modern-card"
-            bordered={false}
+            variant="borderless"
           >
             <Descriptions bordered column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }} size="small" className="custom-descriptions">
               <Descriptions.Item label="系统名称">{systemInfo?.sys?.computerName || '-'}</Descriptions.Item>

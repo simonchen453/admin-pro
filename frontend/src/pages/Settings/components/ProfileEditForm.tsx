@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Form, Input, Select, Upload, Button, Space, message, Avatar } from 'antd';
+import { Form, Input, Select, Upload, Button, Space, Avatar, App, Spin } from 'antd';
 import { UserOutlined, UploadOutlined } from '@ant-design/icons';
 import { getCurrentUserInfoApi, updateProfileApi, type UpdateProfileRequest } from '../../../api/auth';
 import type { UserEntity } from '../../../types';
@@ -14,6 +14,7 @@ interface ProfileEditFormProps {
 
 function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
   const [form] = Form.useForm();
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [avatarUrl, setAvatarUrl] = useState<string>('');
@@ -130,120 +131,118 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
     }
   };
 
-  if (loadingData) {
-    return <div>加载中...</div>;
-  }
-
   return (
-    <Form autoComplete="off"
-      form={form}
-      layout="vertical"
-      onFinish={handleSubmit}
-      style={{ maxWidth: 600 }}
-    >
-      <Form.Item
-        name="avatarUrl"
-        label="头像"
+    <Spin spinning={loadingData}>
+      <Form autoComplete="off"
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        style={{ maxWidth: 600 }}
       >
-        <Space direction="vertical" align="center">
-          <Avatar
-            size={100}
-            src={avatarUrl}
-            icon={<UserOutlined />}
+        <Form.Item
+          name="avatarUrl"
+          label="头像"
+        >
+          <Space direction="vertical" align="center">
+            <Avatar
+              size={100}
+              src={avatarUrl || undefined}
+              icon={<UserOutlined />}
+            />
+            <Upload
+              name="file"
+              action="/api/common/file/upload2/original"
+              showUploadList={false}
+              onChange={handleAvatarChange}
+              withCredentials
+              accept="image/*"
+              beforeUpload={(file) => {
+                const isImage = file.type.startsWith('image/');
+                if (!isImage) {
+                  message.error('只能上传图片文件！');
+                  return Upload.LIST_IGNORE;
+                }
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                if (!isLt5M) {
+                  message.error('图片大小不能超过 5MB！');
+                  return Upload.LIST_IGNORE;
+                }
+                return true;
+              }}
+            >
+              <Button icon={<UploadOutlined />}>上传头像</Button>
+            </Upload>
+          </Space>
+        </Form.Item>
+
+        <Form.Item
+          name="realName"
+          label="真实姓名"
+          rules={[{ required: true, message: '请输入真实姓名' }]}
+        >
+          <Input placeholder="请输入真实姓名" allowClear />
+        </Form.Item>
+
+        <Form.Item
+          name="mobileNo"
+          label="手机号码"
+          rules={[
+            { required: true, message: '请输入手机号码' },
+            { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' }
+          ]}
+        >
+          <Input placeholder="请输入手机号码" maxLength={11} allowClear />
+        </Form.Item>
+
+        <Form.Item
+          name="email"
+          label="邮箱"
+          rules={[
+            { required: true, message: '请输入邮箱' },
+            { type: 'email', message: '请输入正确的邮箱格式' }
+          ]}
+        >
+          <Input placeholder="请输入邮箱" maxLength={50} allowClear />
+        </Form.Item>
+
+        <Form.Item
+          name="sex"
+          label="性别"
+          rules={[{ required: true, message: '请选择性别' }]}
+        >
+          <Select placeholder="请选择性别">
+            <Option value="M">男</Option>
+            <Option value="F">女</Option>
+            <Option value="male">男</Option>
+            <Option value="female">女</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="description"
+          label="备注"
+        >
+          <TextArea
+            autoSize={{ minRows: 3, maxRows: 16 }}
+            placeholder="请输入备注信息"
+            maxLength={200}
+            showCount
+            allowClear
           />
-          <Upload
-            name="file"
-            action="/api/common/file/upload2/original"
-            showUploadList={false}
-            onChange={handleAvatarChange}
-            withCredentials
-            accept="image/*"
-            beforeUpload={(file) => {
-              const isImage = file.type.startsWith('image/');
-              if (!isImage) {
-                message.error('只能上传图片文件！');
-                return Upload.LIST_IGNORE;
-              }
-              const isLt5M = file.size / 1024 / 1024 < 5;
-              if (!isLt5M) {
-                message.error('图片大小不能超过 5MB！');
-                return Upload.LIST_IGNORE;
-              }
-              return true;
-            }}
-          >
-            <Button icon={<UploadOutlined />}>上传头像</Button>
-          </Upload>
-        </Space>
-      </Form.Item>
+        </Form.Item>
 
-      <Form.Item
-        name="realName"
-        label="真实姓名"
-        rules={[{ required: true, message: '请输入真实姓名' }]}
-      >
-        <Input placeholder="请输入真实姓名" allowClear />
-      </Form.Item>
-
-      <Form.Item
-        name="mobileNo"
-        label="手机号码"
-        rules={[
-          { required: true, message: '请输入手机号码' },
-          { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' }
-        ]}
-      >
-        <Input placeholder="请输入手机号码" maxLength={11} allowClear />
-      </Form.Item>
-
-      <Form.Item
-        name="email"
-        label="邮箱"
-        rules={[
-          { required: true, message: '请输入邮箱' },
-          { type: 'email', message: '请输入正确的邮箱格式' }
-        ]}
-      >
-        <Input placeholder="请输入邮箱" maxLength={50} allowClear />
-      </Form.Item>
-
-      <Form.Item
-        name="sex"
-        label="性别"
-        rules={[{ required: true, message: '请选择性别' }]}
-      >
-        <Select placeholder="请选择性别">
-          <Option value="M">男</Option>
-          <Option value="F">女</Option>
-          <Option value="male">男</Option>
-          <Option value="female">女</Option>
-        </Select>
-      </Form.Item>
-
-      <Form.Item
-        name="description"
-        label="备注"
-      >
-        <TextArea
-          autoSize={{ minRows: 3, maxRows: 16 }}
-          placeholder="请输入备注信息"
-          maxLength={200}
-          showCount
-          allowClear
-        />
-      </Form.Item>
-
-      <Form.Item>
-        <Space>
-          <Button onClick={onCancel}>
-            取消
-          </Button>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            保存
-          </Button>
-        </Space>
-      </Form.Item>
-    </Form>
+        <Form.Item>
+          <Space>
+            <Button onClick={onCancel}>
+              取消
+            </Button>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              保存
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
+    </Spin>
   );
 }
 

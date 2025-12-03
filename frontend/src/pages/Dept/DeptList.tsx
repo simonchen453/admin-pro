@@ -111,8 +111,9 @@ const DeptList: React.FC = () => {
       const treeData = response.data || [];
       const options = [
         {
-          id: '0',
-          label: '主类目',
+          value: '0',
+          title: '主类目',
+          key: '0',
           children: convertTreeSelectData(treeData)
         }
       ];
@@ -333,7 +334,7 @@ const DeptList: React.FC = () => {
         />
       </div>
 
-      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
           form={form}
           layout="inline"

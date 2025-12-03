@@ -44,20 +44,22 @@ const Captcha = forwardRef<CaptchaRef, CaptchaProps>(({ onCaptchaChange, classNa
 
   return (
     <div className={`captcha-container ${className}`}>
-      <img 
-        src={imageUrl} 
-        alt="验证码" 
-        width="103" 
-        height="40" 
-        style={{ cursor: 'pointer' }}
-        title="看不清可单击图片刷新"
-        onClick={handleImageClick}
-        onError={(e) => {
-          console.error('验证码图片加载失败，URL:', imageUrl);
-          // 不隐藏图片，而是显示错误信息
-          e.currentTarget.alt = '验证码加载失败，点击重试';
-        }}
-      />
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt="验证码"
+          width="103"
+          height="40"
+          style={{ cursor: 'pointer' }}
+          title="看不清可单击图片刷新"
+          onClick={handleImageClick}
+          onError={(e) => {
+            console.error('验证码图片加载失败，URL:', imageUrl);
+            // 不隐藏图片，而是显示错误信息
+            e.currentTarget.alt = '验证码加载失败，点击重试';
+          }}
+        />
+      )}
     </div>
   );
 });

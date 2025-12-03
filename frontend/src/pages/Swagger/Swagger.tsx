@@ -29,7 +29,7 @@ const Swagger: React.FC = () => {
         />
       </div>
 
-      <Card className="modern-card" bodyStyle={{ padding: 0 }}>
+      <Card className="modern-card" styles={{ body: { padding: 0 } }}>
         <iframe
           src={swaggerUrl}
           frameBorder="0"

@@ -153,6 +153,7 @@ export interface UserEntity {
   latestLoginTime?: string;
   password?: string;
   roleName?: string;
+  index?: number;
 }
 
 export interface UserListResponse {
@@ -1014,9 +1015,22 @@ export interface GeneratorListResponse {
 export interface SystemInfo {
   releaseVersion?: string | null;
   buildVersion?: string | null;
-  platformName: string;
-  platformShortName: string;
-  copyRight: string;
+  platformName?: string;
+  platformShortName?: string;
+  copyRight?: string;
+  sys?: {
+    computerName?: string;
+    osName?: string;
+    osArch?: string;
+    userDir?: string;
+    [key: string]: any;
+  };
+  jvm?: {
+    version?: string;
+    home?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
 }
 
 // 全局 Window 类型扩展

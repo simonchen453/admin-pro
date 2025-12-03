@@ -63,7 +63,7 @@ const AuditLogList: React.FC = () => {
       const total = responseData?.data?.totalCount || responseData?.totalCount || 0;
 
       if (Array.isArray(list)) {
-        setAuditLogList(list);
+        setAuditLogList(list.map((item: any, index: number) => ({ ...item, index })));
         setTotal(total);
       } else {
         setAuditLogList([]);
@@ -147,9 +147,10 @@ const AuditLogList: React.FC = () => {
   const columns: ColumnsType<AuditLogEntity> = [
     {
       title: 'NO.',
+      dataIndex: 'index',
       key: 'index',
       width: 60,
-      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1
+      render: (value: number) => (currentPage - 1) * pageSize + value + 1
     },
     {
       title: '类别',
@@ -244,7 +245,7 @@ const AuditLogList: React.FC = () => {
         />
       </div>
 
-      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
           form={form}
           layout="inline"
@@ -342,7 +343,7 @@ const AuditLogList: React.FC = () => {
         ]}
         width={800}
         style={{ top: 20 }}
-        bodyStyle={{ maxHeight: '70vh', overflow: 'auto' }}
+        styles={{ body: { maxHeight: '70vh', overflow: 'auto' } }}
       >
         {viewData && (
           <div>

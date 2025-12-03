@@ -57,8 +57,8 @@ function ProfileView({ onEdit, refreshTrigger }: ProfileViewProps) {
         <div>
           {onEdit && (
             <div style={{ marginBottom: 16, textAlign: 'right' }}>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 icon={<EditOutlined />}
                 onClick={onEdit}
               >
@@ -70,7 +70,7 @@ function ProfileView({ onEdit, refreshTrigger }: ProfileViewProps) {
             <Descriptions.Item label="头像" span={2}>
               <Avatar
                 size={80}
-                src={userInfo.avatarUrl}
+                src={userInfo.avatarUrl || undefined}
                 icon={<UserOutlined />}
               />
             </Descriptions.Item>

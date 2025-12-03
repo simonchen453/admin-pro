@@ -171,7 +171,7 @@ const UserList: React.FC = () => {
       const total = responseData?.pagination?.total || responseData?.totalCount || responseData?.data?.pagination?.total || responseData?.data?.totalCount || 0;
 
       if (Array.isArray(list)) {
-        setUserList(list);
+        setUserList(list.map((item: any, index: number) => ({ ...item, index })));
         setTotal(total);
       } else {
         setUserList([]);
@@ -475,17 +475,17 @@ const UserList: React.FC = () => {
     return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>;
   };
 
-  // 表格列定义
   const columns: ColumnsType<UserEntity> = [
     {
       title: 'NO.',
+      dataIndex: 'index',
       key: 'index',
       width: 60,
-      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1
+      render: (value: number) => (currentPage - 1) * pageSize + value + 1
     },
     {
       title: '用户域',
-      dataIndex: ['userIden', 'userDomain'],
+      dataIndex: 'userDomain',
       key: 'userDomain',
       ellipsis: true,
       responsive: ['sm'],
@@ -640,7 +640,7 @@ const UserList: React.FC = () => {
             size="small"
             className="modern-card"
             style={{ marginBottom: 16, height: 'calc(100vh - 140px)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
-            bodyStyle={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+            styles={{ body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' } }}
           >
             <Input
               placeholder="搜索部门"
@@ -679,12 +679,9 @@ const UserList: React.FC = () => {
             </div>
           </Card>
         </Col>
-
-        {/* 用户数据 */}
-        <Col flex="1 1 0" style={{ minWidth: 0 }}>
-          <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
-            {/* 搜索表单 */}
-            <Form autoComplete="off"
+        <Col flex="auto" style={{ minWidth: 0, overflow: 'hidden' }}>
+          <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
+            <Form
               form={form}
               layout="inline"
               onFinish={handleSearch}
@@ -693,7 +690,7 @@ const UserList: React.FC = () => {
               <Row gutter={[16, 16]} style={{ width: '100%' }}>
                 <Col xs={24} sm={12} md={6}>
                   <Form.Item name="userDomain" style={{ marginBottom: 0 }}>
-                    <Select placeholder="用户域" allowClear style={{ width: '100%' }}>
+                    <Select placeholder="用户域" allowClear>
                       {domainList.map(domain => (
                         <Option key={domain.name} value={domain.name}>
                           {domain.display}
@@ -701,7 +698,7 @@ const UserList: React.FC = () => {
                       ))}
                     </Select>
                   </Form.Item>
-                </Col>
+                </Col >
                 <Col xs={24} sm={12} md={6}>
                   <Form.Item name="loginName" style={{ marginBottom: 0 }}>
                     <Input placeholder="登录名" allowClear prefix={<UserOutlined style={{ color: '#cbd5e1' }} />} />
@@ -722,11 +719,11 @@ const UserList: React.FC = () => {
                     </Button>
                   </Space>
                 </Col>
-              </Row>
-            </Form>
+              </Row >
+            </Form >
 
             {/* 操作按钮 */}
-            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            < div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Space>
                 <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
                   新增用户
@@ -753,19 +750,19 @@ const UserList: React.FC = () => {
                   导出
                 </Button>
               </Space>
-            </div>
+            </div >
 
             {/* 用户表格 */}
-            <div className="modern-table">
+            < div className="modern-table" >
               <Table
                 columns={columns}
                 dataSource={userList}
                 loading={loading}
-                rowKey={(record, index) => {
+                rowKey={(record) => {
                   if (record?.userIden?.userDomain && record?.userIden?.userId) {
                     return `${record.userIden.userDomain}-${record.userIden.userId}`;
                   }
-                  return `row-${index}`;
+                  return `row-${record.index}`;
                 }}
                 rowSelection={rowSelection}
                 pagination={false}
@@ -774,10 +771,10 @@ const UserList: React.FC = () => {
                   emptyText: userList.length === 0 && !loading ? '暂无数据' : undefined
                 }}
               />
-            </div>
+            </div >
 
             {/* 分页 */}
-            <div style={{ marginTop: 24, textAlign: 'right' }}>
+            < div style={{ marginTop: 24, textAlign: 'right' }}>
               <Pagination
                 current={currentPage}
                 pageSize={pageSize}
@@ -789,13 +786,13 @@ const UserList: React.FC = () => {
                 onShowSizeChange={handlePageChange}
                 pageSizeOptions={['10', '20', '30', '50']}
               />
-            </div>
-          </Card>
-        </Col>
-      </Row>
+            </div >
+          </Card >
+        </Col >
+      </Row >
 
       {/* 用户表单模态框 */}
-      <Modal
+      < Modal
         title={editingUser ? '编辑用户' : '新增用户'}
         open={isModalVisible}
         onCancel={() => {
@@ -821,7 +818,7 @@ const UserList: React.FC = () => {
             setEditingUser(null);
           }}
         />
-      </Modal>
+      </Modal >
 
       <Modal
         title={`重置密码${resetTargetUser ? ` - ${resetTargetUser.realName}` : ''}`}
@@ -870,7 +867,7 @@ const UserList: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </div >
   );
 };
 

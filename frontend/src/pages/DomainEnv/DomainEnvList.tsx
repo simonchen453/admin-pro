@@ -77,7 +77,7 @@ const DomainEnvList: React.FC = () => {
       const response: DomainEnvListResponse = await getDomainEnvListApi(params);
 
       if (response.restCode === '200') {
-        setDomainEnvList(response.data.records || []);
+        setDomainEnvList((response.data.records || []).map((item: any, index: number) => ({ ...item, index })));
         setTotal(response.data.totalCount || 0);
       } else {
         message.error(response.message || '获取用户域环境配置列表失败');
@@ -178,9 +178,10 @@ const DomainEnvList: React.FC = () => {
   const columns: ColumnsType<DomainEnvEntity> = [
     {
       title: 'NO.',
+      dataIndex: 'index',
       key: 'index',
       width: 60,
-      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1
+      render: (value: number) => (currentPage - 1) * pageSize + value + 1
     },
     {
       title: '用户域',
@@ -257,7 +258,7 @@ const DomainEnvList: React.FC = () => {
         />
       </div>
 
-      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
           form={form}
           layout="inline"
@@ -348,7 +349,7 @@ const DomainEnvList: React.FC = () => {
         }}
         footer={null}
         width={500}
-        destroyOnClose
+        destroyOnHidden
       >
         <DomainEnvForm
           domainEnv={editingDomainEnv}

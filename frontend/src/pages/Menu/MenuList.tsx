@@ -464,7 +464,7 @@ const MenuList: React.FC = () => {
         />
       </div>
 
-      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
           form={form}
           layout="inline"
@@ -540,7 +540,7 @@ const MenuList: React.FC = () => {
         }}
         footer={null}
         width={800}
-        destroyOnClose
+        destroyOnHidden
       >
         <MenuForm
           key={editingMenu && editingMenu.id ? `edit-${editingMenu.id}` : `new-${formKey}`}

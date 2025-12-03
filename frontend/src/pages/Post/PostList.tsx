@@ -65,7 +65,7 @@ const PostList: React.FC = () => {
       const response: PostListResponse = await getPostListApi(params);
 
       if (response.restCode === '200') {
-        setPostList(response.data.records || []);
+        setPostList((response.data.records || []).map((item: any, index: number) => ({ ...item, index })));
         setTotal(response.data.totalCount || 0);
       } else {
         message.error(response.message || '获取岗位列表失败');
@@ -208,9 +208,10 @@ const PostList: React.FC = () => {
   const columns: ColumnsType<PostEntity> = [
     {
       title: 'NO.',
+      dataIndex: 'index',
       key: 'index',
       width: 60,
-      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1
+      render: (value: number) => (currentPage - 1) * pageSize + value + 1
     },
     {
       title: '岗位编码',
@@ -301,7 +302,7 @@ const PostList: React.FC = () => {
         />
       </div>
 
-      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
           form={form}
           layout="inline"
@@ -392,7 +393,7 @@ const PostList: React.FC = () => {
         }}
         footer={null}
         width={600}
-        destroyOnClose
+        destroyOnHidden
       >
         <PostForm
           post={editingPost}

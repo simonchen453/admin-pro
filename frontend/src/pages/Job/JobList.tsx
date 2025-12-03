@@ -78,7 +78,7 @@ const JobList: React.FC = () => {
       const total = responseData?.data?.totalCount || responseData?.totalCount || 0;
 
       if (Array.isArray(list)) {
-        setJobList(list);
+        setJobList(list.map((item: any, index: number) => ({ ...item, index })));
         setTotal(total);
       } else {
         setJobList([]);
@@ -146,7 +146,7 @@ const JobList: React.FC = () => {
       onOk: async () => {
         try {
           const response = await deleteJobApi(ids);
-          if (response.restCode === '200' || response.restCode === 200) {
+          if (response.restCode === '200') {
             setSelectedJobs([]);
             setSelectedRowKeys([]);
             fetchJobList(searchForm);
@@ -282,9 +282,10 @@ const JobList: React.FC = () => {
   const columns: ColumnsType<JobEntity> = [
     {
       title: 'NO.',
+      dataIndex: 'index',
       key: 'index',
       width: 60,
-      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1
+      render: (value: number) => (currentPage - 1) * pageSize + value + 1
     },
     {
       title: '任务ID',
@@ -421,7 +422,7 @@ const JobList: React.FC = () => {
         />
       </div>
 
-      <Card className="modern-card" bodyStyle={{ padding: '24px' }}>
+      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
           form={form}
           layout="inline"

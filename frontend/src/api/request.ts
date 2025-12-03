@@ -1,5 +1,5 @@
 import axios, { AxiosError, type AxiosResponse } from 'axios';
-import { message } from 'antd';
+import { message } from '../components/StaticAntd';
 import { useAuthStore } from '../stores/useUserStore';
 import { config as appConfig } from '../config/env';
 

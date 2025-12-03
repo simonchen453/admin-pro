@@ -49,20 +49,20 @@ const JobLog: React.FC = () => {
 
   const fetchLogList = async (params: JobLogSearchForm = {}) => {
     setLoading(true);
-    
+
     try {
       const response = await getJobLogListApi({
         ...params,
         pageNo: params.pageNo ?? currentPage,
         pageSize: params.pageSize ?? pageSize
       });
-      
+
       const responseData = response as any;
       const list = responseData?.data?.records || responseData?.records || [];
       const total = responseData?.data?.totalCount || responseData?.totalCount || 0;
-      
+
       if (Array.isArray(list)) {
-        setLogList(list);
+        setLogList(list.map((item: any, index: number) => ({ ...item, index })));
         setTotal(total);
       } else {
         setLogList([]);
@@ -104,7 +104,7 @@ const JobLog: React.FC = () => {
       message.warning('请选择要删除的日志');
       return;
     }
-    
+
     let ids = '';
     for (let i = 0; i < selectedLogs.length; i++) {
       ids += selectedLogs[i].id + ',';
@@ -112,14 +112,14 @@ const JobLog: React.FC = () => {
     if (ids.indexOf(',') !== -1) {
       ids = ids.slice(0, ids.length - 1);
     }
-    
+
     Modal.confirm({
       title: '确认删除',
       content: `确定要删除选中的 ${selectedLogs.length} 条日志吗？`,
       onOk: async () => {
         try {
           const response = await deleteJobLogApi(ids);
-          if (response.restCode === '200' || response.restCode === 200) {
+          if (response.restCode === '200') {
             setSelectedLogs([]);
             setSelectedRowKeys([]);
             fetchLogList(searchForm);
@@ -142,7 +142,7 @@ const JobLog: React.FC = () => {
       onOk: async () => {
         try {
           const response = await deleteAllJobLogApi();
-          if (response.restCode === '200' || response.restCode === 200) {
+          if (response.restCode === '200') {
             setSelectedLogs([]);
             setSelectedRowKeys([]);
             fetchLogList(searchForm);
@@ -181,9 +181,10 @@ const JobLog: React.FC = () => {
   const columns: ColumnsType<JobLogEntity> = [
     {
       title: 'NO.',
+      dataIndex: 'index',
       key: 'index',
       width: 60,
-      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1
+      render: (value: number) => (currentPage - 1) * pageSize + value + 1
     },
     {
       title: '任务ID',
@@ -273,7 +274,7 @@ const JobLog: React.FC = () => {
           ]}
         />
       </div>
-      
+
       <Divider />
 
       <Card>
@@ -307,24 +308,24 @@ const JobLog: React.FC = () => {
 
         <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'white', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
           <Space>
-            <Button 
-              type="primary" 
+            <Button
+              type="primary"
               icon={<ArrowLeftOutlined />}
               onClick={() => navigate('/admin/job')}
             >
               返回
             </Button>
-            <Button 
-              type="primary" 
+            <Button
+              type="primary"
               icon={<DeleteOutlined />}
               onClick={handleBatchDelete}
               disabled={selectedLogs.length === 0}
             >
               批量删除
             </Button>
-            <Button 
-              type="primary" 
-              danger 
+            <Button
+              type="primary"
+              danger
               icon={<DeleteOutlined />}
               onClick={handleDeleteAll}
             >

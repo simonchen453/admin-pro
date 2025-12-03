@@ -7,6 +7,7 @@ import com.adminpro.core.jdbc.sqlbuilder.SelectBuilder;
 import com.adminpro.framework.common.helper.StringHelper;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,42 @@ public class RoleDao extends BaseDao<RoleEntity, String> {
     public List<RoleEntity> findByNameIsLike(String name) {
         SelectBuilder<RoleEntity> select = new SelectBuilder<>(RoleEntity.class);
         select.addWhereAnd(RoleEntity.COL_NAME + " like ? ", "%" + name + "%");
+        return execute(select);
+    }
+
+    /**
+     * 根据角色名称列表批量查询
+     *
+     * @param names 角色名称列表
+     * @return 角色列表
+     */
+    public List<RoleEntity> findByNames(List<String> names) {
+        if (names == null || names.isEmpty()) {
+            return new ArrayList<>();
+        }
+        SelectBuilder<RoleEntity> select = new SelectBuilder<>(RoleEntity.class);
+        select.addWhereAnd(RoleEntity.COL_NAME + " in (:names)");
+        Map<String, Object> params = new HashMap<>();
+        params.put("names", names);
+        select.setWhereValuesMap(params);
+        return execute(select);
+    }
+
+    /**
+     * 根据ID列表批量查询
+     *
+     * @param ids 角色ID列表
+     * @return 角色列表
+     */
+    public List<RoleEntity> findByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new java.util.ArrayList<>();
+        }
+        SelectBuilder<RoleEntity> select = new SelectBuilder<>(RoleEntity.class);
+        select.addWhereAnd(RoleEntity.COL_ID + " in (:ids)");
+        Map<String, Object> params = new HashMap<>();
+        params.put("ids", ids);
+        select.setWhereValuesMap(params);
         return execute(select);
     }
 

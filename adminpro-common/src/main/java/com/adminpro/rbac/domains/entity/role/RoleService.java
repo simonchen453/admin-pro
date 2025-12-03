@@ -42,6 +42,26 @@ public class RoleService extends BaseService<RoleEntity, String> {
         return dao.findByNameIsLike(name);
     }
 
+    /**
+     * 根据角色名称列表批量查询
+     *
+     * @param names 角色名称列表
+     * @return 角色列表
+     */
+    public List<RoleEntity> findByNames(List<String> names) {
+        return dao.findByNames(names);
+    }
+
+    /**
+     * 根据ID列表批量查询
+     *
+     * @param ids 角色ID列表
+     * @return 角色列表
+     */
+    public List<RoleEntity> findByIds(List<String> ids) {
+        return dao.findByIds(ids);
+    }
+
     @Transactional
     public void deleteMany(String roleIds) {
         String[] idArray = StringUtils.split(roleIds, ",");

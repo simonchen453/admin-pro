@@ -86,4 +86,24 @@ public class PostService extends BaseService<PostEntity, String> {
     public PostEntity findByName(String name) {
         return dao.findByName(name);
     }
+
+    /**
+     * 根据职位代码列表批量查询
+     *
+     * @param codes 职位代码列表
+     * @return 职位列表
+     */
+    public List<PostEntity> findByCodes(List<String> codes) {
+        return dao.findByCodes(codes);
+    }
+
+    /**
+     * 根据ID列表批量查询
+     *
+     * @param ids 职位ID列表
+     * @return 职位列表
+     */
+    public List<PostEntity> findByIds(List<String> ids) {
+        return dao.findByIds(ids);
+    }
 }

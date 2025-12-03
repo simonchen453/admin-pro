@@ -7,6 +7,8 @@ import com.adminpro.tools.domains.entity.exceptionlog.ExceptionLogService;
 import com.google.gson.Gson;
 import org.rendersnake.HtmlAttributesFactory;
 import org.rendersnake.HtmlCanvas;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
@@ -29,6 +31,8 @@ import java.util.Map;
  */
 @Controller
 public class ErrorBasicController implements ErrorController {
+    private static final Logger logger = LoggerFactory.getLogger(ErrorBasicController.class);
+    
     public static final String ERROR_PATH = "/error";
     public static final String SHOW_EXCEPTION = "egp.errors.show.exception";
 
@@ -39,6 +43,9 @@ public class ErrorBasicController implements ErrorController {
 
     @Autowired
     private ErrorAttributes errorAttributes;
+    
+    @Autowired
+    private ExceptionLogService exceptionLogService;
 
     @RequestMapping(value = ERROR_PATH)
     @ResponseBody
@@ -133,9 +140,9 @@ public class ErrorBasicController implements ErrorController {
         log.setType(message);
         log.setPath(path);
         try {
-            ExceptionLogService.getInstance().create(log);
+            exceptionLogService.create(log);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("记录异常日志失败: path={}, message={}", path, message, e);
         }
     }
 

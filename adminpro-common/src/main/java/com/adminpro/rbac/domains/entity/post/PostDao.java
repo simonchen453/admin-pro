@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -140,6 +142,44 @@ public class PostDao extends BaseDao<PostEntity, String> {
         select.setTable(PostEntity.TABLE_NAME);
         select.addWhereAnd(PostEntity.COL_NAME + " = ? ", name);
         return executeSingle(select);
+    }
+
+    /**
+     * 根据职位代码列表批量查询
+     *
+     * @param codes 职位代码列表
+     * @return 职位列表
+     */
+    public List<PostEntity> findByCodes(List<String> codes) {
+        if (codes == null || codes.isEmpty()) {
+            return new ArrayList<>();
+        }
+        SelectBuilder<PostEntity> select = new SelectBuilder<PostEntity>(PostEntity.class);
+        select.setTable(PostEntity.TABLE_NAME);
+        select.addWhereAnd(PostEntity.COL_CODE + " in (:codes)");
+        Map<String, Object> params = new java.util.HashMap<>();
+        params.put("codes", codes);
+        select.setWhereValuesMap(params);
+        return execute(select);
+    }
+
+    /**
+     * 根据ID列表批量查询
+     *
+     * @param ids 职位ID列表
+     * @return 职位列表
+     */
+    public List<PostEntity> findByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new java.util.ArrayList<>();
+        }
+        SelectBuilder<PostEntity> select = new SelectBuilder<PostEntity>(PostEntity.class);
+        select.setTable(PostEntity.TABLE_NAME);
+        select.addWhereAnd(PostEntity.COL_ID + " in (:ids)");
+        Map<String, Object> params = new HashMap<>();
+        params.put("ids", ids);
+        select.setWhereValuesMap(params);
+        return execute(select);
     }
 
     /**

@@ -17,6 +17,8 @@ import com.adminpro.rbac.api.PasswordHelper;
 import com.adminpro.rbac.common.RbacCacheConstants;
 import com.adminpro.rbac.common.RbacConstants;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,18 +36,20 @@ import java.util.List;
 
 @Service
 public class UserService extends BaseService<UserEntity, UserIden> {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    @Autowired
+    private UserDao dao;
 
     @Autowired
     protected UserService(UserDao dao) {
         super(dao);
+        this.dao = dao;
     }
 
     public static UserService getInstance() {
         return SpringUtil.getBean(UserService.class);
     }
-
-    @Autowired
-    private UserDao dao;
 
     public QueryResultSet<UserEntity> search(SearchParam param) {
         return dao.search(param);
@@ -57,43 +61,61 @@ public class UserService extends BaseService<UserEntity, UserIden> {
 
     @Transactional
     public void update(UserEntity entity) {
+        logger.debug("更新用户: userDomain={}, userId={}", entity.getUserDomain(), entity.getUserId());
         dao.update(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
+        logger.debug("更新用户成功: userDomain={}, userId={}", entity.getUserDomain(), entity.getUserId());
     }
 
     @Transactional
     public UserEntity resetPwd(UserIden userIden, String newPassword) {
-        UserEntity entity = UserService.getInstance().findById(userIden);
+        logger.info("重置用户密码: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+        UserEntity entity = findById(userIden);
+        if (entity == null) {
+            logger.warn("重置密码失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            throw new BaseRuntimeException(RbacConstants.MSG_USER_NOT_FOUND);
+        }
         String newPwd = PasswordHelper.encryptPwd(entity.getUserIden(), newPassword);
         entity.setPassword(newPwd);
         dao.update(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
+        logger.info("重置用户密码成功: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
         return entity;
     }
 
     public String authLogin(UserIden userIden, String password) {
-        UserEntity entity = UserService.getInstance().findById(userIden);
+        logger.debug("用户登录验证: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+        UserEntity entity = findById(userIden);
+        if (entity == null) {
+            logger.warn("登录失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            return null;
+        }
         String newPwd = PasswordHelper.encryptPwd(userIden, password);
         boolean restRequest = WebHelper.isRestRequest();
         if (restRequest) {
             if (StringUtils.equals(newPwd, entity.getPassword())) {
                 String token = TokenGenerator.generateValue();
+                logger.info("用户登录成功(REST): userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
                 return token;
             }
         } else {
             if (StringUtils.equals(newPwd, entity.getPassword())) {
+                logger.info("用户登录成功: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
                 return "success";
             }
         }
+        logger.warn("用户登录失败，密码不正确: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
         return null;
     }
 
     @Transactional
     public UserEntity changePwd(UserIden userIden, String oldPwd, String newPassword) {
-        UserEntity entity = UserService.getInstance().findById(userIden);
+        logger.info("修改用户密码: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+        UserEntity entity = findById(userIden);
 
         if (entity == null) {
-            throw new BaseRuntimeException("用户不存在");
+            logger.warn("修改密码失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            throw new BaseRuntimeException(RbacConstants.MSG_USER_NOT_FOUND);
         }
 
         String encryptPwd = PasswordHelper.encryptPayPwd(userIden, oldPwd);
@@ -102,14 +124,18 @@ public class UserService extends BaseService<UserEntity, UserIden> {
             entity.setPassword(newPwd);
             dao.update(entity);
             AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
+            logger.info("修改用户密码成功: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
             return entity;
         } else {
-            throw new BaseRuntimeException("原密码不正确");
+            logger.warn("修改密码失败，原密码不正确: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            throw new BaseRuntimeException(RbacConstants.MSG_OLD_PASSWORD_INCORRECT);
         }
     }
 
     @Transactional
     public void create(UserEntity entity) {
+        logger.info("创建用户: userDomain={}, userId={}, loginName={}", 
+                entity.getUserDomain(), entity.getUserId(), entity.getLoginName());
         String password = entity.getPassword();
         if (StringUtils.isEmpty(password)) {
             entity.setPassword(ConfigHelper.getString(RbacConstants.USER_DEFAULT_PASSWORD));
@@ -119,6 +145,8 @@ public class UserService extends BaseService<UserEntity, UserIden> {
         entity.setPassword(encryptPwd);
         dao.create(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
+        logger.info("创建用户成功: userDomain={}, userId={}, loginName={}", 
+                entity.getUserDomain(), entity.getUserId(), entity.getLoginName());
     }
 
     public UserEntity findById(UserIden userIden) {
@@ -166,15 +194,35 @@ public class UserService extends BaseService<UserEntity, UserIden> {
     }
 
     /**
-     * @param users
+     * 批量删除用户（优化：使用批量删除SQL提升性能）
+     *
+     * @param users 用户ID字符串，格式：userDomain_userId,userDomain_userId
      */
     @Transactional
     public void deleteMany(String users) {
+        logger.info("批量删除用户: users={}", users);
+        if (StringUtils.isEmpty(users)) {
+            logger.warn("批量删除用户失败，参数为空");
+            return;
+        }
+        
         String[] userDomainIdArray = StringUtils.split(users, ",");
+        List<UserIden> userIdens = new ArrayList<>();
+        
         for (String userDomainId : userDomainIdArray) {
             String[] split = userDomainId.split("_");
-            UserIden userIden = new UserIden(split[0], split[1]);
-            dao.delete(userIden);
+            if (split.length == 2) {
+                userIdens.add(new UserIden(split[0], split[1]));
+            } else {
+                logger.warn("删除用户失败，格式不正确: userDomainId={}", userDomainId);
+            }
+        }
+        
+        if (!userIdens.isEmpty()) {
+            dao.deleteMany(userIdens);
+            logger.info("批量删除用户成功: count={}", userIdens.size());
+        } else {
+            logger.warn("批量删除用户失败，没有有效的用户ID");
         }
     }
 
@@ -191,106 +239,146 @@ public class UserService extends BaseService<UserEntity, UserIden> {
      * @return
      */
     public boolean authenticate(UserIden userIden, String password) {
-        UserEntity userEntity = UserService.getInstance().findById(userIden);
+        logger.debug("验证用户密码: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+        UserEntity userEntity = findById(userIden);
+        if (userEntity == null) {
+            logger.warn("验证密码失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            return false;
+        }
         String encryptPwd = PasswordHelper.encryptPwd(userIden, password);
-        return StringUtils.equals(encryptPwd, userEntity.getPassword());
+        boolean result = StringUtils.equals(encryptPwd, userEntity.getPassword());
+        logger.debug("验证用户密码结果: userDomain={}, userId={}, result={}", userIden.getUserDomain(), userIden.getUserId(), result);
+        return result;
     }
 
     @Transactional
     public void importExcel(List<UserImportVo> importList) {
+        logger.info("开始导入用户: count={}", importList.size());
+        int successCount = 0;
+        int skipCount = 0;
+        int updateCount = 0;
+        
         for (UserImportVo importVo : importList) {
             if (StringUtils.isEmpty(importVo.getUserDomain()) || StringUtils.isEmpty(importVo.getLoginName())) {
+                skipCount++;
+                logger.warn("跳过无效用户数据: userDomain={}, loginName={}", importVo.getUserDomain(), importVo.getLoginName());
                 continue;
             }
-            UserEntity existingUser = findByUserDomainAndLoginName(importVo.getUserDomain(), importVo.getLoginName());
-            if (existingUser == null) {
-                UserEntity user = new UserEntity();
-                user.setUserIden(new UserIden(importVo.getUserDomain(), IdGenerator.getInstance().nextStringId()));
-                user.setUserDomain(importVo.getUserDomain());
-                user.setLoginName(importVo.getLoginName());
-                user.setRealName(importVo.getRealName());
-                user.setDisplay(StringUtils.isNotEmpty(importVo.getDisplay()) ? importVo.getDisplay() : importVo.getRealName());
-                user.setEmail(importVo.getEmail());
-                user.setMobileNo(importVo.getMobileNo());
-                user.setStatus(StringUtils.isNotEmpty(importVo.getStatus()) ? importVo.getStatus() : UserStatus.ACTIVE.getCode());
-                user.setSex(importVo.getSex());
-                user.setDescription(importVo.getDescription());
-                user.setDeptNo(importVo.getDeptNo());
-                user.setJobNo(importVo.getJobNo());
-                user.setAddress(importVo.getAddress());
-                user.setBirthday(importVo.getBirthday());
-                user.setIdNo(importVo.getIdNo());
-                
-                if (StringUtils.isNotEmpty(importVo.getPassword())) {
-                    user.setPassword(importVo.getPassword());
+            
+            try {
+                UserEntity existingUser = findByUserDomainAndLoginName(importVo.getUserDomain(), importVo.getLoginName());
+                if (existingUser == null) {
+                    UserEntity user = buildUserFromImportVo(importVo);
+                    create(user);
+                    successCount++;
+                    logger.debug("导入新用户成功: userDomain={}, loginName={}", importVo.getUserDomain(), importVo.getLoginName());
                 } else {
-                    user.setPassword(ConfigHelper.getString(RbacConstants.USER_DEFAULT_PASSWORD));
+                    updateUserFromImportVo(existingUser, importVo);
+                    update(existingUser);
+                    updateCount++;
+                    logger.debug("更新用户成功: userDomain={}, loginName={}", importVo.getUserDomain(), importVo.getLoginName());
                 }
-                create(user);
-            } else {
-                if (StringUtils.isNotEmpty(importVo.getRealName())) {
-                    existingUser.setRealName(importVo.getRealName());
-                }
-                if (StringUtils.isNotEmpty(importVo.getDisplay())) {
-                    existingUser.setDisplay(importVo.getDisplay());
-                }
-                if (StringUtils.isNotEmpty(importVo.getEmail())) {
-                    existingUser.setEmail(importVo.getEmail());
-                }
-                if (StringUtils.isNotEmpty(importVo.getMobileNo())) {
-                    existingUser.setMobileNo(importVo.getMobileNo());
-                }
-                if (StringUtils.isNotEmpty(importVo.getStatus())) {
-                    existingUser.setStatus(importVo.getStatus());
-                }
-                if (StringUtils.isNotEmpty(importVo.getDescription())) {
-                    existingUser.setDescription(importVo.getDescription());
-                }
-                if (StringUtils.isNotEmpty(importVo.getSex())) {
-                    existingUser.setSex(importVo.getSex());
-                }
-                if (StringUtils.isNotEmpty(importVo.getDeptNo())) {
-                    existingUser.setDeptNo(importVo.getDeptNo());
-                }
-                if (StringUtils.isNotEmpty(importVo.getJobNo())) {
-                    existingUser.setJobNo(importVo.getJobNo());
-                }
-                if (StringUtils.isNotEmpty(importVo.getAddress())) {
-                    existingUser.setAddress(importVo.getAddress());
-                }
-                if (importVo.getBirthday() != null) {
-                    existingUser.setBirthday(importVo.getBirthday());
-                }
-                if (StringUtils.isNotEmpty(importVo.getIdNo())) {
-                    existingUser.setIdNo(importVo.getIdNo());
-                }
-                if (StringUtils.isNotEmpty(importVo.getPassword())) {
-                    String encryptPwd = PasswordHelper.encryptPwd(existingUser.getUserIden(), importVo.getPassword());
-                    existingUser.setPassword(encryptPwd);
-                }
-                update(existingUser);
+            } catch (Exception e) {
+                logger.error("导入用户失败: userDomain={}, loginName={}", importVo.getUserDomain(), importVo.getLoginName(), e);
+                skipCount++;
             }
+        }
+        
+        logger.info("导入用户完成: 总数={}, 成功={}, 更新={}, 跳过={}", 
+                importList.size(), successCount, updateCount, skipCount);
+    }
+    
+    /**
+     * 从导入VO构建用户实体
+     */
+    private UserEntity buildUserFromImportVo(UserImportVo importVo) {
+        UserEntity user = new UserEntity();
+        user.setUserIden(new UserIden(importVo.getUserDomain(), IdGenerator.getInstance().nextStringId()));
+        user.setUserDomain(importVo.getUserDomain());
+        user.setLoginName(importVo.getLoginName());
+        user.setRealName(importVo.getRealName());
+        user.setDisplay(StringUtils.isNotEmpty(importVo.getDisplay()) ? importVo.getDisplay() : importVo.getRealName());
+        user.setEmail(importVo.getEmail());
+        user.setMobileNo(importVo.getMobileNo());
+        user.setStatus(StringUtils.isNotEmpty(importVo.getStatus()) ? importVo.getStatus() : UserStatus.ACTIVE.getCode());
+        user.setSex(importVo.getSex());
+        user.setDescription(importVo.getDescription());
+        user.setDeptNo(importVo.getDeptNo());
+        user.setJobNo(importVo.getJobNo());
+        user.setAddress(importVo.getAddress());
+        user.setBirthday(importVo.getBirthday());
+        user.setIdNo(importVo.getIdNo());
+        
+        if (StringUtils.isNotEmpty(importVo.getPassword())) {
+            user.setPassword(importVo.getPassword());
+        } else {
+            user.setPassword(ConfigHelper.getString(RbacConstants.USER_DEFAULT_PASSWORD));
+        }
+        return user;
+    }
+    
+    /**
+     * 从导入VO更新用户实体
+     */
+    private void updateUserFromImportVo(UserEntity existingUser, UserImportVo importVo) {
+        if (StringUtils.isNotEmpty(importVo.getRealName())) {
+            existingUser.setRealName(importVo.getRealName());
+        }
+        if (StringUtils.isNotEmpty(importVo.getDisplay())) {
+            existingUser.setDisplay(importVo.getDisplay());
+        }
+        if (StringUtils.isNotEmpty(importVo.getEmail())) {
+            existingUser.setEmail(importVo.getEmail());
+        }
+        if (StringUtils.isNotEmpty(importVo.getMobileNo())) {
+            existingUser.setMobileNo(importVo.getMobileNo());
+        }
+        if (StringUtils.isNotEmpty(importVo.getStatus())) {
+            existingUser.setStatus(importVo.getStatus());
+        }
+        if (StringUtils.isNotEmpty(importVo.getDescription())) {
+            existingUser.setDescription(importVo.getDescription());
+        }
+        if (StringUtils.isNotEmpty(importVo.getSex())) {
+            existingUser.setSex(importVo.getSex());
+        }
+        if (StringUtils.isNotEmpty(importVo.getDeptNo())) {
+            existingUser.setDeptNo(importVo.getDeptNo());
+        }
+        if (StringUtils.isNotEmpty(importVo.getJobNo())) {
+            existingUser.setJobNo(importVo.getJobNo());
+        }
+        if (StringUtils.isNotEmpty(importVo.getAddress())) {
+            existingUser.setAddress(importVo.getAddress());
+        }
+        if (importVo.getBirthday() != null) {
+            existingUser.setBirthday(importVo.getBirthday());
+        }
+        if (StringUtils.isNotEmpty(importVo.getIdNo())) {
+            existingUser.setIdNo(importVo.getIdNo());
+        }
+        if (StringUtils.isNotEmpty(importVo.getPassword())) {
+            String encryptPwd = PasswordHelper.encryptPwd(existingUser.getUserIden(), importVo.getPassword());
+            existingUser.setPassword(encryptPwd);
         }
     }
 
     public void exportExcel(HttpServletResponse response, List<UserEntity> list) throws Exception {
+        logger.info("导出用户Excel: count={}", list.size());
         Workbook book = generateWorkbook(list);
 
         response.reset();
         response.setContentType("application/x-msdownload");
-        String fileName = "用户数据";
+        String fileName = RbacConstants.MSG_EXPORT_FILE_NAME;
         fileName = fileName + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
         response.setHeader("Content-disposition", "attachment; filename=" + new String(fileName.getBytes("gb2312"), "ISO-8859-1") + ".xls");
-        ServletOutputStream outStream = null;
-        try {
-            outStream = response.getOutputStream();
+        
+        try (ServletOutputStream outStream = response.getOutputStream()) {
             book.write(outStream);
         } finally {
             book.close();
-            if (outStream != null) {
-                outStream.close();
-            }
         }
+        logger.info("导出用户Excel成功: count={}", list.size());
     }
 
     private Workbook generateWorkbook(List<UserEntity> list) {

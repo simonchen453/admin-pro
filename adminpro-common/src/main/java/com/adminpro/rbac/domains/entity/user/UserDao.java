@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class UserDao extends BaseDao<UserEntity, UserIden> {
         return execute(select);
     }
 
-    private void prepareSelectBuilder(SelectBuilder select, SearchParam param) {
+    private void prepareSelectBuilder(SelectBuilder<UserEntity> select, SearchParam param) {
         Map<String, Object> filters = param.getFilters();
         String status = (String) filters.get("status");
         String loginName = (String) filters.get("loginName");
@@ -304,6 +305,34 @@ public class UserDao extends BaseDao<UserEntity, UserIden> {
         DeleteBuilder delete = new DeleteBuilder(UserEntity.TABLE_NAME);
         delete.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, userIden.getUserDomain());
         delete.addWhereAnd(UserEntity.COL_USER_ID + EQ, userIden.getUserId());
+        execute(delete);
+    }
+
+    /**
+     * 批量删除UserEntity（优化性能）
+     *
+     * @param userIdens 用户标识列表
+     */
+    public void deleteMany(List<UserIden> userIdens) {
+        if (userIdens == null || userIdens.isEmpty()) {
+            return;
+        }
+        // 由于是复合主键，需要构建复杂的WHERE条件
+        // 使用OR条件组合多个(userDomain, userId)对
+        DeleteBuilder delete = new DeleteBuilder(UserEntity.TABLE_NAME);
+        StringBuilder whereClause = new StringBuilder("(");
+        List<Object> params = new ArrayList<>();
+        for (int i = 0; i < userIdens.size(); i++) {
+            if (i > 0) {
+                whereClause.append(" OR ");
+            }
+            whereClause.append("(").append(UserEntity.COL_USER_DOMAIN).append(EQ).append("? AND ")
+                    .append(UserEntity.COL_USER_ID).append(EQ).append("?)");
+            params.add(userIdens.get(i).getUserDomain());
+            params.add(userIdens.get(i).getUserId());
+        }
+        whereClause.append(")");
+        delete.setWhereClause(whereClause.toString(), params.toArray());
         execute(delete);
     }
 

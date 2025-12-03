@@ -161,6 +161,18 @@ public class RbacConstants {
 
     public static final String CLOUD_STORAGE_CONFIG = "ossconfig";
 
+    // ========== 用户相关消息常量 ==========
+    public static final String MSG_USER_NOT_FOUND = "用户不存在";
+    public static final String MSG_USER_IMPORT_FAILED = "导入失败：";
+    public static final String MSG_PASSWORD_NOT_EMPTY = "新密码不能为空";
+    public static final String MSG_CONFIRM_PASSWORD_NOT_EMPTY = "确认密码不能为空";
+    public static final String MSG_PASSWORD_NOT_MATCH = "两次密码不一致";
+    public static final String MSG_OLD_PASSWORD_INCORRECT = "原密码不正确";
+    public static final String MSG_EXPORT_FILE_NAME = "用户数据";
+    public static final String MSG_SYSTEM_ERROR = "系统内部错误，请联系管理员";
+    public static final String MSG_PARAM_VALIDATION_FAILED = "参数验证失败";
+    public static final String MSG_PARAM_BIND_FAILED = "参数绑定失败";
+    public static final String MSG_CONSTRAINT_VALIDATION_FAILED = "约束验证失败";
 
     /**
      * 云服务商

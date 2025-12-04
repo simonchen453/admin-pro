@@ -9,7 +9,7 @@ public class LoginUserVo extends BaseVO {
 
     private String password;
 
-    private String platform;
+    private String domain;
 
     private String captcha;
 }

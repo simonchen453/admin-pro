@@ -21,7 +21,6 @@ import com.adminpro.rbac.domains.entity.user.UserEntity;
 import com.adminpro.rbac.domains.entity.user.UserIden;
 import com.adminpro.rbac.domains.entity.user.UserService;
 import com.adminpro.rbac.domains.entity.usertoken.UserTokenEntity;
-import com.adminpro.rbac.enums.UserLoginPlatform;
 import com.adminpro.rbac.enums.UserStatus;
 import com.adminpro.tools.domains.entity.session.SessionEntity;
 import com.adminpro.tools.domains.entity.session.SessionService;
@@ -78,12 +77,12 @@ public class LoginHelper {
     @Autowired
     private UserService userService;
 
-    public String login(UserIden userIden, String password, String platform) throws APIException {
-        return login(userIden, password, platform, null);
+    public String login(UserIden userIden, String password, String userDomain) throws APIException {
+        return login(userIden, password, userDomain, null);
     }
 
-    public String login(UserIden userIden, String password, String platform, Device device) throws APIException {
-        logger.info(MessageFormat.format("用户{0}尝试登陆{1}", userIden.toSecurityUsername(), platform));
+    public String login(UserIden userIden, String password, String userDomain, Device device) throws APIException {
+        logger.info(MessageFormat.format("用户{0}尝试登陆{1}", userIden.toSecurityUsername(), userDomain));
         boolean restRequest = WebHelper.isRestRequest();
 
         Authentication authentication = verifyAccount(userIden, password);
@@ -101,8 +100,7 @@ public class LoginHelper {
             return "user_inactive";
         }
 
-        if (UserLoginPlatform.INTERNET.getCode().equals(platform) && !isInternetUser(userIden.getUserDomain())
-                || UserLoginPlatform.SYSTEM.getCode().equals(platform) && !isSystemUser(userIden.getUserDomain())) {
+        if (!StringUtils.equals(userDomain, userIden.getUserDomain())) {
             logger.error("用户{0}, 没有权限登陆", userIden.toSecurityUsername());
             return "no_privilege";
         }

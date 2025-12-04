@@ -67,7 +67,7 @@ const Login: React.FC = () => {
       const loginData: LoginRequest = {
         userId: data.userId,
         password: data.password,
-        platform: 'SYSTEM',
+        domain: 'system',
         captcha: data.captcha,
         captchaKey: captchaKey
       };

@@ -24,7 +24,7 @@ export interface User {
 export interface LoginRequest {
   userId: string;
   password: string;
-  platform: string;
+  domain: string;
   captcha: string;
   captchaKey: string;
 }

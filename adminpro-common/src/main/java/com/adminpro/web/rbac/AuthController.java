@@ -22,7 +22,6 @@ import com.adminpro.rbac.domains.vo.login.LoginUserVo;
 import com.adminpro.rbac.domains.vo.user.PasswordRuleVo;
 import com.adminpro.rbac.domains.vo.user.UpdateProfileVo;
 import com.adminpro.rbac.domains.vo.user.UserInfoResponseVo;
-import com.adminpro.rbac.enums.UserLoginPlatform;
 import com.google.code.kaptcha.Producer;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
@@ -72,7 +71,7 @@ public class AuthController extends BaseController {
         BeanUtil.beanAttributeValueTrim(loginUserVo);
         String loginName = loginUserVo.getUserId();
         String password = loginUserVo.getPassword();
-        String platform = loginUserVo.getPlatform();
+        String userDomain = loginUserVo.getDomain();
         String captcha = loginUserVo.getCaptcha();
         LoginResponse loginResponse = new LoginResponse();
         try {
@@ -83,14 +82,12 @@ public class AuthController extends BaseController {
             if (StringUtils.isEmpty(password)) {
                 return R.error("601", "密码不能为空");
             }
-            if (!UserLoginPlatform.isValidLoginPlatform(platform)) {
-                return R.error("601", "非法登陆平台");
+            if (StringUtils.isEmpty(userDomain)) {
+                return R.error("601", "非法User Domain");
             }
 
             // spring-mobile-device 已停止维护，使用简单的设备检测
             Device currentDevice = createDeviceFromRequest(request);
-
-            String userDomain = UserLoginPlatform.getUserDomain(platform);
 
             boolean isMobileApp = ClientHelper.isMobileAppRequest(request);
             boolean isMiniProgram = ClientHelper.isMiniProgramRequest(request);
@@ -111,7 +108,7 @@ public class AuthController extends BaseController {
             if (userEntity == null) {
                 return R.error("用户名未注册");
             }
-            String token = LoginHelper.getInstance().login(userEntity.getUserIden(), password, platform, currentDevice);
+            String token = LoginHelper.getInstance().login(userEntity.getUserIden(), password, userDomain, currentDevice);
             if ("pending_active".equals(token)) {
                 return R.error("601", WebConstants.USER_PENDING_ACTIVE);
             } else if ("user_locked".equals(token)) {
@@ -129,7 +126,7 @@ public class AuthController extends BaseController {
             loginResponse.setAuthed(userEntity.isAuthenticated());
             loginResponse.setIdNo(userEntity.getIdNo());
             loginResponse.setRealName(userEntity.getRealName());
-            loginResponse.setPlatform(UserLoginPlatform.getPlatForm(userDomain));
+            loginResponse.setDomain(userDomain);
             loginResponse.setDisplay(userEntity.getDisplay());
             loginResponse.setMobileNo(userEntity.getMobileNo());
             loginResponse.setDate(DateUtil.formatDate(new Date()));

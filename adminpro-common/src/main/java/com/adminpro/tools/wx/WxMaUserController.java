@@ -23,7 +23,6 @@ import com.adminpro.rbac.domains.entity.user.UserIden;
 import com.adminpro.rbac.domains.entity.user.UserService;
 import com.adminpro.rbac.domains.entity.usertoken.UserTokenEntity;
 import com.adminpro.rbac.domains.vo.login.LoginResponse;
-import com.adminpro.rbac.enums.UserLoginPlatform;
 import com.adminpro.rbac.enums.UserStatus;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
@@ -85,7 +84,7 @@ public class WxMaUserController {
             loginResponse.setAuthed(user.isAuthenticated());
             loginResponse.setIdNo(user.getIdNo());
             loginResponse.setRealName(user.getRealName());
-            loginResponse.setPlatform(UserLoginPlatform.getPlatForm(user.getUserIden().getUserDomain()));
+            loginResponse.setPlatform(user.getUserIden().getUserDomain());
             loginResponse.setDisplay(user.getDisplay());
             loginResponse.setMobileNo(user.getMobileNo());
             loginResponse.setDate(DateUtil.formatDate(new Date()));
@@ -158,7 +157,7 @@ public class WxMaUserController {
         loginResponse.setAuthed(user.isAuthenticated());
         loginResponse.setIdNo(user.getIdNo());
         loginResponse.setRealName(user.getRealName());
-        loginResponse.setPlatform(UserLoginPlatform.getPlatForm(user.getUserIden().getUserDomain()));
+        loginResponse.setPlatform(user.getUserIden().getUserDomain());
         loginResponse.setDisplay(user.getDisplay());
         loginResponse.setMobileNo(user.getMobileNo());
         loginResponse.setDate(DateUtil.formatDate(new Date()));
@@ -206,7 +205,7 @@ public class WxMaUserController {
         loginResponse.setAuthed(user.isAuthenticated());
         loginResponse.setIdNo(user.getIdNo());
         loginResponse.setRealName(user.getRealName());
-        loginResponse.setPlatform(UserLoginPlatform.getPlatForm(user.getUserIden().getUserDomain()));
+        loginResponse.setPlatform(user.getUserIden().getUserDomain());
         loginResponse.setDisplay(user.getDisplay());
         loginResponse.setMobileNo(user.getMobileNo());
         loginResponse.setDate(DateUtil.formatDate(new Date()));

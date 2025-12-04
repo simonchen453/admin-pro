@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,7 +31,7 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/admin/apk")
 @PreAuthorize("@ss.hasPermission('system:apk')")
 public class AdminAPKController extends BaseRoutingController {
@@ -41,18 +41,10 @@ public class AdminAPKController extends BaseRoutingController {
     @Autowired
     private APKService apkService;
 
-    @GetMapping()
-    public String apks() {
-        prepareData();
-        return PREFIX + "/list";
-    }
-
-
     /**
      * 查询APK版本管理列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    @ResponseBody
     public R<QueryResultSet<APKEntity>> list() {
         String condition = request.getParameter("condition");
         SearchParam param = startPaging();
@@ -66,19 +58,9 @@ public class AdminAPKController extends BaseRoutingController {
     }
 
     /**
-     * 新增APK版本管理
-     */
-    @GetMapping("/create")
-    public String add() {
-        prepareData();
-        return PREFIX + "/create";
-    }
-
-    /**
      * 新增保存APK版本管理
      */
     @RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R create(@RequestBody APKVO apk) {
         BeanUtil.beanAttributeValueTrim(apk);
         MessageBundle messageBundle = getMessageBundle();
@@ -124,26 +106,9 @@ public class AdminAPKController extends BaseRoutingController {
     }
 
     /**
-     * 修改APK版本管理
-     */
-    @GetMapping("/edit")
-    public String edit(@RequestParam("id") String id) {
-        prepareData();
-        APKEntity apk = apkService.findById(id);
-        String downloadUrl = apk.getDownloadUrl();
-        if (!StringHelper.isEmpty(downloadUrl)) {
-            request.setAttribute("fileName", downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1));
-        }
-
-        request.setAttribute("apk", apk);
-        return PREFIX + "/edit";
-    }
-
-    /**
      * 修改保存APK版本管理
      */
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R editSave(@RequestBody APKVO apk) {
         BeanUtil.beanAttributeValueTrim(apk);
         MessageBundle messageBundle = getMessageBundle();
@@ -219,23 +184,10 @@ public class AdminAPKController extends BaseRoutingController {
         }
     }
 
-
-    /**
-     * 删除APK版本管理
-     */
-    @RequestMapping(value = "/deletepic", method = RequestMethod.DELETE)
-    @ResponseBody
-    public R deletepic(@RequestParam("url") String url) {
-        FileUtil.deleteFile(url);
-        return R.ok();
-    }
-
-
     /**
      * 删除APK版本管理
      */
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @ResponseBody
     @Transactional
     public R remove(@RequestParam("ids") String ids) {
         String[] idArr = ids.split("-");
@@ -297,7 +249,6 @@ public class AdminAPKController extends BaseRoutingController {
      * @throws Exception
      */
     @RequestMapping(value = "/upload", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
     public R<String> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw new BaseRuntimeException("上传文件不能为空");

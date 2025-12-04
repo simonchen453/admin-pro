@@ -18,9 +18,6 @@ import java.io.IOException;
 @RequestMapping
 public class IndexController extends BaseRoutingController {
 
-    @Autowired
-    private SessionService sessionService;
-
     @RequestMapping(value = "/sessionExpired", method = RequestMethod.GET)
     public R sessionExpired() throws IOException {
         SessionEntity sessionEntity = SessionService.getInstance().findBySessionId(WebHelper.getSessionId());

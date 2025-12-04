@@ -3,13 +3,13 @@ import type { LoginRequest, LoginResponse, ApiResponse } from '../types';
 
 // 登录接口
 export const loginApi = async (data: LoginRequest): Promise<LoginResponse> => {
-  const respData = await request.post<LoginResponse>('/rest/auth/login', data);
+  const respData = await request.post<LoginResponse>('/auth/login', data);
   return respData as unknown as LoginResponse;
 };
 
 // 登出接口
 export const logoutApi = async (): Promise<void> => {
-  await request.post('/rest/auth/logout');
+  await request.post('/auth/logout');
 };
 
 // 用户信息类型
@@ -24,13 +24,13 @@ export interface UserInfo {
 
 // 获取用户信息接口
 export const getUserInfoApi = async (): Promise<UserInfo> => {
-  const respData = await request.get<ApiResponse<UserInfo>>('/rest/auth/userinfo');
+  const respData = await request.get<ApiResponse<UserInfo>>('/auth/userinfo');
   return (respData as unknown as ApiResponse<UserInfo>).data;
 };
 
 // 获取当前登录用户详细信息
 export const getCurrentUserInfoApi = async (): Promise<any> => {
-  const respData = await request.get<ApiResponse<any>>('/rest/auth/userinfo');
+  const respData = await request.get<ApiResponse<any>>('/auth/userinfo');
   return respData.data;
 };
 
@@ -62,7 +62,7 @@ export interface UpdateProfileRequest {
 }
 
 export const updateProfileApi = async (data: UpdateProfileRequest): Promise<ApiResponse<any>> => {
-  const response = await request.patch<ApiResponse<any>>('/rest/auth/profile', data);
+  const response = await request.patch<ApiResponse<any>>('/auth/profile', data);
   return response as unknown as ApiResponse<any>;
 };
 
@@ -80,6 +80,6 @@ export interface PasswordRule {
 
 // 获取密码规则接口
 export const getPasswordRuleApi = async (): Promise<PasswordRule> => {
-  const respData = await request.get<ApiResponse<PasswordRule>>('/rest/auth/password-rule');
+  const respData = await request.get<ApiResponse<PasswordRule>>('/auth/password-rule');
   return (respData as unknown as ApiResponse<PasswordRule>).data;
 };

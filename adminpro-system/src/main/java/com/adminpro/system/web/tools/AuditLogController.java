@@ -16,7 +16,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -27,31 +27,16 @@ import java.util.Date;
  * @author dongqin
  * @date 2019-10-21
  */
-@Controller
-@RequestMapping("/admin/audit")
+@RestController
+@RequestMapping(AuditLogController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:audit')")
 public class AuditLogController extends BaseRoutingController {
 
-    private static final String PREFIX = "admin/auditlog";
     protected static final String PREFIX_URL = "/admin/audit";
     protected static final String SEARCH_FORM_KEY = "auditLogSearchForm";
 
     @Autowired
     private AuditLogService auditLogService;
-
-    @GetMapping()
-    public String prepareList() {
-        cleanSearchForm();
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String auditlog() {
-        prepareData();
-        getSearchForm();
-        return PREFIX + "/list";
-    }
-
 
     /**
      * 查询日志
@@ -59,7 +44,6 @@ public class AuditLogController extends BaseRoutingController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<QueryResultSet<AuditLogEntity>> search(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         SearchParam param = startPaging(searchForm);
@@ -98,27 +82,6 @@ public class AuditLogController extends BaseRoutingController {
 
         QueryResultSet<AuditLogDTO> resultSet = auditLogService.search(param);
         return R.ok(resultSet);
-    }
-
-
-    /**
-     * 查看日志
-     *
-     * @return
-     */
-    @RequestMapping(value = "/view", method = RequestMethod.GET)
-    public String view() throws Exception {
-        prepareData();
-        String id = request.getParameter("id");
-        if (StringHelper.isEmpty(id)) {
-            throw new Exception("日志id丢失!");
-        }
-        AuditLogEntity auditLogEntity = auditLogService.findById(id);
-        if (auditLogEntity == null) {
-            throw new Exception("日志编号" + id + "不存在!");
-        }
-        request.setAttribute("entity", auditLogEntity);
-        return PREFIX + "/view";
     }
 
     @Data

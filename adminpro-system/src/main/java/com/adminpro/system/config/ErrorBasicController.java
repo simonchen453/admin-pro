@@ -17,7 +17,7 @@ import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -29,13 +29,12 @@ import java.util.Map;
 /**
  * Created by simon on 2017/6/9.
  */
-@Controller
+@RestController
 public class ErrorBasicController implements ErrorController {
     private static final Logger logger = LoggerFactory.getLogger(ErrorBasicController.class);
     
     public static final String ERROR_PATH = "/error";
     public static final String SHOW_EXCEPTION = "egp.errors.show.exception";
-
 
     public String getErrorPath() {
         return ERROR_PATH;
@@ -48,7 +47,6 @@ public class ErrorBasicController implements ErrorController {
     private ExceptionLogService exceptionLogService;
 
     @RequestMapping(value = ERROR_PATH)
-    @ResponseBody
     public void error(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ErrorAttributeOptions errorAttributeOptions = ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE);
         Map<String, Object> errorAttributes = getErrorAttributes(request, errorAttributeOptions);

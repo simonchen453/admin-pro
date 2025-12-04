@@ -13,6 +13,7 @@ import com.adminpro.system.rbac.domains.entity.domain.DomainService;
 import com.adminpro.system.tools.domains.entity.session.SessionEntity;
 import com.adminpro.system.tools.domains.entity.session.SessionService;
 import com.adminpro.system.tools.domains.enums.SessionStatus;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,18 +26,15 @@ import org.springframework.web.bind.annotation.*;
  * @date 2020-06-17
  */
 @RestController
-@RequestMapping("/admin/session")
+@RequestMapping(SessionController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:session')")
 public class SessionController extends BaseRoutingController {
-    protected static final String PREFIX = "admin/session";
+
     protected static final String PREFIX_URL = "/admin/session";
     protected static final String SEARCH_FORM_KEY = "sessionSearchForm";
 
     @Autowired
     private SessionService sessionService;
-
-    @Autowired
-    private DomainService domainService;
 
     /**
      * 查询用户Session列表
@@ -139,6 +137,7 @@ public class SessionController extends BaseRoutingController {
         }
     }
 
+    @Data
     public static class SearchForm extends BaseSearchForm {
         /**
          * Session ID
@@ -164,54 +163,6 @@ public class SessionController extends BaseRoutingController {
          * 部门编号
          */
         private String deptNo;
-
-        public String getSessionId() {
-            return sessionId;
-        }
-
-        public void setSessionId(String sessionId) {
-            this.sessionId = sessionId;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-
-        public String getUserDomain() {
-            return userDomain;
-        }
-
-        public void setUserDomain(String userDomain) {
-            this.userDomain = userDomain;
-        }
-
-        public String getLoginName() {
-            return loginName;
-        }
-
-        public void setLoginName(String loginName) {
-            this.loginName = loginName;
-        }
-
-        public String getIpAddr() {
-            return ipAddr;
-        }
-
-        public void setIpAddr(String ipAddr) {
-            this.ipAddr = ipAddr;
-        }
-
-        public String getDeptNo() {
-            return deptNo;
-        }
-
-        public void setDeptNo(String deptNo) {
-            this.deptNo = deptNo;
-        }
 
         @Override
         public String toString() {

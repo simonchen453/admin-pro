@@ -23,10 +23,11 @@ import java.util.List;
  * @date 2018-09-06
  */
 @RestController
-@RequestMapping("/admin/generator")
+@RequestMapping(CodeGeneratorController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:generator')")
 public class CodeGeneratorController extends BaseRoutingController {
-    protected static final String PREFIX = "admin/generator";
+
+    protected static final String PREFIX_URL = "/admin/generator";
 
     @Autowired
     private GenService genService;

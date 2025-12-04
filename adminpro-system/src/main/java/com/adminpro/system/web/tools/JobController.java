@@ -15,6 +15,7 @@ import com.adminpro.system.tools.domains.entity.job.ScheduleJobEntity;
 import com.adminpro.system.tools.domains.entity.job.ScheduleJobLogService;
 import com.adminpro.system.tools.domains.entity.job.ScheduleJobService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Data;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 
 @RestController
-@RequestMapping("/admin/job")
+@RequestMapping(JobController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:job')")
 public class JobController extends BaseRoutingController {
 
-    protected static final String PREFIX = "admin/job";
     protected static final String PREFIX_URL = "/admin/job";
     protected static final String SEARCH_FORM_KEY = "jobSearchForm";
 
@@ -193,16 +193,9 @@ public class JobController extends BaseRoutingController {
         return R.ok(nextExecution);
     }
 
+    @Data
     public static class SearchForm extends BaseSearchForm {
         private String condition;
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public void setCondition(String condition) {
-            this.condition = condition;
-        }
 
         @Override
         public String toString() {

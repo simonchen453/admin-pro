@@ -256,9 +256,9 @@ VITE_APP_TITLE=Admin Pro 管理系统
 
 ### 认证相关
 
-- `POST /api/auth/login` - 用户登录
-- `POST /api/auth/logout` - 用户登出
-- `POST /api/auth/changePassword` - 修改密码
+- `POST /auth/login` - 用户登录
+- `POST /auth/logout` - 用户登出
+- `POST /auth/changePassword` - 修改密码
 
 ### 系统信息
 

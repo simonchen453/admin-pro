@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/city")
-@Monitored
 public class CityController {
 
     @Autowired

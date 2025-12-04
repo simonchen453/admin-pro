@@ -8,10 +8,11 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.rbac.domains.entity.domain.*;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
  * @author simon
  * @date 2020-06-14
  */
-@Controller
+@RestController
 @RequestMapping("/admin/userDomainEnv")
 @PreAuthorize("@ss.hasPermission('system:user_domain_env')")
 public class UserDomainEnvController extends BaseRoutingController {
@@ -47,20 +48,10 @@ public class UserDomainEnvController extends BaseRoutingController {
         return "forward:" + PREFIX_URL + "/list";
     }
 
-    @GetMapping("/list")
-    public String userDomainEnv() {
-        prepareData();
-        getSearchForm();
-        List<DomainEntity> all = domainService.findAll();
-        request.setAttribute("domains", all);
-        return PREFIX + "/list";
-    }
-
     /**
      * 查询用户域环境配置列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<QueryResultSet<UserDomainEnvEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String userDomain = searchForm.getUserDomain();
@@ -78,7 +69,6 @@ public class UserDomainEnvController extends BaseRoutingController {
      * 新增保存用户域环境配置
      */
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    @ResponseBody
     public R create(@RequestBody UserDomainEnvEntity userDomainEnv) {
         BeanUtil.beanAttributeValueTrim(userDomainEnv);
         MessageBundle messageBundle = getMessageBundle();
@@ -113,21 +103,9 @@ public class UserDomainEnvController extends BaseRoutingController {
     }
 
     /**
-     * 修改用户域环境配置
-     */
-    @GetMapping("/edit")
-    public String edit(@RequestParam("id") String id) {
-        prepareData();
-        UserDomainEnvEntity userDomainEnv = userDomainEnvService.findById(id);
-        request.setAttribute("userDomainEnv", userDomainEnv);
-        return PREFIX + "/edit";
-    }
-
-    /**
      * 修改保存用户域环境配置
      */
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    @ResponseBody
     public R editSave(@RequestBody UserDomainEnvEntity userDomainEnv) {
         BeanUtil.beanAttributeValueTrim(userDomainEnv);
         MessageBundle messageBundle = getMessageBundle();
@@ -170,7 +148,6 @@ public class UserDomainEnvController extends BaseRoutingController {
      * @return
      */
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @ResponseBody
     public R<UserDomainEnvEntity> detail(@PathVariable String id) {
         UserDomainEnvEntity entity = userDomainEnvService.findById(id);
         if (entity != null) {
@@ -184,22 +161,14 @@ public class UserDomainEnvController extends BaseRoutingController {
      * 删除用户域环境配置
      */
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @ResponseBody
     public R remove(@RequestParam("ids") String ids) {
         userDomainEnvService.deleteByIds(ids);
         return R.ok();
     }
 
+    @Data
     public static class SearchForm extends BaseSearchForm {
         private String userDomain;
-
-        public String getUserDomain() {
-            return userDomain;
-        }
-
-        public void setUserDomain(String userDomain) {
-            this.userDomain = userDomain;
-        }
 
         @Override
         public String toString() {

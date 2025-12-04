@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @author simon
  */
 @RestController
-@RequestMapping("/admin/server")
+@RequestMapping(ServerController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:server')")
 public class ServerController extends BaseRoutingController {
 
-    protected static final String PREFIX = "admin/server";
+    protected static final String PREFIX_URL = "/admin/server";
 
     @GetMapping("/detail")
     public R detail() throws Exception {

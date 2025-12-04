@@ -12,10 +12,11 @@ import com.adminpro.system.tools.domains.entity.config.ConfigCreateValidator;
 import com.adminpro.system.tools.domains.entity.config.ConfigEntity;
 import com.adminpro.system.tools.domains.entity.config.ConfigService;
 import com.adminpro.system.tools.domains.entity.config.ConfigUpdateValidator;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -24,11 +25,11 @@ import org.springframework.web.bind.annotation.*;
  * @author simon
  * @date 2020-06-15
  */
-@Controller
-@RequestMapping("/admin/config")
+@RestController
+@RequestMapping(ConfigController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:config')")
 public class ConfigController extends BaseRoutingController {
-    protected static final String PREFIX = "admin/config";
+
     protected static final String PREFIX_URL = "/admin/config";
     protected static final String SEARCH_FORM_KEY = "configSearchForm";
 
@@ -41,23 +42,10 @@ public class ConfigController extends BaseRoutingController {
     @Autowired
     private ConfigUpdateValidator configUpdateValidator;
 
-    @GetMapping()
-    public String prepareList() {
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String config() {
-        prepareData();
-        getSearchForm();
-        return PREFIX + "/list";
-    }
-
     /**
      * 查询参数配置列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    @ResponseBody
     public R<QueryResultSet<ConfigEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -80,20 +68,10 @@ public class ConfigController extends BaseRoutingController {
     }
 
     /**
-     * 新增参数配置
-     */
-    @GetMapping("/create")
-    public String add() {
-        prepareData();
-        return PREFIX + "/create";
-    }
-
-    /**
      * 新增保存参数配置
      */
     @SysLog("创建配置")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    @ResponseBody
     public R create(@RequestBody ConfigEntity config) {
         BeanUtil.beanAttributeValueTrim(config);
         MessageBundle messageBundle = getMessageBundle();
@@ -120,22 +98,10 @@ public class ConfigController extends BaseRoutingController {
     }
 
     /**
-     * 修改参数配置
-     */
-    @GetMapping("/edit")
-    public String edit(@RequestParam("id") String id) {
-        prepareData();
-        ConfigEntity config = configService.findById(id);
-        request.setAttribute("config", config);
-        return PREFIX + "/edit";
-    }
-
-    /**
      * 修改保存参数配置
      */
     @SysLog("更新配置")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    @ResponseBody
     public R editSave(@RequestBody ConfigEntity config) {
         BeanUtil.beanAttributeValueTrim(config);
         MessageBundle messageBundle = getMessageBundle();
@@ -170,7 +136,6 @@ public class ConfigController extends BaseRoutingController {
      * @return
      */
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @ResponseBody
     public R<ConfigEntity> detail(@PathVariable String id) {
         ConfigEntity entity = configService.findById(id);
         if (entity != null) {
@@ -186,40 +151,16 @@ public class ConfigController extends BaseRoutingController {
      */
     @SysLog("删除配置")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @ResponseBody
     public R remove(@RequestParam("ids") String ids) {
         configService.deleteByIds(ids);
         return R.ok();
     }
 
+    @Data
     public static class SearchForm extends BaseSearchForm {
         private String name;
         private String key;
         private String value;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public void setKey(String key) {
-            this.key = key;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
 
         @Override
         public String toString() {

@@ -357,10 +357,10 @@ docker-compose up -d
 ### 主要 API 接口
 
 **认证相关**
-- `POST /rest/auth/login` - 用户登录
-- `POST /rest/auth/logout` - 用户登出
-- `POST /rest/auth/changePassword` - 修改密码
-- `GET /rest/auth/captcha` - 获取验证码
+- `POST /auth/login` - 用户登录
+- `POST /auth/logout` - 用户登出
+- `POST /auth/changePassword` - 修改密码
+- `GET /auth/captcha` - 获取验证码
 
 **用户管理**
 - `POST /admin/user/list` - 用户列表（分页）

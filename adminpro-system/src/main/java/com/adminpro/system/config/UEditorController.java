@@ -3,7 +3,7 @@ package com.adminpro.system.config;
 import com.adminpro.system.tools.ueditor.ActionEnter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.PrintWriter;
@@ -11,7 +11,7 @@ import java.io.PrintWriter;
 /**
  * @author simon
  */
-@Controller
+@RestController
 public class UEditorController {
 
     @RequestMapping(value = "/config")

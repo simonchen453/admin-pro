@@ -51,7 +51,7 @@ import java.io.IOException;
 import java.util.Date;
 
 @RestController
-@RequestMapping("/rest/auth")
+@RequestMapping("/auth")
 @Monitored
 public class AuthController extends BaseController {
 

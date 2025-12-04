@@ -16,15 +16,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-@Controller
-@RequestMapping(value = "/admin/oss")
+@RestController
+@RequestMapping(value = OssController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:oss')")
 public class OssController extends BaseRoutingController {
+
+    protected static final String PREFIX_URL = "/admin/oss";
 
     @Autowired
     private UploadDownloadHelper uploadDownloadHelper;
@@ -32,14 +34,7 @@ public class OssController extends BaseRoutingController {
     @Autowired
     private OSSService ossService;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public String user() {
-        prepareData();
-        return "admin/oss/list";
-    }
-
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R<QueryResultSet<ListOssVo>> paging(HttpServletRequest request) {
         SearchParam param = startPaging();
         QueryResultSet<ListOssVo> map = ossService.search(param).map(ListOssVoConverter.class);
@@ -47,7 +42,6 @@ public class OssController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
     public R uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw new BaseRuntimeException("上传文件不能为空");
@@ -75,7 +69,6 @@ public class OssController extends BaseRoutingController {
     }
 
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R delete(@PathVariable String id) {
         OSSEntity entity = ossService.findById(id);
         if (entity != null) {
@@ -87,7 +80,6 @@ public class OssController extends BaseRoutingController {
 
     @Transactional
     @RequestMapping(value = "/deletemany", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
     public R deleteMany(@RequestParam String ids) {
         String[] split = ids.split(",");
         try {

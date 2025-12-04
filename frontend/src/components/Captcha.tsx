@@ -24,7 +24,7 @@ const Captcha = forwardRef<CaptchaRef, CaptchaProps>(({ onCaptchaChange, classNa
     const newKey = generateCaptchaKey();
     setCaptchaKey(newKey);
     // 直接使用完整的URL路径
-    setImageUrl(`/api/rest/auth/captcha.jpg?key=${newKey}`);
+    setImageUrl(`/api/auth/captcha.jpg?key=${newKey}`);
     onCaptchaChange?.(newKey);
   };
 

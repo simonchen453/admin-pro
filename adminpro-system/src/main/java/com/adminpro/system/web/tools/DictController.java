@@ -23,18 +23,15 @@ import org.springframework.web.bind.annotation.*;
  * @date 2020-08-22
  */
 @RestController
-@RequestMapping("/admin/dict")
+@RequestMapping(DictController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:dict')")
 public class DictController extends BaseRoutingController {
-    protected static final String PREFIX = "admin/dict";
+
     protected static final String PREFIX_URL = "/admin/dict";
     protected static final String SEARCH_FORM_KEY = "dictSearchForm";
 
     @Autowired
     private DictService dictService;
-
-    @Autowired
-    private DictDataService dictDataService;
 
     @Autowired
     private DictCreateValidator dictCreateValidator;

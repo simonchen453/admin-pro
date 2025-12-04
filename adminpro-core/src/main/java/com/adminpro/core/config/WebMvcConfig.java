@@ -2,10 +2,12 @@ package com.adminpro.core.config;
 
 import com.adminpro.core.base.util.FileUtil;
 import com.adminpro.core.base.util.JsonUtil;
+import com.adminpro.framework.common.interceptor.ClientInfoInterceptor;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
@@ -13,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -30,13 +33,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired
+    private ClientInfoInterceptor clientInfoInterceptor;
+
     /**
      * 访问图片方法
      *
      * @param registry
      */
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@org.springframework.lang.NonNull ResourceHandlerRegistry registry) {
         String publicFileDir = FileUtil.PUBLIC_FILE_DIR;
         String privateFileDir = FileUtil.PRIVATE_FILE_DIR;
         logger.info("文件上传路径, public：{}", publicFileDir);
@@ -53,6 +59,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
         }
         registry.addResourceHandler("/upload/**").addResourceLocations(publicFileDir);
         // Spring Boot 3.x 使用 springdoc-openapi，swagger-ui 路径为 /swagger-ui.html
+    }
+
+    @Override
+    public void addInterceptors(@org.springframework.lang.NonNull InterceptorRegistry registry) {
+        if (clientInfoInterceptor != null) {
+            registry.addInterceptor(clientInfoInterceptor)
+                    .addPathPatterns("/**")
+                    .excludePathPatterns("/js/**", "/plugins/**", "/css/**", "/images/**", "/img/**", "/icons/**");
+        }
     }
 
     /**

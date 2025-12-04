@@ -6,6 +6,7 @@ import com.adminpro.core.base.util.DateUtil;
 import com.adminpro.core.exceptions.APIException;
 import com.adminpro.framework.common.annotation.SysLog;
 import com.adminpro.framework.common.constants.WebConstants;
+import com.adminpro.framework.common.helper.ClientHelper;
 import com.adminpro.framework.common.helper.ConfigHelper;
 import com.adminpro.framework.common.helper.WebHelper;
 import com.adminpro.framework.common.web.BaseController;
@@ -91,7 +92,9 @@ public class AuthController extends BaseController {
 
             String userDomain = UserLoginPlatform.getUserDomain(platform);
 
-            if (!WebHelper.isDevModel() && LoginHelper.getInstance().needCheckCapture(userDomain)) {
+            boolean isMobileApp = ClientHelper.isMobileAppRequest(request);
+            boolean isMiniProgram = ClientHelper.isMiniProgramRequest(request);
+            if (!isMobileApp && !isMiniProgram && !WebHelper.isDevModel() && LoginHelper.getInstance().needCheckCapture(userDomain)) {
                 if (StringUtils.isEmpty(captcha)) {
                     return R.error("验证码不正确");
                 }

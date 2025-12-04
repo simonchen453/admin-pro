@@ -35,22 +35,10 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         if (WebHelper.isRestRequest()) {
-            String authHeader = request.getHeader("x-access-token");
-            if (StringUtils.isEmpty(authHeader)) {
-                authHeader = request.getParameter("x-access-token");
-            }
-            if (authHeader != null) {
-                final String authToken = authHeader;
-                /*boolean authed = false;
-                Authentication auth = SecurityContextHolder.getContext().getAuthentication();*/
+            String authToken = extractToken(request);
+            if (authToken != null) {
                 UserIden userIden = TokenHelper.getInstance().getUserIdenByToken(authToken);
-                /*if (auth != null) {
-                    Object principal = auth.getPrincipal();
-                    if (principal != null && principal instanceof AuthUser) {
-                        authed = true;
-                    }
-                }*/
-                if (userIden != null /*&& !authed*/) {
+                if (userIden != null) {
                     LoginUser authUser = (LoginUser) this.userDetailsService.loadUserByUsername(userIden.toSecurityUsername());
                     if (authUser != null) {
                         if (tokenHelper.validateToken(authToken, authUser)) {
@@ -81,5 +69,34 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(request, response);
+    }
+    
+    /**
+     * 从请求中提取Token
+     * 支持多种方式：
+     * 1. Authorization: Bearer <token> (标准方式，推荐移动端使用)
+     * 2. x-access-token header (兼容现有前端)
+     * 3. x-access-token query参数 (兼容旧版本)
+     *
+     * @param request HTTP请求
+     * @return Token字符串，如果未找到则返回null
+     */
+    private String extractToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (StringUtils.isNotEmpty(authHeader) && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        
+        authHeader = request.getHeader("x-access-token");
+        if (StringUtils.isNotEmpty(authHeader)) {
+            return authHeader;
+        }
+        
+        authHeader = request.getParameter("x-access-token");
+        if (StringUtils.isNotEmpty(authHeader)) {
+            return authHeader;
+        }
+        
+        return null;
     }
 }

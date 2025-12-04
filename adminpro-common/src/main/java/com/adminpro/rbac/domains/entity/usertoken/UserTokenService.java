@@ -42,12 +42,30 @@ public class UserTokenService extends BaseService<UserTokenEntity, String> {
 
     public void create(UserTokenEntity entity) {
         super.create(entity);
-        AppCache.getInstance().set(RbacCacheConstants.AUTH_TOKEN_CACHE, entity.getToken(), entity, TokenHelper.EXPIRE);
+        Integer expireSeconds = calculateCacheExpire(entity);
+        AppCache.getInstance().set(RbacCacheConstants.AUTH_TOKEN_CACHE, entity.getToken(), entity, expireSeconds);
     }
 
     public void update(UserTokenEntity entity) {
         super.update(entity);
-        AppCache.getInstance().set(RbacCacheConstants.AUTH_TOKEN_CACHE, entity.getToken(), entity, TokenHelper.EXPIRE);
+        Integer expireSeconds = calculateCacheExpire(entity);
+        AppCache.getInstance().set(RbacCacheConstants.AUTH_TOKEN_CACHE, entity.getToken(), entity, expireSeconds);
+    }
+    
+    /**
+     * 根据token的过期时间计算缓存过期时间（秒）
+     * 如果token有过期时间，则使用token过期时间；否则使用默认过期时间
+     */
+    private Integer calculateCacheExpire(UserTokenEntity entity) {
+        if (entity.getExpireTime() != null) {
+            long expireTime = entity.getExpireTime().getTime();
+            long now = System.currentTimeMillis();
+            long seconds = (expireTime - now) / 1000;
+            if (seconds > 0) {
+                return (int) seconds;
+            }
+        }
+        return TokenHelper.getInstance().getExpireSeconds(entity.getDevice());
     }
 
     public void inactive(UserTokenEntity entity) {

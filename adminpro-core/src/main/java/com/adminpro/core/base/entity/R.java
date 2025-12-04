@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
@@ -28,11 +29,17 @@ public class R<T> implements Serializable {
     private Map<String, String> errorsMap = new HashMap<>();
 
     private T data;
+    
+    private Long timestamp;
+    
+    private String requestId;
 
     public static R ok() {
         R r = new R();
         r.setRestCode(String.valueOf(HttpStatus.OK.value()));
         r.setSuccess(true);
+        r.setTimestamp(System.currentTimeMillis());
+        r.setRequestId(MDC.get("requestId"));
         return r;
     }
 
@@ -51,6 +58,8 @@ public class R<T> implements Serializable {
         r.setRestCode(String.valueOf(code));
         r.setData(result);
         r.setSuccess(true);
+        r.setTimestamp(System.currentTimeMillis());
+        r.setRequestId(MDC.get("requestId"));
         return r;
     }
 
@@ -81,6 +90,8 @@ public class R<T> implements Serializable {
         }
         r.setSuccess(false);
         r.setMessage(sb.toString());
+        r.setTimestamp(System.currentTimeMillis());
+        r.setRequestId(MDC.get("requestId"));
         logger.error("###请求失败：" + new Gson().toJson(bundle));
         return r;
     }
@@ -90,6 +101,8 @@ public class R<T> implements Serializable {
         r.setRestCode(code);
         r.setMessage(errMsg);
         r.setSuccess(false);
+        r.setTimestamp(System.currentTimeMillis());
+        r.setRequestId(MDC.get("requestId"));
         logger.error("###请求失败：" + errMsg);
         return r;
     }
@@ -153,5 +166,21 @@ public class R<T> implements Serializable {
 
     public void setErrorsMap(Map<String, String> errorsMap) {
         this.errorsMap = errorsMap;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }

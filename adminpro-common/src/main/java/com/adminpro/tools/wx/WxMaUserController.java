@@ -13,6 +13,7 @@ import com.adminpro.core.base.util.IdGenerator;
 import com.adminpro.core.base.util.UUIDUtil;
 import com.adminpro.core.exceptions.APIException;
 import com.adminpro.framework.cache.AppCache;
+import com.adminpro.framework.common.enums.ClientType;
 import com.adminpro.framework.security.auth.TokenHelper;
 import com.adminpro.rbac.api.LoginHelper;
 import com.adminpro.rbac.common.RbacCacheConstants;
@@ -91,7 +92,7 @@ public class WxMaUserController {
             loginResponse.setAvatarUrl(user.getAvatarUrl());
             loginResponse.setExtUserId(user.getExtUserId());
 
-            AppCache.getInstance().set(RbacCacheConstants.WX_SESSION_KEY_CACHE, token.getToken(), session, TokenHelper.EXPIRE);
+            AppCache.getInstance().set(RbacCacheConstants.WX_SESSION_KEY_CACHE, token.getToken(), session, TokenHelper.getInstance().getExpireSeconds(ClientType.WECHAT_MINI_PROGRAM.getCode()));
             return R.ok(loginResponse);
         } catch (WxErrorException e) {
             this.logger.error(e.getMessage(), e);

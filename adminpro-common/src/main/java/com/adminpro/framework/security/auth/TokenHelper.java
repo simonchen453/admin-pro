@@ -6,6 +6,7 @@ import com.adminpro.framework.common.constants.WebConstants;
 import com.adminpro.framework.common.helper.ConfigHelper;
 import com.adminpro.framework.exceptions.InvalidAuthTokenException;
 import com.adminpro.framework.exceptions.LogoutException;
+import com.adminpro.rbac.api.Device;
 import com.adminpro.rbac.common.RbacConstants;
 import com.adminpro.rbac.domains.entity.user.UserIden;
 import com.adminpro.rbac.domains.entity.usertoken.UserTokenEntity;
@@ -24,13 +25,6 @@ import java.util.Date;
 @Component
 public class TokenHelper implements Serializable {
 
-    // spring-mobile-device 已停止维护，使用简单的 Device 接口
-    interface Device {
-        boolean isNormal();
-        boolean isMobile();
-        boolean isTablet();
-    }
-
     public static TokenHelper getInstance() {
         return SpringUtil.getBean(TokenHelper.class);
     }
@@ -40,8 +34,10 @@ public class TokenHelper implements Serializable {
     public static final String AUDIENCE_MOBILE = "mobile";
     public static final String AUDIENCE_TABLET = "tablet";
 
-    //12小时后过期
-    public final static int EXPIRE = 12 * 60 * 60;
+    // 默认过期时间：12小时（Web端）
+    public final static int DEFAULT_EXPIRE_WEB = 12 * 60 * 60;
+    // 移动端过期时间：30天（可配置）
+    public final static int DEFAULT_EXPIRE_MOBILE = 30 * 24 * 60 * 60;
 
     @Autowired
     private UserTokenService userTokenService;
@@ -74,7 +70,10 @@ public class TokenHelper implements Serializable {
         return expireTime.before(new Date());
     }
 
-    private String generateAudience(Device device) {
+    public String generateAudience(Device device) {
+        if (device == null) {
+            return AUDIENCE_WEB;
+        }
         String audience = AUDIENCE_UNKNOWN;
         if (device.isNormal()) {
             audience = AUDIENCE_WEB;
@@ -98,9 +97,11 @@ public class TokenHelper implements Serializable {
         userTokenEntity.setUserDomain(userIden.getUserDomain());
         userTokenEntity.setUserId(userIden.getUserId());
         userTokenEntity.setToken(token);
-        userTokenEntity.setDevice(generateAudience(device));
+        String deviceType = generateAudience(device);
+        userTokenEntity.setDevice(deviceType);
         userTokenEntity.setStatus(UserTokenEntity.STATUS_ACTIVITY);
-        Date expireTime = DateUtils.addSeconds(now, EXPIRE);
+        int expireSeconds = getExpireSeconds(deviceType);
+        Date expireTime = DateUtils.addSeconds(now, expireSeconds);
         userTokenEntity.setExpireTime(expireTime);
         userTokenEntity.setUpdateTime(now);
         userTokenService.create(userTokenEntity);
@@ -115,6 +116,11 @@ public class TokenHelper implements Serializable {
 
     @Transactional
     public UserTokenEntity generateToken(UserIden userIden, String token) {
+        return generateToken(userIden, token, AUDIENCE_WEB);
+    }
+    
+    @Transactional
+    public UserTokenEntity generateToken(UserIden userIden, String token, String deviceType) {
         Date now = new Date();
         boolean deactive = ConfigHelper.getBoolean(RbacConstants.KILL_SESSION_WHEN_LOGIN, false);
         if (deactive) {
@@ -124,9 +130,10 @@ public class TokenHelper implements Serializable {
         userTokenEntity.setUserDomain(userIden.getUserDomain());
         userTokenEntity.setUserId(userIden.getUserId());
         userTokenEntity.setToken(token);
-//        userTokenEntity.setDevice(generateAudience(device));
+        userTokenEntity.setDevice(deviceType != null ? deviceType : AUDIENCE_WEB);
         userTokenEntity.setStatus(UserTokenEntity.STATUS_ACTIVITY);
-        Date expireTime = DateUtils.addSeconds(now, EXPIRE);
+        int expireSeconds = getExpireSeconds(deviceType);
+        Date expireTime = DateUtils.addSeconds(now, expireSeconds);
         userTokenEntity.setExpireTime(expireTime);
         userTokenEntity.setUpdateTime(now);
         userTokenService.create(userTokenEntity);
@@ -150,10 +157,26 @@ public class TokenHelper implements Serializable {
     public UserTokenEntity refreshToken(String token) {
         UserTokenEntity byToken = userTokenService.findByToken(token);
         Date now = new Date();
-        Date expireTime = DateUtils.addSeconds(now, EXPIRE);
+        String deviceType = byToken.getDevice();
+        int expireSeconds = getExpireSeconds(deviceType);
+        Date expireTime = DateUtils.addSeconds(now, expireSeconds);
         byToken.setExpireTime(expireTime);
         userTokenService.update(byToken);
         return byToken;
+    }
+    
+    /**
+     * 根据设备类型获取Token过期时间（秒）
+     * 移动端使用更长的过期时间，Web端使用较短的过期时间
+     *
+     * @param deviceType 设备类型（mobile/tablet/web/unknown）
+     * @return 过期时间（秒）
+     */
+    public int getExpireSeconds(String deviceType) {
+        if (AUDIENCE_MOBILE.equals(deviceType) || AUDIENCE_TABLET.equals(deviceType)) {
+            return ConfigHelper.getInt("app.token.expire.mobile", DEFAULT_EXPIRE_MOBILE);
+        }
+        return ConfigHelper.getInt("app.token.expire.web", DEFAULT_EXPIRE_WEB);
     }
 
     public UserTokenEntity deactiveToken(String token) {

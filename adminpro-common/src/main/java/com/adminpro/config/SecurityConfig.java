@@ -23,8 +23,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * spring security配置
@@ -66,6 +68,9 @@ public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
     private String allowedOrigins;
+    
+    @Value("${app.cors.allow-all-origins:false}")
+    private boolean allowAllOrigins;
 
     /**
      * 配置安全过滤器链
@@ -137,6 +142,8 @@ public class SecurityConfig {
     /**
      * CORS 配置源
      * 配置跨域请求，支持通过配置文件设置允许的源
+     * 支持移动端调用：允许所有源或指定源列表
+     * 支持小程序调用：微信小程序和支付宝小程序的域名
      *
      * @return CorsConfigurationSource
      */
@@ -145,11 +152,30 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         
-        if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
+        List<String> miniProgramOrigins = Arrays.asList(
+            "https://servicewechat.com",
+            "https://servicewechat.net",
+            "https://*.servicewechat.com",
+            "https://*.servicewechat.net",
+            "https://alipay.com",
+            "https://alipaydev.com",
+            "https://*.alipay.com",
+            "https://*.alipaydev.com"
+        );
+        
+        if (allowAllOrigins) {
+            config.setAllowedOriginPatterns(Collections.singletonList("*"));
+        } else if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
             String[] origins = allowedOrigins.split(",");
-            config.setAllowedOrigins(Arrays.asList(origins));
+            List<String> originList = new ArrayList<>(Arrays.asList(origins));
+            originList.addAll(miniProgramOrigins);
+            config.setAllowedOrigins(originList);
         } else {
-            config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+            List<String> defaultOrigins = new ArrayList<>();
+            defaultOrigins.add("http://localhost:3000");
+            defaultOrigins.add("http://localhost:5173");
+            defaultOrigins.addAll(miniProgramOrigins);
+            config.setAllowedOrigins(defaultOrigins);
         }
         
         config.addAllowedHeader("*");

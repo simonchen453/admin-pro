@@ -108,12 +108,11 @@ public class LoginHelper {
         }
 
         logger.info(MessageFormat.format("用户{0}登陆成功", userIden.getUserDomain() + "/" + userDetails.getLoginName()));
-//        UserTokenEntity userTokenEntity = tokenHelper.generateToken(userIden, device);
-//        return userTokenEntity.getToken();
         if (restRequest) {
             AuthToken principal = (AuthToken) authentication.getPrincipal();
             String token = principal.getToken();
-            tokenHelper.generateToken(userIden, token);
+            String deviceType = device != null ? tokenHelper.generateAudience(device) : TokenHelper.AUDIENCE_WEB;
+            tokenHelper.generateToken(userIden, token, deviceType);
             UserEntity userEntity = UserService.getInstance().findById(userIden);
             userEntity.setLatestLoginTime(new Date());
             UserService.getInstance().update(userEntity);

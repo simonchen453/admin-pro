@@ -280,13 +280,15 @@ public class WebHelper {
 
     /**
      * 判断当前URL是不是Rest URL
+     * 支持多种REST API路径：/api/**、/rest/**
      *
-     * @return
+     * @param url 请求URL
+     * @return 是否为REST API
      */
     public static boolean isRestUrl(String url) {
         AntPathMatcher matcher = new AntPathMatcher("/");
-        boolean match = matcher.match("/api/**", url);
-        return match;
+        return matcher.match("/api/**", url) 
+            || matcher.match("/rest/**", url);
     }
 
     /**

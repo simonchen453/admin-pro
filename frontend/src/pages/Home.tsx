@@ -17,9 +17,7 @@ import {
   BarChartOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
-  CheckCircleOutlined,
-  SyncOutlined,
-  CloseCircleOutlined
+  CheckCircleOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getSystemInfoApi, getStatisticsApi, getRecentActivitiesApi, type RecentActivity as ApiRecentActivity } from '../api/common';
@@ -329,8 +327,6 @@ function Home() {
               <Descriptions.Item label="操作系统">{systemInfo?.sys?.osName || '-'}</Descriptions.Item>
               <Descriptions.Item label="系统架构">{systemInfo?.sys?.osArch || '-'}</Descriptions.Item>
               <Descriptions.Item label="Java版本">{systemInfo?.jvm?.version || '-'}</Descriptions.Item>
-              <Descriptions.Item label="Java路径">{systemInfo?.jvm?.home || '-'}</Descriptions.Item>
-              <Descriptions.Item label="工作目录">{systemInfo?.sys?.userDir || '-'}</Descriptions.Item>
             </Descriptions>
           </Card>
         </Col>

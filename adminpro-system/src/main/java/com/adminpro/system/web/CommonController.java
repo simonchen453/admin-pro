@@ -250,6 +250,20 @@ public class CommonController extends BaseRoutingController {
         copyRight = copyRight.replace("{platformShortName}", platformShortName);
         serverInfo.setCopyRight(copyRight);
 
+        ReleaseInfo.SysInfo sysInfo = new ReleaseInfo.SysInfo();
+        try {
+            sysInfo.setComputerName(java.net.InetAddress.getLocalHost().getHostName());
+        } catch (java.net.UnknownHostException e) {
+            sysInfo.setComputerName("Unknown");
+        }
+        sysInfo.setOsName(System.getProperty("os.name"));
+        sysInfo.setOsArch(System.getProperty("os.arch"));
+        serverInfo.setSys(sysInfo);
+
+        ReleaseInfo.JvmInfo jvmInfo = new ReleaseInfo.JvmInfo();
+        jvmInfo.setVersion(System.getProperty("java.version"));
+        serverInfo.setJvm(jvmInfo);
+
         return R.ok(serverInfo);
     }
 

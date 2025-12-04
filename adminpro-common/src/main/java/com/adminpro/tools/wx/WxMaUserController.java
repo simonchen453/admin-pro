@@ -84,7 +84,7 @@ public class WxMaUserController {
             loginResponse.setAuthed(user.isAuthenticated());
             loginResponse.setIdNo(user.getIdNo());
             loginResponse.setRealName(user.getRealName());
-            loginResponse.setPlatform(user.getUserIden().getUserDomain());
+            loginResponse.setDomain(user.getUserIden().getUserDomain());
             loginResponse.setDisplay(user.getDisplay());
             loginResponse.setMobileNo(user.getMobileNo());
             loginResponse.setDate(DateUtil.formatDate(new Date()));
@@ -157,7 +157,7 @@ public class WxMaUserController {
         loginResponse.setAuthed(user.isAuthenticated());
         loginResponse.setIdNo(user.getIdNo());
         loginResponse.setRealName(user.getRealName());
-        loginResponse.setPlatform(user.getUserIden().getUserDomain());
+        loginResponse.setDomain(user.getUserIden().getUserDomain());
         loginResponse.setDisplay(user.getDisplay());
         loginResponse.setMobileNo(user.getMobileNo());
         loginResponse.setDate(DateUtil.formatDate(new Date()));
@@ -205,7 +205,7 @@ public class WxMaUserController {
         loginResponse.setAuthed(user.isAuthenticated());
         loginResponse.setIdNo(user.getIdNo());
         loginResponse.setRealName(user.getRealName());
-        loginResponse.setPlatform(user.getUserIden().getUserDomain());
+        loginResponse.setDomain(user.getUserIden().getUserDomain());
         loginResponse.setDisplay(user.getDisplay());
         loginResponse.setMobileNo(user.getMobileNo());
         loginResponse.setDate(DateUtil.formatDate(new Date()));

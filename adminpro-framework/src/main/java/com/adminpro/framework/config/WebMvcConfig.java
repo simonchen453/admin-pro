@@ -14,6 +14,7 @@ import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -42,7 +43,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
      * @param registry
      */
     @Override
-    public void addResourceHandlers(@org.springframework.lang.NonNull ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         String publicFileDir = FileUtil.PUBLIC_FILE_DIR;
         String privateFileDir = FileUtil.PRIVATE_FILE_DIR;
         logger.info("文件上传路径, public：{}", publicFileDir);
@@ -62,7 +63,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addInterceptors(@org.springframework.lang.NonNull InterceptorRegistry registry) {
+    public void addInterceptors(@NonNull InterceptorRegistry registry) {
         if (clientInfoInterceptor != null) {
             registry.addInterceptor(clientInfoInterceptor)
                     .addPathPatterns("/**")

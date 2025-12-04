@@ -3,7 +3,7 @@ package com.adminpro.system.web.vo;
 import lombok.Data;
 
 @Data
-public class ServerInfo {
+public class ReleaseInfo {
     private String releaseVersion;
     private String buildVersion;
     private String platformName;

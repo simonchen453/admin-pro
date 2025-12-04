@@ -262,7 +262,7 @@ VITE_APP_TITLE=Admin Pro 管理系统
 
 ### 系统信息
 
-- `GET /api/common/info` - 获取系统信息（平台名称、版本、版权等）
+- `GET /api/common/release-info` - 获取版本信息（平台名称、版本、版权等）
 
 ### 用户管理
 

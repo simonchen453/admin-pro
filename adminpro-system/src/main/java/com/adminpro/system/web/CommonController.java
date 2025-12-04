@@ -37,7 +37,7 @@ import com.adminpro.system.tools.domains.entity.syslog.SysLogDTO;
 import com.adminpro.system.tools.domains.entity.syslog.SysLogService;
 import com.adminpro.system.tools.domains.enums.SessionStatus;
 import com.adminpro.system.web.vo.RecentActivityVO;
-import com.adminpro.system.web.vo.ServerInfo;
+import com.adminpro.system.web.vo.ReleaseInfo;
 import jakarta.servlet.http.HttpSession;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
@@ -45,7 +45,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,7 +52,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.*;
 
-@Controller
+@RestController
 @RequestMapping(value = "/common")
 public class CommonController extends BaseRoutingController {
 
@@ -86,7 +85,7 @@ public class CommonController extends BaseRoutingController {
      *
      * @return
      */
-    @ResponseBody
+    @PreAuthorize("@ss.hasPermission('common:home-data')")
     @RequestMapping(value = "/statistics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<Map<String, Long>> statistics() {
         Map<String, Long> stats = new HashMap<>();
@@ -116,7 +115,7 @@ public class CommonController extends BaseRoutingController {
      * @param limit 返回的记录数，默认 10
      * @return 最近活动列表
      */
-    @ResponseBody
+    @PreAuthorize("@ss.hasPermission('common:home-data')")
     @RequestMapping(value = "/recent-activities", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<List<RecentActivityVO>> recentActivities(@RequestParam(value = "limit", defaultValue = "10") int limit) {
         try {
@@ -196,7 +195,6 @@ public class CommonController extends BaseRoutingController {
      */
     @SysLog("修改密码")
     @PreAuthorize("@ss.hasPermission('common:changepwd')")
-    @ResponseBody
     @RequestMapping(value = "/changepwd", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<List<UserEntity>> changepwd(@RequestBody ChangePwdVo vo) {
         UserIden userIden = LoginHelper.getInstance().getLoginUserIden();
@@ -224,23 +222,25 @@ public class CommonController extends BaseRoutingController {
      * @return
      */
     @PreAuthorize("@ss.hasPermission('common:domains')")
-    @ResponseBody
     @RequestMapping(value = "/domains", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<List<DomainEntity>> domains() {
         List<DomainEntity> list = DomainService.getInstance().findAll();
         return R.ok(list);
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/info", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public R<ServerInfo> info() {
+    /**
+     * 获取服务器相关信息，这个不需要权限
+     * @return
+     */
+    @RequestMapping(value = "/release-info", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public R<ReleaseInfo> info() {
         String releaseVersion = ConfigHelper.getString(BaseConstants.SERVER_RELEASE_VERSION_KEY);
         String platformName = ConfigHelper.getString(BaseConstants.PLATFORM_NAME_KEY);
         String platformShortName = ConfigHelper.getString(BaseConstants.PLATFORM_SHORT_NAME_KEY);
         String buildVersion = ConfigHelper.getString(BaseConstants.SERVER_BUILD_VERSION_KEY);
         String copyRight = ConfigHelper.getString(BaseConstants.COPY_RIGHT_KEY);
 
-        ServerInfo serverInfo = new ServerInfo();
+        ReleaseInfo serverInfo = new ReleaseInfo();
         serverInfo.setReleaseVersion(releaseVersion);
         serverInfo.setBuildVersion(buildVersion);
         serverInfo.setPlatformName(platformName);
@@ -258,7 +258,6 @@ public class CommonController extends BaseRoutingController {
      */
     @PreAuthorize("@ss.hasPermission('common:dept:treeselect')")
     @GetMapping("/dept/treeselect")
-    @ResponseBody
     public R deptTreeSelect() {
         SearchParam param = startPaging();
         List<DeptEntity> list = deptService.findByParam(param);
@@ -271,7 +270,6 @@ public class CommonController extends BaseRoutingController {
      */
     @PreAuthorize("@ss.hasPermission('common:menu:treeselect')")
     @GetMapping("/menu/treeselect")
-    @ResponseBody
     public R menuTreeSelect() {
         UserIden loginUserIden = LoginHelper.getInstance().getLoginUserIden();
         SearchParam param = startPaging();
@@ -283,7 +281,6 @@ public class CommonController extends BaseRoutingController {
 
     @PreAuthorize("@ss.hasPermission('common:changepwd')")
     @GetMapping("/menus")
-    @ResponseBody
     public R menus() {
         HttpSession session = request.getSession();
         UserEntity userEntity = LoginHelper.getInstance().getUserEntity();
@@ -361,7 +358,6 @@ public class CommonController extends BaseRoutingController {
      */
     @PreAuthorize("@ss.hasPermission('common:menu:roleMenuTreeSelect')")
     @GetMapping(value = "/menu/roleMenuTreeSelect/{roleName}")
-    @ResponseBody
     public R roleMenuTreeSelect(@PathVariable("roleName") String roleName) {
         SearchParam param = startPaging();
         List<MenuEntity> list = menuService.findByParam(param);
@@ -385,7 +381,6 @@ public class CommonController extends BaseRoutingController {
     @SysLog("OSS文件上传")
     @PreAuthorize("@ss.hasPermission('common:oss:upload')")
     @RequestMapping(value = "/oss/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
     public R ossUploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw new BaseRuntimeException("上传文件不能为空");
@@ -418,7 +413,6 @@ public class CommonController extends BaseRoutingController {
     @SysLog("OSS文件删除")
     @PreAuthorize("@ss.hasPermission('common:oss:upload')")
     @RequestMapping(value = "/oss/delete/{id}", method = RequestMethod.DELETE)
-    @ResponseBody
     public R ossDeleteFile(@PathVariable String id) throws Exception {
         OSSEntity entity = ossService.findById(id);
         UserIden loginUserIden = LoginHelper.getInstance().getLoginUserIden();
@@ -435,7 +429,6 @@ public class CommonController extends BaseRoutingController {
     @SysLog("本地文件上传")
     @PreAuthorize("@ss.hasPermission('common:file:upload')")
     @RequestMapping(value = "/file/upload/{type}", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
     public R uploadFile(@RequestParam("file") MultipartFile file, @PathVariable String type) throws Exception {
         if (file.isEmpty()) {
             throw new BaseRuntimeException("上传文件不能为空");
@@ -468,7 +461,6 @@ public class CommonController extends BaseRoutingController {
     @SysLog("本地文件上传")
     @PreAuthorize("@ss.hasPermission('common:file:upload')")
     @RequestMapping(value = "/file/upload2/{type}", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseBody
     public R uploadFile2(@RequestParam("file") MultipartFile file, @PathVariable String type) throws Exception {
         if (file.isEmpty()) {
             throw new BaseRuntimeException("上传文件不能为空");

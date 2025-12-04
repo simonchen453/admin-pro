@@ -6,6 +6,7 @@ import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.common.BaseRoutingController;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,7 @@ import java.util.Date;
  * @author simon
  * @date 2018-11-29
  */
-@Controller
+@RestController
 @RequestMapping("/admin/exceptionlog")
 public class ExceptionLogController extends BaseRoutingController {
     protected static final String PREFIX = "admin/exceptionlog";
@@ -27,19 +28,6 @@ public class ExceptionLogController extends BaseRoutingController {
     protected static final String SEARCH_FORM_KEY = ExceptionLogController.class.getSimpleName();
     @Autowired
     private ExceptionLogService exceptionLogService;
-
-    @GetMapping()
-    public String prepareList() {
-        cleanSearchForm();
-        return "forward:" + PREFIX_URL + "/list";
-    }
-
-    @GetMapping("/list")
-    public String exceptionLog() {
-        prepareData();
-        getSearchForm();
-        return PREFIX + "/list";
-    }
 
     /**
      * 查询异常列表
@@ -73,45 +61,11 @@ public class ExceptionLogController extends BaseRoutingController {
         return R.ok(resultSet);
     }
 
-    /**
-     * 查看异常
-     */
-    @GetMapping("/view")
-    public String edit(@RequestParam("id") String id) {
-        prepareData();
-        ExceptionLogEntity exceptionLog = exceptionLogService.findById(id);
-        request.setAttribute("exceptionLog", exceptionLog);
-        return PREFIX + "/view";
-    }
-
+    @Data
     public static class SearchForm extends BaseSearchForm {
         private String condition;
         private String startTime;
         private String endTime;
-
-        public String getCondition() {
-            return condition;
-        }
-
-        public void setCondition(String condition) {
-            this.condition = condition;
-        }
-
-        public String getStartTime() {
-            return startTime;
-        }
-
-        public void setStartTime(String startTime) {
-            this.startTime = startTime;
-        }
-
-        public String getEndTime() {
-            return endTime;
-        }
-
-        public void setEndTime(String endTime) {
-            this.endTime = endTime;
-        }
 
         @Override
         public String toString() {

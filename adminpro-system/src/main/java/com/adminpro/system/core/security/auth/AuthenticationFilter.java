@@ -1,5 +1,6 @@
 package com.adminpro.system.core.security.auth;
 
+import com.adminpro.framework.client.helper.ClientHelper;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.system.core.common.constants.WebConstants;
 import com.adminpro.system.core.common.helper.WebHelper;
@@ -33,21 +34,16 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-
-        if (WebHelper.isRestRequest()) {
-            String authToken = extractToken(request);
-            if (authToken != null) {
-                UserIden userIden = TokenHelper.getInstance().getUserIdenByToken(authToken);
-                if (userIden != null) {
-                    LoginUser authUser = (LoginUser) this.userDetailsService.loadUserByUsername(userIden.toSecurityUsername());
-                    if (authUser != null) {
-                        if (tokenHelper.validateToken(authToken, authUser)) {
-                            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authUser, null, authUser.getAuthorities());
-                            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                            SecurityContextHolder.getContext().setAuthentication(authentication);
-                        } else {
-                            throw new BaseRuntimeException(WebConstants.INVALID_AUTH_TOKEN_EXCEPTION);
-                        }
+        String authToken = extractToken(request);
+        if (ClientHelper.isMobileRequest(request) && StringUtils.isNotEmpty(authToken)) {
+            UserIden userIden = TokenHelper.getInstance().getUserIdenByToken(authToken);
+            if (userIden != null) {
+                LoginUser authUser = (LoginUser) this.userDetailsService.loadUserByUsername(userIden.toSecurityUsername());
+                if (authUser != null) {
+                    if (tokenHelper.validateToken(authToken, authUser)) {
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authUser, null, authUser.getAuthorities());
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
                     } else {
                         SecurityContextHolder.getContext().setAuthentication(null);
                     }

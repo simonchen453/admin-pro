@@ -13,16 +13,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.adminpro.framework.client.helper.ClientHelper;
+
 @Service
 public class AuthUserDetailServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserService userService;
 
+
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        boolean restRequest = WebHelper.isRestRequest();
-        if (restRequest) {
+        boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
+        if (isMobileRequest) {
             LoginUser userDetails = AppCache.getInstance().get(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, username, LoginUser.class);
             if (userDetails != null) {
                 return userDetails;
@@ -42,7 +46,7 @@ public class AuthUserDetailServiceImpl implements UserDetailsService {
             return null;
         } else {
             LoginUser authUser = LoginUser.convertFrom(user);
-            if (restRequest) {
+            if (isMobileRequest) {
                 AppCache.getInstance().set(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, username, authUser);
             }else{
                 HttpSession session = WebHelper.getHttpRequest().getSession();

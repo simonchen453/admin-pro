@@ -6,6 +6,7 @@ import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import com.adminpro.framework.base.entity.BaseService;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.util.SpringUtil;
+import com.adminpro.framework.client.helper.ClientHelper;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
@@ -90,8 +91,8 @@ public class UserService extends BaseService<UserEntity, UserIden> {
         }
         logger.debug("用户登录验证: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
         String newPwd = PasswordHelper.encryptPwd(userIden, password);
-        boolean restRequest = WebHelper.isRestRequest();
-        if (restRequest) {
+        boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
+        if (isMobileRequest) {
             if (StringUtils.equals(newPwd, entity.getPassword())) {
                 String token = TokenGenerator.generateValue();
                 logger.info("用户登录成功(REST): userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());

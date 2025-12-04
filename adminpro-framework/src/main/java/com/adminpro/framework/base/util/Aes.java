@@ -156,13 +156,4 @@ public class Aes {
         }
         return new String(encryptedText);
     }
-
-    public static void main(String[] args) {
-        String sn = "8680220675926050";
-        String key = "haoyixiu$123456";
-        Key key1 = generateKey(key);
-        byte[] encrypt = encrypt(sn, key1);
-        System.out.println(sn.length());
-        System.out.println(Base64Util.encode(encrypt));
-    }
 }

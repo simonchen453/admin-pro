@@ -73,97 +73,6 @@ public class WebHelper {
     public static final String[][] OSES = {OS_WINDOWS, OS_MAC, OS_LINUX, OS_ANDROID, OS_IOS};
     public static final String LOGIN_CONTINUE_URL = "continueUrl";
 
-    public static void setCurrentMenuId(HttpServletResponse response, String menuId) {
-        Cookie cookie = new Cookie(WebConstants.COOKIE_CUR_MENU, menuId);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-    }
-
-    /**
-     * @param cur   between start and end
-     * @param start
-     * @param end
-     * @param size  should be odd number
-     * @return
-     */
-    public static int[] getPageNoRange(int cur, int start, int end, int size) {
-        Validate.isTrue(cur >= start && cur <= end);
-        Validate.isTrue(size % 2 == 1);
-        Validate.isTrue(start <= end);
-
-        int[] ori = new int[size];
-        int item = cur - size / 2;
-
-        for (int i = 0; i < size; i++) {
-            ori[i] = item++;
-        }
-
-        if (ori[0] < start) {
-            int offset = start - ori[0];
-            for (int i = 0; i < size; i++) {
-                ori[i] = ori[i] + offset;
-            }
-        }
-
-        if (ori[size - 1] > end) {
-            int offset = ori[size - 1] - end;
-            for (int i = 0; i < size; i++) {
-                ori[i] = ori[i] - offset;
-            }
-        }
-
-        return Arrays.stream(ori).filter(value -> value >= start).toArray();
-    }
-
-    /**
-     * 从request获取action参数，并转存为request的属性
-     *
-     * @param request
-     * @return
-     */
-    public static String getActionParam(HttpServletRequest request) {
-        String parameter = request.getParameter(WebConstants.PARAM_ACTION);
-        request.setAttribute(WebConstants.PARAM_ACTION, parameter);
-        return parameter;
-    }
-
-    /**
-     * 从multi request获取action参数，并转存为request的属性
-     *
-     * @param request
-     * @return
-     */
-    public static String getActionParam(MultipartHttpServletRequest request) {
-        String parameter = request.getParameter(WebConstants.PARAM_ACTION);
-        request.setAttribute(WebConstants.PARAM_ACTION, parameter);
-        return parameter;
-    }
-
-    /**
-     * 从request获取action value参数，并转存为request的属性
-     *
-     * @param request
-     * @return
-     */
-    public static String getActionValueParam(HttpServletRequest request) {
-        String parameter = request.getParameter(WebConstants.PARAM_ACTION_VALUE);
-        request.setAttribute(WebConstants.PARAM_ACTION_VALUE, parameter);
-        return parameter;
-    }
-
-    public static String appendParameter(String url, String key, String value) {
-        String sep = "?";
-        if (url.indexOf('?') > 0) {
-            sep = "&";
-        }
-
-        try {
-            return url + sep + URLEncoder.encode(key, WebConstants.ENCODING) + "=" + URLEncoder.encode(value, WebConstants.ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            throw new BaseRuntimeException(e);
-        }
-    }
-
     public static String getEncoding() {
         HttpServletRequest httpRequest = getHttpRequest();
         String encoding = getAttribute(httpRequest, ATTR_ENCODING, String.class);
@@ -254,79 +163,12 @@ public class WebHelper {
         String requestUri = request.getRequestURI();
         String contextPath = request.getContextPath();
         String result = requestUri.substring(contextPath.length());
-        // remove sessionid appended after ";", e.g.
-        // "/login;jsessionid=A4F14C7D0B3E11C8DFBED5FAFE120A18"
         int index = result.indexOf(";");
         if (index < 0) {
             return result;
         }
 
         return result.substring(0, index);
-    }
-
-    /**
-     * 判断当前请求是不是Rest API
-     *
-     * @return
-     */
-    public static boolean isRestRequest() {
-        HttpServletRequest httpRequest = getHttpRequest();
-        if (httpRequest != null) {
-            return isRestUrl(getRequestUriWithoutContextPath(httpRequest));
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * 判断当前URL是不是Rest URL
-     * 支持多种REST API路径：/api/**、/rest/**
-     *
-     * @param url 请求URL
-     * @return 是否为REST API
-     */
-    public static boolean isRestUrl(String url) {
-        AntPathMatcher matcher = new AntPathMatcher("/");
-        return matcher.match("/api/**", url);
-    }
-
-    /**
-     * 判断当前URL是不是Rest URL
-     *
-     * @return
-     */
-    public static boolean isAjaxUrl(String url) {
-        AntPathMatcher matcher = new AntPathMatcher("/");
-        boolean match = matcher.match("/rest/**", url);
-        return match;
-    }
-
-    /**
-     * 是否是Ajax异步请求
-     *
-     * @param request
-     */
-    public static boolean isAjaxRequest(HttpServletRequest request) {
-        String accept = request.getHeader("accept");
-        if (accept != null && accept.indexOf("application/json") != -1) {
-            return true;
-        }
-
-        String xRequestedWith = request.getHeader("X-Requested-With");
-        if (xRequestedWith != null && xRequestedWith.indexOf("XMLHttpRequest") != -1) {
-            return true;
-        }
-
-        String uri = request.getRequestURI();
-        if (StringHelper.inStringIgnoreCase(uri, ".json", ".xml")) {
-            return true;
-        }
-
-        String ajax = request.getParameter("__ajax");
-        if (StringHelper.inStringIgnoreCase(ajax, "json", "xml")) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -446,35 +288,6 @@ public class WebHelper {
         return ParamUtil.getAttribute(context, key, clazz);
     }
 
-    public static String fillStringByArgs(String str, String[] arr) {
-        Matcher m = Pattern.compile(REGEX).matcher(str);
-        while (m.find()) {
-            str = str.replace(m.group(), arr[Integer.parseInt(m.group(1))]);
-        }
-        return str;
-    }
-
-    public static String formatMoney(double d) {
-        String sal = new DecimalFormat("#.00").format(d);
-        return sal;
-    }
-
-    public static String formatMoney(String money) {
-        if (StringUtils.isEmpty(money)) {
-            return "0.00";
-        }
-        double d = Double.valueOf(money);
-//		int d = Integer.parseInt(money);
-        double a = d / 100.00;
-        String sal = new DecimalFormat("#0.00").format(a);
-        return sal;
-    }
-
-    public static int getMoneyFen(String moneyStr) {
-        double d = Double.valueOf(moneyStr);
-        return (int) (d * 100);
-    }
-
     public static String getRequestValue(HttpServletRequest request, String paramName) {
         Object value = request.getAttribute(paramName);
         if (value != null && value instanceof String) {
@@ -515,7 +328,7 @@ public class WebHelper {
                 logger.error("IPUtils ERROR ", e);
             }
 
-//        //使用代理，则获取第一个IP地址
+           //使用代理，则获取第一个IP地址
             if (StringUtils.isEmpty(ip) && ip.length() > 15) {
                 if (ip.indexOf(",") > 0) {
                     ip = ip.substring(0, ip.indexOf(","));
@@ -523,21 +336,6 @@ public class WebHelper {
             }
         }
         return ip;
-    }
-
-    public static String getSessionIdFromHeaders(HttpHeaders headers) {
-        String sessionId = null;
-        if (headers != null) {
-            List<String> cookies = headers.get("Set-Cookie");
-            if (!CollectionUtils.isEmpty(cookies)) {
-                for (String cookie : cookies) {
-                    if (cookie.startsWith("JSESSIONID=")) {
-                        sessionId = cookie;
-                    }
-                }
-            }
-        }
-        return sessionId;
     }
 
     public static boolean isDevModel() {

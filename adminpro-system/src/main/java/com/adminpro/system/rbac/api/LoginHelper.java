@@ -2,6 +2,7 @@ package com.adminpro.system.rbac.api;
 
 import com.adminpro.framework.base.util.JsonUtil;
 import com.adminpro.framework.base.util.SpringUtil;
+import com.adminpro.framework.client.helper.ClientHelper;
 import com.adminpro.framework.exceptions.APIException;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.common.helper.AuditLogHelper;
@@ -81,7 +82,7 @@ public class LoginHelper {
 
     public String login(UserIden userIden, String password, String userDomain, Device device) throws APIException {
         logger.info(MessageFormat.format("用户{0}尝试登陆{1}", userIden.toSecurityUsername(), userDomain));
-        boolean restRequest = WebHelper.isRestRequest();
+        boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
 
         Authentication authentication = verifyAccount(userIden, password);
 
@@ -104,7 +105,7 @@ public class LoginHelper {
         }
 
         logger.info(MessageFormat.format("用户{0}登陆成功", userIden.getUserDomain() + "/" + userDetails.getLoginName()));
-        if (restRequest) {
+        if (isMobileRequest) {
             AuthToken principal = (AuthToken) authentication.getPrincipal();
             String token = principal.getToken();
             String deviceType = device != null ? tokenHelper.generateAudience(device) : TokenHelper.AUDIENCE_WEB;
@@ -199,8 +200,8 @@ public class LoginHelper {
         if (httpRequest == null) {
             return null;
         }
-        boolean restRequest = WebHelper.isRestRequest();
-        if (restRequest) {
+        boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
+        if (isMobileRequest) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 Object principal = authentication.getPrincipal();
@@ -306,8 +307,8 @@ public class LoginHelper {
 
     public boolean logout() {
         HttpServletRequest httpRequest = WebHelper.getHttpRequest();
-        boolean restRequest = WebHelper.isRestRequest();
-        if (restRequest) {
+        boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
+        if (isMobileRequest) {
             String authToken = getAuthToken();
             UserTokenEntity userTokenEntity = TokenHelper.getInstance().deactiveToken(authToken);
             if (userTokenEntity != null) {

@@ -1,11 +1,11 @@
 package com.adminpro.system.config;
 
-import com.adminpro.system.framework.security.CustomAuthenticationProvider;
-import com.adminpro.system.framework.security.auth.AuthUserDetailServiceImpl;
-import com.adminpro.system.framework.security.auth.AuthenticationFilter;
-import com.adminpro.system.framework.security.handle.AuthenticationEntryPointImpl;
-import com.adminpro.system.framework.security.handle.LogoutHandlerImpl;
-import com.adminpro.system.framework.security.handle.LogoutSuccessHandlerImpl;
+import com.adminpro.system.core.security.CustomAuthenticationProvider;
+import com.adminpro.system.core.security.auth.AuthUserDetailServiceImpl;
+import com.adminpro.system.core.security.auth.AuthenticationFilter;
+import com.adminpro.system.core.security.handle.AuthenticationEntryPointImpl;
+import com.adminpro.system.core.security.handle.LogoutHandlerImpl;
+import com.adminpro.system.core.security.handle.LogoutSuccessHandlerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

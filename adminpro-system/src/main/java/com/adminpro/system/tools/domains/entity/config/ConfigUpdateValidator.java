@@ -3,7 +3,7 @@ package com.adminpro.system.tools.domains.entity.config;
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
 import com.adminpro.framework.base.validator.IValidatorGroup;
-import com.adminpro.system.framework.common.helper.StringHelper;
+import com.adminpro.system.core.common.helper.StringHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

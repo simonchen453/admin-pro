@@ -2,7 +2,7 @@ package com.adminpro.system.rbac.domains.entity.domain;
 
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
-import com.adminpro.system.framework.common.helper.StringHelper;
+import com.adminpro.system.core.common.helper.StringHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

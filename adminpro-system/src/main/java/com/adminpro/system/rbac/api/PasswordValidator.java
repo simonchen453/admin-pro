@@ -1,6 +1,6 @@
 package com.adminpro.system.rbac.api;
 
-import com.adminpro.system.framework.common.helper.ConfigHelper;
+import com.adminpro.system.core.common.helper.ConfigHelper;
 import com.adminpro.system.rbac.domains.vo.user.PasswordRuleVo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;

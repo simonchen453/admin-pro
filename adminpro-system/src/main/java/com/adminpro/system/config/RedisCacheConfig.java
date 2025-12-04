@@ -1,7 +1,7 @@
 package com.adminpro.system.config;
 
-import com.adminpro.system.framework.common.constants.ConfigKeys;
-import com.adminpro.system.framework.common.helper.ConfigHelper;
+import com.adminpro.system.core.common.constants.ConfigKeys;
+import com.adminpro.system.core.common.helper.ConfigHelper;
 import com.adminpro.system.tools.lock.CacheKeyGenerator;
 import com.adminpro.system.tools.lock.LockKeyGenerator;
 import lombok.extern.slf4j.Slf4j;

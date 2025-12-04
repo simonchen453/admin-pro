@@ -3,7 +3,7 @@ package com.adminpro.system.web.tools;
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.framework.common.BaseRoutingController;
+import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.tools.gen.GenService;
 import com.adminpro.system.tools.gen.TableInfo;
 import org.apache.commons.io.IOUtils;

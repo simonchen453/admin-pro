@@ -1,7 +1,7 @@
 package com.adminpro.system.tools.domains.entity.server;
 
 import com.adminpro.framework.base.util.DateUtil;
-import com.adminpro.system.framework.common.helper.Arith;
+import com.adminpro.system.core.common.helper.Arith;
 
 import java.lang.management.ManagementFactory;
 

@@ -2,7 +2,7 @@ package com.adminpro.system.rbac.domains.vo.job;
 
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
-import com.adminpro.system.framework.batchjob.utils.CronUtils;
+import com.adminpro.system.core.batchjob.utils.CronUtils;
 import com.adminpro.system.tools.domains.entity.job.ScheduleJobEntity;
 import com.adminpro.system.tools.domains.entity.job.ScheduleJobService;
 import org.apache.commons.lang3.StringUtils;

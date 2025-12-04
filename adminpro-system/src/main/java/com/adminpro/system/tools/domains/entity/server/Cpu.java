@@ -1,6 +1,6 @@
 package com.adminpro.system.tools.domains.entity.server;
 
-import com.adminpro.system.framework.common.helper.Arith;
+import com.adminpro.system.core.common.helper.Arith;
 
 /**
  * CPU相关信息

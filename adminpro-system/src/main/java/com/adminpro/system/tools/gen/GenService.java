@@ -4,7 +4,7 @@ import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.config.GenConfig;
-import com.adminpro.system.framework.common.helper.StringHelper;
+import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.tools.gen.util.FreeMarkerInitializer;
 import com.adminpro.system.tools.gen.util.GenUtils;

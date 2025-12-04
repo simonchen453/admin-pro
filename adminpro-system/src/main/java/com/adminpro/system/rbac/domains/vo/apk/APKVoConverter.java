@@ -1,8 +1,8 @@
 package com.adminpro.system.rbac.domains.vo.apk;
 
 import com.adminpro.framework.jdbc.query.IModelConverter;
-import com.adminpro.system.framework.common.constants.WebConstants;
-import com.adminpro.system.framework.common.helper.WebHelper;
+import com.adminpro.system.core.common.constants.WebConstants;
+import com.adminpro.system.core.common.helper.WebHelper;
 import com.adminpro.system.rbac.domains.entity.apk.APKEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;

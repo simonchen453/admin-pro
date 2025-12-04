@@ -1,6 +1,6 @@
 package com.adminpro.system.rbac.enums;
 
-import com.adminpro.system.framework.common.helper.StringHelper;
+import com.adminpro.system.core.common.helper.StringHelper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;

@@ -1,6 +1,6 @@
 package com.adminpro.system.web;
 
-import com.adminpro.system.framework.common.helper.ConfigHelper;
+import com.adminpro.system.core.common.helper.ConfigHelper;
 
 /**
  * @author simon

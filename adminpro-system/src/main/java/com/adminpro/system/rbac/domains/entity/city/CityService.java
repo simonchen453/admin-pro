@@ -5,7 +5,7 @@ import com.adminpro.framework.base.entity.BaseService;
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.framework.cache.AppCache;
+import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

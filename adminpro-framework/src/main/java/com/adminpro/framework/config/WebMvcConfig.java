@@ -2,7 +2,7 @@ package com.adminpro.framework.config;
 
 import com.adminpro.framework.base.util.FileUtil;
 import com.adminpro.framework.base.util.JsonUtil;
-import com.adminpro.framework.common.interceptor.ClientInfoInterceptor;
+import com.adminpro.framework.client.interceptor.ClientInfoInterceptor;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

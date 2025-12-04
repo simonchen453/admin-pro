@@ -4,7 +4,7 @@ import com.adminpro.framework.base.entity.BaseService;
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.framework.common.helper.UploadDownloadHelper;
+import com.adminpro.system.core.common.helper.UploadDownloadHelper;
 import com.adminpro.system.rbac.domains.vo.oss.ListOssDto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

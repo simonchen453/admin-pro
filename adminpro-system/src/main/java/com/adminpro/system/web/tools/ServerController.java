@@ -1,7 +1,7 @@
 package com.adminpro.system.web.tools;
 
 import com.adminpro.framework.base.entity.R;
-import com.adminpro.system.framework.common.BaseRoutingController;
+import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.tools.domains.entity.server.Server;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

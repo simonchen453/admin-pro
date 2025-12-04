@@ -5,7 +5,7 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
-import com.adminpro.system.framework.common.helper.StringHelper;
+import com.adminpro.system.core.common.helper.StringHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 

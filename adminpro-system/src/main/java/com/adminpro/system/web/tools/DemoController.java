@@ -1,6 +1,6 @@
 package com.adminpro.system.web.tools;
 
-import com.adminpro.system.framework.common.BaseRoutingController;
+import com.adminpro.system.core.common.BaseRoutingController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 

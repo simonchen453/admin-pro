@@ -1,6 +1,6 @@
 package com.adminpro.system.tools.domains.entity.auditlog;
 
-import com.adminpro.system.framework.common.entity.BaseAuditDTO;
+import com.adminpro.system.core.common.entity.BaseAuditDTO;
 import lombok.Data;
 
 /**

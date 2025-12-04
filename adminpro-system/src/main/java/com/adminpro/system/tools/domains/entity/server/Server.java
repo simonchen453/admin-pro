@@ -1,7 +1,7 @@
 package com.adminpro.system.tools.domains.entity.server;
 
-import com.adminpro.system.framework.common.helper.Arith;
-import com.adminpro.system.framework.common.helper.ip.IpUtils;
+import com.adminpro.system.core.common.helper.Arith;
+import com.adminpro.system.core.common.helper.ip.IpUtils;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.CentralProcessor.TickType;

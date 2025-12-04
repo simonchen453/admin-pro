@@ -1,7 +1,7 @@
 package com.adminpro.system.rbac.common;
 
-import com.adminpro.system.framework.common.constants.ConfigKeys;
-import com.adminpro.system.framework.common.helper.ConfigHelper;
+import com.adminpro.system.core.common.constants.ConfigKeys;
+import com.adminpro.system.core.common.helper.ConfigHelper;
 
 /**
  * Created by simon on 2017/5/31.

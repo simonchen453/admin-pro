@@ -4,7 +4,7 @@ import com.adminpro.framework.base.entity.BaseAuditEntity;
 import com.adminpro.framework.base.util.DateUtil;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.system.config.GenConfig;
-import com.adminpro.system.framework.common.helper.StringHelper;
+import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.tools.gen.ColumnInfo;
 import com.adminpro.system.tools.gen.TableInfo;
 import org.apache.commons.lang3.ArrayUtils;

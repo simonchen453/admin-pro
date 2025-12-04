@@ -1,7 +1,7 @@
 package com.adminpro.system.config;
 
-import com.adminpro.system.framework.common.helper.ConfigHelper;
-import com.adminpro.system.framework.common.helper.StringHelper;
+import com.adminpro.system.core.common.helper.ConfigHelper;
+import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.tools.domains.entity.exceptionlog.ExceptionLogEntity;
 import com.adminpro.system.tools.domains.entity.exceptionlog.ExceptionLogService;
 import com.google.gson.Gson;

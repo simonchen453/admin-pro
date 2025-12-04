@@ -4,7 +4,7 @@ import com.adminpro.framework.base.entity.BaseDao;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
-import com.adminpro.system.framework.common.helper.StringHelper;
+import com.adminpro.system.core.common.helper.StringHelper;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

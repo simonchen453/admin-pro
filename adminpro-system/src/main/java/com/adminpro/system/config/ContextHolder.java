@@ -4,7 +4,7 @@ import com.adminpro.framework.base.context.AppContext;
 import com.adminpro.framework.base.context.IContextHolder;
 import com.adminpro.framework.base.util.CommonUtil;
 import com.adminpro.framework.base.util.ParamUtil;
-import com.adminpro.system.framework.security.auth.LoginUser;
+import com.adminpro.system.core.security.auth.LoginUser;
 import com.adminpro.system.rbac.api.LoginHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;

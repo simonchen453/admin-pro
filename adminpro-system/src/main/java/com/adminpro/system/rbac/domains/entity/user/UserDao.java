@@ -8,7 +8,7 @@ import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.InsertBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.UpdateBuilder;
-import com.adminpro.system.framework.common.helper.ConfigHelper;
+import com.adminpro.system.core.common.helper.ConfigHelper;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.web.BaseConstants;
 import org.apache.commons.lang3.StringUtils;

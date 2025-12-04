@@ -5,7 +5,7 @@ import com.adminpro.framework.base.util.DateUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.framework.common.BaseRoutingController;
+import com.adminpro.system.core.common.BaseRoutingController;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

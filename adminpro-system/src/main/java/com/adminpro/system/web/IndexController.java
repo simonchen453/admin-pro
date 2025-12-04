@@ -1,9 +1,9 @@
 package com.adminpro.system.web;
 
 import com.adminpro.framework.base.entity.R;
-import com.adminpro.system.framework.common.BaseRoutingController;
-import com.adminpro.system.framework.common.helper.StringHelper;
-import com.adminpro.system.framework.common.helper.WebHelper;
+import com.adminpro.system.core.common.BaseRoutingController;
+import com.adminpro.system.core.common.helper.StringHelper;
+import com.adminpro.system.core.common.helper.WebHelper;
 import com.adminpro.system.tools.domains.entity.session.SessionEntity;
 import com.adminpro.system.tools.domains.entity.session.SessionService;
 import com.adminpro.system.tools.domains.enums.SessionStatus;

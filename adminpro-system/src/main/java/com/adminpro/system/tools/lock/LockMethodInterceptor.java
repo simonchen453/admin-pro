@@ -1,6 +1,6 @@
 package com.adminpro.system.tools.lock;
 
-import com.adminpro.system.framework.cache.AppCache;
+import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
 import com.adminpro.system.tools.lock.annotation.CacheLock;
 import com.adminpro.system.web.BaseConstants;

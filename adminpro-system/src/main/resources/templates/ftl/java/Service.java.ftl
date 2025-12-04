@@ -1,9 +1,9 @@
 package ${package};
 
-import com.adminpro.core.base.entity.BaseService;
-import com.adminpro.core.base.util.SpringUtil;
-import com.adminpro.core.jdbc.query.QueryResultSet;
-import com.adminpro.core.jdbc.SearchParam;
+import com.adminpro.framework.base.entity.BaseService;
+import com.adminpro.framework.base.util.SpringUtil;
+import com.adminpro.framework.jdbc.query.QueryResultSet;
+import com.adminpro.framework.jdbc.SearchParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;

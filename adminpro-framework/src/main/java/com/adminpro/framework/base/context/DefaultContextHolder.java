@@ -1,0 +1,32 @@
+package com.adminpro.framework.base.context;
+
+import com.adminpro.framework.base.util.CommonUtil;
+import com.adminpro.framework.base.util.ParamUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author simon
+ * @date 2021/2/3
+ */
+@ConditionalOnMissingBean({IContextHolder.class})
+@Component
+public class DefaultContextHolder implements IContextHolder {
+
+    @Override
+    public void setAppContext(HttpServletRequest request, AppContext appContext) {
+        ParamUtil.setSessionAttr(request, APP_CONTEXT_KEY, appContext);
+    }
+
+    @Override
+    public AppContext getAppContext() {
+        AppContext ctx = (AppContext) ParamUtil.getSessionAttr(CommonUtil.getCurrentRequest(), APP_CONTEXT_KEY);
+        return ctx;
+    }
+
+    @Override
+    public void clearAppContext(HttpServletRequest request) {
+        ParamUtil.setSessionAttr(request, APP_CONTEXT_KEY, null);
+    }
+}

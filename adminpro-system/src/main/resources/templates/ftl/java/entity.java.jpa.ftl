@@ -1,6 +1,6 @@
 package ${package};
 
-import com.adminpro.framework.common.entity.*;
+import com.adminpro.framework.system.framework.common.entity.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import jakarta.persistence.*;

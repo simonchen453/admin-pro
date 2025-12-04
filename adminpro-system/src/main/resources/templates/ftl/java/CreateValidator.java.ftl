@@ -1,11 +1,11 @@
 package ${package};
-import com.adminpro.core.base.enums.CommonStatus;
-import com.adminpro.core.base.message.MessageBundle;
+import com.adminpro.framework.base.enums.CommonStatus;
+import com.adminpro.framework.base.message.MessageBundle;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Component;
-import com.adminpro.core.base.validator.BaseValidator;
+import com.adminpro.framework.base.validator.BaseValidator;
 
 /**
  * ${tableComment} 校验类

@@ -59,6 +59,6 @@
     <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="WARN"/>
     
     <!-- 应用日志配置 -->
-    <logger name="com.adminpro.framework.security" level="INFO"/>
+    <logger name="com.adminpro.framework.system.framework.security" level="INFO"/>
 </included>
 

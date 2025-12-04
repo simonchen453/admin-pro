@@ -1,9 +1,9 @@
 package ${package};
 
-import com.adminpro.core.base.entity.BaseDao;
-import com.adminpro.core.jdbc.query.QueryResultSet;
-import com.adminpro.core.jdbc.SearchParam;
-import com.adminpro.core.jdbc.sqlbuilder.SelectBuilder;
+import com.adminpro.framework.base.entity.BaseDao;
+import com.adminpro.framework.jdbc.query.QueryResultSet;
+import com.adminpro.framework.jdbc.SearchParam;
+import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;

@@ -32,11 +32,11 @@ const NotFound = lazy(() => import('../pages/NotFound'));
 
 // 加载中组件
 const LoadingSpinner = () => (
-    <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '200px' 
+    <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '200px'
     }}>
         <Spin size="large" />
     </div>
@@ -46,140 +46,140 @@ function AppRouter() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route 
-                    path="/login" 
+                <Route
+                    path="/login"
                     element={
                         <PublicRoute>
                             <Suspense fallback={<LoadingSpinner />}>
                                 <Login />
                             </Suspense>
                         </PublicRoute>
-                    } 
+                    }
                 />
                 <Route path="/" element={
                     <ProtectedRoute>
                         <Layout />
                     </ProtectedRoute>
                 }>
-                    <Route 
-                        index 
+                    <Route
+                        index
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <Home />
                             </Suspense>
-                        } 
-                    />
-                    <Route 
-                        path="home" 
-                        element={
-                            <Suspense fallback={<LoadingSpinner />}>
-                                <Home />
-                            </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/user" 
+                        path="home"
+                        element={
+                            <Suspense fallback={<LoadingSpinner />}>
+                                <Home />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="admin/user"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <UserList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/role" 
+                        path="admin/role"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <RoleList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/menu" 
+                        path="admin/menu"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <MenuList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/domain" 
+                        path="admin/domain"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <DomainList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/userDomainEnv" 
+                        path="admin/userDomainEnv"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <DomainEnvList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/dept" 
+                        path="admin/dept"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <DeptList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/post" 
+                        path="admin/post"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <PostList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/config" 
+                        path="admin/config"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <ConfigList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/dict" 
+                        path="admin/dict"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <DictList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/job" 
+                        path="admin/job"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <JobList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/job/log" 
+                        path="admin/job/log"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <JobLog />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/session" 
+                        path="admin/session"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <SessionList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/server" 
+                        path="admin/server"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <ServerInfo />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
                         path="admin/syslog"
@@ -187,15 +187,15 @@ function AppRouter() {
                             <Suspense fallback={<LoadingSpinner />}>
                                 <SysLogList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
-                        path="admin/syslog/view" 
+                        path="admin/syslog/view"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <SysLogView />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
                         path="admin/audit"
@@ -203,7 +203,7 @@ function AppRouter() {
                             <Suspense fallback={<LoadingSpinner />}>
                                 <AuditLogList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
                         path="admin/generator"
@@ -211,7 +211,7 @@ function AppRouter() {
                             <Suspense fallback={<LoadingSpinner />}>
                                 <GeneratorList />
                             </Suspense>
-                        } 
+                        }
                     />
                     <Route
                         path="admin/swagger"
@@ -219,7 +219,7 @@ function AppRouter() {
                             <Suspense fallback={<LoadingSpinner />}>
                                 <Swagger />
                             </Suspense>
-                        } 
+                        }
                     />
 
                     <Route
@@ -233,20 +233,20 @@ function AppRouter() {
                 </Route>
 
                 <Route
-                    path="/no-permission" 
+                    path="/no-permission"
                     element={
                         <Suspense fallback={<LoadingSpinner />}>
                             <NoPermission />
                         </Suspense>
-                    } 
+                    }
                 />
-                <Route 
-                    path="*" 
+                <Route
+                    path="*"
                     element={
                         <Suspense fallback={<LoadingSpinner />}>
                             <NotFound />
                         </Suspense>
-                    } 
+                    }
                 />
             </Routes>
         </BrowserRouter>

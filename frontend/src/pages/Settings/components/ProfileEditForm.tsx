@@ -211,8 +211,6 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
           rules={[{ required: true, message: '请选择性别' }]}
         >
           <Select placeholder="请选择性别">
-            <Option value="M">男</Option>
-            <Option value="F">女</Option>
             <Option value="male">男</Option>
             <Option value="female">女</Option>
           </Select>

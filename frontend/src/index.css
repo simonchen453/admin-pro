@@ -139,65 +139,6 @@ body {
   }
 }
 
-/* Ant Design Overrides for HD Inputs */
-.ant-input:not(textarea),
-.ant-select-selector,
-.ant-picker,
-.ant-input-number,
-.ant-input-password,
-.ant-input-affix-wrapper {
-  border-radius: 8px !important;
-  border-color: #e2e8f0 !important;
-  background-color: #fff !important;
-  box-shadow: none !important;
-  font-weight: 400 !important;
-  color: #334155 !important;
-  padding: 4px 11px !important;
-  height: 36px !important;
-  line-height: 1.5 !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-/* Override for TextArea to support resizing and auto height */
-textarea.ant-input {
-  height: auto !important;
-  min-height: 36px !important;
-  padding: 8px 11px !important;
-  display: block !important;
-  resize: vertical !important;
-}
-
-/* Reset height for affix wrapper when it contains textarea (more specific selector) */
-.ant-input-affix-wrapper textarea.ant-input {
-  height: auto !important;
-  min-height: 36px !important;
-}
-
-.ant-input-affix-wrapper textarea {
-  height: auto !important;
-  min-height: 36px !important;
-}
-
-/* Fix for input inside affix wrapper (e.g. password, search) */
-.ant-input-affix-wrapper .ant-input {
-  height: 100% !important;
-  padding: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  font-weight: 400 !important;
-  /* Ensure internal input is also normal weight */
-}
-
-.ant-select-selection-item {
-  line-height: 26px !important;
-  /* Vertically center select text */
-  font-weight: 400 !important;
-  /* Ensure select text is normal weight */
-}
-
 .ant-input:hover,
 .ant-select-selector:hover,
 .ant-picker:hover,

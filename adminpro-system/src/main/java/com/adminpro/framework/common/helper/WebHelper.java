@@ -287,8 +287,7 @@ public class WebHelper {
      */
     public static boolean isRestUrl(String url) {
         AntPathMatcher matcher = new AntPathMatcher("/");
-        return matcher.match("/api/**", url) 
-            || matcher.match("/rest/**", url);
+        return matcher.match("/api/**", url);
     }
 
     /**

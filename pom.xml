@@ -9,8 +9,8 @@
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
     <modules>
-        <module>adminpro-core</module>
-        <module>adminpro-common</module>
+        <module>adminpro-framework</module>
+        <module>adminpro-system</module>
         <module>adminpro-web</module>
     </modules>
     <parent>

@@ -59,81 +59,80 @@ public class UserService extends BaseService<UserEntity, UserIden> {
 
     @Transactional
     public void update(UserEntity entity) {
-        logger.debug("更新用户: userDomain={}, userId={}", entity.getUserDomain(), entity.getUserId());
+        logger.debug("更新用户: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
         dao.update(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
-        logger.debug("更新用户成功: userDomain={}, userId={}", entity.getUserDomain(), entity.getUserId());
+        logger.debug("更新用户成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
     }
 
     @Transactional
     public UserEntity resetPwd(UserIden userIden, String newPassword) {
-        logger.info("重置用户密码: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
         UserEntity entity = findById(userIden);
         if (entity == null) {
             logger.warn("重置密码失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
             throw new BaseRuntimeException(RbacConstants.MSG_USER_NOT_FOUND);
         }
+        logger.info("重置用户密码: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
         String newPwd = PasswordHelper.encryptPwd(entity.getUserIden(), newPassword);
         entity.setPassword(newPwd);
         dao.update(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
-        logger.info("重置用户密码成功: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+        logger.info("重置用户密码成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getUserId());
         return entity;
     }
 
     public String authLogin(UserIden userIden, String password) {
-        logger.debug("用户登录验证: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+
         UserEntity entity = findById(userIden);
         if (entity == null) {
             logger.warn("登录失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
             return null;
         }
+        logger.debug("用户登录验证: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
         String newPwd = PasswordHelper.encryptPwd(userIden, password);
         boolean restRequest = WebHelper.isRestRequest();
         if (restRequest) {
             if (StringUtils.equals(newPwd, entity.getPassword())) {
                 String token = TokenGenerator.generateValue();
-                logger.info("用户登录成功(REST): userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+                logger.info("用户登录成功(REST): userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
                 return token;
             }
         } else {
             if (StringUtils.equals(newPwd, entity.getPassword())) {
-                logger.info("用户登录成功: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+                logger.info("用户登录成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
                 return "success";
             }
         }
-        logger.warn("用户登录失败，密码不正确: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+        logger.warn("用户登录失败，密码不正确: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
         return null;
     }
 
     @Transactional
     public UserEntity changePwd(UserIden userIden, String oldPwd, String newPassword) {
-        logger.info("修改用户密码: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
         UserEntity entity = findById(userIden);
 
         if (entity == null) {
             logger.warn("修改密码失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
             throw new BaseRuntimeException(RbacConstants.MSG_USER_NOT_FOUND);
         }
-
+        logger.info("修改用户密码: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
         String encryptPwd = PasswordHelper.encryptPayPwd(userIden, oldPwd);
         String newPwd = PasswordHelper.encryptPwd(entity.getUserIden(), newPassword);
         if (StringUtils.equals(encryptPwd, entity.getPassword())) {
             entity.setPassword(newPwd);
             dao.update(entity);
             AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
-            logger.info("修改用户密码成功: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            logger.info("修改用户密码成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
             return entity;
         } else {
-            logger.warn("修改密码失败，原密码不正确: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            logger.warn("修改密码失败，原密码不正确: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
             throw new BaseRuntimeException(RbacConstants.MSG_OLD_PASSWORD_INCORRECT);
         }
     }
 
     @Transactional
     public void create(UserEntity entity) {
-        logger.info("创建用户: userDomain={}, userId={}, loginName={}", 
-                entity.getUserDomain(), entity.getUserId(), entity.getLoginName());
+        logger.info("创建用户: userDomain={}, loginName={}, loginName={}", entity.getUserDomain(), entity.getUserId(), entity.getLoginName());
         String password = entity.getPassword();
         if (StringUtils.isEmpty(password)) {
             entity.setPassword(ConfigHelper.getString(RbacConstants.USER_DEFAULT_PASSWORD));
@@ -143,8 +142,7 @@ public class UserService extends BaseService<UserEntity, UserIden> {
         entity.setPassword(encryptPwd);
         dao.create(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
-        logger.info("创建用户成功: userDomain={}, userId={}, loginName={}", 
-                entity.getUserDomain(), entity.getUserId(), entity.getLoginName());
+        logger.info("创建用户成功: userDomain={}, loginName={}, loginName={}", entity.getUserDomain(), entity.getUserId(), entity.getLoginName());
     }
 
     public UserEntity findById(UserIden userIden) {
@@ -237,15 +235,15 @@ public class UserService extends BaseService<UserEntity, UserIden> {
      * @return
      */
     public boolean authenticate(UserIden userIden, String password) {
-        logger.debug("验证用户密码: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
         UserEntity userEntity = findById(userIden);
         if (userEntity == null) {
-            logger.warn("验证密码失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            logger.warn("验证密码失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getUserId());
             return false;
         }
+        logger.debug("验证用户密码: userDomain={}, loginName={}", userEntity.getUserDomain(), userEntity.getLoginName());
         String encryptPwd = PasswordHelper.encryptPwd(userIden, password);
         boolean result = StringUtils.equals(encryptPwd, userEntity.getPassword());
-        logger.debug("验证用户密码结果: userDomain={}, userId={}, result={}", userIden.getUserDomain(), userIden.getUserId(), result);
+        logger.debug("验证用户密码结果: userDomain={}, loginName={}, result={}", userEntity.getUserDomain(), userEntity.getLoginName(), result);
         return result;
     }
 

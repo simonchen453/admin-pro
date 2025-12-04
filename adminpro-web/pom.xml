@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.adminpro</groupId>
-            <artifactId>adminpro-common</artifactId>
+            <artifactId>adminpro-system</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

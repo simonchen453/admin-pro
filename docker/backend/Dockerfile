@@ -10,8 +10,8 @@ COPY docker/backend/settings.xml /root/.m2/settings.xml
 
 # Copy Maven POMs first (for dependency caching)
 COPY pom.xml .
-COPY adminpro-common/pom.xml adminpro-common/
-COPY adminpro-core/pom.xml adminpro-core/
+COPY adminpro-system/pom.xml adminpro-system/
+COPY adminpro-framework/pom.xml adminpro-framework/
 COPY adminpro-web/pom.xml adminpro-web/
 
 # Download dependencies (this layer will be cached if pom.xml doesn't change)
@@ -19,8 +19,8 @@ COPY adminpro-web/pom.xml adminpro-web/
 RUN mvn dependency:go-offline -B
 
 # Copy backend source code
-COPY adminpro-common/src adminpro-common/src
-COPY adminpro-core/src adminpro-core/src
+COPY adminpro-system/src adminpro-system/src
+COPY adminpro-framework/src adminpro-framework/src
 COPY adminpro-web/src adminpro-web/src
 
 # Build the JAR

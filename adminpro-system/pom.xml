@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>adminpro-common</artifactId>
+    <artifactId>adminpro-system</artifactId>
 
     <packaging>jar</packaging>
 
@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.adminpro</groupId>
-            <artifactId>adminpro-core</artifactId>
+            <artifactId>adminpro-framework</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -153,7 +153,7 @@
 
     <build>
         <finalName>
-            adminpro-common-${project.version}
+            adminpro-system-${project.version}
         </finalName>
         <plugins>
             <plugin>

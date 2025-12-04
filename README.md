@@ -65,7 +65,7 @@ Admin Pro 是一个前后端分离的企业级权限管理系统，提供完整�
 
 ```
 admin-pro/
-├── adminpro-common/              # 后端：公共业务模块
+├── adminpro-system/              # 后端：公共业务模块
 │   ├── src/main/java/com/adminpro/
 │   │   ├── api/                  # APK相关API
 │   │   ├── config/               # 配置类

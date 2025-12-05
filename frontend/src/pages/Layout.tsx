@@ -30,7 +30,7 @@ import { useAuthStore } from '../stores/useUserStore';
 import { getMenuList } from '../api/menu';
 import { getSystemInfoApi } from '../api/common';
 import { getCurrentUserInfoApi } from '../api/auth';
-import type { MenuItem, BackendMenuItem, SystemInfo, UserEntity } from '../types/index';
+import type { MenuItem, BackendMenuItem, SystemInfo, UserEntity, User } from '../types/index';
 import './Layout.css';
 
 const { Header, Sider, Content, Footer } = AntLayout;
@@ -45,7 +45,7 @@ function MainLayout() {
     const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
     const [currentUserInfo, setCurrentUserInfo] = useState<UserEntity | null>(null);
     const navigate = useNavigate();
-    const { logout, currentUser } = useAuthStore();
+    const { logout, currentUser, updateCurrentUser } = useAuthStore();
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
@@ -184,7 +184,27 @@ function MainLayout() {
                 const userInfo = (response as any)?.data || response;
                 console.log('解析后的用户信息:', userInfo);
                 if (userInfo) {
-                    setCurrentUserInfo(userInfo as unknown as UserEntity);
+                    const userEntity = userInfo as unknown as UserEntity;
+                    setCurrentUserInfo(userEntity);
+
+                    // Convert UserEntity to User for store
+                    const user: User = {
+                        id: Number(userEntity.userId),
+                        loginName: userEntity.loginName,
+                        realName: userEntity.realName,
+                        name: userEntity.realName || userEntity.loginName,
+                        avatarUrl: userEntity.avatarUrl,
+                        mobileNo: userEntity.mobileNo,
+                        email: userEntity.email,
+                        userIden: {
+                            userDomain: userEntity.userDomain,
+                            userId: userEntity.userId
+                        },
+                        status: (userEntity.status === 'active' || userEntity.status === '1') ? 'active' : 'inactive'
+                    };
+
+                    // Sync to store
+                    updateCurrentUser(user);
                 }
             } catch (error) {
                 console.error('获取用户信息失败:', error);
@@ -425,7 +445,12 @@ function MainLayout() {
                                         key: subChild.key,
                                         icon: subChild.icon,
                                         label: subChild.label,
-                                    }))
+                                        children: child.children?.map(subChild => ({
+                                            key: subChild.key,
+                                            icon: subChild.icon,
+                                            label: subChild.label,
+                                        }))
+                                    })),
                                 })),
                             }))}
                             style={{ background: 'transparent', borderRight: 0 }}

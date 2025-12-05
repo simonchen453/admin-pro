@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type {User, LoginRequest} from '../types/index';
+import type { User, LoginRequest } from '../types/index';
 import { loginApi, logoutApi } from '../api/auth';
 
 interface AuthState {
@@ -9,6 +9,7 @@ interface AuthState {
     login: (loginData: LoginRequest) => Promise<void>;
     logout: () => Promise<void>;
     clearAuth: () => void;
+    updateCurrentUser: (user: User) => void;
 }
 
 interface UserState {
@@ -30,11 +31,23 @@ export const useAuthStore = create<AuthState>()(
             login: async (loginData: LoginRequest) => {
                 try {
                     const response = await loginApi(loginData);
-                    const { user } = response;
-                    
+                    // Map LoginResponse to User object
+                    const user: User = {
+                        loginName: response.userId,
+                        realName: response.realName,
+                        name: response.realName || response.userId,
+                        avatarUrl: response.avatarUrl,
+                        mobileNo: response.mobileNo,
+                        userIden: {
+                            userDomain: response.domain,
+                            userId: response.id
+                        },
+                        status: 'active'
+                    };
+
                     // session认证不需要存储token，后端会设置session cookie
-                    set({ 
-                        isAuthenticated: true, 
+                    set({
+                        isAuthenticated: true,
                         currentUser: user
                     });
                 } catch (error) {
@@ -49,22 +62,25 @@ export const useAuthStore = create<AuthState>()(
                     console.error('登出失败:', error);
                 } finally {
                     // 无论登出API是否成功，都清除本地状态
-                    set({ 
-                        isAuthenticated: false, 
+                    set({
+                        isAuthenticated: false,
                         currentUser: null
                     });
                 }
             },
             clearAuth: () => {
-                set({ 
-                    isAuthenticated: false, 
+                set({
+                    isAuthenticated: false,
                     currentUser: null
                 });
+            },
+            updateCurrentUser: (user: User) => {
+                set({ currentUser: user });
             }
         }),
         {
             name: 'auth-storage',
-            partialize: (state) => ({ 
+            partialize: (state) => ({
                 currentUser: state.currentUser,
                 isAuthenticated: state.isAuthenticated
             }),

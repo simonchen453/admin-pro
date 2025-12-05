@@ -31,8 +31,23 @@ export interface LoginRequest {
 
 // 登录响应类型
 export interface LoginResponse {
-  user: User;
-  message?: string;
+  id: string;
+  userId: string;
+  token: string;
+  hasPayPwd: boolean;
+  authed: boolean;
+  idNo: string;
+  realName: string;
+  domain: string;
+  display: string;
+  mobileNo: string;
+  date: string;
+  avatarUrl: string;
+  extUserId: string;
+  post?: string;
+  postNo?: string;
+  deptName?: string;
+  deptNo?: string;
 }
 
 // API响应类型

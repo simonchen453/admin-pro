@@ -416,7 +416,7 @@ function MainLayout() {
                 >
                     <div className="logo">
                         <div className="layout-logo-background">
-                            <img src="/logo.svg" alt="Admin Pro" className="layout-logo-image" />
+                            <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Admin Pro" className="layout-logo-image" />
                         </div>
                         {!collapsed && (
                             <div className="logo-text fade-in">

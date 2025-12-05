@@ -6,7 +6,7 @@ import { EyeInvisibleOutlined, EyeTwoTone, LockOutlined, UserOutlined, SafetyOut
 import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
 import { useAuthStore } from '../../stores/useUserStore.ts';
-import Captcha, {type CaptchaRef } from '../../components/Captcha';
+import Captcha, { type CaptchaRef } from '../../components/Captcha';
 import { getSystemInfoApi } from '../../api/common';
 import type { LoginRequest, SystemInfo } from '../../types/index';
 import './Login.css';
@@ -71,20 +71,20 @@ const Login: React.FC = () => {
         captcha: data.captcha,
         captchaKey: captchaKey
       };
-      
+
       // 调用登录API
       await login(loginData);
-      
+
       messageApi.success('登录成功！');
-      
+
       // 跳转到首页
       navigate('/home', { replace: true });
     } catch (error: unknown) {
       console.error('登录失败:', error);
-      
+
       // 获取错误消息 - 优先使用服务器返回的message
       let errorMessage = '登录失败，请检查用户名、密码和验证码';
-      
+
       if (error && typeof error === 'object' && 'response' in error) {
         const errorResponse = error as { response?: { data?: { message?: string } } };
         if (errorResponse.response?.data?.message) {
@@ -94,15 +94,15 @@ const Login: React.FC = () => {
         const errorWithMessage = error as { message: string };
         errorMessage = errorWithMessage.message;
       }
-      
+
       // 显示错误消息
       messageApi.error(errorMessage);
-      
+
       // 自动刷新验证码
       if (captchaRef.current) {
         captchaRef.current.refresh();
       }
-      
+
       // 清空验证码输入框
       setValue('captcha', '');
     } finally {
@@ -121,13 +121,13 @@ const Login: React.FC = () => {
           ))}
         </div>
       </div>
-      
+
       <div className="login-card">
         <div className="login-header">
           <div className="brand-section">
             <div className="logo-wrapper">
               <div className="login-logo-background">
-                <img src="/logo.svg" alt="Admin Pro" className="logo-image" />
+                <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Admin Pro" className="logo-image" />
               </div>
             </div>
             <div className="login-brand-text">
@@ -144,7 +144,7 @@ const Login: React.FC = () => {
           {/* 添加隐藏的输入框，欺骗浏览器自动填充机制 */}
           <input type="text" style={{ display: 'none' }} />
           <input type="password" style={{ display: 'none' }} />
-          
+
           <div className="form-group">
             <div className="input-wrapper">
               <UserOutlined className="input-icon" />
@@ -200,7 +200,7 @@ const Login: React.FC = () => {
                   autoComplete="off"
                 />
               </div>
-              <Captcha 
+              <Captcha
                 ref={captchaRef}
                 onCaptchaChange={setCaptchaKey}
                 className="captcha-component"

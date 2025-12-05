@@ -75,9 +75,11 @@ docker-compose logs -f frontend
 
 ### 4. 访问应用
 
-- **前端**: http://localhost
-- **后端 API**: http://localhost/api
-- **Swagger 文档**: http://localhost/api/swagger-ui.html (开发环境)
+- **前端**: http://localhost/adminpro
+- **后端 API**: http://localhost/api (前端代理) 或 http://localhost/adminpro/api (直接访问)
+- **Swagger 文档**: http://localhost/adminpro/swagger-ui.html (开发环境)
+
+**注意**: 前端使用 `/adminpro` 作为 contextPath，根路径 `/` 可留给业务代码使用。
 
 ## 💻 开发环境说明
 
@@ -115,8 +117,9 @@ docker-compose logs -f frontend
 
 - **镜像**: 基于 `nginx:alpine`
 - **端口**: 80 (可通过 `FRONTEND_PORT` 环境变量修改)
+- **ContextPath**: `/adminpro` (根路径 `/` 可留给业务代码使用)
 - **功能**:
-  - 服务前端静态文件
+  - 服务前端静态文件（路径：`/adminpro/`）
   - 代理 `/api` 请求到后端
   - 支持 SPA 路由
   - Gzip 压缩

@@ -12,6 +12,9 @@ const request = axios.create({
     },
 });
 
+// 获取前端 base path（从 vite.config.ts 的 base 配置）
+const BASE_PATH = import.meta.env.BASE_URL || '/adminpro/';
+
 // 防止重复跳转的标志
 let isRelogging = false;
 
@@ -35,8 +38,9 @@ const handleAuthFailure = (msg: string = '会话已过期，请重新登录') =>
         setTimeout(() => {
             const current = window.location.pathname + window.location.search;
             const redirect = encodeURIComponent(current);
-            if (!window.location.pathname.startsWith('/login')) {
-                window.location.href = `/login?redirect=${redirect}`;
+            const loginPath = `${BASE_PATH}login`.replace(/\/+/g, '/');
+            if (!window.location.pathname.startsWith(loginPath)) {
+                window.location.href = `${loginPath}?redirect=${redirect}`;
             }
             // 重置标志
             isRelogging = false;
@@ -70,8 +74,9 @@ request.interceptors.response.use(
         if (data.restCode === '403' || (data.restCode === 403) || data.message?.includes('权限不足') || data.message?.includes('无权限')) {
             if (typeof window !== 'undefined') {
                 message.error('权限不足');
-                if (!window.location.pathname.startsWith('/no-permission')) {
-                    window.location.href = '/no-permission';
+                const noPermissionPath = `${BASE_PATH}no-permission`.replace(/\/+/g, '/');
+                if (!window.location.pathname.startsWith(noPermissionPath)) {
+                    window.location.href = noPermissionPath;
                 }
             }
             return Promise.reject({ response: { data }, isPermissionError: true });

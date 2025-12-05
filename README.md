@@ -280,10 +280,18 @@ pnpm dev
 
 ### 6. 访问系统
 
-- **管理后台**: http://localhost:3000
+**开发环境**:
+- **管理后台**: http://localhost:3000/adminpro
 - **门户网站**: http://localhost:5173
 - **后端API**: http://localhost:8080/adminpro
 - **API文档**: http://localhost:8080/adminpro/swagger-ui.html
+
+**Docker 部署环境**:
+- **管理后台**: http://localhost/adminpro
+- **后端API**: http://localhost/api (前端代理) 或 http://localhost/adminpro/api (直接访问)
+- **API文档**: http://localhost/adminpro/swagger-ui.html
+
+**注意**: Docker 部署时，前端使用 `/adminpro` 作为 contextPath，根路径 `/` 可留给业务代码使用。
 
 ### 7. 默认账号
 

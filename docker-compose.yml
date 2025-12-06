@@ -44,9 +44,9 @@ services:
     networks:
       - admin-pro-network
     extra_hosts:
-      - "host.docker.internal:host-gateway"  # 允许访问宿主机服务（Mac/Windows）
+      - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/adminpro/actuator/health"]
+      test: ["CMD-SHELL", "nc -z localhost 8080 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

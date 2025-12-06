@@ -32,11 +32,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.javasimon.aop.Monitored;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -52,7 +53,6 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/auth")
-@Monitored
 public class AuthController extends BaseController {
 
     @Autowired
@@ -60,9 +60,6 @@ public class AuthController extends BaseController {
 
     @Autowired
     private DeptService deptService;
-
-    @Resource(name = "captchaProducer")
-    private Producer captchaProducer;
 
     @Resource(name = "captchaProducerMath")
     private Producer captchaProducerMath;
@@ -169,6 +166,7 @@ public class AuthController extends BaseController {
         }
     }
 
+    @PreAuthorize("@ss.hasPermission('system:common')")
     @RequestMapping(value = "/userinfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<UserInfoResponseVo> getUserInfo() {
         try {
@@ -213,6 +211,7 @@ public class AuthController extends BaseController {
         }
     }
 
+    @PreAuthorize("@ss.hasPermission('system:common')")
     @RequestMapping(value = "/password-rule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<PasswordRuleVo> getPasswordRule() {
         try {
@@ -224,6 +223,7 @@ public class AuthController extends BaseController {
         }
     }
 
+    @PreAuthorize("@ss.hasPermission('system:common')")
     @SysLog("更新个人资料")
     @RequestMapping(value = "/profile", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R updateProfile(@RequestBody UpdateProfileVo updateProfileVo) {
@@ -282,7 +282,16 @@ public class AuthController extends BaseController {
         bi = captchaProducerMath.createImage(capStr);
 
         logger.debug("生成验证码：" + code);
-        request.getSession().setAttribute(RbacCacheConstants.CAPTCHA_CACHE, code);
+        
+        // 获取或创建 session，确保验证码存储在其中
+        HttpSession session = request.getSession();
+        // 如果 session 不存在或无效，创建新 session
+        if (session == null) {
+            session = request.getSession(true);
+        }
+        logger.debug("session id:" + session.getId());
+
+        session.setAttribute(RbacCacheConstants.CAPTCHA_CACHE, code);
 
         ServletOutputStream out = response.getOutputStream();
         ImageIO.write(bi, "jpg", out);

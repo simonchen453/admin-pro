@@ -49,6 +49,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     const loadSystemInfo = async () => {
       try {
+        // 先加载系统信息，建立 session
         const response = await getSystemInfoApi();
         if (response.data) {
           setSystemInfo(response.data);
@@ -57,7 +58,16 @@ const Login: React.FC = () => {
         console.error('获取系统信息失败:', error);
       }
     };
-    loadSystemInfo();
+    // 先加载系统信息，建立 session，然后再加载验证码
+    // 这样可以确保验证码使用同一个 session
+    loadSystemInfo().then(() => {
+      // 系统信息加载完成后，再刷新验证码，确保使用同一个 session
+      setTimeout(() => {
+        if (captchaRef.current) {
+          captchaRef.current.refresh();
+        }
+      }, 50);
+    });
   }, []);
 
   const onSubmit = async (data: LoginForm) => {

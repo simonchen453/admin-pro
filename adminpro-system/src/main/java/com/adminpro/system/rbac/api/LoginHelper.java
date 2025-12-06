@@ -317,16 +317,19 @@ public class LoginHelper {
             SecurityContextHolder.getContext().setAuthentication(null);
             return true;
         } else {
-            HttpSession session = httpRequest.getSession();
-            session.removeAttribute(LOGIN_AUTH_USER_KEY);
-            session.removeAttribute(RbacCacheConstants.AUTH_USER_DETAIL_CACHE);
-            SessionService.getInstance().invalid(session.getId());
-            session.invalidate();
+            // 使用 getSession(false) 避免自动创建新 session
+            HttpSession session = httpRequest.getSession(false);
+            if (session != null) {
+                logger.debug("logout: {}", session.getId());
+                SessionService.getInstance().invalid(session.getId());
+                session.invalidate();
+            }
             return true;
         }
     }
 
     public void renewSession(HttpSession session, HttpServletRequest request) {
+        logger.debug("renewSession: {}", session.getId());
         Map<String, Object> attrs = getSessionAttributes(session);
         session.invalidate();
         Cookie[] cookies = request.getCookies();
@@ -365,10 +368,28 @@ public class LoginHelper {
     }
 
     public boolean validCaptcha(String captcha) {
-        HttpSession session = WebHelper.getHttpRequest().getSession();
-        String c = (String) session.getAttribute(RbacCacheConstants.CAPTCHA_CACHE);
-        logger.debug("session中的Captcha：" + c);
-        logger.debug("用户输入的Captcha：" + captcha);
-        return StringUtils.equalsIgnoreCase(captcha, c);
+        HttpServletRequest request = WebHelper.getHttpRequest();
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            logger.debug("验证码验证时 session 不存在");
+            return false;
+        }
+        
+        try {
+            String c = (String) session.getAttribute(RbacCacheConstants.CAPTCHA_CACHE);
+            logger.debug("session中的Captcha：" + c);
+            logger.debug("用户输入的Captcha：" + captcha);
+            boolean isValid = StringUtils.equalsIgnoreCase(captcha, c);
+            
+            // 验证后清除验证码，防止重复使用
+            if (isValid) {
+                session.removeAttribute(RbacCacheConstants.CAPTCHA_CACHE);
+            }
+            
+            return isValid;
+        } catch (IllegalStateException e) {
+            logger.debug("验证码验证时 session 已失效");
+            return false;
+        }
     }
 }

@@ -234,59 +234,8 @@ function MainLayout() {
                 setMenuItems(convertedMenus);
             } catch (error) {
                 console.error('加载菜单失败:', error);
-                // 如果加载失败，使用默认菜单
-                setMenuItems([
-                    {
-                        key: '/',
-                        icon: <DashboardOutlined />,
-                        label: '仪表盘',
-                        path: '/',
-                    },
-                    {
-                        key: 'user-management',
-                        icon: <TeamOutlined />,
-                        label: '用户管理',
-                        children: [
-                            {
-                                key: '/user/list',
-                                icon: <UserOutlined />,
-                                label: '用户列表',
-                                path: '/user/list',
-                            },
-                            {
-                                key: '/admin/user',
-                                icon: <UserOutlined />,
-                                label: '用户管理',
-                                path: '/admin/user',
-                            },
-                        ],
-                    },
-                    {
-                        key: 'role-management',
-                        icon: <TagOutlined />,
-                        label: '角色管理',
-                        children: [
-                            {
-                                key: '/roles',
-                                icon: <TagOutlined />,
-                                label: '角色列表',
-                                path: '/roles',
-                            },
-                            {
-                                key: '/admin/role',
-                                icon: <TagOutlined />,
-                                label: '角色管理',
-                                path: '/admin/role',
-                            },
-                            {
-                                key: '/role/list',
-                                icon: <TagOutlined />,
-                                label: '角色列表',
-                                path: '/role/list',
-                            },
-                        ],
-                    },
-                ]);
+                // 如果加载失败，清空菜单
+                setMenuItems([]);
             } finally {
                 setLoading(false);
             }
@@ -311,14 +260,21 @@ function MainLayout() {
         },
     ];
 
-    const handleUserMenuClick = ({ key }: { key: string }) => {
+    const handleUserMenuClick = async ({ key }: { key: string }) => {
         switch (key) {
             case 'profile':
                 navigate('/settings');
                 break;
             case 'logout':
-                logout();
-                navigate('/login', { replace: true });
+                try {
+                    await logout();
+                    setMenuItems([]);
+                    navigate('/login', { replace: true });
+                } catch (error) {
+                    console.error('登出失败:', error);
+                    setMenuItems([]);
+                    navigate('/login', { replace: true });
+                }
                 break;
             default:
                 console.log('点击了:', key);
@@ -326,7 +282,7 @@ function MainLayout() {
     };
 
     // 处理菜单点击
-    const handleMenuClick = ({ key }: { key: string }) => {
+    const handleMenuClick = async ({ key }: { key: string }) => {
         const findMenuItem = (items: MenuItem[], targetKey: string): MenuItem | null => {
             for (const item of items) {
                 if (item.key === targetKey) {
@@ -346,8 +302,15 @@ function MainLayout() {
             navigate(menuItem.path);
         } else if (menuItem && menuItem.path === '/logout') {
             // 特殊处理退出登录
-            logout();
-            navigate('/login', { replace: true });
+            try {
+                await logout();
+                setMenuItems([]);
+                navigate('/login', { replace: true });
+            } catch (error) {
+                console.error('登出失败:', error);
+                setMenuItems([]);
+                navigate('/login', { replace: true });
+            }
         }
     };
 

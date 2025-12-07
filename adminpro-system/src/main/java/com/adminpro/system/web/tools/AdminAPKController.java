@@ -9,10 +9,9 @@ import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.core.common.helper.ConfigHelper;
-import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.core.common.helper.UploadDownloadHelper;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.apk.APKEntity;
 import com.adminpro.system.rbac.domains.entity.apk.APKService;
 import com.adminpro.system.rbac.domains.vo.apk.APKVO;
@@ -34,7 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/apk")
 @PreAuthorize("@ss.hasPermission('system:apk')")
-public class AdminAPKController extends BaseRoutingController {
+public class AdminAPKController extends BaseController {
 
     protected static final String PREFIX = "admin/apk";
 

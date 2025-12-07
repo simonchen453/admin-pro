@@ -8,7 +8,7 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.batchjob.ScheduleStatus;
 import com.adminpro.system.core.batchjob.utils.CronUtils;
-import com.adminpro.system.core.common.BaseRoutingController;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.vo.job.*;
 import com.adminpro.system.rbac.domains.vo.role.ListRoleVo;
 import com.adminpro.system.tools.domains.entity.job.ScheduleJobEntity;
@@ -28,7 +28,7 @@ import java.util.Date;
 @RestController
 @RequestMapping(JobController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:job')")
-public class JobController extends BaseRoutingController {
+public class JobController extends BaseController {
 
     protected static final String PREFIX_URL = "/admin/job";
     protected static final String SEARCH_FORM_KEY = "jobSearchForm";

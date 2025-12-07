@@ -6,7 +6,7 @@ import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.domain.*;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * 用户域环境配置 信息操作处理
@@ -26,7 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/userDomainEnv")
 @PreAuthorize("@ss.hasPermission('system:user_domain_env')")
-public class UserDomainEnvController extends BaseRoutingController {
+public class UserDomainEnvController extends BaseController {
     protected static final String PREFIX = "admin/userdomainenv";
     protected static final String PREFIX_URL = "/admin/userDomainEnv";
     protected static final String SEARCH_FORM_KEY = "userDomainEnvSearchForm";

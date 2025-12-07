@@ -5,8 +5,8 @@ import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.core.common.helper.UploadDownloadHelper;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.vo.oss.ListOssVo;
 import com.adminpro.system.rbac.domains.vo.oss.ListOssVoConverter;
 import com.adminpro.system.tools.domains.entity.oss.OSSEntity;
@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping(value = OssController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:oss')")
-public class OssController extends BaseRoutingController {
+public class OssController extends BaseController {
 
     protected static final String PREFIX_URL = "/admin/oss";
 

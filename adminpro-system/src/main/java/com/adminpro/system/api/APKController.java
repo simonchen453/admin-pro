@@ -1,7 +1,7 @@
 package com.adminpro.system.api;
 
 import com.adminpro.framework.base.entity.R;
-import com.adminpro.system.core.common.BaseRoutingController;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.apk.APKEntity;
 import com.adminpro.system.rbac.domains.entity.apk.APKService;
 import com.adminpro.system.rbac.domains.vo.apk.APKVO;
@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/apk")
-public class APKController extends BaseRoutingController {
+public class APKController extends BaseController {
 
     @Autowired
     private APKService apkService;

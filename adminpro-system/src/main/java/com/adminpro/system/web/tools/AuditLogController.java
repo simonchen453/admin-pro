@@ -1,14 +1,12 @@
 package com.adminpro.system.web.tools;
 
-
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.util.DateUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
-import com.adminpro.system.core.common.helper.StringHelper;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.tools.domains.entity.auditlog.AuditLogDTO;
 import com.adminpro.system.tools.domains.entity.auditlog.AuditLogEntity;
 import com.adminpro.system.tools.domains.entity.auditlog.AuditLogService;
@@ -30,7 +28,7 @@ import java.util.Date;
 @RestController
 @RequestMapping(AuditLogController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:audit')")
-public class AuditLogController extends BaseRoutingController {
+public class AuditLogController extends BaseController {
 
     protected static final String PREFIX_URL = "/admin/audit";
     protected static final String SEARCH_FORM_KEY = "auditLogSearchForm";

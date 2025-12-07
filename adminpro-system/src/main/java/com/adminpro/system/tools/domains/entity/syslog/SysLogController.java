@@ -5,7 +5,7 @@ import com.adminpro.framework.base.util.DateUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
+import com.adminpro.system.core.common.web.BaseController;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,7 +21,7 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping("/admin/syslog")
-public class SysLogController extends BaseRoutingController {
+public class SysLogController extends BaseController {
     protected static final String PREFIX = "admin/syslog";
     protected static final String PREFIX_URL = "/admin/syslog";
     protected static final String SEARCH_FORM_KEY = SysLogController.class.getSimpleName();

@@ -3,7 +3,7 @@ package com.adminpro.system.web.tools;
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.tools.gen.GenService;
 import com.adminpro.system.tools.gen.TableInfo;
 import org.apache.commons.io.IOUtils;
@@ -25,7 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping(CodeGeneratorController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:generator')")
-public class CodeGeneratorController extends BaseRoutingController {
+public class CodeGeneratorController extends BaseController {
 
     protected static final String PREFIX_URL = "/admin/generator";
 

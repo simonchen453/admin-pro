@@ -8,9 +8,9 @@ import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
-import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.helper.UploadDownloadHelper;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.dept.DeptCreateValidator;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
@@ -37,7 +37,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/dept")
 @PreAuthorize("@ss.hasPermission('system:dept')")
-public class DeptController extends BaseRoutingController {
+public class DeptController extends BaseController {
     protected static final String PREFIX = "admin/dept";
     protected static final String PREFIX_URL = "/admin/dept";
     protected static final String SEARCH_FORM_KEY = "deptSearchForm";

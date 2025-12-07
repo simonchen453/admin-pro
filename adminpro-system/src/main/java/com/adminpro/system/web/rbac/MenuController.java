@@ -5,8 +5,8 @@ import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
-import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.core.common.annotation.SysLog;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.menu.MenuCreateValidator;
 import com.adminpro.system.rbac.domains.entity.menu.MenuEntity;
 import com.adminpro.system.rbac.domains.entity.menu.MenuService;
@@ -27,7 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/menu")
 @PreAuthorize("@ss.hasPermission('system:menu')")
-public class MenuController extends BaseRoutingController {
+public class MenuController extends BaseController {
     protected static final String PREFIX = "admin/menu";
     protected static final String PREFIX_URL = "/admin/menu";
     protected static final String SEARCH_FORM_KEY = "menuSearchForm";

@@ -7,8 +7,8 @@ import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.core.common.annotation.SysLog;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.tools.domains.entity.dict.*;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(DictController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:dict')")
-public class DictController extends BaseRoutingController {
+public class DictController extends BaseController {
 
     protected static final String PREFIX_URL = "/admin/dict";
     protected static final String SEARCH_FORM_KEY = "dictSearchForm";

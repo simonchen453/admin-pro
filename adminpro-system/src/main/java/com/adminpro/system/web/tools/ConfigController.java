@@ -6,8 +6,8 @@ import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.core.common.annotation.SysLog;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.tools.domains.entity.config.ConfigCreateValidator;
 import com.adminpro.system.tools.domains.entity.config.ConfigEntity;
 import com.adminpro.system.tools.domains.entity.config.ConfigService;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(ConfigController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:config')")
-public class ConfigController extends BaseRoutingController {
+public class ConfigController extends BaseController {
 
     protected static final String PREFIX_URL = "/admin/config";
     protected static final String SEARCH_FORM_KEY = "configSearchForm";

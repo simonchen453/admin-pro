@@ -5,11 +5,10 @@ import com.adminpro.framework.base.util.DateUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
+import com.adminpro.system.core.common.web.BaseController;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -22,7 +21,7 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping("/admin/exceptionlog")
-public class ExceptionLogController extends BaseRoutingController {
+public class ExceptionLogController extends BaseController {
     protected static final String PREFIX = "admin/exceptionlog";
     protected static final String PREFIX_URL = "/admin/exceptionlog";
     protected static final String SEARCH_FORM_KEY = ExceptionLogController.class.getSimpleName();

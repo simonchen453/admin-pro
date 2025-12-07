@@ -6,8 +6,8 @@ import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.core.common.annotation.SysLog;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.role.RoleCreateValidator;
 import com.adminpro.system.rbac.domains.entity.role.RoleEntity;
 import com.adminpro.system.rbac.domains.entity.role.RoleService;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/admin/role")
 @PreAuthorize("@ss.hasPermission('system:role')")
-public class RoleController extends BaseRoutingController {
+public class RoleController extends BaseController {
     protected static final String PREFIX = "admin/role";
     protected static final String PREFIX_URL = "/admin/role";
     protected static final String SEARCH_FORM_KEY = "roleSearchForm";

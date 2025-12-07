@@ -5,11 +5,10 @@ import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.core.common.helper.WebHelper;
-import com.adminpro.system.rbac.domains.entity.domain.DomainService;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.tools.domains.entity.session.SessionEntity;
 import com.adminpro.system.tools.domains.entity.session.SessionService;
 import com.adminpro.system.tools.domains.enums.SessionStatus;
@@ -28,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(SessionController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:session')")
-public class SessionController extends BaseRoutingController {
+public class SessionController extends BaseController {
 
     protected static final String PREFIX_URL = "/admin/session";
     protected static final String SEARCH_FORM_KEY = "sessionSearchForm";

@@ -8,10 +8,10 @@ import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.BaseRoutingController;
 import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.helper.ExcelHelper;
 import com.adminpro.system.core.common.helper.UploadDownloadHelper;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.api.PasswordValidator;
 import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/admin/user")
 @PreAuthorize("@ss.hasPermission('system:user')")
-public class UserController extends BaseRoutingController {
+public class UserController extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     protected static final String PREFIX = "admin/user";

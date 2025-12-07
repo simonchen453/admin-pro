@@ -34,7 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class UserService extends BaseService<UserEntity, UserIden> {
+public class UserService extends BaseService<UserEntity, String> {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
@@ -68,7 +68,7 @@ public class UserService extends BaseService<UserEntity, UserIden> {
 
     @Transactional
     public UserEntity resetPwd(UserIden userIden, String newPassword) {
-        UserEntity entity = findById(userIden);
+        UserEntity entity = findByIden(userIden);
         if (entity == null) {
             logger.warn("重置密码失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
             throw new BaseRuntimeException(RbacConstants.MSG_USER_NOT_FOUND);
@@ -84,7 +84,7 @@ public class UserService extends BaseService<UserEntity, UserIden> {
 
     public String authLogin(UserIden userIden, String password) {
 
-        UserEntity entity = findById(userIden);
+        UserEntity entity = findByIden(userIden);
         if (entity == null) {
             logger.warn("登录失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
             return null;
@@ -110,7 +110,7 @@ public class UserService extends BaseService<UserEntity, UserIden> {
 
     @Transactional
     public UserEntity changePwd(UserIden userIden, String oldPwd, String newPassword) {
-        UserEntity entity = findById(userIden);
+        UserEntity entity = findByIden(userIden);
 
         if (entity == null) {
             logger.warn("修改密码失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
@@ -146,8 +146,12 @@ public class UserService extends BaseService<UserEntity, UserIden> {
         logger.info("创建用户成功: userDomain={}, loginName={}, loginName={}", entity.getUserDomain(), entity.getUserId(), entity.getLoginName());
     }
 
-    public UserEntity findById(UserIden userIden) {
-        return dao.findById(userIden);
+    public UserEntity findByIden(UserIden userIden) {
+        return dao.findByIden(userIden);
+    }
+
+    public UserEntity findById(String id) {
+        return dao.findById(id);
     }
 
     public List<UserEntity> findByDomain(String domain) {
@@ -155,7 +159,7 @@ public class UserService extends BaseService<UserEntity, UserIden> {
     }
 
     public UserEntity findByUserDomainAndUserId(String userDomain, String userId) {
-        return dao.findById(new UserIden(userDomain, userId));
+        return dao.findByIden(new UserIden(userDomain, userId));
     }
 
     public UserEntity findByUserDomainAndLoginName(String userDomain, String loginName) {
@@ -236,7 +240,7 @@ public class UserService extends BaseService<UserEntity, UserIden> {
      * @return
      */
     public boolean authenticate(UserIden userIden, String password) {
-        UserEntity userEntity = findById(userIden);
+        UserEntity userEntity = findByIden(userIden);
         if (userEntity == null) {
             logger.warn("验证密码失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getUserId());
             return false;

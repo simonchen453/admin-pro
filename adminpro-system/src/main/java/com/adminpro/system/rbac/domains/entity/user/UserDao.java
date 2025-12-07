@@ -28,7 +28,7 @@ import java.util.Map;
  * @date 2018-09-06
  */
 @Component
-public class UserDao extends BaseDao<UserEntity, UserIden> {
+public class UserDao extends BaseDao<UserEntity, String> {
 
     private static final String SQL_USER_LIST = "select u.* from sys_user_tbl u left join sys_dept_tbl d on u.col_dept_no = d.col_no";
 
@@ -80,6 +80,7 @@ public class UserDao extends BaseDao<UserEntity, UserIden> {
     public void create(UserEntity entity) {
         InsertBuilder insert = new InsertBuilder(UserEntity.TABLE_NAME);
         handleAuditColumnValues(insert, entity);
+        insert.addColumnValue(UserEntity.COL_ID, entity.getId());
         insert.addColumnValue(UserEntity.COL_USER_DOMAIN, entity.getUserDomain());
         insert.addColumnValue(UserEntity.COL_USER_ID, entity.getUserId());
         insert.addColumnValue(UserEntity.COL_LOGIN_NAME, entity.getLoginName());
@@ -183,8 +184,12 @@ public class UserDao extends BaseDao<UserEntity, UserIden> {
         update.addColumnValue(UserEntity.COL_PROFESSION, entity.getProfession());
         update.addColumnValue(UserEntity.COL_CONSTELLATION, entity.getConstellation());
         update.addColumnValue(UserEntity.COL_THIRD_PARTY_USER_NAME, entity.getThirdPartyUserName());
-        update.addWhereAnd(UserEntity.COL_USER_DOMAIN + " = ?", entity.getUserDomain());
-        update.addWhereAnd(UserEntity.COL_USER_ID + " = ?", entity.getUserId());
+        if (entity.getId() != null) {
+            update.addWhereAnd(UserEntity.COL_ID + " = ?", entity.getId());
+        } else {
+            update.addWhereAnd(UserEntity.COL_USER_DOMAIN + " = ?", entity.getUserDomain());
+            update.addWhereAnd(UserEntity.COL_USER_ID + " = ?", entity.getUserId());
+        }
 
         String partyPwd = entity.getThirdPartyPwd();
         try {
@@ -209,12 +214,25 @@ public class UserDao extends BaseDao<UserEntity, UserIden> {
      * @param userIden
      * @return
      */
-    @Override
-    public UserEntity findById(UserIden userIden) {
+    public UserEntity findByIden(UserIden userIden) {
         SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
         select.setTable(UserEntity.TABLE_NAME);
         select.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, userIden.getUserDomain());
         select.addWhereAnd(UserEntity.COL_USER_ID + EQ, userIden.getUserId());
+        return executeSingle(select);
+    }
+
+    /**
+     * 根据id查找UserEntity对象
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public UserEntity findById(String id) {
+        SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
+        select.setTable(UserEntity.TABLE_NAME);
+        select.addWhereAnd(UserEntity.COL_ID + EQ, id);
         return executeSingle(select);
     }
 
@@ -300,11 +318,17 @@ public class UserDao extends BaseDao<UserEntity, UserIden> {
      * @param userIden
      * @return
      */
-    @Override
     public void delete(UserIden userIden) {
         DeleteBuilder delete = new DeleteBuilder(UserEntity.TABLE_NAME);
         delete.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, userIden.getUserDomain());
         delete.addWhereAnd(UserEntity.COL_USER_ID + EQ, userIden.getUserId());
+        execute(delete);
+    }
+
+    @Override
+    public void delete(String id) {
+        DeleteBuilder delete = new DeleteBuilder(UserEntity.TABLE_NAME);
+        delete.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, id);
         execute(delete);
     }
 
@@ -347,8 +371,10 @@ public class UserDao extends BaseDao<UserEntity, UserIden> {
             public UserEntity mapRow(ResultSet resultSet, int i) throws SQLException {
                 UserEntity entity = new UserEntity();
 
+                String id = resultSet.getString(UserEntity.COL_ID);
                 String userDomain = resultSet.getString(UserEntity.COL_USER_DOMAIN);
                 String userId = resultSet.getString(UserEntity.COL_USER_ID);
+                entity.setId(id);
                 entity.setUserDomain(userDomain);
                 entity.setUserId(userId);
                 entity.setUserIden(new UserIden(userDomain, userId));

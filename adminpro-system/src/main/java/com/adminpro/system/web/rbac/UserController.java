@@ -309,7 +309,7 @@ public class UserController extends BaseRoutingController {
         MessageBundle messageBundle = getMessageBundle();
         userUpdateValidator.validate(userRequestVo, messageBundle);
         if (!messageBundle.hasErrorMessage()) {
-            UserEntity userEntity = userService.findById(new UserIden(userRequestVo.getUserDomain(), userRequestVo.getUserId()));
+            UserEntity userEntity = userService.findByIden(new UserIden(userRequestVo.getUserDomain(), userRequestVo.getUserId()));
             if (userEntity == null) {
                 logger.warn("更新用户失败，用户不存在: userDomain={}, userId={}", userRequestVo.getUserDomain(), userRequestVo.getUserId());
                 return R.error(RbacConstants.MSG_USER_NOT_FOUND);

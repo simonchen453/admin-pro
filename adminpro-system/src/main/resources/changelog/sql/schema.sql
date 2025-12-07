@@ -31,58 +31,59 @@ CREATE TABLE `sys_user_domain_tbl`  (
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COMMENT = '用户域';
 
 CREATE TABLE `sys_user_tbl`  (
-  `col_user_domain` varchar(64) NOT NULL COMMENT '用户域',
-  `col_user_id` varchar(64) NOT NULL COMMENT '用户ID',
-  `col_login_name` varchar(255) DEFAULT NULL COMMENT '用户登录名称',
-  `col_display` varchar(255) DEFAULT NULL COMMENT '用户显示昵称',
-  `col_real_name` varchar(255) DEFAULT NULL COMMENT '用户真实名称',
-  `col_id_no` varchar(255) DEFAULT NULL COMMENT '用户身份证号',
-  `col_email` varchar(255) DEFAULT NULL COMMENT '用户邮箱',
-  `col_status` varchar(64) DEFAULT NULL COMMENT '用户状态',
-  `col_authenticated` bit(1) NULL DEFAULT NULL COMMENT '是否实名认证',
-  `col_mobile_no` varchar(255) DEFAULT NULL COMMENT '手机号码',
-  `col_is_system` bit(1) DEFAULT NULL COMMENT '是否系统配置',
-  `col_address` varchar(255) DEFAULT NULL COMMENT '地址',
-  `col_pwd` varchar(255) DEFAULT NULL COMMENT '密码',
-  `col_birthday` datetime(0) DEFAULT NULL COMMENT '生日',
-  `col_sex` varchar(12) DEFAULT NULL COMMENT '性别',
-  `col_marital` varchar(12) DEFAULT NULL COMMENT '婚姻状态',
-  `col_nation` varchar(255) DEFAULT NULL COMMENT '民族',
-  `col_pay_no_pwd` int(11) DEFAULT NULL COMMENT '是否免密支付',
-  `col_pay_pwd` varchar(255) DEFAULT NULL COMMENT '支付密码',
-  `col_pay_no_pwd_point` int(11) NULL DEFAULT NULL COMMENT '免密支付阀值',
-  `col_avatar_url` varchar(255) DEFAULT NULL COMMENT '头像地址',
-  `col_post` varchar(255) DEFAULT NULL COMMENT '职位',
-  `col_profession` varchar(255) DEFAULT NULL COMMENT '职业',
-  `col_constellation` varchar(255) DEFAULT NULL COMMENT '星座',
-  `col_third_party_user_name` varchar(255) DEFAULT NULL COMMENT '第三方账号',
-  `col_third_party_pwd` varchar(255) DEFAULT NULL COMMENT '第三方密码',
-  `col_job_no` varchar(255) DEFAULT NULL COMMENT '工号',
-  `col_ext_user_id` varchar(255) DEFAULT NULL COMMENT '外部用户ID',
-  `col_authenticate_date` datetime(0) DEFAULT NULL COMMENT '实名认证时间',
-  `col_latest_login_time` datetime(0) DEFAULT NULL COMMENT '最后登录时间',
-  `col_latest_change_pwd_time` datetime(0) NULL DEFAULT NULL COMMENT '最后修改支付密码时间',
-  `col_description` varchar(255) DEFAULT NULL COMMENT '用户描述',
-  `col_dept_no` varchar(255) DEFAULT NULL COMMENT '部门号',
-  `col_share_code` varchar(255) DEFAULT NULL COMMENT '分享码',
-  `col_parent_share_code` varchar(255) DEFAULT NULL COMMENT '上级分享码',
-  `col_integral` bigint(20) DEFAULT 0 COMMENT '用户积分',
-  `col_province` varchar(255) DEFAULT NULL COMMENT '省',
-  `col_city` varchar(255) DEFAULT NULL COMMENT '市',
-  `col_district` varchar(255) DEFAULT NULL COMMENT '区',
+    `col_id` varchar(64) NOT NULL COMMENT 'ID',
+    `col_user_domain` varchar(64) NOT NULL COMMENT '用户域',
+    `col_user_id` varchar(64) NOT NULL COMMENT '用户ID',
+    `col_login_name` varchar(255) DEFAULT NULL COMMENT '用户登录名称',
+    `col_display` varchar(255) DEFAULT NULL COMMENT '用户显示昵称',
+    `col_real_name` varchar(255) DEFAULT NULL COMMENT '用户真实名称',
+    `col_id_no` varchar(255) DEFAULT NULL COMMENT '用户身份证号',
+    `col_email` varchar(255) DEFAULT NULL COMMENT '用户邮箱',
+    `col_status` varchar(64) DEFAULT NULL COMMENT '用户状态',
+    `col_authenticated` bit(1) NULL DEFAULT NULL COMMENT '是否实名认证',
+    `col_mobile_no` varchar(255) DEFAULT NULL COMMENT '手机号码',
+    `col_is_system` bit(1) DEFAULT NULL COMMENT '是否系统配置',
+    `col_address` varchar(255) DEFAULT NULL COMMENT '地址',
+    `col_pwd` varchar(255) DEFAULT NULL COMMENT '密码',
+    `col_birthday` datetime(0) DEFAULT NULL COMMENT '生日',
+    `col_sex` varchar(12) DEFAULT NULL COMMENT '性别',
+    `col_marital` varchar(12) DEFAULT NULL COMMENT '婚姻状态',
+    `col_nation` varchar(255) DEFAULT NULL COMMENT '民族',
+    `col_pay_no_pwd` int(11) DEFAULT NULL COMMENT '是否免密支付',
+    `col_pay_pwd` varchar(255) DEFAULT NULL COMMENT '支付密码',
+    `col_pay_no_pwd_point` int(11) NULL DEFAULT NULL COMMENT '免密支付阀值',
+    `col_avatar_url` varchar(255) DEFAULT NULL COMMENT '头像地址',
+    `col_post` varchar(255) DEFAULT NULL COMMENT '职位',
+    `col_profession` varchar(255) DEFAULT NULL COMMENT '职业',
+    `col_constellation` varchar(255) DEFAULT NULL COMMENT '星座',
+    `col_third_party_user_name` varchar(255) DEFAULT NULL COMMENT '第三方账号',
+    `col_third_party_pwd` varchar(255) DEFAULT NULL COMMENT '第三方密码',
+    `col_job_no` varchar(255) DEFAULT NULL COMMENT '工号',
+    `col_ext_user_id` varchar(255) DEFAULT NULL COMMENT '外部用户ID',
+    `col_authenticate_date` datetime(0) DEFAULT NULL COMMENT '实名认证时间',
+    `col_latest_login_time` datetime(0) DEFAULT NULL COMMENT '最后登录时间',
+    `col_latest_change_pwd_time` datetime(0) NULL DEFAULT NULL COMMENT '最后修改支付密码时间',
+    `col_description` varchar(255) DEFAULT NULL COMMENT '用户描述',
+    `col_dept_no` varchar(255) DEFAULT NULL COMMENT '部门号',
+    `col_share_code` varchar(255) DEFAULT NULL COMMENT '分享码',
+    `col_parent_share_code` varchar(255) DEFAULT NULL COMMENT '上级分享码',
+    `col_integral` bigint(20) DEFAULT 0 COMMENT '用户积分',
+    `col_province` varchar(255) DEFAULT NULL COMMENT '省',
+    `col_city` varchar(255) DEFAULT NULL COMMENT '市',
+    `col_district` varchar(255) DEFAULT NULL COMMENT '区',
 
-  `col_created_by_user_domain` varchar(64) DEFAULT NULL COMMENT '创建人Domain',
-  `col_created_by_user_id` varchar(64) DEFAULT NULL COMMENT '创建人ID',
-  `col_created_date` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',
-  `col_updated_by_user_domain` varchar(64) DEFAULT NULL COMMENT '更新人Domain',
-  `col_updated_by_user_id` varchar(64) DEFAULT NULL COMMENT '更新人ID',
-  `col_updated_date` datetime(0) NULL DEFAULT NULL COMMENT '更新日期',
-  PRIMARY KEY (`col_user_domain`, `col_user_id`),
-  UNIQUE INDEX `unq_user_domain`(`col_user_domain`, `col_user_id`),
-  UNIQUE INDEX `unq_ext_userid`(`col_ext_user_id`),
-  UNIQUE INDEX `unq_login_name`(`col_user_domain`, `col_login_name`),
-  UNIQUE INDEX `uk_share_code`(`col_share_code`),
-  UNIQUE INDEX `unq_mobileno`(`col_user_domain`, `col_mobile_no`)
+    `col_created_by_user_domain` varchar(64) DEFAULT NULL COMMENT '创建人Domain',
+    `col_created_by_user_id` varchar(64) DEFAULT NULL COMMENT '创建人ID',
+    `col_created_date` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',
+    `col_updated_by_user_domain` varchar(64) DEFAULT NULL COMMENT '更新人Domain',
+    `col_updated_by_user_id` varchar(64) DEFAULT NULL COMMENT '更新人ID',
+    `col_updated_date` datetime(0) NULL DEFAULT NULL COMMENT '更新日期',
+    PRIMARY KEY (`col_id`),
+    UNIQUE INDEX `unq_user_domain`(`col_user_domain`, `col_user_id`),
+    UNIQUE INDEX `unq_ext_userid`(`col_ext_user_id`),
+    UNIQUE INDEX `unq_login_name`(`col_user_domain`, `col_login_name`),
+    UNIQUE INDEX `uk_share_code`(`col_share_code`),
+    UNIQUE INDEX `unq_mobileno`(`col_user_domain`, `col_mobile_no`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COMMENT = '用户';
 
 CREATE TABLE `sys_user_profile_tbl`  (
@@ -603,9 +604,9 @@ INSERT INTO `sys_menu_tbl` VALUES ('1275410212509061122', 'B_FILE_UPLOAD', '普�
 INSERT INTO `sys_menu_tbl` VALUES ('1275410212509061123', 'B_HOME_DATA', 'Home页面数据', '1275409249979207680', 7, NULL, 0, 'F', 'show', 'active', 'common:home-data', NULL, NULL, 'system', '1068812449987166208', '2020-06-23 20:47:45', 'system', '1068812449987166208', '2020-06-23 20:47:45');
 INSERT INTO `sys_menu_tbl` VALUES ('1275410212509061124', 'B_SYS_COMMON', '基础common权限', '1275409249979207680', 8, NULL, 0, 'F', 'show', 'active', 'system:common', NULL, NULL, 'system', '1068812449987166208', '2020-06-23 20:47:45', 'system', '1068812449987166208', '2020-06-23 20:47:45');
 
-INSERT INTO `sys_user_tbl` VALUES ('intranet', '78ce3eb73bca425c81b34807cef660f7', 'test', NULL, '王小二', NULL, NULL, 'active', b'0', '18913157427', b'0', NULL, '51fc924f79d0864892c479bf5e612ea4d746973ac27e28711d8130000e620d15', NULL, 'male', '0', NULL, 0, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2020-06-04 00:00:00', NULL, '测试账号', '00001', NULL, NULL, 0, NULL, NULL, NULL, 'system', 'admin', '2018-05-31 16:01:20', 'intranet', '78ce3eb73bca425c81b34807cef660f7', '2020-06-15 23:18:38');
-INSERT INTO `sys_user_tbl` VALUES ('system', '1068812449987166207', 'admin', '系统管理员', '管理员', NULL, '438767782@qq.com', 'active', b'0', '18913157427', b'0', '', '8567c0af955031776e699fd9ba780578dad7b1127c0bfecd267c9e82e1acff63', NULL, 'female', '0', NULL, 0, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2020-06-15 23:20:18', NULL, '系统管理员', '00001', NULL, NULL, 0, NULL, NULL, NULL, 'system', 'superadmin', '2017-06-21 16:33:25', 'system', 'admin', '2020-06-15 23:20:18');
-INSERT INTO `sys_user_tbl` VALUES ('system', '1068812449987166208', 'superadmin', NULL, '超级管理员', NULL, NULL, 'active', b'0', '18913157426', b'0', NULL, 'c7532d2f93471dcf6ee868f4a15368583189cfaea684795211dd434570465827', NULL, 'male', '0', NULL, 0, NULL, 0, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2020-06-15 23:27:31', NULL, '超级管理员', '00001', NULL, NULL, 0, NULL, NULL, NULL, 'system', 'admin', '2018-12-01 18:22:00', 'system', '1068812449987166208', '2020-06-15 23:27:31');
+INSERT INTO `sys_user_tbl` VALUES ('1275410212509061125', 'intranet', '78ce3eb73bca425c81b34807cef660f7', 'test', NULL, '王小二', NULL, NULL, 'active', b'0', '18913157427', b'0', NULL, '51fc924f79d0864892c479bf5e612ea4d746973ac27e28711d8130000e620d15', NULL, 'male', '0', NULL, 0, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2020-06-04 00:00:00', NULL, '测试账号', '00001', NULL, NULL, 0, NULL, NULL, NULL, 'system', 'admin', '2018-05-31 16:01:20', 'intranet', '78ce3eb73bca425c81b34807cef660f7', '2020-06-15 23:18:38');
+INSERT INTO `sys_user_tbl` VALUES ('1275410212509061126', 'system', '1068812449987166207', 'admin', '系统管理员', '管理员', NULL, '438767782@qq.com', 'active', b'0', '18913157427', b'0', '', '8567c0af955031776e699fd9ba780578dad7b1127c0bfecd267c9e82e1acff63', NULL, 'female', '0', NULL, 0, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2020-06-15 23:20:18', NULL, '系统管理员', '00001', NULL, NULL, 0, NULL, NULL, NULL, 'system', 'superadmin', '2017-06-21 16:33:25', 'system', 'admin', '2020-06-15 23:20:18');
+INSERT INTO `sys_user_tbl` VALUES ('1275410212509061127', 'system', '1068812449987166208', 'superadmin', NULL, '超级管理员', NULL, NULL, 'active', b'0', '18913157426', b'0', NULL, 'c7532d2f93471dcf6ee868f4a15368583189cfaea684795211dd434570465827', NULL, 'male', '0', NULL, 0, NULL, 0, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2020-06-15 23:27:31', NULL, '超级管理员', '00001', NULL, NULL, 0, NULL, NULL, NULL, 'system', 'admin', '2018-12-01 18:22:00', 'system', '1068812449987166208', '2020-06-15 23:27:31');
 
 INSERT INTO `sys_dept_tbl` VALUES ('1271649734330814463', '00001', '0', '0', 'AdminPro集团', 1, NULL, NULL, '', NULL, NULL, NULL, 'active', NULL, NULL, '2020-06-06 21:49:08', NULL, NULL, '2020-06-06 21:50:26');
 INSERT INTO `sys_dept_tbl` VALUES ('1271649734330814464', 'NO.002', '1271649734330814463', '0,1271649734330814463', '测试部门', 1, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '', '', '2020-06-13 11:44:57', '', '', '2020-06-13 11:44:57');
@@ -810,4 +811,5 @@ INSERT INTO `sys_config_tbl` VALUES (
         '1068812449987166208',
         NOW()
     );
+
 

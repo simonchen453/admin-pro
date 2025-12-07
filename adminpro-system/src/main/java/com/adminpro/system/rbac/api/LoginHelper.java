@@ -110,7 +110,7 @@ public class LoginHelper {
             String token = principal.getToken();
             String deviceType = device != null ? tokenHelper.generateAudience(device) : TokenHelper.AUDIENCE_WEB;
             tokenHelper.generateToken(userIden, token, deviceType);
-            UserEntity userEntity = UserService.getInstance().findById(userIden);
+            UserEntity userEntity = UserService.getInstance().findByIden(userIden);
             userEntity.setLatestLoginTime(new Date());
             UserService.getInstance().update(userEntity);
             AuditLogHelper.log(AuditLogHelper.CATEGORY_ADMIN, "User Management", "login", "success", JsonUtil.toJson(userIden));
@@ -123,7 +123,7 @@ public class LoginHelper {
                 setUserAgent(userDetails);
                 session.setAttribute(LOGIN_AUTH_USER_KEY, userDetails);
                 renewSession(session, WebHelper.getHttpRequest());
-                UserEntity userEntity = UserService.getInstance().findById(userIden);
+                UserEntity userEntity = UserService.getInstance().findByIden(userIden);
                 userEntity.setLatestLoginTime(new Date());
                 UserService.getInstance().update(userEntity);
                 loginUserSession(userDetails);

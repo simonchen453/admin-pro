@@ -414,6 +414,18 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <distributionManagement>
+                <repository>
+                    <id>ecqee-releases</id>
+                    <name>release reap</name>
+                    <url>http://adminpro-nexus:28081/repository/maven-releases</url>
+                </repository>
+                <snapshotRepository>
+                    <id>ecqee-snapshots</id>
+                    <name>snapshot reap</name>
+                    <url>http://adminpro-nexus:28081/repository/maven-snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
     </profiles>
 </project>

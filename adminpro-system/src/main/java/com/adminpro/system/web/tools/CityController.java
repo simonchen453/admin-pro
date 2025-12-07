@@ -1,6 +1,7 @@
 package com.adminpro.system.web.tools;
 
 import com.adminpro.framework.base.entity.R;
+import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.city.CityEntity;
 import com.adminpro.system.rbac.domains.entity.city.CityService;
 import com.adminpro.system.rbac.domains.vo.city.CityVo;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/city")
-public class CityController {
+public class CityController extends BaseController {
 
     @Autowired
     private CityService cityService;

@@ -22,10 +22,9 @@ import org.springframework.web.bind.annotation.*;
  * @date 2020-06-14
  */
 @RestController
-@RequestMapping("/admin/userDomainEnv")
+@RequestMapping(UserDomainEnvController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:user_domain_env')")
 public class UserDomainEnvController extends BaseController {
-    protected static final String PREFIX = "admin/userdomainenv";
     protected static final String PREFIX_URL = "/admin/userDomainEnv";
     protected static final String SEARCH_FORM_KEY = "userDomainEnvSearchForm";
 
@@ -37,14 +36,6 @@ public class UserDomainEnvController extends BaseController {
 
     @Autowired
     private UserDomainEnvUpdateValidator userDomainEnvUpdateValidator;
-
-    @Autowired
-    private DomainService domainService;
-
-    @GetMapping()
-    public String prepareList() {
-        return "forward:" + PREFIX_URL + "/list";
-    }
 
     /**
      * 查询用户域环境配置列表

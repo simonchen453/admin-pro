@@ -24,10 +24,9 @@ import org.springframework.web.bind.annotation.*;
  * @date 2020-06-14
  */
 @RestController
-@RequestMapping("/admin/domain")
+@RequestMapping(DomainController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:domain')")
 public class DomainController extends BaseController {
-    protected static final String PREFIX = "admin/domain";
     protected static final String PREFIX_URL = "/admin/domain";
     protected static final String SEARCH_FORM_KEY = "domainSearchForm";
 

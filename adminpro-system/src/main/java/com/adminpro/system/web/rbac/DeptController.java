@@ -35,10 +35,9 @@ import java.util.List;
  * @date 2020-05-24
  */
 @RestController
-@RequestMapping("/admin/dept")
+@RequestMapping(DeptController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:dept')")
 public class DeptController extends BaseController {
-    protected static final String PREFIX = "admin/dept";
     protected static final String PREFIX_URL = "/admin/dept";
     protected static final String SEARCH_FORM_KEY = "deptSearchForm";
 

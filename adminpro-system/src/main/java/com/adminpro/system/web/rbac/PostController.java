@@ -24,10 +24,9 @@ import org.springframework.web.bind.annotation.*;
  * @date 2020-05-21
  */
 @RestController
-@RequestMapping("/admin/post")
+@RequestMapping(PostController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:post')")
 public class PostController extends BaseController {
-    protected static final String PREFIX = "admin/post";
     protected static final String PREFIX_URL = "/admin/post";
     protected static final String SEARCH_FORM_KEY = "postSearchForm";
 

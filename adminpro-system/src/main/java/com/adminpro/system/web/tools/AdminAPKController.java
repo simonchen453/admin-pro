@@ -31,11 +31,11 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/apk")
+@RequestMapping(AdminAPKController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:apk')")
 public class AdminAPKController extends BaseController {
 
-    protected static final String PREFIX = "admin/apk";
+    protected static final String PREFIX_URL = "/admin/apk";
 
     @Autowired
     private APKService apkService;

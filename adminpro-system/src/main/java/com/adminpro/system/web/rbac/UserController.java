@@ -52,12 +52,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/admin/user")
+@RequestMapping(UserController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:user')")
 public class UserController extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    protected static final String PREFIX = "admin/user";
     protected static final String PREFIX_URL = "/admin/user";
     protected static final String SEARCH_FORM_KEY = "userSearchForm";
 
@@ -87,9 +86,6 @@ public class UserController extends BaseController {
 
     @Autowired
     private PostService postService;
-
-    @Autowired
-    private DomainService domainService;
 
     @RequestMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public R<QueryResultSet<UserListResponseVo>> search(@RequestBody SearchForm searchForm) {

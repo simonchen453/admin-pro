@@ -27,10 +27,9 @@ import org.springframework.web.bind.annotation.*;
  * @date 2020-06-08
  */
 @RestController
-@RequestMapping("/admin/role")
+@RequestMapping(RoleController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:role')")
 public class RoleController extends BaseController {
-    protected static final String PREFIX = "admin/role";
     protected static final String PREFIX_URL = "/admin/role";
     protected static final String SEARCH_FORM_KEY = "roleSearchForm";
 

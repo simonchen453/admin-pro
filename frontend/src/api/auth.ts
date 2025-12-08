@@ -22,12 +22,6 @@ export interface UserInfo {
   status?: 'active' | 'inactive';
 }
 
-// 获取用户信息接口
-export const getUserInfoApi = async (): Promise<UserInfo> => {
-  const respData = await request.get<ApiResponse<UserInfo>>('/auth/userinfo');
-  return (respData as unknown as ApiResponse<UserInfo>).data;
-};
-
 // 获取当前登录用户详细信息
 export const getCurrentUserInfoApi = async (): Promise<any> => {
   const respData = await request.get<ApiResponse<any>>('/auth/userinfo');

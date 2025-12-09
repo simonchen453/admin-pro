@@ -11,15 +11,12 @@ import {
   Modal,
   Row,
   Col,
-  Pagination,
-  Breadcrumb,
-  Divider
+  Pagination
 } from 'antd';
 import {
   DeleteOutlined,
   SearchOutlined,
   ClearOutlined,
-  HomeOutlined,
   ArrowLeftOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -241,10 +238,6 @@ const JobLog: React.FC = () => {
 
   return (
     <div style={{ padding: '0', background: '#f5f5f5', minHeight: '100vh' }}>
-
-
-      <Divider />
-
       <Card>
         <Card size="small" style={{ marginBottom: 16 }}>
           <Form autoComplete="off"
@@ -252,15 +245,13 @@ const JobLog: React.FC = () => {
             layout="inline"
             onFinish={handleSearch}
           >
-            <Row gutter={[16, 16]}>
+            <Row gutter={[16, 16]} style={{ width: '100%' }}>
               <Col xs={24} sm={12} md={8}>
-                <Form.Item name="condition" label="Bean名称">
-                  <Input placeholder="关键字" allowClear style={{ width: '100%' }} />
+                <Form.Item name="condition" style={{ marginBottom: 0 }}>
+                  <Input placeholder="Bean名称" allowClear style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
-            </Row>
-            <Row>
-              <Col span={24} style={{ textAlign: 'left', marginTop: 26, marginLeft: 2, marginBottom: 10 }}>
+              <Col xs={24} sm={12} md={8}>
                 <Space>
                   <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                     搜索

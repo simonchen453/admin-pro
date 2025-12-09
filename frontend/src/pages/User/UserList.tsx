@@ -26,11 +26,8 @@ import {
   SearchOutlined,
   ClearOutlined,
   DeleteOutlined,
-  HomeOutlined,
   UploadOutlined,
-  DownloadOutlined,
-  ApartmentOutlined,
-  UserOutlined
+  DownloadOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';

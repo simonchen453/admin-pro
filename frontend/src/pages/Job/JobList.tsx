@@ -12,7 +12,6 @@ import {
   Row,
   Col,
   Pagination,
-  Breadcrumb,
   Descriptions
 } from 'antd';
 import {
@@ -21,7 +20,6 @@ import {
   DeleteOutlined,
   SearchOutlined,
   ClearOutlined,
-  HomeOutlined,
   PauseCircleOutlined,
   PlayCircleOutlined,
   ThunderboltOutlined,
@@ -405,7 +403,7 @@ const JobList: React.FC = () => {
           onFinish={handleSearch}
           style={{ marginBottom: 24 }}
         >
-          <Row gutter={[16, 16]}>
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
             <Col xs={24} sm={12} md={8}>
               <Form.Item name="condition" style={{ marginBottom: 0 }}>
                 <Input placeholder="Bean名称关键字" allowClear style={{ width: '100%' }} />

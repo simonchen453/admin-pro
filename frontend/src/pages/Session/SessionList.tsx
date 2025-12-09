@@ -13,13 +13,11 @@ import {
   Row,
   Col,
   Pagination,
-  Breadcrumb
 } from 'antd';
 import {
   ReloadOutlined,
   SearchOutlined,
   ClearOutlined,
-  HomeOutlined,
   StopOutlined,
   PlayCircleOutlined,
   LogoutOutlined
@@ -339,8 +337,8 @@ const SessionList: React.FC = () => {
           onFinish={handleSearch}
           style={{ marginBottom: 24 }}
         >
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} md={6}>
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Col xs={24} sm={12} md={6} lg={4}>
               <Form.Item name="userDomain" style={{ marginBottom: 0 }}>
                 <Select placeholder="用户域" allowClear style={{ width: '100%' }}>
                   {domainList.map(domain => (
@@ -351,12 +349,12 @@ const SessionList: React.FC = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={12} md={6} lg={4}>
               <Form.Item name="loginName" style={{ marginBottom: 0 }}>
                 <Input placeholder="登陆名" allowClear />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={12} md={6} lg={4}>
               <Form.Item name="status" style={{ marginBottom: 0 }}>
                 <Select placeholder="状态" allowClear style={{ width: '100%' }}>
                   <Option value="active">正常</Option>
@@ -365,12 +363,12 @@ const SessionList: React.FC = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={12} md={6} lg={4}>
               <Form.Item name="deptNo" style={{ marginBottom: 0 }}>
                 <Input placeholder="部门编号" allowClear />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={24}>
+            <Col xs={24} sm={12} md={24} lg={8}>
               <Space>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索

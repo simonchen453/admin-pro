@@ -9,14 +9,12 @@ import {
   message,
   Modal,
   Pagination,
-  Breadcrumb,
   Row,
   Col
 } from 'antd';
 import {
   SearchOutlined,
   ClearOutlined,
-  HomeOutlined,
   CodeOutlined,
   DownloadOutlined
 } from '@ant-design/icons';
@@ -246,7 +244,7 @@ const GeneratorList: React.FC = () => {
           onFinish={handleSearch}
           style={{ marginBottom: 24 }}
         >
-          <Row gutter={[16, 16]}>
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
             <Col xs={24} sm={12} md={8}>
               <Form.Item name="tableName" style={{ marginBottom: 0 }}>
                 <Input placeholder="表名" allowClear />

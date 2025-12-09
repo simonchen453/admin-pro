@@ -13,8 +13,6 @@ import {
   Row,
   Col,
   Pagination,
-  Breadcrumb,
-  Divider,
   Typography
 } from 'antd';
 import {
@@ -22,8 +20,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
-  ClearOutlined,
-  HomeOutlined
+  ClearOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';

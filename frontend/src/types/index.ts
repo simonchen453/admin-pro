@@ -522,7 +522,7 @@ export const MenuStatus = {
 // 菜单显示状态常量
 export const MenuVisible = {
   SHOW: 'show',
-  HIDE: 'hide'
+  HIDE: 'hidden'
 } as const;
 
 // 部门状态常量

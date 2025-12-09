@@ -188,7 +188,7 @@ const DictForm: React.FC<DictFormProps> = ({
 
   const dataColumns: ColumnsType<DictDataEntity> = [
     {
-      title: 'NO.',
+      title: '序号',
       dataIndex: 'index',
       key: 'index',
       width: 50,

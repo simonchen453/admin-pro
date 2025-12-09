@@ -23,3 +23,7 @@ export const updateDomainApi = (params: DomainEntity): Promise<DomainCreateRespo
   return request.patch('/admin/domain/edit', params);
 };
 
+export const deleteDomainApi = (id: string): Promise<DomainCreateResponse> => {
+  return request.post(`/admin/domain/delete/${id}`);
+};
+

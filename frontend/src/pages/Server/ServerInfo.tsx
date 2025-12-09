@@ -163,25 +163,8 @@ const ServerInfo: React.FC = () => {
     : [];
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
-      <div className="page-header">
-        <Breadcrumb
-          className="page-header-breadcrumb"
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '服务器监控'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
+
 
       <Spin spinning={loading}>
         {!loading && (

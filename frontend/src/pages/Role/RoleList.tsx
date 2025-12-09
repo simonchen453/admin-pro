@@ -254,7 +254,7 @@ const RoleList: React.FC = () => {
   // 表格列定义
   const columns: ColumnsType<RoleEntity> = [
     {
-      title: 'NO.',
+      title: '序号',
       dataIndex: 'index',
       key: 'index',
       width: 60,
@@ -296,21 +296,18 @@ const RoleList: React.FC = () => {
         <Space size="small">
           <Button
             size="small"
+            type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
-            type="primary"
-            ghost
           >
             修改
           </Button>
           <Button
             size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              handleDelete(record);
-            }}
-            type="primary"
+            type="link"
             danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
           >
             删除
           </Button>
@@ -325,26 +322,9 @@ const RoleList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
+    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
       {/* Page Header */}
-      <div className="page-header">
-        <Breadcrumb
-          className="page-header-breadcrumb"
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '角色管理'
-            }
-          ]}
-        />
-      </div>
+
 
       <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         {/* 搜索表单 */}

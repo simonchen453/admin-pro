@@ -205,7 +205,7 @@ const SessionList: React.FC = () => {
 
   const columns: ColumnsType<SessionEntity> = [
     {
-      title: 'NO.',
+      title: '序号',
       dataIndex: 'index',
       key: 'index',
       width: 60,
@@ -329,25 +329,8 @@ const SessionList: React.FC = () => {
   ];
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
-      <div className="page-header">
-        <Breadcrumb
-          className="page-header-breadcrumb"
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '在线用户'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
+
 
       <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
@@ -356,7 +339,7 @@ const SessionList: React.FC = () => {
           onFinish={handleSearch}
           style={{ marginBottom: 24 }}
         >
-          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+          <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={6}>
               <Form.Item name="userDomain" style={{ marginBottom: 0 }}>
                 <Select placeholder="用户域" allowClear style={{ width: '100%' }}>

@@ -180,7 +180,7 @@ const JobLog: React.FC = () => {
 
   const columns: ColumnsType<JobLogEntity> = [
     {
-      title: 'NO.',
+      title: '序号',
       dataIndex: 'index',
       key: 'index',
       width: 60,
@@ -240,40 +240,8 @@ const JobLog: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
-        <Breadcrumb
-          items={[
-            {
-              title: (
-                <Button
-                  type="link"
-                  icon={<HomeOutlined />}
-                  onClick={() => navigate('/')}
-                  style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-                >
-                  首页
-                </Button>
-              )
-            },
-            {
-              title: (
-                <Button
-                  type="link"
-                  icon={<ArrowLeftOutlined />}
-                  onClick={() => navigate('/admin/job')}
-                  style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-                >
-                  定时任务
-                </Button>
-              )
-            },
-            {
-              title: '定时任务日志'
-            }
-          ]}
-        />
-      </div>
+    <div style={{ padding: '0', background: '#f5f5f5', minHeight: '100vh' }}>
+
 
       <Divider />
 
@@ -284,10 +252,10 @@ const JobLog: React.FC = () => {
             layout="inline"
             onFinish={handleSearch}
           >
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={8}>
                 <Form.Item name="condition" label="Bean名称">
-                  <Input placeholder="关键字" allowClear />
+                  <Input placeholder="关键字" allowClear style={{ width: '100%' }} />
                 </Form.Item>
               </Col>
             </Row>

@@ -167,7 +167,7 @@ const SysLogList: React.FC = () => {
 
   const columns: ColumnsType<SysLogEntity> = [
     {
-      title: 'NO.',
+      title: '序号',
       dataIndex: 'index',
       key: 'index',
       width: 60,
@@ -261,28 +261,8 @@ const SysLogList: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
-        <Breadcrumb
-          items={[
-            {
-              title: (
-                <Button
-                  type="link"
-                  icon={<HomeOutlined />}
-                  onClick={() => navigate('/')}
-                  style={{ padding: 0, height: 'auto', lineHeight: 1 }}
-                >
-                  首页
-                </Button>
-              )
-            },
-            {
-              title: '系统日志管理'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '0', background: '#f5f5f5', minHeight: '100vh' }}>
+
 
       <Divider />
 
@@ -293,7 +273,7 @@ const SysLogList: React.FC = () => {
             layout="inline"
             onFinish={handleSearch}
           >
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={6}>
                 <Form.Item name="condition" label="关键字">
                   <Input placeholder="关键字" allowClear />

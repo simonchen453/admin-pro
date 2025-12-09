@@ -57,11 +57,7 @@ body {
   transition: all 0.3s ease;
 }
 
-.modern-card:hover {
-  box-shadow: var(--card-hover-shadow) !important;
-  transform: translateY(-2px);
-  border-color: rgba(99, 102, 241, 0.2) !important;
-}
+
 
 /* Modern Table Style - HD Look */
 .modern-table .ant-table {
@@ -137,6 +133,14 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.ant-input,
+.ant-select-selector,
+.ant-picker,
+.ant-input-affix-wrapper {
+  border-color: #cbd5e1 !important;
+  /* Default visible border */
 }
 
 .ant-input:hover,

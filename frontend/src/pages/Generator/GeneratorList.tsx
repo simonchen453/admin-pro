@@ -17,7 +17,8 @@ import {
   SearchOutlined,
   ClearOutlined,
   HomeOutlined,
-  CodeOutlined
+  CodeOutlined,
+  DownloadOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -100,15 +101,15 @@ const GeneratorList: React.FC = () => {
     return dateTime;
   };
 
-  const handleGenerate = (tableName: string) => {
+  const handleGenerate = (record: GeneratorEntity) => {
     Modal.confirm({
       title: '确认生成',
-      content: `确定要生成表 ${tableName} 的代码吗？`,
+      content: `确定要生成表 ${record.tableName} 的代码吗？`,
       okText: '确定',
       cancelText: '取消',
       onOk: async () => {
         try {
-          await batchGenCodeApi(tableName);
+          await batchGenCodeApi(record.tableName);
           message.success('代码生成成功，正在下载...');
         } catch (error) {
           console.error('代码生成失败:', error);
@@ -176,7 +177,7 @@ const GeneratorList: React.FC = () => {
 
   const columns: ColumnsType<GeneratorEntity> = [
     {
-      title: 'NO.',
+      title: '序号',
       dataIndex: 'index',
       key: 'index',
       width: 60,
@@ -219,10 +220,9 @@ const GeneratorList: React.FC = () => {
         <Space size="small">
           <Button
             size="small"
-            type="primary"
-            ghost
-            icon={<CodeOutlined />}
-            onClick={() => handleGenerate(record.tableName)}
+            type="link"
+            icon={<DownloadOutlined />}
+            onClick={() => handleGenerate(record)}
           >
             生成代码
           </Button>
@@ -236,25 +236,8 @@ const GeneratorList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
-      <div className="page-header">
-        <Breadcrumb
-          className="page-header-breadcrumb"
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '代码生成器'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
+
 
       <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
@@ -263,7 +246,7 @@ const GeneratorList: React.FC = () => {
           onFinish={handleSearch}
           style={{ marginBottom: 24 }}
         >
-          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+          <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={8}>
               <Form.Item name="tableName" style={{ marginBottom: 0 }}>
                 <Input placeholder="表名" allowClear />

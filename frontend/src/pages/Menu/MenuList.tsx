@@ -376,6 +376,37 @@ const MenuList: React.FC = () => {
       align: 'center'
     },
     {
+      title: '菜单类型',
+      dataIndex: 'type',
+      key: 'type',
+      width: 80,
+      align: 'center',
+      render: (type: string) => {
+        const typeMap: Record<string, { color: string; text: string }> = {
+          [MenuType.DIRECTORY]: { color: 'blue', text: '目录' },
+          [MenuType.MENU]: { color: 'green', text: '菜单' },
+          [MenuType.BUTTON]: { color: 'orange', text: '按钮' }
+        };
+        const info = typeMap[type] || { color: 'default', text: type };
+        return <Tag color={info.color}>{info.text}</Tag>;
+      }
+    },
+    {
+      title: '显示状态',
+      dataIndex: 'visible',
+      key: 'visible',
+      width: 80,
+      align: 'center',
+      render: (visible: string) => {
+        const visibleMap: Record<string, { color: string; text: string }> = {
+          [MenuVisible.SHOW]: { color: 'cyan', text: '显示' },
+          [MenuVisible.HIDE]: { color: 'geekblue', text: '隐藏' }
+        };
+        const info = visibleMap[visible] || { color: 'default', text: visible };
+        return <Tag color={info.color}>{info.text}</Tag>;
+      }
+    },
+    {
       title: '权限标识',
       dataIndex: 'permission',
       key: 'permission',
@@ -410,27 +441,26 @@ const MenuList: React.FC = () => {
         <Space size="small">
           <Button
             size="small"
+            type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
-            type="primary"
-            ghost
           >
             修改
           </Button>
           <Button
             size="small"
+            type="link"
             icon={<PlusOutlined />}
             onClick={() => handleAdd(record)}
-            type="primary"
           >
             新增
           </Button>
           <Button
             size="small"
+            type="link"
+            danger
             icon={<DeleteOutlined />}
             onClick={() => handleDelete(record)}
-            type="primary"
-            danger
           >
             删除
           </Button>
@@ -444,25 +474,8 @@ const MenuList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
-      <div className="page-header">
-        <Breadcrumb
-          className="page-header-breadcrumb"
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '菜单管理'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
+
 
       <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
@@ -478,13 +491,14 @@ const MenuList: React.FC = () => {
                   placeholder="菜单名称"
                   prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />}
                   allowClear
+                  size="large"
                   onPressEnter={() => form.submit()}
                 />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={6}>
               <Form.Item name="status" style={{ marginBottom: 0 }}>
-                <Select placeholder="状态" allowClear style={{ width: '100%' }}>
+                <Select placeholder="状态" allowClear style={{ width: '100%' }} size="large">
                   <Option value={MenuStatus.ACTIVE}>正常</Option>
                   <Option value={MenuStatus.INACTIVE}>停用</Option>
                 </Select>

@@ -229,7 +229,7 @@ const DictList: React.FC = () => {
 
   const columns: ColumnsType<DictEntity> = [
     {
-      title: 'NO.',
+      title: '序号',
       dataIndex: 'index',
       key: 'index',
       width: 60,
@@ -303,7 +303,7 @@ const DictList: React.FC = () => {
             size="small"
             icon={<DeleteOutlined />}
             onClick={() => handleDelete(record)}
-            type="primary"
+            type="link"
             danger
           >
             删除
@@ -318,25 +318,8 @@ const DictList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
-      <div className="page-header">
-        <Breadcrumb
-          className="page-header-breadcrumb"
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '字典管理'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
+
 
       <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"

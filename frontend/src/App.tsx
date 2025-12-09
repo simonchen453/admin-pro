@@ -28,6 +28,12 @@ function App() {
                     Input: {
                         controlHeight: 36,
                     },
+                    Select: {
+                        controlHeight: 36,
+                    },
+                    DatePicker: {
+                        controlHeight: 36,
+                    },
                     Layout: {
                         bodyBg: '#f3f4f6', // Very light gray for background
                         headerBg: '#ffffff',

@@ -13,8 +13,7 @@ import {
   Row,
   Col,
   Pagination,
-  Tree,
-  Breadcrumb,
+  TreeSelect,
   Divider,
   Typography
 } from 'antd';
@@ -477,7 +476,7 @@ const UserList: React.FC = () => {
 
   const columns: ColumnsType<UserEntity> = [
     {
-      title: 'NO.',
+      title: '序号',
       dataIndex: 'index',
       key: 'index',
       width: 60,
@@ -539,56 +538,55 @@ const UserList: React.FC = () => {
         <Space size="small">
           <Button
             size="small"
+            type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
-            type="primary"
-            ghost
           >
             修改
           </Button>
           <Button
             size="small"
+            type="link"
             icon={<ReloadOutlined />}
             onClick={() => handleResetPassword(record)}
-            type="default"
           >
             重置密码
           </Button>
           {record.status === UserStatus.LOCKED ? (
             <Button
               size="small"
+              type="link"
               icon={<UserAddOutlined />}
               onClick={() => handleActive(record)}
-              type="primary"
             >
               启用
             </Button>
           ) : record.status === UserStatus.INACTIVE ? (
             <Button
               size="small"
+              type="link"
               icon={<UserAddOutlined />}
               onClick={() => handleActive(record)}
-              type="primary"
             >
               启用
             </Button>
           ) : record.status === UserStatus.ACTIVE ? (
             <Button
               size="small"
+              type="link"
+              danger
               icon={<UserDeleteOutlined />}
               onClick={() => handleInactive(record)}
-              type="default"
-              danger
             >
               停用
             </Button>
           ) : null}
           <Button
             size="small"
+            type="link"
+            danger
             icon={<DeleteOutlined />}
             onClick={() => handleDelete(record)}
-            type="primary"
-            danger
           >
             删除
           </Button>
@@ -603,196 +601,116 @@ const UserList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
-      {/* Page Header */}
-      <div className="page-header">
-        <Breadcrumb
-          className="page-header-breadcrumb"
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '用户管理'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
 
-      <Row gutter={24} wrap={false}>
-        {/* 部门树 */}
-        <Col
-          flex="0 0 280px"
-          style={{ minWidth: 260, maxWidth: 320 }}
+      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
+        <Form autoComplete="off"
+          form={form}
+          layout="inline"
+          onFinish={handleSearch}
+          style={{ marginBottom: 24 }}
         >
-          <Card
-            title={
-              <Space>
-                <ApartmentOutlined style={{ color: '#6366f1' }} />
-                <span>部门列表</span>
-              </Space>
-            }
-            size="small"
-            className="modern-card"
-            style={{ marginBottom: 16, height: 'calc(100vh - 140px)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
-            styles={{ body: { flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' } }}
-          >
-            <Input
-              placeholder="搜索部门"
-              style={{ marginBottom: 16 }}
-              allowClear
-              prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
-            />
-            <div style={{
-              flex: 1,
-              overflow: 'auto',
-              padding: '4px',
-            }} className="custom-scrollbar">
-              {deptTreeData.length > 0 ? (
-                <Tree
-                  treeData={deptTreeData}
-                  showLine={false}
-                  defaultExpandAll
-                  blockNode
-                  onSelect={(selectedKeys, info) => {
-                    if (selectedKeys.length > 0) {
-                      const deptId = selectedKeys[0] as string;
-                      setSearchForm(prev => ({ ...prev, deptId }));
-                      setCurrentPage(1);
-                      fetchUserList({ ...searchForm, deptId, page: 1 });
-                    }
-                  }}
-                  style={{
-                    background: 'transparent'
-                  }}
+          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="deptId" style={{ marginBottom: 0 }}>
+                <TreeSelect
+                  treeData={convertToTreeSelectData(deptTreeData)}
+                  placeholder="选择部门"
+                  allowClear
+                  treeDefaultExpandAll
+                  style={{ width: '100%' }}
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 />
-              ) : (
-                <div style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
-                  <div>暂无部门数据</div>
-                </div>
-              )}
-            </div>
-          </Card>
-        </Col>
-        <Col flex="auto" style={{ minWidth: 0, overflow: 'hidden' }}>
-          <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
-            <Form
-              form={form}
-              layout="inline"
-              onFinish={handleSearch}
-              style={{ marginBottom: 24 }}
-            >
-              <Row gutter={[16, 16]} style={{ width: '100%' }}>
-                <Col xs={24} sm={12} md={6}>
-                  <Form.Item name="userDomain" style={{ marginBottom: 0 }}>
-                    <Select placeholder="用户域" allowClear>
-                      {domainList.map(domain => (
-                        <Option key={domain.name} value={domain.name}>
-                          {domain.display}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col >
-                <Col xs={24} sm={12} md={6}>
-                  <Form.Item name="loginName" style={{ marginBottom: 0 }}>
-                    <Input placeholder="登录名" allowClear prefix={<UserOutlined style={{ color: '#cbd5e1' }} />} />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} sm={12} md={6}>
-                  <Form.Item name="realName" style={{ marginBottom: 0 }}>
-                    <Input placeholder="用户姓名" allowClear prefix={<UserOutlined style={{ color: '#cbd5e1' }} />} />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} sm={12} md={6}>
-                  <Space>
-                    <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                      搜索
-                    </Button>
-                    <Button onClick={handleReset} icon={<ClearOutlined />}>
-                      重置
-                    </Button>
-                  </Space>
-                </Col>
-              </Row >
-            </Form >
-
-            {/* 操作按钮 */}
-            < div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="loginName" style={{ marginBottom: 0 }}>
+                <Input placeholder="登录名" allowClear prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Form.Item name="realName" style={{ marginBottom: 0 }}>
+                <Input placeholder="用户姓名" allowClear prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
               <Space>
-                <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-                  新增用户
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
                 </Button>
-                <Button
-                  danger
-                  icon={<DeleteOutlined />}
-                  disabled={selectedUsers.length === 0}
-                  onClick={handleBatchDelete}
-                >
-                  批量删除
-                </Button>
-                <Button
-                  icon={<UploadOutlined />}
-                  onClick={handleImport}
-                  loading={importLoading}
-                >
-                  导入
-                </Button>
-                <Button
-                  icon={<DownloadOutlined />}
-                  onClick={handleExportAll}
-                >
-                  导出
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  重置
                 </Button>
               </Space>
-            </div >
+            </Col>
+          </Row>
+        </Form>
 
-            {/* 用户表格 */}
-            < div className="modern-table" >
-              <Table
-                columns={columns}
-                dataSource={userList}
-                loading={loading}
-                rowKey={(record) => {
-                  if (record?.userIden?.userDomain && record?.userIden?.userId) {
-                    return `${record.userIden.userDomain}-${record.userIden.userId}`;
-                  }
-                  return `row-${record.index}`;
-                }}
-                rowSelection={rowSelection}
-                pagination={false}
-                size="middle"
-                locale={{
-                  emptyText: userList.length === 0 && !loading ? '暂无数据' : undefined
-                }}
-              />
-            </div >
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Space>
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+              新增用户
+            </Button>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              disabled={selectedUsers.length === 0}
+              onClick={handleBatchDelete}
+            >
+              批量删除
+            </Button>
+            <Button
+              icon={<UploadOutlined />}
+              onClick={handleImport}
+              loading={importLoading}
+            >
+              导入
+            </Button>
+            <Button
+              icon={<DownloadOutlined />}
+              onClick={handleExportAll}
+            >
+              导出
+            </Button>
+          </Space>
+        </div>
 
-            {/* 分页 */}
-            < div style={{ marginTop: 24, textAlign: 'right' }}>
-              <Pagination
-                current={currentPage}
-                pageSize={pageSize}
-                total={total}
-                showSizeChanger
-                showQuickJumper
-                showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
-                onChange={handlePageChange}
-                onShowSizeChange={handlePageChange}
-                pageSizeOptions={['10', '20', '30', '50']}
-              />
-            </div >
-          </Card >
-        </Col >
-      </Row >
+        <div className="modern-table">
+          <Table
+            columns={columns}
+            dataSource={userList}
+            loading={loading}
+            rowKey={(record) => {
+              if (record?.userIden?.userDomain && record?.userIden?.userId) {
+                return `${record.userIden.userDomain}-${record.userIden.userId}`;
+              }
+              return `row-${record.index}`;
+            }}
+            rowSelection={rowSelection}
+            pagination={false}
+            size="middle"
+            locale={{
+              emptyText: userList.length === 0 && !loading ? '暂无数据' : undefined
+            }}
+          />
+        </div>
 
-      {/* 用户表单模态框 */}
-      < Modal
+        <div style={{ marginTop: 24, textAlign: 'right' }}>
+          <Pagination
+            current={currentPage}
+            pageSize={pageSize}
+            total={total}
+            showSizeChanger
+            showQuickJumper
+            showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
+            onChange={handlePageChange}
+            onShowSizeChange={handlePageChange}
+            pageSizeOptions={['10', '20', '30', '50']}
+          />
+        </div>
+      </Card>
+
+      <Modal
         title={editingUser ? '编辑用户' : '新增用户'}
         open={isModalVisible}
         onCancel={() => {
@@ -818,7 +736,7 @@ const UserList: React.FC = () => {
             setEditingUser(null);
           }}
         />
-      </Modal >
+      </Modal>
 
       <Modal
         title={`重置密码${resetTargetUser ? ` - ${resetTargetUser.realName}` : ''}`}
@@ -867,7 +785,7 @@ const UserList: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
-    </div >
+    </div>
   );
 };
 

@@ -281,7 +281,7 @@ const JobList: React.FC = () => {
 
   const columns: ColumnsType<JobEntity> = [
     {
-      title: 'NO.',
+      title: '序号',
       dataIndex: 'index',
       key: 'index',
       width: 60,
@@ -340,57 +340,50 @@ const JobList: React.FC = () => {
       width: 280,
       render: (_, record: JobEntity) => (
         <Space size="small">
-          {record.status === JobStatus.NORMAL && (
+          <Button
+            size="small"
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+          >
+            修改
+          </Button>
+          {record.status === JobStatus.PAUSE ? (
             <Button
               size="small"
-              icon={<EditOutlined />}
-              onClick={() => handleEdit(record)}
-              type="primary"
-              ghost
-            >
-              修改
-            </Button>
-          )}
-          {record.status === JobStatus.PAUSE && (
-            <Button
-              size="small"
-              icon={<PauseCircleOutlined />}
-              onClick={() => handleResume(record)}
-              type="primary"
-              ghost
-            >
-              启动
-            </Button>
-          )}
-          {record.status === JobStatus.NORMAL && (
-            <Button
-              size="small"
+              type="link"
               icon={<PlayCircleOutlined />}
-              onClick={() => handlePause(record)}
-              type="default"
+              onClick={() => handleResume(record)}
+            >
+              恢复
+            </Button>
+          ) : (
+            <Button
+              size="small"
+              type="link"
               danger
+              icon={<PauseCircleOutlined />}
+              onClick={() => handlePause(record)}
             >
               暂停
             </Button>
           )}
-          {record.status === JobStatus.PAUSE && (
-            <Button
-              size="small"
-              icon={<ThunderboltOutlined />}
-              onClick={() => handleRun(record)}
-              type="primary"
-              ghost
-            >
-              立即执行
-            </Button>
-          )}
           <Button
             size="small"
-            icon={<EyeOutlined />}
-            onClick={() => handleView(record)}
-            type="default"
+            type="link"
+            icon={<ThunderboltOutlined />}
+            onClick={() => handleRun(record)}
           >
-            查看
+            执行
+          </Button>
+          <Button
+            size="small"
+            type="link"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
+          >
+            删除
           </Button>
         </Space>
       )
@@ -402,25 +395,8 @@ const JobList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
-      <div className="page-header">
-        <Breadcrumb
-          className="page-header-breadcrumb"
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '定时任务'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
+
 
       <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"
@@ -429,10 +405,10 @@ const JobList: React.FC = () => {
           onFinish={handleSearch}
           style={{ marginBottom: 24 }}
         >
-          <Row gutter={[16, 16]} style={{ width: '100%' }}>
+          <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={8}>
               <Form.Item name="condition" style={{ marginBottom: 0 }}>
-                <Input placeholder="Bean名称关键字" allowClear />
+                <Input placeholder="Bean名称关键字" allowClear style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={8}>

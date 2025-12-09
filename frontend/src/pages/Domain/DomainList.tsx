@@ -10,20 +10,20 @@ import {
   Modal,
   Row,
   Col,
-  Pagination,
-  Breadcrumb
+  Pagination
 } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
   SearchOutlined,
   ClearOutlined,
-  HomeOutlined
+  DeleteOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import {
-  getDomainListApi
+  getDomainListApi,
+  deleteDomainApi
 } from '../../api/domain';
 import type {
   DomainEntity,
@@ -107,9 +107,33 @@ const DomainList: React.FC = () => {
     setIsModalVisible(true);
   };
 
+  const handleDelete = (domain: DomainEntity) => {
+    if (!domain.id) return;
+    Modal.confirm({
+      title: '确认删除',
+      content: `是否确认删除名称为"${domain.name}"的用户域?`,
+      okText: '确定',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          const response = await deleteDomainApi(domain.id!);
+          if (response.restCode === '200') {
+            message.success('删除成功');
+            fetchDomainList();
+          } else {
+            message.error(response.message || '删除失败');
+          }
+        } catch (error) {
+          console.error('删除失败:', error);
+          message.error('删除失败');
+        }
+      }
+    });
+  };
+
   const columns: ColumnsType<DomainEntity> = [
     {
-      title: 'NO.',
+      title: '序号',
       dataIndex: 'index',
       key: 'index',
       width: 60,
@@ -130,17 +154,25 @@ const DomainList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 120,
+      width: 180,
       render: (_, record: DomainEntity) => (
         <Space size="small">
           <Button
             size="small"
+            type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
-            type="primary"
-            ghost
           >
             修改
+          </Button>
+          <Button
+            size="small"
+            type="link"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
+          >
+            删除
           </Button>
         </Space>
       )
@@ -152,25 +184,8 @@ const DomainList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
-      <div className="page-header">
-        <Breadcrumb
-          className="page-header-breadcrumb"
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '用户域'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
+
 
       <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"

@@ -279,28 +279,26 @@ const DeptList: React.FC = () => {
         <Space size="small">
           <Button
             size="small"
+            type="link"
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
-            type="primary"
-            ghost
           >
             修改
           </Button>
           <Button
             size="small"
+            type="link"
             icon={<PlusOutlined />}
             onClick={() => handleAdd(record)}
-            type="primary"
-            ghost
           >
             新增
           </Button>
           <Button
             size="small"
+            type="link"
+            danger
             icon={<DeleteOutlined />}
             onClick={() => handleDelete(record)}
-            type="primary"
-            danger
           >
             删除
           </Button>
@@ -314,25 +312,8 @@ const DeptList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh' }}>
-      <div className="page-header">
-        <Breadcrumb
-          className="page-header-breadcrumb"
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '部门管理'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
+
 
       <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
         <Form autoComplete="off"

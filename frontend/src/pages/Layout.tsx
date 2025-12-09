@@ -1,4 +1,4 @@
-import { Layout as AntLayout, Menu, theme, Button, Avatar, Dropdown, Space, Typography, Tooltip, ConfigProvider } from 'antd';
+import { Layout as AntLayout, Menu, theme, Button, Avatar, Dropdown, Space, Typography, Tooltip, ConfigProvider, message } from 'antd';
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -24,8 +24,11 @@ import {
     AppstoreOutlined,
     IdcardOutlined,
     SlidersOutlined,
-    BookOutlined
+    BookOutlined,
+    BellOutlined,
+    TranslationOutlined
 } from '@ant-design/icons';
+import { Breadcrumb, Badge } from 'antd';
 import { useAuthStore } from '../stores/useUserStore';
 import { getMenuList } from '../api/menu';
 import { getSystemInfoApi } from '../api/common';
@@ -156,6 +159,41 @@ function MainLayout() {
             }
         }
         return null;
+    };
+
+    // 获取当前路径的面包屑数据
+    const getBreadcrumbItems = () => {
+        const currentPath = location.pathname;
+        const items: { title: React.ReactNode, href?: string }[] = [
+            { title: '首页', href: '/' }
+        ];
+
+        // 查找当前页面对应的菜单项
+        let currentMenuItem: MenuItem | null = null;
+
+        const findItem = (items: MenuItem[]) => {
+            for (const item of items) {
+                if (item.path === currentPath) {
+                    currentMenuItem = item;
+                    return;
+                }
+                if (item.children) {
+                    findItem(item.children);
+                }
+            }
+        };
+
+        findItem(menuItems);
+
+        if (currentMenuItem) {
+            items.push({
+                title: (currentMenuItem as MenuItem).label,
+                // 最后一级不加链接
+                href: undefined
+            });
+        }
+
+        return items;
     };
 
     // 加载系统信息
@@ -441,26 +479,81 @@ function MainLayout() {
                     height: 64,
                     borderBottom: '1px solid rgba(0,0,0,0.03)'
                 }}>
-                    <Button
-                        type="text"
-                        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                        onClick={() => setCollapsed(!collapsed)}
-                        style={{ fontSize: '18px', width: 48, height: 48 }}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Button
+                            type="text"
+                            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                            onClick={() => setCollapsed(!collapsed)}
+                            style={{ fontSize: '18px', width: 48, height: 48, marginRight: 16 }}
+                        />
+                        <Breadcrumb items={getBreadcrumbItems()} />
+                    </div>
 
-                    <Space size={24}>
-                        <Tooltip title="个人设置">
-                            <Button type="text" shape="circle" icon={<SettingOutlined />} onClick={() => navigate('/settings')} />
-                        </Tooltip>
+                    <Space size={12}>
+                        {/* Language Switch */}
                         <Dropdown
                             menu={{
-                                items: userMenuItems,
-                                onClick: handleUserMenuClick,
+                                items: [
+                                    {
+                                        key: 'zh-CN',
+                                        label: '简体中文',
+                                        onClick: () => message.success('已切换至简体中文')
+                                    },
+                                    {
+                                        key: 'en-US',
+                                        label: 'English',
+                                        onClick: () => message.success('Switched to English')
+                                    }
+                                ]
                             }}
                             placement="bottomRight"
-                            arrow
                         >
-                            <Space style={{ cursor: 'pointer' }} className="user-dropdown">
+                            <Button
+                                type="text"
+                                shape="circle"
+                                icon={<TranslationOutlined />}
+                            />
+                        </Dropdown>
+                        <Tooltip title="消息通知">
+                            <Button type="text" shape="circle" icon={
+                                <Badge dot offset={[-2, 2]}>
+                                    <BellOutlined style={{ fontSize: 18 }} />
+                                </Badge>
+                            } />
+                        </Tooltip>
+
+                        {/* User Info Dropdown */}
+                        <Dropdown
+                            menu={{
+                                items: [
+                                    {
+                                        key: 'settings',
+                                        label: '个人设置',
+                                        icon: <SettingOutlined />,
+                                        onClick: () => navigate('/settings')
+                                    },
+                                    {
+                                        key: 'logout',
+                                        label: '退出登录',
+                                        icon: <LogoutOutlined />,
+                                        danger: true,
+                                        onClick: async () => {
+                                            try {
+                                                await logout();
+                                                setMenuItems([]);
+                                                navigate('/login', { replace: true });
+                                            } catch (error) {
+                                                console.error('登出失败:', error);
+                                                setMenuItems([]);
+                                                navigate('/login', { replace: true });
+                                            }
+                                        }
+                                    }
+                                ]
+                            }}
+                            placement="bottomRight"
+                        >
+                            <Space className="user-info" style={{ cursor: 'pointer' }}>
                                 <Avatar
                                     src={currentUserInfo?.avatarUrl || currentUser?.avatarUrl || currentUser?.avatar}
                                     icon={<UserOutlined />}
@@ -486,15 +579,11 @@ function MainLayout() {
                     </Space>
                 </Header>
                 <Content style={{
-                    margin: '24px',
+                    margin: '16px',
                     minHeight: 280,
                 }}>
                     <div className="fade-in" style={{
-                        background: colorBgContainer,
-                        padding: 24,
-                        borderRadius: borderRadiusLG,
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
-                        minHeight: 'calc(100vh - 160px)'
+                        minHeight: 'calc(100vh - 144px)'
                     }}>
                         <Outlet />
                     </div>

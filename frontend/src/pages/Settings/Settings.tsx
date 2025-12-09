@@ -1,104 +1,117 @@
-import { useState } from 'react';
-import { Card, Tabs, Space, Breadcrumb, Button, Divider } from 'antd';
+import React, { useState } from 'react';
+import { Card, Menu, Typography, theme } from 'antd';
 import {
-  SafetyOutlined,
   UserOutlined,
-  HomeOutlined
+  SafetyOutlined,
+  BellOutlined,
+  SkinOutlined
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import ChangePasswordForm from './components/ChangePasswordForm';
-import ProfileView from './components/ProfileView';
 import ProfileEditForm from './components/ProfileEditForm';
+import ChangePasswordForm from './components/ChangePasswordForm';
+import NotificationSettings from './components/NotificationSettings';
+import SystemPreferences from './components/SystemPreferences';
 import './Settings.css';
 
-function Settings() {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('profile');
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [profileRefreshKey, setProfileRefreshKey] = useState(0);
+const { Title, Text } = Typography;
 
-  const tabItems = [
+const Settings: React.FC = () => {
+  const [selectedKey, setSelectedKey] = useState('profile');
+  const { token } = theme.useToken();
+
+  const menuItems = [
     {
       key: 'profile',
-      label: (
-        <Space>
-          <UserOutlined />
-          <span>个人资料</span>
-        </Space>
-      ),
-      children: (
-        <div className="settings-tab-content">
-          {isEditingProfile ? (
-            <ProfileEditForm
-              onSuccess={() => {
-                setIsEditingProfile(false);
-                setProfileRefreshKey(prev => prev + 1);
-              }}
-              onCancel={() => {
-                setIsEditingProfile(false);
-              }}
-            />
-          ) : (
-            <ProfileView
-              onEdit={() => {
-                setIsEditingProfile(true);
-              }}
-              refreshTrigger={profileRefreshKey}
-            />
-          )}
-        </div>
-      ),
+      icon: <UserOutlined />,
+      label: '个人资料',
     },
     {
       key: 'security',
-      label: (
-        <Space>
-          <SafetyOutlined />
-          <span>账户安全</span>
-        </Space>
-      ),
-      children: (
-        <div className="settings-tab-content">
-          <ChangePasswordForm />
-        </div>
-      ),
+      icon: <SafetyOutlined />,
+      label: '账号安全',
+    },
+    {
+      key: 'notification',
+      icon: <BellOutlined />,
+      label: '消息通知',
+    },
+    {
+      key: 'preferences',
+      icon: <SkinOutlined />,
+      label: '系统偏好',
     },
   ];
 
+  const renderContent = () => {
+    switch (selectedKey) {
+      case 'profile':
+        return (
+          <div>
+            <Title level={4} style={{ marginBottom: 24, marginTop: 0 }}>个人资料</Title>
+            <ProfileEditForm />
+          </div>
+        );
+      case 'security':
+        return (
+          <div>
+            <Title level={4} style={{ marginBottom: 8, marginTop: 0 }}>账号安全</Title>
+            <Text type="secondary" style={{ display: 'block', marginBottom: 24 }}>管理您的登录密码及双重验证设置。</Text>
+            <ChangePasswordForm />
+          </div>
+        );
+      case 'notification':
+        return (
+          <div>
+            <Title level={4} style={{ marginBottom: 24, marginTop: 0 }}>消息通知</Title>
+            <NotificationSettings />
+          </div>
+        );
+      case 'preferences':
+        return (
+          <div>
+            <Title level={4} style={{ marginBottom: 24, marginTop: 0 }}>系统偏好</Title>
+            <SystemPreferences />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div style={{ padding: '24px', minHeight: '100vh' }}>
-      {/* 面包屑导航 */}
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
-        <Breadcrumb
-          items={[
-            {
-              title: (
-                <Space onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                  <HomeOutlined />
-                  <span>首页</span>
-                </Space>
-              )
-            },
-            {
-              title: '个人资料'
-            }
-          ]}
-        />
-      </div>
+    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh', display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
 
-      <Divider />
+      {/* Left Sidebar */}
+      <Card
+        className="settings-sidebar modern-card"
+        style={{ width: 280, flexShrink: 0 }}
+        styles={{ body: { padding: '12px' } }}
+      >
+        <div style={{ padding: '12px 16px 24px 16px' }}>
+          <Title level={4} style={{ margin: 0 }}>设置中心</Title>
+          <Text type="secondary" style={{ fontSize: '12px' }}>管理您的账号与系统偏好</Text>
+        </div>
 
-      <Card>
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          items={tabItems}
-          size="large"
+        <Menu
+          mode="vertical"
+          selectedKeys={[selectedKey]}
+          items={menuItems}
+          onClick={({ key }) => setSelectedKey(key)}
+          style={{ borderRight: 'none' }}
+          className="settings-menu"
+          theme="light"
         />
+      </Card>
+
+      {/* Right Content */}
+      <Card
+        className="settings-content modern-card"
+        style={{ flex: 1, minHeight: 600 }}
+        styles={{ body: { padding: '32px' } }}
+      >
+        {renderContent()}
       </Card>
     </div>
   );
-}
+};
 
 export default Settings;
-

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Form, Input, Select, Upload, Button, Space, Avatar, App, Spin } from 'antd';
-import { UserOutlined, UploadOutlined } from '@ant-design/icons';
+import { Form, Input, Select, Upload, Button, Space, Avatar, App, Spin, Row, Col } from 'antd';
+import { UserOutlined, UploadOutlined, CheckCircleFilled } from '@ant-design/icons';
 import { getCurrentUserInfoApi, updateProfileApi, type UpdateProfileRequest } from '../../../api/auth';
 import type { UserEntity } from '../../../types';
 
@@ -133,112 +133,143 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
 
   return (
     <Spin spinning={loadingData}>
+      {/* 标题部分 */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ fontSize: '16px', fontWeight: 500, color: '#1f1f1f', marginBottom: 4 }}>基本信息</div>
+        <div style={{ fontSize: '14px', color: '#8c8c8c' }}>更新您的头像和个人详细信息。</div>
+      </div>
+
       <Form autoComplete="off"
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        style={{ maxWidth: 600 }}
       >
-        <Form.Item
-          name="avatarUrl"
-          label="头像"
-        >
-          <Space direction="vertical" align="center">
-            <Avatar
-              size={100}
-              src={avatarUrl || undefined}
-              icon={<UserOutlined />}
-            />
-            <Upload
-              name="file"
-              action="/api/common/file/upload2/original"
-              showUploadList={false}
-              onChange={handleAvatarChange}
-              withCredentials
-              accept="image/*"
-              beforeUpload={(file) => {
-                const isImage = file.type.startsWith('image/');
-                if (!isImage) {
-                  message.error('只能上传图片文件！');
-                  return Upload.LIST_IGNORE;
-                }
-                const isLt5M = file.size / 1024 / 1024 < 5;
-                if (!isLt5M) {
-                  message.error('图片大小不能超过 5MB！');
-                  return Upload.LIST_IGNORE;
-                }
-                return true;
-              }}
-            >
-              <Button icon={<UploadOutlined />}>上传头像</Button>
-            </Upload>
-          </Space>
-        </Form.Item>
+        <Row gutter={48}>
+          {/* 左侧头像 */}
+          <Col xs={24} md={6} style={{ textAlign: 'center' }}>
+            <Form.Item name="avatarUrl" style={{ marginBottom: 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{
+                  position: 'relative',
+                  width: 120,
+                  height: 120,
+                  marginBottom: 16,
+                  cursor: 'pointer'
+                }}>
+                  <Avatar
+                    size={120}
+                    src={avatarUrl || undefined}
+                    icon={<UserOutlined />}
+                    style={{ border: '1px solid #f0f0f0' }}
+                  />
+                  <Upload
+                    name="file"
+                    action="/api/common/file/upload2/original"
+                    showUploadList={false}
+                    onChange={handleAvatarChange}
+                    withCredentials
+                    accept="image/*"
+                    beforeUpload={(file) => {
+                      const isImage = file.type.startsWith('image/');
+                      if (!isImage) {
+                        message.error('只能上传图片文件！');
+                        return Upload.LIST_IGNORE;
+                      }
+                      const isLt5M = file.size / 1024 / 1024 < 5;
+                      if (!isLt5M) {
+                        message.error('图片大小不能超过 5MB！');
+                        return Upload.LIST_IGNORE;
+                      }
+                      return true;
+                    }}
+                  >
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      right: 0,
+                      width: 32,
+                      height: 32,
+                      background: '#fff',
+                      borderRadius: '50%',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      color: '#5b73e8'
+                    }}>
+                      <UploadOutlined />
+                    </div>
+                  </Upload>
+                </div>
+                <div style={{ color: '#666', fontSize: '12px', marginTop: 8 }}>点击更换头像</div>
+              </div>
+            </Form.Item>
+          </Col>
 
-        <Form.Item
-          name="realName"
-          label="真实姓名"
-          rules={[{ required: true, message: '请输入真实姓名' }]}
-        >
-          <Input placeholder="请输入真实姓名" allowClear />
-        </Form.Item>
+          {/* 右侧表单 */}
+          <Col xs={24} md={18}>
+            <Row gutter={24}>
+              <Col xs={24} sm={12}>
+                <Form.Item
+                  name="realName"
+                  label="用户姓名"
+                  rules={[{ required: true, message: '请输入用户姓名' }]}
+                >
+                  <Input placeholder="请输入用户姓名" allowClear size="large" />
+                </Form.Item>
+              </Col>
 
-        <Form.Item
-          name="mobileNo"
-          label="手机号码"
-          rules={[
-            { required: true, message: '请输入手机号码' },
-            { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' }
-          ]}
-        >
-          <Input placeholder="请输入手机号码" maxLength={11} allowClear />
-        </Form.Item>
+              <Col xs={24} sm={12}>
+                <Form.Item
+                  name="mobileNo"
+                  label="手机号码"
+                  rules={[
+                    { required: true, message: '请输入手机号码' },
+                    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号' }
+                  ]}
+                >
+                  <Input placeholder="请输入手机号码" maxLength={11} allowClear size="large" />
+                </Form.Item>
+              </Col>
 
-        <Form.Item
-          name="email"
-          label="邮箱"
-          rules={[
-            { required: true, message: '请输入邮箱' },
-            { type: 'email', message: '请输入正确的邮箱格式' }
-          ]}
-        >
-          <Input placeholder="请输入邮箱" maxLength={50} allowClear />
-        </Form.Item>
+              <Col span={24}>
+                <Form.Item
+                  name="email"
+                  label="联系邮箱"
+                  rules={[
+                    { required: true, message: '请输入邮箱' },
+                    { type: 'email', message: '请输入正确的邮箱格式' }
+                  ]}
+                >
+                  <Input placeholder="请输入邮箱" maxLength={50} allowClear size="large" />
+                </Form.Item>
+              </Col>
 
-        <Form.Item
-          name="sex"
-          label="性别"
-          rules={[{ required: true, message: '请选择性别' }]}
-        >
-          <Select placeholder="请选择性别">
-            <Option value="male">男</Option>
-            <Option value="female">女</Option>
-          </Select>
-        </Form.Item>
+              <Col span={24}>
+                <Form.Item
+                  name="description"
+                  label="个人简介"
+                >
+                  <TextArea
+                    autoSize={{ minRows: 4, maxRows: 8 }}
+                    placeholder="请输入个人简介..."
+                    maxLength={200}
+                    showCount
+                    allowClear
+                    size="large"
+                  />
+                </Form.Item>
+              </Col>
 
-        <Form.Item
-          name="description"
-          label="备注"
-        >
-          <TextArea
-            autoSize={{ minRows: 3, maxRows: 16 }}
-            placeholder="请输入备注信息"
-            maxLength={200}
-            showCount
-            allowClear
-          />
-        </Form.Item>
-
-        <Form.Item>
-          <Space>
-            <Button onClick={onCancel}>
-              取消
-            </Button>
-            <Button type="primary" htmlType="submit" loading={loading}>
-              保存
-            </Button>
-          </Space>
-        </Form.Item>
+              <Col span={24} style={{ textAlign: 'right', marginTop: 12 }}>
+                <Button type="primary" htmlType="submit" loading={loading} size="large" icon={<CheckCircleFilled />}>
+                  保存更改
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
       </Form>
     </Spin>
   );

@@ -428,7 +428,7 @@ const MenuList: React.FC = () => {
       title: '创建时间',
       dataIndex: 'createdDate',
       key: 'createdDate',
-      width: 150,
+      width: 180,
       render: (date: string) => formatDateTime(date)
     },
     {

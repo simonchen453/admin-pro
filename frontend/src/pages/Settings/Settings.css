@@ -1,4 +1,30 @@
-.settings-tab-content {
-  padding: 0;
+.settings-menu .ant-menu-item {
+  height: 50px;
+  line-height: 50px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  color: #333333 !important;
+  /* Explicitly set text color with !important */
+  /* Explicitly set text color */
 }
 
+.settings-menu .ant-menu-item-selected {
+  background-color: #eff4ff;
+  color: #5b73e8;
+  font-weight: 500;
+}
+
+.settings-menu .ant-menu-item:not(.ant-menu-item-selected):hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.modern-card {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  transition: box-shadow 0.3s;
+}
+
+.modern-card:hover {
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.08), 0 9px 28px 0 rgba(0, 0, 0, 0.05), 0 12px 48px 16px rgba(0, 0, 0, 0.03);
+}

@@ -164,6 +164,12 @@ function MainLayout() {
     // 获取当前路径的面包屑数据
     const getBreadcrumbItems = () => {
         const currentPath = location.pathname;
+
+        // 如果是首页，直接返回首页面包屑，避免重复
+        if (currentPath === '/' || currentPath === '/home') {
+            return [{ title: '首页' }];
+        }
+
         const items: { title: React.ReactNode, href?: string }[] = [
             { title: '首页', href: '/' }
         ];

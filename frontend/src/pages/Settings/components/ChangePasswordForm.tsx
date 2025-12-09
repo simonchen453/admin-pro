@@ -215,30 +215,39 @@ const ChangePasswordForm: React.FC = () => {
   return (
     <div>
       <Card
+        className="modern-card"
         title={
           <Space>
-            <SafetyOutlined />
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 32,
+              height: 32,
+              background: '#eff4ff',
+              borderRadius: 6,
+              color: '#5b73e8'
+            }}>
+              <LockOutlined />
+            </span>
             <span>修改密码</span>
           </Space>
         }
+        styles={{
+          header: { borderBottom: 'none', paddingTop: 20, paddingLeft: 24, paddingRight: 24 },
+          body: { paddingTop: 0, paddingLeft: 24, paddingRight: 24, paddingBottom: 24 }
+        }}
+        style={{ background: '#f8f9fa', border: '1px solid #f0f0f0' }}
+        bordered={false}
       >
-        <Alert
-          message="密码安全提示"
-          description="为了您的账户安全，请定期更换密码，并使用强密码。"
-          type="info"
-          icon={<SafetyOutlined />}
-          showIcon
-          style={{ marginBottom: 24 }}
-        />
-
         <Form autoComplete="off"
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
           validateTrigger={['onBlur', 'onSubmit']}
-          style={{ maxWidth: 600 }}
+          style={{ marginTop: 20 }}
         >
-          <Row gutter={[0, 16]}>
+          <Row gutter={24}>
             <Col span={24}>
               <Form.Item
                 name="currentPassword"
@@ -249,15 +258,14 @@ const ChangePasswordForm: React.FC = () => {
               >
                 <Input.Password
                   placeholder="请输入当前密码"
-                  prefix={<LockOutlined />}
-                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                   size="large"
                   allowClear
+                  style={{ background: '#fff' }}
                 />
               </Form.Item>
             </Col>
 
-            <Col span={24}>
+            <Col xs={24} md={12}>
               <Form.Item
                 name="newPassword"
                 label="新密码"
@@ -265,15 +273,11 @@ const ChangePasswordForm: React.FC = () => {
               >
                 <Input.Password
                   placeholder="请输入新密码"
-                  prefix={<LockOutlined />}
-                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                   size="large"
                   allowClear
+                  style={{ background: '#fff' }}
                   onChange={(e) => {
-                    // 确保 Form.useWatch 能监听到变化
-                    // 不在这里设置值，让 Form 自己管理
                     const value = e.target.value;
-                    // 如果字段有错误且现在有值，清除错误
                     if (value) {
                       const errors = form.getFieldError('newPassword');
                       if (errors.length > 0) {
@@ -286,10 +290,10 @@ const ChangePasswordForm: React.FC = () => {
                 />
               </Form.Item>
               {newPasswordValue && (
-                <div style={{ marginTop: -16, marginBottom: 16 }}>
+                <div style={{ marginTop: -8, marginBottom: 16 }}>
                   <div style={{
                     height: 4,
-                    backgroundColor: '#f0f0f0',
+                    backgroundColor: '#e6e6e6',
                     borderRadius: 2,
                     overflow: 'hidden'
                   }}>
@@ -311,7 +315,7 @@ const ChangePasswordForm: React.FC = () => {
               )}
             </Col>
 
-            <Col span={24}>
+            <Col xs={24} md={12}>
               <Form.Item
                 name="confirmPassword"
                 label="确认新密码"
@@ -336,15 +340,11 @@ const ChangePasswordForm: React.FC = () => {
               >
                 <Input.Password
                   placeholder="请再次输入新密码"
-                  prefix={<LockOutlined />}
-                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                   size="large"
                   allowClear
+                  style={{ background: '#fff' }}
                   onChange={(e) => {
-                    // 确保 Form.useWatch 能监听到变化
-                    // 不在这里设置值，让 Form 自己管理
                     const value = e.target.value;
-                    // 如果字段有错误且现在有值，清除错误
                     if (value) {
                       const errors = form.getFieldError('confirmPassword');
                       if (errors.length > 0) {
@@ -356,65 +356,20 @@ const ChangePasswordForm: React.FC = () => {
                   }}
                 />
               </Form.Item>
-              {confirmPasswordValue && newPasswordValue && (
-                <div style={{ marginTop: -16, marginBottom: 16 }}>
-                  {confirmPasswordValue === newPasswordValue ? (
-                    <Text style={{ color: '#52c41a', fontSize: '12px' }}>
-                      ✓ 密码一致
-                    </Text>
-                  ) : (
-                    <Text style={{ color: '#ff4d4f', fontSize: '12px' }}>
-                      ✗ 两次输入的密码不一致
-                    </Text>
-                  )}
-                </div>
-              )}
             </Col>
           </Row>
 
-          <Card
-            size="small"
-            style={{
-              marginTop: 16,
-              marginBottom: 24,
-              backgroundColor: '#fafafa'
-            }}
-            title={<Text strong>密码要求</Text>}
-          >
-            {passwordRule ? (
-              <ul style={{ margin: 0, paddingLeft: 20 }}>
-                <li>至少{passwordRule.minLength}位字符{passwordRule.maxLength ? `，最多${passwordRule.maxLength}位` : ''}</li>
-                {passwordRule.requireLowerCase && <li>包含小写字母</li>}
-                {passwordRule.requireUpperCase && <li>包含大写字母</li>}
-                {passwordRule.requireDigit && <li>包含数字</li>}
-                {passwordRule.requireSpecialChar && <li>包含特殊字符 ({passwordRule.specialChars})</li>}
-              </ul>
-            ) : (
-              <ul style={{ margin: 0, paddingLeft: 20 }}>
-                <li>加载中...</li>
-              </ul>
-            )}
-          </Card>
-
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Space size="middle">
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={isLoading}
-                icon={<CheckCircleOutlined />}
-                size="large"
-              >
-                确认修改
-              </Button>
-              <Button
-                onClick={() => form.resetFields()}
-                size="large"
-              >
-                重置
-              </Button>
-            </Space>
-          </Form.Item>
+          <div style={{ textAlign: 'right', marginTop: 8 }}>
+            <Button
+              type="link"
+              htmlType="submit"
+              loading={isLoading}
+              size="large"
+              style={{ fontWeight: 500 }}
+            >
+              确认修改
+            </Button>
+          </div>
         </Form>
       </Card>
     </div>

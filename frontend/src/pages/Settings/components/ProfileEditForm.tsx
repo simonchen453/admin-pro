@@ -248,6 +248,19 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
 
               <Col span={24}>
                 <Form.Item
+                  name="sex"
+                  label="性别"
+                >
+                  <Select placeholder="请选择性别" size="large" allowClear>
+                    <Option value="male">男</Option>
+                    <Option value="female">女</Option>
+                    <Option value="unknown">保密</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col span={24}>
+                <Form.Item
                   name="description"
                   label="个人简介"
                 >

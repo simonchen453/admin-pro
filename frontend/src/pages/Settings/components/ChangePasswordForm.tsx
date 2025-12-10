@@ -17,7 +17,7 @@ import {
   EyeInvisibleOutlined,
   EyeTwoTone,
   CheckCircleOutlined,
-  SafetyOutlined
+  SafetyOutlined, CheckCircleFilled
 } from '@ant-design/icons';
 import { changePasswordApi, getPasswordRuleApi, type PasswordRule } from '../../../api/auth';
 
@@ -361,10 +361,11 @@ const ChangePasswordForm: React.FC = () => {
 
           <div style={{ textAlign: 'right', marginTop: 8 }}>
             <Button
-              type="link"
+              type="primary"
               htmlType="submit"
               loading={isLoading}
               size="large"
+              icon={<CheckCircleFilled />}
               style={{ fontWeight: 500 }}
             >
               确认修改

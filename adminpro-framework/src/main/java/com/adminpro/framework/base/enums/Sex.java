@@ -22,7 +22,7 @@ public enum Sex {
     /**
      * 未知
      */
-    UNKNOWN("unknown", "未知");
+    UNKNOWN("unknown", "保密");
 
     private String code;
     private String desc;

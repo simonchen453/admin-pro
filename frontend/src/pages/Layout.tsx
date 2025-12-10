@@ -174,6 +174,19 @@ function MainLayout() {
             { title: '首页', href: '/' }
         ];
 
+        // 特殊路径处理（不在菜单中的页面）
+        const specialPaths: Record<string, string> = {
+            '/settings': '个人设置'
+        };
+
+        if (specialPaths[currentPath]) {
+            items.push({
+                title: specialPaths[currentPath],
+                href: undefined
+            });
+            return items;
+        }
+
         // 查找当前页面对应的菜单项
         let currentMenuItem: MenuItem | null = null;
 

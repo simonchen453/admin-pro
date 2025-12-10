@@ -63,6 +63,7 @@ Admin Pro 是一个前后端分离的企业级权限管理系统，提供完整�
 - **构建工具**: Vite 7.2.4
 - **UI组件库**: Ant Design 6.0.1
 - **国际化**: i18next + react-i18next
+- **语言**: TypeScript 5.9.3
 
 ## 项目结构
 
@@ -90,7 +91,7 @@ admin-pro/
 ├── adminpro-system/                 # 后端：业务系统模块
 │   └── src/main/java/com/adminpro/
 │       ├── system/
-│       │   ├── api/                  # APK相关API
+│       │   ├── api/                  # API相关API
 │       │   ├── config/               # 配置类
 │       │   │   ├── ApiWebSecurityConfig.java
 │       │   │   ├── CaptchaConfig.java
@@ -104,34 +105,34 @@ admin-pro/
 │       │   ├── core/                 # 核心功能
 │       │   │   ├── batchjob/         # 定时任务（Quartz）
 │       │   │   ├── cache/            # 缓存管理
-│       │   │   ├── common/            # 通用工具
-│       │   │   │   ├── annotation/    # 注解（@SysLog等）
-│       │   │   │   ├── aspect/        # AOP切面
-│       │   │   │   ├── constants/     # 常量定义
-│       │   │   │   ├── helper/        # 辅助类
-│       │   │   │   └── web/           # Web基础类
-│       │   │   ├── exceptions/        # 异常定义
-│       │   │   ├── filters/           # 过滤器
-│       │   │   ├── manager/           # 管理器（异步、关闭等）
-│       │   │   └── security/          # 安全相关
+│       │   │   ├── common/           # 通用工具
+│       │   │   │   ├── annotation/   # 注解（@SysLog等）
+│       │   │   │   ├── aspect/       # AOP切面
+│       │   │   │   ├── constants/    # 常量定义
+│       │   │   │   ├── helper/       # 辅助类
+│       │   │   │   └── web/          # Web基础类
+│       │   │   ├── exceptions/       # 异常定义
+│       │   │   ├── filters/          # 过滤器
+│       │   │   ├── manager/          # 管理器（异步、关闭等）
+│       │   │   └── security/         # 安全相关
 │       │   ├── rbac/                 # RBAC权限模块
-│       │   │   ├── api/               # 权限API辅助类
-│       │   │   ├── common/            # 公共常量
-│       │   │   ├── domains/           # 领域模型
+│       │   │   ├── api/              # 权限API辅助类
+│       │   │   ├── common/           # 公共常量
+│       │   │   ├── domains/          # 领域模型
 │       │   │   │   ├── entity/       # 实体类（User、Role、Menu等）
 │       │   │   │   └── vo/           # 视图对象
-│       │   │   ├── encrypt/          # 加密工具（密码加密）
-│       │   │   └── enums/            # 枚举类
+│       │   │   ├── encrypt/         # 加密工具（密码加密）
+│       │   │   └── enums/           # 枚举类
 │       │   ├── tools/                # 工具模块
-│       │   │   ├── api/              # 工具API（OSS、支付等）
-│       │   │   ├── domains/          # 领域模型
-│       │   │   ├── gen/              # 代码生成器
-│       │   │   ├── lock/             # 分布式锁
-│       │   │   ├── payment/          # 支付（支付宝、微信）
-│       │   │   ├── ueditor/          # 富文本编辑器
-│       │   │   └── wx/               # 微信相关
-│       │   └── web/                  # Web控制器
-│       │       ├── rbac/             # 权限相关控制器
+│       │   │   ├── api/             # 工具API（OSS、支付等）
+│       │   │   ├── domains/         # 领域模型
+│       │   │   ├── gen/             # 代码生成器
+│       │   │   ├── lock/            # 分布式锁
+│       │   │   ├── payment/         # 支付（支付宝、微信）
+│       │   │   ├── ueditor/         # 富文本编辑器
+│       │   │   └── wx/              # 微信相关
+│       │   └── web/                 # Web控制器
+│       │       ├── rbac/            # 权限相关控制器
 │       │       │   ├── AuthController.java
 │       │       │   ├── UserController.java
 │       │       │   ├── RoleController.java
@@ -139,7 +140,7 @@ admin-pro/
 │       │       │   ├── DeptController.java
 │       │       │   ├── PostController.java
 │       │       │   └── DomainController.java
-│       │       └── tools/            # 工具相关控制器
+│       │       └── tools/           # 工具相关控制器
 │       │           ├── CodeGeneratorController.java
 │       │           ├── JobController.java
 │       │           ├── ConfigController.java
@@ -147,8 +148,8 @@ admin-pro/
 │       │           ├── AuditLogController.java
 │       │           └── ...
 │       └── src/main/resources/
-│           ├── changelog/            # Liquibase变更日志
-│           └── templates/          # FreeMarker模板（代码生成）
+│           ├── changelog/           # Liquibase变更日志
+│           └── templates/           # FreeMarker模板（代码生成）
 ├── adminpro-web/                    # 后端：Web启动模块
 │   ├── src/main/java/com/adminpro/
 │   │   └── Application.java         # 启动类
@@ -198,6 +199,7 @@ admin-pro/
 ├── pom.xml                          # Maven父POM
 ├── docker-compose.yml               # Docker Compose配置
 ├── docker-compose.prod.yml          # 生产环境配置
+├── Makefile                         # 便捷命令
 ├── DOCKER_DEPLOY.md                 # Docker部署文档
 └── README.md                        # 项目文档
 ```
@@ -344,9 +346,41 @@ pnpm dev
 
 #### 快速部署
 
+使用 Makefile 提供的便捷命令：
+
+```bash
+# 查看所有可用命令
+make help
+
+# 构建镜像
+make build
+
+# 启动服务（生产环境）
+make up
+
+# 查看日志
+make logs
+make logs-backend
+make logs-frontend
+
+# 查看服务状态
+make ps
+
+# 停止服务
+make down
+
+# 重启服务
+make restart
+
+# 清理容器和镜像
+make clean
+```
+
+或直接使用 Docker Compose：
+
 ```bash
 # 使用 Docker Compose 一键部署
-docker-compose up -d
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 **注意**: 数据库使用外部独立服务，不包含在 Docker Compose 中。请确保数据库服务已启动并配置好连接信息。

@@ -21,6 +21,7 @@ public class UserInfoResponseVo extends BaseVO {
     private String status;
     private String deptNo;
     private String deptName;
+    private String description;
     private Date latestLoginTime;
 }
 

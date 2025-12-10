@@ -194,7 +194,7 @@ public class AuthController extends BaseController {
             userInfoVo.setStatus(userEntity.getStatus());
             userInfoVo.setDeptNo(userEntity.getDeptNo());
             userInfoVo.setLatestLoginTime(userEntity.getLatestLoginTime());
-            
+            userInfoVo.setDescription(userEntity.getDescription());
             // 根据部门编号查询部门名称
             String deptNo = userEntity.getDeptNo();
             if (StringUtils.isNotEmpty(deptNo)) {

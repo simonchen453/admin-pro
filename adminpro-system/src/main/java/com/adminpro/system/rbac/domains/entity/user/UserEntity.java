@@ -339,7 +339,7 @@ public class UserEntity extends BaseAuditEntity {
      */
     private Date latestChangePwdTime;
     /**
-     * 用户描述
+     * 个人简介
      */
     @Size(max = 255)
     private String description;

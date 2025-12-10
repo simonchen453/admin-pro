@@ -23,6 +23,9 @@ public class UpdateProfileVo extends BaseVO {
     @Size(max = 12)
     private String sex;
 
+    /**
+     * 个人简介
+     */
     @Size(max = 255)
     private String description;
 }

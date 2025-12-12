@@ -615,7 +615,7 @@ const UserList: React.FC = () => {
                   allowClear
                   treeDefaultExpandAll
                   style={{ width: '100%' }}
-                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  styles={{ popup: { root: { maxHeight: 400, overflow: 'auto' } } }}
                 />
               </Form.Item>
             </Col>

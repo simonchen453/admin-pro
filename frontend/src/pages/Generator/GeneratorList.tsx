@@ -48,7 +48,7 @@ const GeneratorList: React.FC = () => {
     try {
       const params = {
         ...(searchParams || searchForm),
-        pageNo: (page ?? currentPage) - 1,
+        pageNo: page ?? currentPage,
         pageSize: size ?? pageSize
       };
 

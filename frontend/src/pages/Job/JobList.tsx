@@ -393,7 +393,7 @@ const JobList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
+    <div className="fade-in" style={{ padding: '0' }}>
 
 
       <Card className="modern-card" styles={{ body: { padding: '24px' } }}>

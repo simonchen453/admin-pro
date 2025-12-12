@@ -163,7 +163,7 @@ const ServerInfo: React.FC = () => {
     : [];
 
   return (
-    <div className="fade-in" style={{ padding: '0', minHeight: '100vh' }}>
+    <div className="fade-in" style={{ padding: '0' }}>
 
 
       <Spin spinning={loading}>

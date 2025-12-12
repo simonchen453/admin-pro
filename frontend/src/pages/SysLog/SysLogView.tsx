@@ -77,7 +77,7 @@ const SysLogView: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
+    <div style={{ padding: '24px', background: '#f5f5f5' }}>
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
         <Breadcrumb
           items={[

@@ -414,7 +414,7 @@ function MainLayout() {
     }, [collapsed, menuItems, location.pathname]);
 
     return (
-        <AntLayout style={{ minHeight: '100vh' }}>
+        <AntLayout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'row' }}>
             <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
                 <Sider
                     collapsible
@@ -481,7 +481,11 @@ function MainLayout() {
             <AntLayout style={{
                 marginLeft: collapsed ? 0 : 260,
                 transition: 'margin-left 0.2s',
-                background: '#f3f4f6'
+                background: '#f3f4f6',
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: '100vh',
+                flex: 1
             }}>
                 <Header style={{
                     padding: '0 24px',
@@ -599,15 +603,22 @@ function MainLayout() {
                 </Header>
                 <Content style={{
                     margin: '16px',
-                    minHeight: 280,
+                    minHeight: 'calc(100vh - 80px - 80px)',
+                    flex: '1 1 auto',
+                    display: 'flex',
+                    flexDirection: 'column',
                 }}>
-                    <div className="fade-in" style={{
-                        minHeight: 'calc(100vh - 144px)'
-                    }}>
+                    <div className="fade-in" style={{ flex: 1 }}>
                         <Outlet />
                     </div>
                 </Content>
-                <Footer style={{ textAlign: 'center', background: 'transparent', color: '#9ca3af' }}>
+                <Footer style={{ 
+                    textAlign: 'center', 
+                    background: 'transparent', 
+                    color: '#9ca3af',
+                    flexShrink: 0,
+                    padding: '16px 0'
+                }}>
                     <div className="copyright-text">
                         {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} Admin Pro. All rights reserved.`}
                     </div>

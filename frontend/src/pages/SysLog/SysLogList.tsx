@@ -259,7 +259,7 @@ const SysLogList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '0', background: '#f5f5f5', minHeight: '100vh' }}>
+    <div className="fade-in" style={{ padding: '0', background: '#f5f5f5' }}>
 
 
       <Divider />

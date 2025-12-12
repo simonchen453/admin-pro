@@ -78,7 +78,7 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="fade-in" style={{ padding: '24px', minHeight: '100vh', display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+    <div className="fade-in" style={{ padding: '24px', display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
 
       {/* Left Sidebar */}
       <Card

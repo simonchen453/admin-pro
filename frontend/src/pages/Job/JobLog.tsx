@@ -237,7 +237,7 @@ const JobLog: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '0', background: '#f5f5f5', minHeight: '100vh' }}>
+    <div style={{ padding: '0', background: '#f5f5f5' }}>
       <Card>
         <Card size="small" style={{ marginBottom: 16 }}>
           <Form autoComplete="off"

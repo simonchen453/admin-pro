@@ -95,12 +95,58 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         apiResponse.put(REST_CODE, String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
                     }
                 }
+
+                // Explicitly try to get the exception
+                Throwable t = getError(requestAttributes);
+
                 String path = (String) errorAttributes.get("path");
                 String trace = (String) errorAttributes.get("trace");
                 String message = (String) errorAttributes.get(MESSAGE);
+                String exception = (String) errorAttributes.get("exception");
+
+                // If super failed to get details but we successfully got the exception,
+                // populate them manually
+                if (t != null) {
+                    if (message == null) {
+                        message = t.getMessage();
+                    }
+                    if (exception == null) {
+                        exception = t.getClass().getName();
+                    }
+                    if (trace == null) {
+                        try (java.io.StringWriter sw = new java.io.StringWriter();
+                                java.io.PrintWriter pw = new java.io.PrintWriter(sw)) {
+                            t.printStackTrace(pw);
+                            trace = sw.toString();
+                        } catch (Exception ignore) {
+                        }
+                    }
+                } else {
+                    // unexpected error, check status code
+                    Object statusCode = requestAttributes.getAttribute("jakarta.servlet.error.status_code",
+                            WebRequest.SCOPE_REQUEST);
+                    if (statusCode != null) {
+                        apiResponse.put(REST_CODE, statusCode.toString());
+                    }
+                    Object errorMessage = requestAttributes.getAttribute("jakarta.servlet.error.message",
+                            WebRequest.SCOPE_REQUEST);
+                    if (errorMessage != null) {
+                        message = errorMessage.toString();
+                    }
+                }
+
                 apiResponse.put(MESSAGE, message != null ? message : "Unknown error");
                 apiResponse.put("success", false);
                 apiResponse.put("path", path != null ? path : "");
+                // Pass trace and exception to controller for logging, but controller must
+                // remove them before responding
+                if (trace != null) {
+                    apiResponse.put("trace", trace);
+                }
+                if (exception != null) {
+                    apiResponse.put("exception", exception);
+                }
+
                 apiResponse.put("errors", null);
                 apiResponse.put("data", null);
                 logger.debug("===============errorAttributes start===========================");

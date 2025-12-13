@@ -4,6 +4,7 @@ import com.adminpro.system.core.common.helper.ConfigHelper;
 import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.tools.domains.entity.exceptionlog.ExceptionLogEntity;
 import com.adminpro.system.tools.domains.entity.exceptionlog.ExceptionLogService;
+import org.apache.commons.lang3.StringUtils;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +33,7 @@ import java.util.Map;
 @RestController
 public class ErrorBasicController implements ErrorController {
     private static final Logger logger = LoggerFactory.getLogger(ErrorBasicController.class);
-    
+
     public static final String ERROR_PATH = "/error";
     public static final String SHOW_EXCEPTION = "egp.errors.show.exception";
 
@@ -42,7 +43,7 @@ public class ErrorBasicController implements ErrorController {
 
     @Autowired
     private ErrorAttributes errorAttributes;
-    
+
     @Autowired
     private ExceptionLogService exceptionLogService;
 
@@ -51,6 +52,10 @@ public class ErrorBasicController implements ErrorController {
         ErrorAttributeOptions errorAttributeOptions = ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE);
         Map<String, Object> errorAttributes = getErrorAttributes(request, errorAttributeOptions);
         logException(errorAttributes);
+
+        // Remove trace and exception before sending to client
+        errorAttributes.remove("trace");
+        errorAttributes.remove("exception");
 
         response.setCharacterEncoding("UTF-8");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -62,6 +67,7 @@ public class ErrorBasicController implements ErrorController {
         String errorPage = ConfigHelper.getString("egp.error.page");
         ErrorAttributeOptions errorAttributeOptions = ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE);
         Map<String, Object> errorAttributes = getErrorAttributes(request, errorAttributeOptions);
+        logException(errorAttributes);
         request.setAttribute("errors", errorAttributes);
 
         if (!StringHelper.isEmpty(errorPage)) {
@@ -76,9 +82,10 @@ public class ErrorBasicController implements ErrorController {
             HtmlCanvas canvas = new HtmlCanvas();
             String resourcePath = request.getContextPath();
             canvas.meta(writer -> {
-                        writer.write(" http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"");
-                    })
-                    .link(HtmlAttributesFactory.href(resourcePath + "/css/error-page.css").rel("stylesheet").type("text/css"))
+                writer.write(" http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"");
+            })
+                    .link(HtmlAttributesFactory.href(resourcePath + "/css/error-page.css").rel("stylesheet")
+                            .type("text/css"))
                     .script(HtmlAttributesFactory.src(resourcePath + "/plugins/jquery/jquery.min.js"))
                     ._script()
                     .script(HtmlAttributesFactory.type("text/javascript"))
@@ -90,7 +97,8 @@ public class ErrorBasicController implements ErrorController {
                     ._script()
                     .div()
                     .div()
-                    .div(HtmlAttributesFactory.class_("fb-rounded-box-content-error-Appexception fb-summary-info-error-Appexception"))
+                    .div(HtmlAttributesFactory
+                            .class_("fb-rounded-box-content-error-Appexception fb-summary-info-error-Appexception"))
                     .div()
                     .div(HtmlAttributesFactory.id("title_head"))
                     .strong().write("An unexpected error has been encountered")
@@ -132,10 +140,29 @@ public class ErrorBasicController implements ErrorController {
         String path = (String) errorAttributes.get("path");
         String message = (String) errorAttributes.get("message");
         String trace = (String) errorAttributes.get("trace");
+        String exception = (String) errorAttributes.get("exception");
 
         ExceptionLogEntity log = new ExceptionLogEntity();
-        log.setDetails(trace);
-        log.setType(message);
+
+        // Use full stack trace for details
+        StringBuilder details = new StringBuilder();
+        if (message != null) {
+            details.append("Message: ").append(message).append("\n");
+        }
+        if (trace != null) {
+            details.append(trace);
+        }
+        log.setDetails(details.toString());
+
+        // Use exception class name as type, fallback to message or "Unknown Error"
+        if (exception != null) {
+            log.setType(exception);
+        } else if (message != null) {
+            log.setType(StringUtils.abbreviate(message, 255));
+        } else {
+            log.setType("Unknown Error");
+        }
+
         log.setPath(path);
         try {
             exceptionLogService.create(log);

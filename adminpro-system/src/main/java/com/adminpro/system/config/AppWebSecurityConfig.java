@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
+ * 针对session less的security配置
  * SpringSecurity的配置
  *
  * @author simon

@@ -20,7 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
  */
 @Configuration
 @Order(1)
-public class ApiWebSecurityConfig {
+public class AppWebSecurityConfig {
 
     @Autowired
     private AuthenticationFilter authenticationFilter;
@@ -42,7 +42,7 @@ public class ApiWebSecurityConfig {
     @Order(1)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .securityMatcher("/api/**")
+                .securityMatcher("/app/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))

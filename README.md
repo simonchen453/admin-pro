@@ -1,684 +1,102 @@
-# Admin Pro 管理系统
+# Admin Pro
 
 <div align="center">
-  <h3>企业级权限管理系统</h3>
-  <p>基于 Spring Boot + React 的现代化管理平台</p>
-  <p>
-    <img src="https://img.shields.io/badge/Spring%20Boot-3.5.6-brightgreen?logo=spring" alt="Spring Boot Version" />
-    <img src="https://img.shields.io/badge/React-19.x-blue?logo=react" alt="React Version" />
-    <img src="https://img.shields.io/badge/TypeScript-5.9.x-blue?logo=typescript" alt="TypeScript Version" />
-    <img src="https://img.shields.io/badge/Java-21-orange?logo=java" alt="Java Version" />
-    <img src="https://img.shields.io/badge/MySQL-8.0+-blue?logo=mysql" alt="MySQL Version" />
-  </p>
+  <h3>现代化企业级权限管理系统</h3>
+  <p>Spring Boot 3 + React 19 + TypeScript + Ant Design 5</p>
 </div>
 
-## 项目简介
 
-Admin Pro 是一个前后端分离的企业级权限管理系统，提供完整的用户管理、角色权限、菜单管理、组织架构等核心功能。系统采用现代化的技术栈，具有良好的扩展性和可维护性。
+## 项目展示
 
-本项目包含三个主要部分：
+<table>
+  <tr>
+    <td align="center">
+      <img src="screenshot/login.png" alt="登录页" width="100%" />
+      <br />
+      <b>登录页</b>
+    </td>
+    <td align="center">
+      <img src="screenshot/home.png" alt="仪表盘" width="100%" />
+      <br />
+      <b>仪表盘</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="screenshot/user.png" alt="用户管理" width="100%" />
+      <br />
+      <b>用户管理</b>
+    </td>
+    <td align="center">
+      <img src="screenshot/menu.png" alt="菜单管理" width="100%" />
+      <br />
+      <b>菜单管理</b>
+    </td>
+  </tr>
+</table>
 
-1. **后端 API**: 基于 Spring Boot 的 RESTful API 服务
-2. **管理后台 (Frontend)**: 基于 React + Ant Design 的单页应用 (SPA)，采用**混合主题**设计（深色侧边栏 + 浅色内容区）
-3. **门户网站 (Portal)**: 基于 React 的多语言展示型官网，采用**高级深色主题**设计
+## 简介
+
+
+Admin Pro 是一个稳健的全栈企业级权限管理系统。它采用 Spring Boot 后端与 React 前端分离的架构，提供现代化的"玻璃拟态"（Glassmorphism）UI 设计和完善的 RBAC（基于角色的访问控制）能力。
+
+## 核心功能
+
+- **RBAC 安全**: 完整的用户、角色、菜单和部门管理。
+- **现代化 UI**: React 19 + Ant Design 5，搭配自定义"玻璃拟态"主题。
+- **强大后端**: Spring Boot 3.5.6, Java 21, MySQL 8.0+。
+- **开发工具**: 代码生成器、Swagger 文档、Quartz 定时任务、系统监控。
+- **SaaS 就绪**: 支持多租户模式（Domain）。
+- **包含门户**: 独立的、SEO 友好的门户网站。
 
 ## 技术栈
 
-### 后端技术
-
-- **框架**: Spring Boot 3.5.6
-- **语言**: Java 21
-- **构建工具**: Maven 3.9+
-- **数据库**: MySQL 8.0+
-- **数据库版本管理**: Liquibase
-- **缓存**: Spring Cache (Simple/Redis/JCache)
-- **API文档**: springdoc-openapi 2.6.0 (OpenAPI 3.0)
-- **模板引擎**: FreeMarker (代码生成)
-- **对象映射**: ModelMapper 3.2.0
-- **JSON处理**: Gson 2.11.0
-- **任务调度**: Quartz
-- **安全框架**: Spring Security 6.x
-- **其他**: 
-  - EasyPOI (Excel导入导出)
-  - Kaptcha (验证码)
-  - Oshi (系统信息监控)
-  - HikariCP (数据库连接池)
-
-### 前端技术 (Frontend - 管理后台)
-
-- **框架**: React 19.1.1
-- **构建工具**: Vite 7.1.7
-- **语言**: TypeScript 5.9.3
-- **UI组件库**: Ant Design 5.27.4
-- **状态管理**: Zustand 5.0.8
-- **路由**: React Router DOM 7.9.4
-- **HTTP客户端**: Axios 1.12.2
-- **表单处理**: React Hook Form + Zod
-- **日期处理**: Day.js
-- **包管理器**: pnpm 9.0.0
-
-### 门户网站 (Portal)
-
-- **框架**: React 19.2.0
-- **构建工具**: Vite 7.2.4
-- **UI组件库**: Ant Design 6.0.1
-- **国际化**: i18next + react-i18next
-- **语言**: TypeScript 5.9.3
-
-## 项目结构
-
-```
-admin-pro/
-├── adminpro-framework/              # 后端：核心框架模块
-│   └── src/main/java/com/adminpro/framework/
-│       ├── aspect/                   # AOP切面（数据源切换）
-│       ├── base/                     # 基础类
-│       │   ├── entity/               # 基础实体类
-│       │   ├── enums/                # 枚举类
-│       │   ├── message/              # 消息处理
-│       │   ├── util/                 # 工具类
-│       │   ├── validator/            # 验证器
-│       │   └── web/                  # Web基础类
-│       ├── client/                   # 客户端信息
-│       ├── config/                   # 核心配置
-│       ├── exceptions/               # 异常定义
-│       ├── jdbc/                     # JDBC封装
-│       │   ├── annotation/           # 数据库注解
-│       │   ├── datasource/           # 动态数据源
-│       │   └── sqlbuilder/           # SQL构建器
-│       └── tools/                    # 工具类
-│           └── seq/                  # 序列号生成
-├── adminpro-system/                 # 后端：业务系统模块
-│   └── src/main/java/com/adminpro/
-│       ├── system/
-│       │   ├── api/                  # API相关API
-│       │   ├── config/               # 配置类
-│       │   │   ├── ApiWebSecurityConfig.java
-│       │   │   ├── CaptchaConfig.java
-│       │   │   ├── EhcacheConfig.java
-│       │   │   ├── ErrorBasicController.java
-│       │   │   ├── GlobalExceptionHandler.java
-│       │   │   ├── RedisCacheConfig.java
-│       │   │   ├── SecurityConfig.java
-│       │   │   ├── SessionConfig.java
-│       │   │   └── SwaggerConfig.java
-│       │   ├── core/                 # 核心功能
-│       │   │   ├── batchjob/         # 定时任务（Quartz）
-│       │   │   ├── cache/            # 缓存管理
-│       │   │   ├── common/           # 通用工具
-│       │   │   │   ├── annotation/   # 注解（@SysLog等）
-│       │   │   │   ├── aspect/       # AOP切面
-│       │   │   │   ├── constants/    # 常量定义
-│       │   │   │   ├── helper/       # 辅助类
-│       │   │   │   └── web/          # Web基础类
-│       │   │   ├── exceptions/       # 异常定义
-│       │   │   ├── filters/          # 过滤器
-│       │   │   ├── manager/          # 管理器（异步、关闭等）
-│       │   │   └── security/         # 安全相关
-│       │   ├── rbac/                 # RBAC权限模块
-│       │   │   ├── api/              # 权限API辅助类
-│       │   │   ├── common/           # 公共常量
-│       │   │   ├── domains/          # 领域模型
-│       │   │   │   ├── entity/       # 实体类（User、Role、Menu等）
-│       │   │   │   └── vo/           # 视图对象
-│       │   │   ├── encrypt/         # 加密工具（密码加密）
-│       │   │   └── enums/           # 枚举类
-│       │   ├── tools/                # 工具模块
-│       │   │   ├── api/             # 工具API（OSS、支付等）
-│       │   │   ├── domains/         # 领域模型
-│       │   │   ├── gen/             # 代码生成器
-│       │   │   ├── lock/            # 分布式锁
-│       │   │   ├── payment/         # 支付（支付宝、微信）
-│       │   │   ├── ueditor/         # 富文本编辑器
-│       │   │   └── wx/              # 微信相关
-│       │   └── web/                 # Web控制器
-│       │       ├── rbac/            # 权限相关控制器
-│       │       │   ├── AuthController.java
-│       │       │   ├── UserController.java
-│       │       │   ├── RoleController.java
-│       │       │   ├── MenuController.java
-│       │       │   ├── DeptController.java
-│       │       │   ├── PostController.java
-│       │       │   └── DomainController.java
-│       │       └── tools/           # 工具相关控制器
-│       │           ├── CodeGeneratorController.java
-│       │           ├── JobController.java
-│       │           ├── ConfigController.java
-│       │           ├── DictController.java
-│       │           ├── AuditLogController.java
-│       │           └── ...
-│       └── src/main/resources/
-│           ├── changelog/           # Liquibase变更日志
-│           └── templates/           # FreeMarker模板（代码生成）
-├── adminpro-web/                    # 后端：Web启动模块
-│   ├── src/main/java/com/adminpro/
-│   │   └── Application.java         # 启动类
-│   └── src/main/resources/
-│       ├── application.yml          # 应用配置
-│       ├── application-dev.yml      # 开发环境配置
-│       ├── application-prod.yml     # 生产环境配置
-│       └── logback/                 # 日志配置
-├── frontend/                        # 前端：管理后台项目
-│   ├── src/
-│   │   ├── api/                     # API接口定义
-│   │   ├── components/              # 公共组件
-│   │   ├── pages/                   # 页面组件
-│   │   │   ├── Layout.tsx           # 主布局
-│   │   │   ├── Login/               # 登录页面
-│   │   │   ├── User/                # 用户管理
-│   │   │   ├── Role/                # 角色管理
-│   │   │   ├── Menu/                # 菜单管理
-│   │   │   ├── Dept/                # 部门管理
-│   │   │   ├── Post/                # 岗位管理
-│   │   │   ├── Config/              # 系统配置
-│   │   │   ├── Dict/                # 字典管理
-│   │   │   ├── Job/                 # 定时任务
-│   │   │   ├── AuditLog/            # 审计日志
-│   │   │   └── ...
-│   │   ├── router/                  # 路由配置
-│   │   ├── stores/                  # 状态管理（Zustand）
-│   │   ├── types/                   # TypeScript类型定义
-│   │   ├── utils/                   # 工具函数
-│   │   └── config/                  # 配置文件
-│   ├── package.json
-│   └── vite.config.ts
-├── portal/                          # 前端：门户网站项目
-│   ├── src/
-│   │   ├── components/              # 门户组件
-│   │   ├── locales/                 # 国际化资源（中英文）
-│   │   └── ...
-│   └── package.json
-├── docker/                          # Docker配置
-│   ├── backend/                     # 后端Docker配置
-│   │   ├── Dockerfile
-│   │   └── settings.xml
-│   ├── frontend/                    # 前端Docker配置
-│   │   ├── Dockerfile
-│   │   └── nginx.conf
-│   └── start.sh                     # 启动脚本
-├── pom.xml                          # Maven父POM
-├── docker-compose.yml               # Docker Compose配置
-├── docker-compose.prod.yml          # 生产环境配置
-├── Makefile                         # 便捷命令
-├── DOCKER_DEPLOY.md                 # Docker部署文档
-└── README.md                        # 项目文档
-```
-
-## 环境要求
-
-### 后端环境
-
-- **JDK 21+** (必需)
-- Maven 3.9+
-- MySQL 8.0+
-
-### 前端环境
-
-- Node.js 18+
-- pnpm 9.0.0+ (推荐) 或 npm/yarn
+| 类型 | 技术组件 |
+|------|--------------|
+| **后端** | Java 21, Spring Boot 3.5, MySQL 8, Redis, Liquibase, Spring Security |
+| **前端** | React 19, TypeScript 5.9, Vite 7, Ant Design 5, Zustand, React Router 7 |
+| **门户** | React 19, TypeScript, Ant Design 6, i18next |
 
 ## 快速开始
 
-### 1. 克隆项目
+### 环境要求
+- JDK 21+
+- Node.js 18+ & pnpm
+- MySQL 8.0+
+
+### 本地开发
+
+1.  **克隆 & 数据库配置**:
+    ```bash
+    git clone <url>
+    # 创建数据库 'adminpro' 并配置 'adminpro-web/src/main/resources/application.yml'
+    ```
+2.  **启动后端**:
+    ```bash
+    mvn clean install
+    cd adminpro-web && mvn spring-boot:run
+    # 服务地址: http://localhost:8080/adminpro
+    ```
+3.  **启动管理后台**:
+    ```bash
+    cd frontend && pnpm install && pnpm dev
+    # 访问地址: http://localhost:3000
+    ```
+4.  **登录**:
+    - 用户名: `superadmin`
+    - 密码: `password$1`
+
+## Docker 部署
+
+使用 Makefile 一键部署:
 
 ```bash
-git clone <repository-url>
-cd admin-pro
+make build  # 构建镜像
+make up     # 启动服务
 ```
 
-### 2. 数据库配置
-
-创建 MySQL 数据库：
-
-```sql
-CREATE DATABASE adminpro DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-修改 `adminpro-web/src/main/resources/application.yml` 中的数据库配置：
-
-```yaml
-spring:
-  datasource:
-    master:
-      jdbc-url: jdbc:mysql://127.0.0.1:3306/adminpro?...
-      username: your_username
-      password: your_password
-```
-
-系统使用 Liquibase 自动管理数据库版本，首次启动会自动创建表结构。
-
-### 3. 启动后端
-
-```bash
-# 编译项目
-mvn clean install
-
-# 启动后端服务
-cd adminpro-web
-mvn spring-boot:run
-```
-
-后端服务将在 `http://localhost:8080/adminpro` 启动。
-
-### 4. 启动管理后台 (Frontend)
-
-```bash
-cd frontend
-pnpm install
-pnpm dev
-```
-
-管理后台将在 `http://localhost:3000` 启动（或 Vite 分配的端口）。
-
-### 5. 启动门户网站 (Portal) - 可选
-
-```bash
-cd portal
-pnpm install
-pnpm dev
-```
-
-门户网站将在 `http://localhost:5173` 启动（或 Vite 分配的端口）。
-
-### 6. 访问系统
-
-**开发环境**:
-- **管理后台**: http://localhost:3000/adminpro
-- **门户网站**: http://localhost:5173
-- **后端API**: http://localhost:8080/adminpro
-- **API文档**: http://localhost:8080/adminpro/swagger-ui.html
-
-**Docker 部署环境**:
-- **管理后台**: http://localhost/adminpro
-- **后端API**: http://localhost/api (前端代理) 或 http://localhost/adminpro/api (直接访问)
-- **API文档**: http://localhost/adminpro/swagger-ui.html
-
-**注意**: Docker 部署时，前端使用 `/adminpro` 作为 contextPath，根路径 `/` 可留给业务代码使用。
-
-### 7. 默认账号
-
-首次启动后，系统会自动创建默认管理员账号（如果数据库为空）：
-- **用户名**: superadmin
-- **密码**: password$1
-
-**⚠️ 重要**: 生产环境部署前，请务必修改默认密码！
-
-## 功能模块
-
-### 管理后台核心功能
-
-- ✅ **用户认证**: 登录、验证码、Session管理、密码修改
-- ✅ **权限管理**: 
-  - 用户管理（增删改查、激活/停用、重置密码）
-  - 角色管理（角色权限分配）
-  - 菜单管理（菜单树、权限配置）
-  - 部门管理（组织架构树）
-  - 岗位管理
-  - 多租户支持（Domain）
-- ✅ **系统配置**: 
-  - 参数配置管理
-  - 字典管理
-- ✅ **监控运维**: 
-  - 系统监控（服务器信息、JVM信息）
-  - 操作日志查看
-  - 在线用户管理
-  - 审计日志
-- ✅ **开发工具**: 
-  - 代码生成器（基于数据库表自动生成CRUD代码）
-  - Swagger API文档
-  - 定时任务管理（Quartz）
-- ✅ **其他功能**: 
-  - 文件上传（支持OSS：阿里云、七牛云、腾讯云）
-  - 支付集成（支付宝、微信支付）
-  - 富文本编辑器（UEditor）
-
-### 门户网站功能
-
-- ✅ **现代化设计**: 响应式布局，高级深色主题
-- ✅ **多语言支持**: 中英文无缝切换
-- ✅ **产品展示**: 核心特性、技术栈展示
-
-## 部署
-
-### Docker 部署
-
-详细部署说明请参考 [DOCKER_DEPLOY.md](DOCKER_DEPLOY.md)。
-
-#### 快速部署
-
-使用 Makefile 提供的便捷命令：
-
-```bash
-# 查看所有可用命令
-make help
-
-# 构建镜像
-make build
-
-# 启动服务（生产环境）
-make up
-
-# 查看日志
-make logs
-make logs-backend
-make logs-frontend
-
-# 查看服务状态
-make ps
-
-# 停止服务
-make down
-
-# 重启服务
-make restart
-
-# 清理容器和镜像
-make clean
-```
-
-或直接使用 Docker Compose：
-
-```bash
-# 使用 Docker Compose 一键部署
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-```
-
-**注意**: 数据库使用外部独立服务，不包含在 Docker Compose 中。请确保数据库服务已启动并配置好连接信息。
-
-#### 环境变量配置
-
-创建 `.env` 文件（可选）：
-
-```bash
-# 数据库配置（外部数据库）
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_NAME=adminpro
-DB_USERNAME=adminpro
-DB_PASSWORD=your_password
-
-# 端口配置
-BACKEND_PORT=8080
-FRONTEND_PORT=80
-
-# 其他配置
-SPRING_PROFILES_ACTIVE=prod
-APP_SWAGGER_ENABLED=false
-```
-
-### 传统部署
-
-#### 后端部署
-
-```bash
-# 1. 编译打包
-mvn clean package -DskipTests
-
-# 2. 运行 JAR 包
-java -jar adminpro-web/target/adminpro-web.jar
-```
-
-#### 前端部署
-
-```bash
-# 1. 构建生产版本
-cd frontend
-pnpm build
-
-# 2. 将 dist 目录部署到 Nginx 或其他 Web 服务器
-# 配置 Nginx 代理 /api 到后端服务
-```
-
-## 开发规范
-
-### 代码规范
-
-#### 后端
-
-- 遵循阿里巴巴 Java 开发规范
-- 使用 Lombok 简化代码
-- 统一异常处理（GlobalExceptionHandler）
-- 统一返回格式（R<T>）
-- 使用 `@SysLog` 记录操作日志
-- 添加空值检查，避免 NPE 异常
-- 使用依赖注入替代静态方法
-- 使用 logger 记录日志，禁止使用 printStackTrace
-- 提取重复代码为公共方法
-- 使用常量替代硬编码字符串
-- 优化数据库查询，避免 N+1 问题
-
-#### 前端
-
-- 使用 ESLint + TypeScript 进行代码检查
-- 组件采用函数式组件 + Hooks
-- 统一使用 pnpm 作为包管理器
-- 使用 React Hook Form + Zod 进行表单验证
-- 使用 Zustand 进行状态管理
-- 组件和函数命名清晰，职责单一
-
-### 命名规范
-
-#### 后端
-
-- 类名：PascalCase（如 `UserController`）
-- 方法名：camelCase（如 `getUserList`）
-- 常量：UPPER_SNAKE_CASE（如 `MAX_SIZE`）
-- 包名：小写，点分隔（如 `com.adminpro.web`）
-
-#### 前端
-
-- 组件文件：PascalCase（如 `UserList.tsx`）
-- 工具函数：camelCase（如 `formatDate`）
-- 常量：UPPER_SNAKE_CASE（如 `API_BASE_URL`）
-- CSS 类名：kebab-case（如 `user-list-container`）
-
-## API 接口说明
-
-### 统一返回格式
-
-所有 API 接口统一返回格式（使用 `R<T>` 类）：
-
-**成功响应示例**：
-```json
-{
-  "restCode": "200",
-  "message": "操作成功",
-  "success": true,
-  "data": {
-    "id": "123",
-    "name": "用户名"
-  },
-  "errors": [],
-  "errorsMap": {}
-}
-```
-
-**失败响应示例**：
-```json
-{
-  "restCode": "500",
-  "message": "操作失败：用户名不能为空",
-  "success": false,
-  "data": null,
-  "errors": [
-    {
-      "field": "username",
-      "message": "用户名不能为空"
-    }
-  ],
-  "errorsMap": {
-    "username": "用户名不能为空"
-  }
-}
-```
-
-### 主要 API 接口
-
-#### 认证相关
-
-- `POST /auth/login` - 用户登录
-- `POST /auth/logout` - 用户登出
-- `POST /auth/changePassword` - 修改密码
-- `GET /auth/captcha` - 获取验证码
-
-#### 用户管理
-
-- `POST /admin/user/list` - 用户列表（分页）
-- `GET /admin/user/detail/{userDomain}/{userId}` - 用户详情
-- `POST /admin/user` - 创建用户
-- `PATCH /admin/user` - 更新用户
-- `DELETE /admin/user/delete` - 删除用户
-- `PATCH /admin/user/active/{userDomain}/{userId}` - 激活用户
-- `PATCH /admin/user/inactive/{userDomain}/{userId}` - 停用用户
-- `PATCH /admin/user/resetpwd` - 重置密码
-- `GET /admin/user/prepare` - 获取准备数据（部门、角色、岗位）
-
-#### 角色管理
-
-- `POST /admin/role/list` - 角色列表
-- `GET /admin/role/detail/{roleDomain}/{roleId}` - 角色详情
-- `POST /admin/role` - 创建角色
-- `PATCH /admin/role` - 更新角色
-- `DELETE /admin/role/delete` - 删除角色
-
-#### 菜单管理
-
-- `GET /admin/menu/tree` - 菜单树
-- `GET /admin/menu/detail/{menuDomain}/{menuId}` - 菜单详情
-- `POST /admin/menu` - 创建菜单
-- `PATCH /admin/menu` - 更新菜单
-- `DELETE /admin/menu/delete` - 删除菜单
-
-更多 API 接口请参考 Swagger 文档：http://localhost:8080/adminpro/swagger-ui.html
-
-## 性能优化
-
-### 后端优化
-
-1. **数据库优化**
-   - 合理使用索引
-   - 避免 N+1 查询（使用批量查询）
-   - 使用分页查询
-   - 使用连接池（HikariCP）
-   - 批量操作优化（批量删除、批量更新）
-
-2. **缓存策略**
-   - 热点数据使用缓存
-   - 支持三种缓存类型：simple（内存）、redis（分布式）、jcache（EhCache 3.x）
-   - 设置合理的过期时间
-   - 使用缓存预热
-
-3. **异步处理**
-   - 使用 `@Async` 处理耗时操作
-   - 使用消息队列处理异步任务
-
-### 前端优化
-
-1. **代码分割**
-   - 使用路由懒加载
-   - 按需加载组件
-
-2. **资源优化**
-   - 图片懒加载
-   - 使用 CDN 加速
-   - 压缩静态资源
-
-3. **请求优化**
-   - 合并请求
-   - 使用防抖和节流
-   - 缓存 API 响应
-
-## 安全性
-
-### 后端安全
-
-1. **认证授权**
-   - 使用 Spring Security 6.x
-   - Session 管理
-   - 密码加密存储（SHA256）
-
-2. **SQL 注入防护**
-   - 使用参数化查询
-   - 避免拼接 SQL
-
-3. **XSS 防护**
-   - 输入验证和过滤
-   - 输出转义
-
-4. **CSRF 防护**
-   - 使用 CSRF Token
-   - 验证请求来源
-
-### 前端安全
-
-1. **XSS 防护**
-   - 使用 React 的自动转义
-   - 避免使用 `dangerouslySetInnerHTML`
-
-2. **敏感信息保护**
-   - 不在前端存储敏感信息
-   - 使用 HTTPS 传输
-
-3. **权限控制**
-   - 路由权限控制
-   - 按钮权限控制
-
-## 常见问题
-
-### 1. Java 版本问题
-
-**错误**: `无效的目标发行版: 21`
-
-**解决方案**:
-- 确保已安装 JDK 21
-- 设置 `JAVA_HOME` 环境变量指向 JDK 21
-- 在 IDE 中配置项目使用 Java 21
-
-### 2. 数据库连接失败
-
-检查数据库配置是否正确，确保数据库服务已启动。
-
-**注意**: MySQL 8.0+ 需要使用新的驱动类 `com.mysql.cj.jdbc.Driver`（已在配置中使用）
-
-### 3. 缓存配置问题
-
-**错误**: `No enum constant org.springframework.boot.autoconfigure.cache.CacheType.ehcache`
-
-**解决方案**: 
-- Spring Boot 3.x 不再支持 `spring.cache.type=ehcache`
-- 使用 `spring.cache.type=simple`、`spring.cache.type=redis` 或 `spring.cache.type=jcache`
-- 如果使用 EhCache，请使用 `spring.cache.type=jcache` 并配置 `ehcache.xml` 文件
-
-### 4. 前端代理错误
-
-检查 `vite.config.ts` 中的代理配置，确保后端服务地址正确。
-
-### 5. 端口被占用
-
-修改 `application.yml` 中的 `server.port` 或 `vite.config.ts` 中的 `server.port`。
-
-### 6. Maven 依赖下载失败
-
-配置 Maven 使用国内镜像（已在 `pom.xml` 中配置阿里云镜像）。
-
-### 7. pnpm 安装失败
-
-如果 pnpm 安装失败，可以尝试：
-```bash
-npm install -g pnpm
-# 或
-corepack enable
-corepack prepare pnpm@9.0.0 --activate
-```
+详细说明请参考 [DOCKER_DEPLOY.md](DOCKER_DEPLOY.md)。
 
 ## 许可证
 
-查看 [LICENSE](LICENSE) 文件了解详情。
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request。
-
-## 联系方式
-
-如有问题或建议，请通过 Issue 反馈。
+[LICENSE](LICENSE)

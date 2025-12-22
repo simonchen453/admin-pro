@@ -5,8 +5,11 @@ import { resolve } from 'path'
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+  // 如果是生产构建，使用占位符；如果是开发模式，使用默认值或环境变量
+  const base = mode === 'production' ? '__VITE_BASE_URL_PLACEHOLDER__' : (env.VITE_BASE_URL || '/adminpro/')
+
   return {
-    base: env.VITE_BASE_URL || '/adminpro/',
+    base: base,
     plugins: [react()],
     resolve: {
       alias: {

@@ -65,8 +65,6 @@ services:
     build:
       context: .
       dockerfile: docker/frontend/Dockerfile
-      args:
-        - VITE_BASE_URL=${APP_BASE_PATH:-/adminpro/}
     container_name: admin-pro-frontend
     restart: unless-stopped
     environment:

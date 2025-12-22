@@ -3,9 +3,6 @@
 # ==================================================
 FROM node:20-alpine AS frontend-builder
 
-ARG VITE_BASE_URL
-ENV VITE_BASE_URL=$VITE_BASE_URL
-
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
@@ -38,7 +35,12 @@ COPY --from=frontend-builder /app/dist /usr/share/nginx/html
 # 4. 生成配置：替换后会在 /etc/nginx/conf.d/ 自动生成最终的 default.conf 文件
 COPY docker/frontend/nginx.conf.template /etc/nginx/templates/default.conf.template
 
+# 复制自定义入口脚本，用于运行时替换静态文件中的占位符
+COPY docker/frontend/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 EXPOSE 80
 
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
 

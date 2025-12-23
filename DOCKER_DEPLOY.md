@@ -189,6 +189,26 @@ FRONTEND_PORT=80
 BACKEND_PORT=8080
 ```
 
+### 修改部署路径 (Context Path)
+
+默认部署路径为 `/adminpro`。如需修改（例如改为 `/dashboard`），**无需重新构建镜像**，只需修改环境变量配置：
+
+1. **修改环境变量**  
+   在 `docker-compose.yml` 或 `.env` 文件中设置 `APP_BASE_PATH`：
+   ```bash
+   APP_BASE_PATH=/dashboard
+   ```
+
+2. **重启服务**  
+   修改配置后，重启容器即可生效（容器启动时会自动替换静态资源中的路径）：
+   ```bash
+   docker-compose up -d
+   ```
+
+**注意**：
+- 新的路径格式建议为 `/path`（不要以 `/` 结尾）。
+- 容器启动脚本会自动处理前端静态资源的路径引用。
+
 ## 🛠️ 常用命令
 
 ### 构建镜像

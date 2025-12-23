@@ -13,6 +13,8 @@ services:
     environment:
       # Spring 配置
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
+      # 动态配置后端ContextPath
+      - SERVER_SERVLET_CONTEXT_PATH=${BACKEND_CONTEXT_PATH:-/adminpro}
       
       # 数据库配置（使用外部数据库）
       - DB_HOST=${DB_HOST:-host.docker.internal}
@@ -69,12 +71,16 @@ services:
     restart: unless-stopped
     environment:
       - APP_BASE_PATH=${APP_BASE_PATH:-/adminpro}
+      # 传递后端配置给 Nginx
+      - BACKEND_HOST=${BACKEND_HOST:-backend}
+      - BACKEND_API_PORT=${BACKEND_PORT:-8080}
+      - BACKEND_CONTEXT_PATH=${BACKEND_CONTEXT_PATH:-/adminpro}
     ports:
       - "${FRONTEND_PORT:-80}:80"
     networks:
       - admin-pro-network
-    depends_on:
-      - backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost${APP_BASE_PATH:-/adminpro}/health"]
       interval: 30s

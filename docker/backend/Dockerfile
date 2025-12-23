@@ -52,11 +52,12 @@ RUN mkdir -p /app/logs /app/upload/public /app/upload/private
 COPY --from=backend-builder /app/adminpro-web/target/adminpro-web.jar app.jar
 
 # Expose port
+# Expose port
 EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:8080/adminpro/actuator/health || exit 1
+  CMD curl -f http://localhost:8080${SERVER_SERVLET_CONTEXT_PATH:-/adminpro}/actuator/health || exit 1
 
 # Start the application
 ENTRYPOINT ["java", \
@@ -67,5 +68,6 @@ ENTRYPOINT ["java", \
   "-Djava.security.egd=file:/dev/./urandom", \
   "-jar", \
   "app.jar", \
+  "--server.servlet.context-path=${SERVER_SERVLET_CONTEXT_PATH:-/adminpro}", \
   "--spring.profiles.active=${SPRING_PROFILES_ACTIVE:-prod}"]
 

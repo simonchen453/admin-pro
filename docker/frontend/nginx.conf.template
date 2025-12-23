@@ -50,16 +50,16 @@ server {
     # API 代理配置
     # ============================================
     
-    # API 代理到后端（前端请求 /api，后端实际路径是 /adminpro）
+    # API 代理到后端（前端请求 /api，后端实际路径是 ${BACKEND_CONTEXT_PATH}）
     location ^~ /api {
-        proxy_pass http://backend:8080/adminpro;
+        proxy_pass http://${BACKEND_HOST}:${BACKEND_API_PORT}${BACKEND_CONTEXT_PATH};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         
-        # Cookie 路径重写（后端返回的 Cookie Path 是 /adminpro，需要改为 /api）
-        proxy_cookie_path /adminpro /api;
+        # Cookie 路径重写（后端返回的 Cookie Path 是 ${BACKEND_CONTEXT_PATH}，需要改为 /api）
+        proxy_cookie_path ${BACKEND_CONTEXT_PATH} /api;
         
         # WebSocket 支持（如果需要）
         proxy_http_version 1.1;
@@ -77,7 +77,7 @@ server {
 
     # 后端 API 直接代理（用于 Swagger 等，通过 ${APP_BASE_PATH}/api 访问）
     location ^~ ${APP_BASE_PATH}/api {
-        proxy_pass http://backend:8080/adminpro;
+        proxy_pass http://${BACKEND_HOST}:${BACKEND_API_PORT}${BACKEND_CONTEXT_PATH};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

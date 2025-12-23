@@ -1,26 +1,34 @@
 #!/bin/sh
 set -e
 
-# 如果没有设置 APP_BASE_PATH，默认使用 /adminpro/
-APP_BASE_PATH=${APP_BASE_PATH:-/adminpro/}
+# 如果没有设置 APP_BASE_PATH，默认使用 /adminpro
+APP_BASE_PATH=${APP_BASE_PATH:-/adminpro}
 
-# 确保路径以 / 结尾和开头
-case "$APP_BASE_PATH" in
-  */) ;;
-  *) APP_BASE_PATH="$APP_BASE_PATH/" ;;
-esac
+# 1. 处理 APP_BASE_PATH (供 Nginx 使用): 确保以 / 开头，且除非是根路径 /，否则移除尾部斜杠
 case "$APP_BASE_PATH" in
   /*) ;;
   *) APP_BASE_PATH="/$APP_BASE_PATH" ;;
 esac
 
-echo "Applying runtime base path: $APP_BASE_PATH"
+if [ "$APP_BASE_PATH" != "/" ] && [ "${APP_BASE_PATH##*/}" = "" ]; then
+    # 如果不是根路径且以 / 结尾，去掉尾部 /
+    APP_BASE_PATH=${APP_BASE_PATH%/}
+fi
 
-# 1. 替换 HTML 中的 base 路径引用和 JS/CSS 引用
-# 我们在构建时使用了 __VITE_BASE_URL_PLACEHOLDER__ 作为占位符
-# 使用 sed 遍历所有 html, js, css 文件进行替换
+# 2. 生成 VITE_BASE (供前端静态资源替换使用)
+# 我们的目标是替换 vite.config.ts 中定义的 '/__VITE_BASE_URL_PLACEHOLDER__/'
+if [ "$APP_BASE_PATH" = "/" ]; then
+  VITE_BASE="/"
+else
+  VITE_BASE="$APP_BASE_PATH/"
+fi
 
-find /usr/share/nginx/html -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' \) -exec sed -i "s|__VITE_BASE_URL_PLACEHOLDER__|$APP_BASE_PATH|g" {} +
+echo "Applying runtime base path: Nginx=$APP_BASE_PATH, Vite=$VITE_BASE"
+
+# 3. 替换 HTML 中的 base 路径引用
+# Vite 配置中使用了 '/__VITE_BASE_URL_PLACEHOLDER__/'，所以我们替换这个精确的字符串
+# 注意：Vite 构建后的源码中会出现 src="/__VITE_BASE_URL_PLACEHOLDER__/assets/..."
+find /usr/share/nginx/html -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' \) -exec sed -i "s|/__VITE_BASE_URL_PLACEHOLDER__/|$VITE_BASE|g" {} +
 
 echo "Runtime injection complete."
 

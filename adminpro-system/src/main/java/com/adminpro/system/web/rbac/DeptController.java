@@ -9,7 +9,7 @@ import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.system.core.common.annotation.SysLog;
-import com.adminpro.system.core.common.helper.UploadDownloadHelper;
+import com.adminpro.system.core.common.helper.FileHelper;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.dept.DeptCreateValidator;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
@@ -42,7 +42,7 @@ public class DeptController extends BaseController {
     protected static final String SEARCH_FORM_KEY = "deptSearchForm";
 
     @Autowired
-    private UploadDownloadHelper uploadDownloadHelper;
+    private FileHelper fileHelper;
 
     @Autowired
     private DeptService deptService;
@@ -186,10 +186,10 @@ public class DeptController extends BaseController {
         String dir = DateUtil.formatDate(new Date(), "yyyyMMdd");
         String sep = "/";
         url.append("/file").append(sep).append(dir);
-        String fileDir = uploadDownloadHelper.makePublicFileDir(url.toString());
+        String fileDir = fileHelper.makePublicFileDir(url.toString());
         String originalFilename = file.getOriginalFilename();
-        String suffix = uploadDownloadHelper.getSuffix(originalFilename);
-        String fileType = uploadDownloadHelper.getFileType(originalFilename);
+        String suffix = fileHelper.getSuffix(originalFilename);
+        String fileType = fileHelper.getFileType(originalFilename);
         String fileName = IdGenerator.getInstance().nextStringId() + suffix;
         String filePath = fileDir + sep + fileName;
         url.append(sep).append(fileName);

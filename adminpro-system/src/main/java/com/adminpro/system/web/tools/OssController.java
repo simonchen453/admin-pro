@@ -5,7 +5,7 @@ import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.helper.UploadDownloadHelper;
+import com.adminpro.system.core.common.helper.FileHelper;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.vo.oss.ListOssVo;
 import com.adminpro.system.rbac.domains.vo.oss.ListOssVoConverter;
@@ -29,7 +29,7 @@ public class OssController extends BaseController {
     protected static final String PREFIX_URL = "/admin/oss";
 
     @Autowired
-    private UploadDownloadHelper uploadDownloadHelper;
+    private FileHelper fileHelper;
 
     @Autowired
     private OSSService ossService;
@@ -57,7 +57,7 @@ public class OssController extends BaseController {
         if (StringUtils.isNotEmpty(batchId) && single) {
             ossService.deleteByBatchId(batchId);
         }
-        OSSEntity ossEntity = uploadDownloadHelper.uploadOssFile(file);
+        OSSEntity ossEntity = fileHelper.uploadOssFile(file);
         if (StringUtils.isNotEmpty(batchId)) {
             ossEntity.setBatchId(batchId);
         } else {

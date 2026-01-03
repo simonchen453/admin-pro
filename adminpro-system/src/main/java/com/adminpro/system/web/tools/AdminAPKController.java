@@ -10,7 +10,7 @@ import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.common.helper.ConfigHelper;
-import com.adminpro.system.core.common.helper.UploadDownloadHelper;
+import com.adminpro.system.core.common.helper.FileHelper;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.apk.APKEntity;
 import com.adminpro.system.rbac.domains.entity.apk.APKService;
@@ -144,7 +144,6 @@ public class AdminAPKController extends BaseController {
             messageBundle.addErrorMessage("verName", "必填项");
         }
 
-
         if (StringUtils.isEmpty(osVersion)) {
             messageBundle.addErrorMessage("osVersion", "必填项");
         }
@@ -213,13 +212,14 @@ public class AdminAPKController extends BaseController {
             String downLoadUrl = latestVersion.getDownloadUrl();
             String name = downLoadUrl.substring(downLoadUrl.lastIndexOf("/") + 1);
             response.setHeader("Content-Disposition", "attachment;filename=" + name);
-            File file = new File(UploadDownloadHelper.getInstance().getFileDir()
+            File file = new File(FileHelper.getInstance().getFileDir()
                     + downLoadUrl);
             if (file.exists()) {
                 FileInputStream fileInputStream = null;
                 try {
                     fileInputStream = new FileInputStream(file);
-                    response.setHeader("Content-Disposition", "attachment;Filename=" + URLEncoder.encode(name, "UTF-8"));
+                    response.setHeader("Content-Disposition",
+                            "attachment;Filename=" + URLEncoder.encode(name, "UTF-8"));
                     OutputStream outputStream = response.getOutputStream();
                     byte[] bytes = new byte[2048];
                     int len = 0;
@@ -256,7 +256,7 @@ public class AdminAPKController extends BaseController {
         String sep = "/";
         String dir = DateUtil.formatDate(new Date(), "yyyyMMdd");
         fileName.append("apks").append(sep).append(dir);
-        String fileDir = UploadDownloadHelper.getInstance().makePublicFileDir(fileName.toString());
+        String fileDir = FileHelper.getInstance().makePublicFileDir(fileName.toString());
         String filePath = fileDir + sep + file.getOriginalFilename();
         File fileDb = new File(filePath);
         ByteArrayInputStream bis = new ByteArrayInputStream(file.getBytes());

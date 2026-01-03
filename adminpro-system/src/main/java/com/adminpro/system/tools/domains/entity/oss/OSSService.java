@@ -4,7 +4,7 @@ import com.adminpro.framework.base.entity.BaseService;
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.common.helper.UploadDownloadHelper;
+import com.adminpro.system.core.common.helper.FileHelper;
 import com.adminpro.system.rbac.domains.vo.oss.ListOssDto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +36,9 @@ public class OSSService extends BaseService<OSSEntity, String> {
     @Transactional
     public void delete(OSSEntity entity) {
         dao.delete(entity.getId());
-        UploadDownloadHelper.getInstance().delete(entity.getKey());
+        FileHelper.getInstance().delete(entity.getKey());
         if (StringUtils.isNotEmpty(entity.getCoverKey())) {
-            UploadDownloadHelper.getInstance().delete(entity.getCoverKey());
+            FileHelper.getInstance().delete(entity.getCoverKey());
         }
     }
 

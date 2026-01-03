@@ -10,7 +10,7 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.helper.ExcelHelper;
-import com.adminpro.system.core.common.helper.UploadDownloadHelper;
+import com.adminpro.system.core.common.helper.FileHelper;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.api.PasswordValidator;
 import com.adminpro.system.rbac.common.RbacConstants;
@@ -76,7 +76,7 @@ public class UserController extends BaseController {
     private UserUpdateValidator userUpdateValidator;
 
     @Autowired
-    private UploadDownloadHelper uploadDownloadHelper;
+    private FileHelper fileHelper;
 
     @Autowired
     private RoleService roleService;
@@ -129,7 +129,8 @@ public class UserController extends BaseController {
     @SysLog("重置用户密码")
     @RequestMapping(value = "/resetpwd", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R resetPwd(@Valid @RequestBody UserResetPwdRequestVo userResetPwdRequestVo) {
-        logger.info("重置用户密码: userDomain={}, userId={}", userResetPwdRequestVo.getUserDomain(), userResetPwdRequestVo.getUserId());
+        logger.info("重置用户密码: userDomain={}, userId={}", userResetPwdRequestVo.getUserDomain(),
+                userResetPwdRequestVo.getUserId());
         BeanUtil.beanAttributeValueTrim(userResetPwdRequestVo);
         String userId = userResetPwdRequestVo.getUserId();
         String userDomain = userResetPwdRequestVo.getUserDomain();
@@ -158,7 +159,8 @@ public class UserController extends BaseController {
                 logger.info("重置用户密码成功: userDomain={}, userId={}", userDomain, userId);
                 return R.ok();
             } else {
-                logger.warn("重置用户密码验证失败: userDomain={}, userId={}, errors={}", userDomain, userId, messageBundle.getErrorMessages());
+                logger.warn("重置用户密码验证失败: userDomain={}, userId={}, errors={}", userDomain, userId,
+                        messageBundle.getErrorMessages());
                 return R.error(messageBundle);
             }
         } catch (Exception e) {
@@ -291,7 +293,8 @@ public class UserController extends BaseController {
                     userRequestVo.getLoginName(), userRequestVo.getUserDomain(), user.getUserId());
             return R.ok();
         } else {
-            logger.warn("创建用户验证失败: loginName={}, errors={}", userRequestVo.getLoginName(), messageBundle.getErrorMessages());
+            logger.warn("创建用户验证失败: loginName={}, errors={}", userRequestVo.getLoginName(),
+                    messageBundle.getErrorMessages());
             return R.error(messageBundle);
         }
     }
@@ -305,9 +308,11 @@ public class UserController extends BaseController {
         MessageBundle messageBundle = getMessageBundle();
         userUpdateValidator.validate(userRequestVo, messageBundle);
         if (!messageBundle.hasErrorMessage()) {
-            UserEntity userEntity = userService.findByIden(new UserIden(userRequestVo.getUserDomain(), userRequestVo.getUserId()));
+            UserEntity userEntity = userService
+                    .findByIden(new UserIden(userRequestVo.getUserDomain(), userRequestVo.getUserId()));
             if (userEntity == null) {
-                logger.warn("更新用户失败，用户不存在: userDomain={}, userId={}", userRequestVo.getUserDomain(), userRequestVo.getUserId());
+                logger.warn("更新用户失败，用户不存在: userDomain={}, userId={}", userRequestVo.getUserDomain(),
+                        userRequestVo.getUserId());
                 return R.error(RbacConstants.MSG_USER_NOT_FOUND);
             }
 
@@ -333,7 +338,7 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R uploadFile(@RequestParam MultipartFile file, MultipartHttpServletRequest multipartRequest) {
         try {
-            OSSEntity upload = uploadDownloadHelper.uploadOssFile(file);
+            OSSEntity upload = fileHelper.uploadOssFile(file);
             return R.ok(upload.getUrl());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

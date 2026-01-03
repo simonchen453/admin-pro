@@ -36,6 +36,8 @@ public final class FileUtil {
     public static String PUBLIC_FILE_DIR = ConfigUtil.getString("app.upload.public.dir");
     public static String PRIVATE_FILE_DIR = ConfigUtil.getString("app.upload.private.dir");
 
+    public static final String FILE_URL_PREFIX = "/upload";
+
     static {
         // bytes in a kilobyte
         final BigInteger ONE_KB = BigInteger.valueOf(1024L);
@@ -290,7 +292,7 @@ public final class FileUtil {
     }
 
     public static BufferedImage frameToBufferedImage(Frame frame) {
-        //创建BufferedImage对象
+        // 创建BufferedImage对象
         Java2DFrameConverter converter = new Java2DFrameConverter();
         BufferedImage bufferedImage = converter.getBufferedImage(frame);
         return bufferedImage;
@@ -298,17 +300,17 @@ public final class FileUtil {
 
     public static String md5HashCode(InputStream fis) {
         try {
-            //拿到一个MD5转换器,如果想使用SHA-1或SHA-256，则传入SHA-1,SHA-256
+            // 拿到一个MD5转换器,如果想使用SHA-1或SHA-256，则传入SHA-1,SHA-256
             MessageDigest md = MessageDigest.getInstance("MD5");
 
-            //分多次将一个文件读入，对于大型文件而言，比较推荐这种方式，占用内存比较少。
+            // 分多次将一个文件读入，对于大型文件而言，比较推荐这种方式，占用内存比较少。
             byte[] buffer = new byte[1024];
             int length = -1;
             while ((length = fis.read(buffer, 0, 1024)) != -1) {
                 md.update(buffer, 0, length);
             }
             fis.close();
-            //转换并返回包含16个元素字节数组,返回数值范围为-128到127
+            // 转换并返回包含16个元素字节数组,返回数值范围为-128到127
             byte[] resultByte = md.digest();
             StringBuffer result = new StringBuffer();
             for (int i = 0; i < resultByte.length; ++i) {
@@ -319,7 +321,7 @@ public final class FileUtil {
                 result.append(Integer.toHexString(v));
             }
 
-            return result.toString();//转换为16进制
+            return result.toString();// 转换为16进制
         } catch (Exception e) {
             logger.error("Error calculating MD5 hash", e);
             return "";
@@ -343,8 +345,8 @@ public final class FileUtil {
 
         if (StringUtils.isEmpty(fileName)) {
             return;
-        } else if (fileName.startsWith("/upload")) {
-            fileName = fileName.substring("/upload".length());
+        } else if (fileName.startsWith(FileUtil.FILE_URL_PREFIX)) {
+            fileName = fileName.substring(FileUtil.FILE_URL_PREFIX.length());
         } else if (fileName.startsWith("upload")) {
             fileName = fileName.substring("upload".length());
         }
@@ -356,7 +358,7 @@ public final class FileUtil {
     }
 
     public static String makePrivateFileDir(String dir) {
-        //构造新的保存目录
+        // 构造新的保存目录
         String path = null;
         String privatePath = FileUtil.PRIVATE_FILE_DIR;
         if (privatePath.startsWith("file:")) {
@@ -365,11 +367,11 @@ public final class FileUtil {
             String tempPath = FileUtil.class.getClassLoader().getResource("").getPath();
             path = tempPath + privatePath.substring(privatePath.indexOf(":") + 1) + dir;
         }
-        //如果目录不存在
+        // 如果目录不存在
         if (StringUtils.isNotEmpty(path)) {
             File file = new File(path);
             if (!file.exists()) {
-                //创建目录
+                // 创建目录
                 boolean mkdirsFlag = new File(path).mkdirs();
                 if (!mkdirsFlag) {
                     throw new RuntimeException("Can not make dir " + path);
@@ -385,7 +387,7 @@ public final class FileUtil {
      * @return
      */
     public static String makePublicFileDir(String dir) {
-        //构造新的保存目录
+        // 构造新的保存目录
         String path = null;
         String publicPath = FileUtil.PUBLIC_FILE_DIR;
         if (publicPath.startsWith("file:")) {
@@ -394,11 +396,11 @@ public final class FileUtil {
             String tempPath = FileUtil.class.getClassLoader().getResource("").getPath();
             path = tempPath + publicPath.substring(publicPath.indexOf(":") + 1) + dir;
         }
-        //如果目录不存在
+        // 如果目录不存在
         if (StringUtils.isNotEmpty(path)) {
             File file = new File(path);
             if (!file.exists()) {
-                //创建目录
+                // 创建目录
                 boolean mkdirsFlag = new File(path).mkdirs();
                 if (!mkdirsFlag) {
                     throw new RuntimeException("Can not make dir " + path);
@@ -436,6 +438,13 @@ public final class FileUtil {
     }
 
     public static File getPublicFile(String relativeName) {
+        if (StringUtils.isNotEmpty(relativeName)) {
+            if (relativeName.startsWith(FileUtil.FILE_URL_PREFIX)) {
+                relativeName = relativeName.substring(FileUtil.FILE_URL_PREFIX.length());
+            } else if (relativeName.startsWith("upload")) {
+                relativeName = relativeName.substring("upload".length());
+            }
+        }
         String path = getPublicFileDir() + relativeName;
         File f = new File(path);
         return f;
@@ -455,34 +464,35 @@ public final class FileUtil {
      * @param response
      * @param messageBundle
      */
-    public static void download(String url, HttpServletRequest request, HttpServletResponse response, MessageBundle messageBundle) throws IOException {
-        //得到要下载的文件
+    public static void download(String url, HttpServletRequest request, HttpServletResponse response,
+            MessageBundle messageBundle) throws IOException {
+        // 得到要下载的文件
         File file = new File(url);
-        //如果文件不存在
+        // 如果文件不存在
         if (!file.exists()) {
             messageBundle.addErrorMessage(null, "您要下载的资源已被删除。");
             return;
         }
-        //处理文件名
+        // 处理文件名
         String realName = url.substring(url.lastIndexOf("/") + 1);
         String fileName = realName.substring(20);
-        //设置响应头，控制浏览器下载该文件
+        // 设置响应头，控制浏览器下载该文件
         response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
-        //读取要下载的文件，保存到文件输入流
+        // 读取要下载的文件，保存到文件输入流
         FileInputStream in = new FileInputStream(file);
-        //创建输出流
+        // 创建输出流
         OutputStream out = response.getOutputStream();
-        //创建缓冲区
+        // 创建缓冲区
         byte buffer[] = new byte[1024];
         int len = 0;
-        //循环将输入流中的内容读取到缓冲区当中
+        // 循环将输入流中的内容读取到缓冲区当中
         while ((len = in.read(buffer)) > 0) {
-            //输出缓冲区的内容到浏览器，实现文件下载
+            // 输出缓冲区的内容到浏览器，实现文件下载
             out.write(buffer, 0, len);
         }
-        //关闭文件输入流
+        // 关闭文件输入流
         in.close();
-        //关闭输出流
+        // 关闭输出流
         out.close();
     }
 
@@ -519,7 +529,8 @@ public final class FileUtil {
             return false;
         } else {
             suffix = suffix.substring(1);
-            return StringUtils.equalsIgnoreCase(suffix, "png") || StringUtils.equalsIgnoreCase(suffix, "jpg") || StringUtils.equalsIgnoreCase(suffix, "jpeg");
+            return StringUtils.equalsIgnoreCase(suffix, "png") || StringUtils.equalsIgnoreCase(suffix, "jpg")
+                    || StringUtils.equalsIgnoreCase(suffix, "jpeg");
         }
     }
 

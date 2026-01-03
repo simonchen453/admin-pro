@@ -3,6 +3,7 @@ package com.adminpro.system.web;
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.enums.UploadImageType;
 import com.adminpro.framework.base.util.DateUtil;
+import com.adminpro.framework.base.util.FileUtil;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -467,7 +468,7 @@ public class CommonController extends BaseController {
         } else {
             Thumbnails.of(bis).size(900, 900).outputFormat(fileType).toFile(f);
         }
-        return R.ok(WebConstants.getServerAddress() + request.getContextPath() + "/upload" + url);
+        return R.ok(WebConstants.getServerAddress() + request.getContextPath() + FileUtil.FILE_URL_PREFIX + url);
     }
 
     /**
@@ -500,8 +501,8 @@ public class CommonController extends BaseController {
             Thumbnails.of(bis).size(900, 900).outputFormat(fileType).toFile(f);
         }
         FileUploadVo vo = new FileUploadVo();
-        vo.setRelativePath("/upload" + url);
-        vo.setAbsolutePath(WebConstants.getServerAddress() + request.getContextPath() + "/upload" + url);
+        vo.setRelativePath(FileUtil.FILE_URL_PREFIX + url);
+        vo.setAbsolutePath(WebConstants.getServerAddress() + request.getContextPath() + FileUtil.FILE_URL_PREFIX + url);
         return R.ok(vo);
     }
 }

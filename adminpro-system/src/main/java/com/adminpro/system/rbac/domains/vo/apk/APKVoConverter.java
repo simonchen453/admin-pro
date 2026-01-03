@@ -1,5 +1,6 @@
 package com.adminpro.system.rbac.domains.vo.apk;
 
+import com.adminpro.framework.base.util.FileUtil;
 import com.adminpro.framework.jdbc.query.IModelConverter;
 import com.adminpro.system.core.common.constants.WebConstants;
 import com.adminpro.system.core.common.helper.WebHelper;
@@ -21,7 +22,7 @@ public class APKVoConverter implements IModelConverter<APKEntity, APKVO> {
         aPKVo.setVerCode(apk.getVerCode());
         aPKVo.setOsVersion(apk.getOsVersion());
         HttpServletRequest request = WebHelper.getHttpRequest();
-        aPKVo.setDownloadUrl(WebConstants.getServerAddress() + request.getContextPath() + "/upload/" + apk.getDownloadUrl());
+        aPKVo.setDownloadUrl(WebConstants.getServerAddress() + request.getContextPath() + FileUtil.FILE_URL_PREFIX + apk.getDownloadUrl());
         aPKVo.setMessage(apk.getMessage());
         return aPKVo;
     }

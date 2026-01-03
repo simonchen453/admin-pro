@@ -29,29 +29,53 @@ import java.util.Date;
 public class FileHelper {
 
     /**
-     * 给URL添加contextPath前缀 (用于返回给前端)
+     * 给URL添加前缀 (用于返回给前端)
      */
-    public String getUrlWithContextPath(String url) {
-        String contextPath = WebHelper.getContextPath();
-        if ("/".equals(contextPath)) {
+    public String getUrlWithPrefix(String url) {
+        if (url == null || url.startsWith("http")) {
             return url;
         }
-        if (url != null && !url.startsWith("http") && !url.startsWith(contextPath)) {
-            return contextPath + url;
+
+        String contextPath = WebHelper.getContextPath();
+        String prefix = FileUtil.FILE_URL_PREFIX;
+        if ("/".equals(contextPath)) {
+            contextPath = "";
+        }
+
+        String intendedPrefix = contextPath + prefix;
+        if (!url.startsWith(intendedPrefix)) {
+            // Check if it already has the prefix partially?
+            // e.g. url starts with /upload but missing contextPath?
+            // Safer to just ensure it starts with full intended prefix.
+            // Assumption: input url is relative path e.g. /2023/file.jpg or
+            // /upload/2023/file.jpg (if saved with it)
+            // If saved with /upload, we might duplicate.
+            // Let's assume input url handles relative path after upload root or absolute
+            // path without context.
+
+            // If url is "/upload/file.jpg" and intended is "/ctx/upload", result
+            // "/ctx/upload/upload/file.jpg" -> Bad.
+            // If url starts with prefix, we do nothing.
+            if (url.startsWith(prefix)) {
+                return contextPath + url;
+            }
+            return intendedPrefix + url;
         }
         return url;
     }
 
     /**
-     * 去除URL的ContextPath前缀 (用于存入数据库)
+     * 去除URL的前缀 (用于存入数据库)
      */
-    public String getUrlWithoutContextPath(String url) {
+    public String getUrlWithoutPrefix(String url) {
         String contextPath = WebHelper.getContextPath();
         if ("/".equals(contextPath)) {
-            return url;
+            contextPath = "";
         }
-        if (url != null && url.startsWith(contextPath)) {
-            return url.substring(contextPath.length());
+        String prefix = contextPath + FileUtil.FILE_URL_PREFIX;
+
+        if (url != null && url.startsWith(prefix)) {
+            return url.substring(prefix.length());
         }
         return url;
     }
@@ -88,7 +112,7 @@ public class FileHelper {
         } else {
             FileUtils.copyInputStreamToFile(bis, f);
         }
-        return WebConstants.getServerAddress() + WebHelper.getContextPath() + "/upload" + url;
+        return url.toString();
     }
 
     /**
@@ -136,7 +160,7 @@ public class FileHelper {
         File f = new File(filePath);
         FileUtils.writeByteArrayToFile(f, bytes);
 
-        return "/upload" + url.toString();
+        return url.toString();
     }
 
     /**
@@ -161,7 +185,7 @@ public class FileHelper {
         ByteArrayInputStream bis = new ByteArrayInputStream(multipartFile.getBytes());
         File f = new File(filePath);
         FileUtils.copyInputStreamToFile(bis, f);
-        return WebConstants.getServerAddress() + WebHelper.getContextPath() + "/upload" + url;
+        return url.toString();
     }
 
     public String getSuffix(String fileName) {
@@ -277,7 +301,7 @@ public class FileHelper {
      * @return
      */
     public String getFilePath(String dir, File file) {
-        String filePath = WebConstants.getServerAddress() + "/upload" + dir + file.getName();
+        String filePath = WebConstants.getServerAddress() + FileUtil.FILE_URL_PREFIX + dir + file.getName();
         return filePath;
     }
 

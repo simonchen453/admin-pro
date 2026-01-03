@@ -55,10 +55,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
             } else if (imagesPath.indexOf("classes") > -1) {
                 imagesPath = "file:" + imagesPath.substring(0, imagesPath.indexOf("classes"));
             }
-            imagesPath = imagesPath.substring(0, imagesPath.lastIndexOf("/")) + "/upload/";
+            imagesPath = imagesPath.substring(0, imagesPath.lastIndexOf("/")) + FileUtil.FILE_URL_PREFIX + "/";
             publicFileDir = imagesPath;
         }
-        registry.addResourceHandler("/upload/**").addResourceLocations(publicFileDir);
+        registry.addResourceHandler(FileUtil.FILE_URL_PREFIX + "/**").addResourceLocations(publicFileDir);
         // Spring Boot 3.x 使用 springdoc-openapi，swagger-ui 路径为 /swagger-ui.html
     }
 

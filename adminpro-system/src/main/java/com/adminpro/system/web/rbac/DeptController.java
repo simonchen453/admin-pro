@@ -4,6 +4,7 @@ import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.util.DateUtil;
+import com.adminpro.framework.base.util.FileUtil;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
@@ -198,7 +199,7 @@ public class DeptController extends BaseController {
         File f = new File(filePath);
         Thumbnails.of(bis).size(900, 900).outputFormat(fileType).toFile(f);
 
-        return R.ok("/upload" + url);
+        return R.ok(FileUtil.FILE_URL_PREFIX + url);
     }
 
     /**

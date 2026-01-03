@@ -11,6 +11,7 @@ import com.adminpro.system.rbac.domains.entity.menu.MenuCreateValidator;
 import com.adminpro.system.rbac.domains.entity.menu.MenuEntity;
 import com.adminpro.system.rbac.domains.entity.menu.MenuService;
 import com.adminpro.system.rbac.domains.entity.menu.MenuUpdateValidator;
+import com.adminpro.system.rbac.enums.MenuType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -99,6 +100,11 @@ public class MenuController extends BaseController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public R create(@RequestBody MenuEntity menu) {
         BeanUtil.beanAttributeValueTrim(menu);
+
+        if (MenuType.isButton(menu.getType()) && StringUtils.isEmpty(menu.getVisible())) {
+            menu.setVisible("0");
+        }
+
         MessageBundle messageBundle = getMessageBundle();
         menuCreateValidator.validate(menu, messageBundle);
         if (messageBundle.hasErrorMessage()) {
@@ -143,8 +149,12 @@ public class MenuController extends BaseController {
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
     public R editSave(@RequestBody MenuEntity menu) {
         BeanUtil.beanAttributeValueTrim(menu);
-        MessageBundle messageBundle = getMessageBundle();
 
+        if (MenuType.isButton(menu.getType()) && StringUtils.isEmpty(menu.getVisible())) {
+            menu.setVisible("0");
+        }
+
+        MessageBundle messageBundle = getMessageBundle();
         menuUpdateValidator.validate(menu, messageBundle);
 
         if (messageBundle.hasErrorMessage()) {

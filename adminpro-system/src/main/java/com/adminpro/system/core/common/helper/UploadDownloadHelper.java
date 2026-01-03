@@ -28,6 +28,34 @@ import java.util.Date;
 @Component
 public class UploadDownloadHelper {
 
+    /**
+     * 给URL添加contextPath前缀 (用于返回给前端)
+     */
+    public String getUrlWithContextPath(String url) {
+        String contextPath = WebHelper.getContextPath();
+        if ("/".equals(contextPath)) {
+            return url;
+        }
+        if (url != null && !url.startsWith("http") && !url.startsWith(contextPath)) {
+            return contextPath + url;
+        }
+        return url;
+    }
+
+    /**
+     * 去除URL的ContextPath前缀 (用于存入数据库)
+     */
+    public String getUrlWithoutContextPath(String url) {
+        String contextPath = WebHelper.getContextPath();
+        if ("/".equals(contextPath)) {
+            return url;
+        }
+        if (url != null && url.startsWith(contextPath)) {
+            return url.substring(contextPath.length());
+        }
+        return url;
+    }
+
     public static UploadDownloadHelper getInstance() {
         return SpringUtil.getBean(UploadDownloadHelper.class);
     }
@@ -61,6 +89,54 @@ public class UploadDownloadHelper {
             FileUtils.copyInputStreamToFile(bis, f);
         }
         return WebConstants.getServerAddress() + WebHelper.getContextPath() + "/upload" + url;
+    }
+
+    /**
+     * 上传Base64文件
+     *
+     * @param base64Data Base64字符串
+     * @param category   分类
+     * @return 文件URL
+     */
+    public String uploadPublicFile(String base64Data, String category) throws IOException {
+        if (StringUtils.isEmpty(base64Data)) {
+            return null;
+        }
+
+        String suffix = ".png"; // Default
+        String data = base64Data;
+        if (base64Data.contains(",")) {
+            String[] parts = base64Data.split(",");
+            String header = parts[0];
+            data = parts[1];
+            if (header.contains("image/jpeg")) {
+                suffix = ".jpg";
+            } else if (header.contains("image/png")) {
+                suffix = ".png";
+            } else if (header.contains("image/gif")) {
+                suffix = ".gif";
+            }
+        }
+
+        byte[] bytes = java.util.Base64.getDecoder().decode(data);
+
+        String fileName = IdGenerator.getInstance().nextStringId() + suffix;
+        StringBuffer url = new StringBuffer();
+        String dir = DateUtil.formatDate(new Date(), "yyyyMMdd");
+        String sep = "/";
+        if (StringHelper.isNotEmpty(category)) {
+            url.append(sep).append(category);
+        }
+        url.append(sep).append(dir);
+
+        String fileDir = makePublicFileDir(url.toString());
+        String filePath = fileDir + sep + fileName;
+        url.append(sep).append(fileName);
+
+        File f = new File(filePath);
+        FileUtils.writeByteArrayToFile(f, bytes);
+
+        return "/upload" + url.toString();
     }
 
     /**
@@ -115,7 +191,7 @@ public class UploadDownloadHelper {
         OSSEntity entity = OSSFactory.build().uploadSuffix(file.getBytes(), originalFilename, suffix);
         boolean aBoolean = ConfigHelper.getBoolean(ConfigKeys.Oss.FETCH_FRAME, false);
         if (aBoolean && isVideo(entity)) {
-//            String tempPath = getClass().getClassLoader().getResource("").getPath();
+            // String tempPath = getClass().getClassLoader().getResource("").getPath();
             String tempPath = makePublicFileDir("temp");
             File f = new File(tempPath + "/" + IdGenerator.getInstance().nextId() + suffix);
             FileOutputStream fos = new FileOutputStream(f);
@@ -151,7 +227,8 @@ public class UploadDownloadHelper {
             return false;
         } else {
             suffix = suffix.substring(1);
-            return StringUtils.equalsIgnoreCase(suffix, "png") || StringUtils.equalsIgnoreCase(suffix, "jpg") || StringUtils.equalsIgnoreCase(suffix, "jpeg");
+            return StringUtils.equalsIgnoreCase(suffix, "png") || StringUtils.equalsIgnoreCase(suffix, "jpg")
+                    || StringUtils.equalsIgnoreCase(suffix, "jpeg");
         }
     }
 
@@ -187,7 +264,8 @@ public class UploadDownloadHelper {
      * @param response
      * @param messageBundle
      */
-    public void download(String url, HttpServletRequest request, HttpServletResponse response, MessageBundle messageBundle) throws IOException {
+    public void download(String url, HttpServletRequest request, HttpServletResponse response,
+            MessageBundle messageBundle) throws IOException {
         FileUtil.download(url, request, response, messageBundle);
     }
 
@@ -213,7 +291,6 @@ public class UploadDownloadHelper {
         String tempFileName = IdGenerator.getInstance().nextStringId() + getSuffix(originalFilename);
         return tempFileName;
     }
-
 
     /**
      * 构造新的存储目录

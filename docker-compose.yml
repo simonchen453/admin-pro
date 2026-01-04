@@ -71,6 +71,8 @@ services:
     restart: unless-stopped
     environment:
       - APP_BASE_PATH=${APP_BASE_PATH:-/adminpro}
+      # API 基础路径配置（前端会使用此路径访问后端API）
+      - API_BASE_URL=${API_BASE_URL:-/api}
       # 传递后端配置给 Nginx
       - BACKEND_HOST=${BACKEND_HOST:-backend}
       - BACKEND_API_PORT=${BACKEND_PORT:-8080}

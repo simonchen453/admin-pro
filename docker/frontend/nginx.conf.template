@@ -49,16 +49,16 @@ server {
     # API 代理配置
     # ============================================
     
-    # API 代理到后端（前端请求 /api，后端实际路径是 ${BACKEND_CONTEXT_PATH}）
-    location ^~ /api {
+    # API 代理到后端（前端请求 ${API_BASE_URL}，后端实际路径是 ${BACKEND_CONTEXT_PATH}）
+    location ^~ ${API_BASE_URL} {
         proxy_pass http://${BACKEND_HOST}:${BACKEND_API_PORT}${BACKEND_CONTEXT_PATH};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         
-        # Cookie 路径重写（后端返回的 Cookie Path 是 ${BACKEND_CONTEXT_PATH}，需要改为 /api）
-        proxy_cookie_path ${BACKEND_CONTEXT_PATH} /api;
+        # Cookie 路径重写（后端返回的 Cookie Path 是 ${BACKEND_CONTEXT_PATH}，需要改为 ${API_BASE_URL}）
+        proxy_cookie_path ${BACKEND_CONTEXT_PATH} ${API_BASE_URL};
         
         # WebSocket 支持（如果需要）
         proxy_http_version 1.1;

@@ -97,6 +97,81 @@ make up     # 启动服务
 
 详细说明请参考 [DOCKER_DEPLOY.md](DOCKER_DEPLOY.md)。
 
+### 环境变量配置
+
+项目支持通过环境变量灵活配置部署参数。在项目根目录创建 `.env` 文件：
+
+#### 前端配置
+
+```bash
+# 应用基础路径（前端静态资源和路由的路径前缀）
+APP_BASE_PATH=/adminpro
+
+# API 基础路径（前端访问后端 API 的路径）
+API_BASE_URL=/api
+```
+
+#### 后端配置
+
+```bash
+# 后端上下文路径（Spring Boot context-path）
+BACKEND_CONTEXT_PATH=/adminpro
+
+# 后端服务端口
+BACKEND_PORT=8080
+```
+
+#### 数据库配置
+
+```bash
+DB_HOST=host.docker.internal
+DB_PORT=3306
+DB_NAME=adminpro
+DB_USERNAME=adminpro
+DB_PASSWORD=password$1
+```
+
+### API_BASE_URL 工作原理
+
+`API_BASE_URL` 在前端和 Nginx 两个层面同步生效：
+
+1. **前端层**: 所有 API 请求使用此路径（如 `/${API_BASE_URL}/auth/login`）
+2. **Nginx 层**: 自动配置代理规则 `location ^~ ${API_BASE_URL}`
+
+**示例**（设置 `API_BASE_URL=/my-api`）：
+- 前端发起: `fetch('/${API_BASE_URL}/auth/login')`
+- Nginx 代理: `/${API_BASE_URL}/*` → `http://backend:8080/adminpro/*`
+- Cookie 路径: `/adminpro` 自动重写为 `/${API_BASE_URL}`
+
+### 常见配置场景
+
+**场景 1: 默认配置**
+```bash
+APP_BASE_PATH=/adminpro
+API_BASE_URL=/api
+BACKEND_CONTEXT_PATH=/adminpro
+```
+- 前端: `http://your-domain/adminpro/`
+- API: `http://your-domain/api/*` → 后端: `http://backend:8080/adminpro/*`
+
+**场景 2: 自定义 API 路径**
+```bash
+APP_BASE_PATH=/admin
+API_BASE_URL=/backend-api
+BACKEND_CONTEXT_PATH=/adminpro
+```
+- 前端: `http://your-domain/admin/`
+- API: `http://your-domain/backend-api/*` → 后端: `http://backend:8080/adminpro/*`
+
+**场景 3: 根路径部署**
+```bash
+APP_BASE_PATH=/
+API_BASE_URL=/api
+BACKEND_CONTEXT_PATH=/
+```
+- 前端: `http://your-domain/`
+- API: `http://your-domain/api/*` → 后端: `http://backend:8080/*`
+
 ## 许可证
 
 [LICENSE](LICENSE)

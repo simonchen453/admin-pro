@@ -1,5 +1,6 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import './Captcha.css';
+import config from '@/config/env';
 
 interface CaptchaProps {
   onCaptchaChange?: (captchaKey: string) => void;
@@ -23,8 +24,8 @@ const Captcha = forwardRef<CaptchaRef, CaptchaProps>(({ onCaptchaChange, classNa
   const refreshCaptcha = () => {
     const newKey = generateCaptchaKey();
     setCaptchaKey(newKey);
-    // 直接使用完整的URL路径
-    setImageUrl(`/api/auth/captcha.jpg?key=${newKey}`);
+    // 使用配置的API基础路径
+    setImageUrl(`${config.API_BASE_URL}/auth/captcha.jpg?key=${newKey}`);
     onCaptchaChange?.(newKey);
   };
 

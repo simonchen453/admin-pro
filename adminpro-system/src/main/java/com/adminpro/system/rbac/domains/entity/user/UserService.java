@@ -4,6 +4,7 @@ import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import com.adminpro.framework.base.entity.BaseService;
+import com.adminpro.framework.base.util.CryptUtil;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.client.helper.ClientHelper;
@@ -20,6 +21,7 @@ import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.vo.user.UserExportVo;
 import com.adminpro.system.rbac.domains.vo.user.UserImportVo;
 import com.adminpro.system.rbac.enums.UserStatus;
+import com.adminpro.system.web.BaseConstants;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +63,19 @@ public class UserService extends BaseService<UserEntity, String> {
     @Transactional
     public void update(UserEntity entity) {
         logger.debug("更新用户: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
+
+        String partyPwd = entity.getThirdPartyPwd();
+        try {
+            boolean thirdPartyEncryptPwdEnabled = ConfigHelper.getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
+            String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, "szyh$123");
+            if (thirdPartyEncryptPwdEnabled && StringUtils.isNotEmpty(partyPwd)) {
+                byte[] encrypt = CryptUtil.encrypt(partyPwd.getBytes(), thirdPartyEncryptPwd);
+                entity.setThirdPartyPwd(CryptUtil.encodeBase64(encrypt));
+            }
+        } catch (Exception e) {
+            logger.error("第三方密码加密失败：", e);
+        }
+
         dao.update(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
         logger.debug("更新用户成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
@@ -139,8 +154,21 @@ public class UserService extends BaseService<UserEntity, String> {
             entity.setPassword(ConfigHelper.getString(RbacConstants.USER_DEFAULT_PASSWORD));
         }
         String encryptPwd = PasswordHelper.encryptPwd(entity.getUserIden(), entity.getPassword());
-
         entity.setPassword(encryptPwd);
+
+        String partyPwd = entity.getThirdPartyPwd();
+        try {
+            boolean thirdPartyEncryptPwdEnabled = ConfigHelper.getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
+            String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, "szyh$123");
+            if (thirdPartyEncryptPwdEnabled && StringUtils.isNotEmpty(partyPwd)) {
+                byte[] encrypt = CryptUtil.encrypt(partyPwd.getBytes(), thirdPartyEncryptPwd);
+                entity.setThirdPartyPwd(CryptUtil.encodeBase64(encrypt));
+            }
+        } catch (Exception e) {
+            logger.error("第三方密码加密失败：", e);
+        }
+
+
         dao.create(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
         logger.info("创建用户成功: userDomain={}, loginName={}, loginName={}", entity.getUserDomain(), entity.getUserId(), entity.getLoginName());

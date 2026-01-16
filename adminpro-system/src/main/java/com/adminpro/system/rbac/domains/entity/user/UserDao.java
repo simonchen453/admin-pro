@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
 
@@ -70,20 +70,6 @@ public class UserDao extends BaseDao<UserEntity, String> {
                     + " = ? or d.col_id in (select t.col_id from sys_dept_tbl t where find_in_set (?, col_ancestors)))",
                     deptId, deptId);
         }
-    }
-
-    /**
-     * 根据userIden查找UserEntity对象
-     *
-     * @param userIden
-     * @return
-     */
-    public UserEntity findByIden(UserIden userIden) {
-        SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
-        select.setTable(UserEntity.TABLE_NAME);
-        select.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, userIden.getUserDomain());
-        select.addWhereAnd(UserEntity.COL_LOGIN_NAME + EQ, userIden.getLoginName());
-        return executeSingle(select);
     }
 
     /**
@@ -187,13 +173,14 @@ public class UserDao extends BaseDao<UserEntity, String> {
     /**
      * 删除UserEntity
      *
-     * @param userIden
+     * @param userDomain
+     * @param loginName
      * @return
      */
-    public void delete(UserIden userIden) {
+    public void delete(String userDomain, String loginName) {
         DeleteBuilder delete = new DeleteBuilder(UserEntity.TABLE_NAME);
-        delete.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, userIden.getUserDomain());
-        delete.addWhereAnd(UserEntity.COL_LOGIN_NAME + EQ, userIden.getLoginName());
+        delete.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, userDomain);
+        delete.addWhereAnd(UserEntity.COL_LOGIN_NAME + EQ, loginName);
         execute(delete);
     }
 

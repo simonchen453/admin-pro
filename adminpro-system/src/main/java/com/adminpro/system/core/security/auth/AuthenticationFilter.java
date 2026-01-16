@@ -3,7 +3,7 @@ package com.adminpro.system.core.security.auth;
 import com.adminpro.framework.client.helper.ClientHelper;
 
 import com.adminpro.system.rbac.api.LoginHelper;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
+import com.adminpro.system.rbac.domains.entity.user.UserEntity;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,10 +35,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             throws IOException, ServletException {
         String authToken = extractToken(request);
         if (ClientHelper.isMobileRequest(request) && StringUtils.isNotEmpty(authToken)) {
-            UserIden userIden = TokenHelper.getInstance().getUserIdenByToken(authToken);
-            if (userIden != null) {
-                LoginUser authUser = (LoginUser) this.userDetailsService
-                        .loadUserByUsername(userIden.toSecurityUsername());
+            UserEntity user = TokenHelper.getInstance().getUserByToken(authToken);
+            if (user != null) {
+                // 构造 securityUsername: userDomain_loginName
+                String securityUsername = user.getUserDomain() + "_" + user.getLoginName();
+                LoginUser authUser = (LoginUser) this.userDetailsService.loadUserByUsername(securityUsername);
                 if (authUser != null) {
                     if (tokenHelper.validateToken(authToken, authUser)) {
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

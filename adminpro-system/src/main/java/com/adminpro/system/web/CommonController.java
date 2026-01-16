@@ -25,7 +25,7 @@ import com.adminpro.system.rbac.domains.entity.menu.MenuEntity;
 import com.adminpro.system.rbac.domains.entity.menu.MenuService;
 import com.adminpro.system.rbac.domains.entity.role.RoleService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
+
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.domains.vo.menu.MenuTreeVo;
 import com.adminpro.system.rbac.domains.vo.oss.FileUploadVo;
@@ -201,7 +201,8 @@ public class CommonController extends BaseController {
         if (userEntity == null) {
             return R.error("未登录");
         }
-        UserIden userIden = new UserIden(userEntity.getUserDomain(), userEntity.getLoginName());
+        String userDomain = userEntity.getUserDomain();
+        String loginName = userEntity.getLoginName();
 
         String confirmNewPwd = vo.getConfirmNewPwd();
         String newPwd = vo.getNewPwd();
@@ -216,7 +217,7 @@ public class CommonController extends BaseController {
         }
 
         String oldPwd = vo.getOldPwd();
-        UserEntity entity = UserService.getInstance().changePwd(userIden, oldPwd, newPwd);
+        UserEntity entity = UserService.getInstance().changePwd(userDomain, loginName, oldPwd, newPwd);
         return R.ok(entity);
     }
 
@@ -290,7 +291,7 @@ public class CommonController extends BaseController {
     @PreAuthorize("@ss.hasPermission('common:menu:treeselect')")
     @GetMapping("/menu/treeselect")
     public R menuTreeSelect() {
-        UserIden loginUserIden = LoginHelper.getInstance().getLoginUserIden();
+        // 获取当前登录用户信息（已不再使用 UserIden）
         SearchParam param = startPaging();
         // param.addFilter("userIden", loginUserIden);
         List<MenuEntity> list = menuService.findByParam(param);

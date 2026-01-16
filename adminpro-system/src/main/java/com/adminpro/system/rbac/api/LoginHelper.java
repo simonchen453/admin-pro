@@ -1,6 +1,5 @@
 package com.adminpro.system.rbac.api;
 
-import com.adminpro.framework.base.util.JsonUtil;
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.client.helper.ClientHelper;
 import com.adminpro.framework.exceptions.APIException;
@@ -19,7 +18,6 @@ import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.domains.entity.usertoken.UserTokenEntity;
 import com.adminpro.system.rbac.enums.UserStatus;
@@ -73,52 +71,72 @@ public class LoginHelper {
     @Autowired
     private TokenHelper tokenHelper;
 
-    public String login(UserIden userIden, String password) throws APIException {
-        return login(userIden, password, null);
+    /**
+     * 用户登录
+     * 
+     * @param userDomain 用户域
+     * @param loginName  登录名
+     * @param password   密码
+     * @return 登录结果
+     */
+    public String login(String userDomain, String loginName, String password) throws APIException {
+        return login(userDomain, loginName, password, null);
     }
 
-    public String login(UserIden userIden, String password, Device device) throws APIException {
-        logger.info(MessageFormat.format("用户{0}尝试登陆{1}", userIden.toSecurityUsername(), userIden.getUserDomain()));
+    /**
+     * 用户登录
+     * 
+     * @param userDomain 用户域
+     * @param loginName  登录名
+     * @param password   密码
+     * @param device     设备类型
+     * @return 登录结果
+     */
+    public String login(String userDomain, String loginName, String password, Device device) throws APIException {
+        String securityUsername = userDomain + "_" + loginName;
+        logger.info(MessageFormat.format("用户{0}尝试登陆{1}", securityUsername, userDomain));
         boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
 
-        Authentication authentication = verifyAccount(userIden, password);
+        Authentication authentication = verifyAccount(userDomain, loginName, password);
 
-        final LoginUser userDetails = (LoginUser) userDetailsService.loadUserByUsername(userIden.toSecurityUsername());
+        final LoginUser userDetails = (LoginUser) userDetailsService.loadUserByUsername(securityUsername);
         if (authentication == null || userDetails == null) {
             return RbacConstants.LOGIN_RESULT_NO_MATCH;
         }
         if (StringHelper.equals(userDetails.getStatus(), UserStatus.LOCKED.getCode())) {
-            logger.error("用户{0}, 账户锁定", userIden.toSecurityUsername());
+            logger.error("用户{0}, 账户锁定", securityUsername);
             return RbacConstants.LOGIN_RESULT_USER_LOCKED;
         }
         if (StringHelper.equals(userDetails.getStatus(), UserStatus.INACTIVE.getCode())) {
-            logger.error("用户{0}, 账户停用", userIden.toSecurityUsername());
+            logger.error("用户{0}, 账户停用", securityUsername);
             return RbacConstants.LOGIN_RESULT_USER_INACTIVE;
         }
 
-        logger.info(MessageFormat.format("用户{0}登陆成功", userIden.getUserDomain() + "/" + userDetails.getLoginName()));
+        logger.info(MessageFormat.format("用户{0}登陆成功", userDomain + "/" + userDetails.getLoginName()));
         if (isMobileRequest) {
-            return handleMobileLogin(userIden, authentication, device);
+            return handleMobileLogin(userDomain, loginName, authentication, device);
         } else {
-            return handleWebLogin(userIden, authentication, userDetails);
+            return handleWebLogin(userDomain, loginName, authentication, userDetails);
         }
     }
 
-    private String handleMobileLogin(UserIden userIden, Authentication authentication, Device device) {
+    private String handleMobileLogin(String userDomain, String loginName, Authentication authentication,
+            Device device) {
         AuthToken principal = (AuthToken) authentication.getPrincipal();
         String token = principal.getToken();
         String deviceType = device != null ? tokenHelper.generateAudience(device) : TokenHelper.AUDIENCE_WEB;
-        tokenHelper.generateToken(userIden, token, deviceType);
-        UserEntity userEntity = UserService.getInstance().findByIden(userIden);
+        tokenHelper.generateToken(userDomain, loginName, token, deviceType);
+        UserEntity userEntity = UserService.getInstance().findByUserDomainAndLoginName(userDomain, loginName);
         userEntity.setLatestLoginTime(new Date());
         UserService.getInstance().update(userEntity);
         AuditLogHelper.log(AuditLogHelper.CATEGORY_ADMIN, RbacConstants.AUDIT_MODULE_USER,
                 RbacConstants.AUDIT_ACTION_LOGIN, RbacConstants.LOGIN_RESULT_SUCCESS,
-                JsonUtil.toJson(userIden));
+                "userDomain=" + userDomain + ", loginName=" + loginName);
         return token;
     }
 
-    private String handleWebLogin(UserIden userIden, Authentication authentication, LoginUser userDetails) {
+    private String handleWebLogin(String userDomain, String loginName, Authentication authentication,
+            LoginUser userDetails) {
         HttpSession session = WebHelper.getHttpRequest().getSession();
         Object principal = authentication.getPrincipal();
         String token = RbacConstants.LOGIN_RESULT_SUCCESS;
@@ -129,21 +147,22 @@ public class LoginHelper {
             setUserAgent(userDetails);
             session.setAttribute(LOGIN_AUTH_USER_KEY, userDetails);
             renewSession(session, WebHelper.getHttpRequest());
-            UserEntity userEntity = UserService.getInstance().findByIden(userIden);
+            UserEntity userEntity = UserService.getInstance().findByUserDomainAndLoginName(userDomain, loginName);
             userEntity.setLatestLoginTime(new Date());
             UserService.getInstance().update(userEntity);
             loginUserSession(userDetails);
             AuditLogHelper.log(AuditLogHelper.CATEGORY_ADMIN, RbacConstants.AUDIT_MODULE_USER,
                     RbacConstants.AUDIT_ACTION_LOGIN,
                     RbacConstants.LOGIN_RESULT_SUCCESS,
-                    JsonUtil.toJson(userIden));
+                    "userDomain=" + userDomain + ", loginName=" + loginName);
         }
         return token;
     }
 
-    private Authentication verifyAccount(UserIden userIden, String password) throws APIException {
+    private Authentication verifyAccount(String userDomain, String loginName, String password) throws APIException {
+        String securityUsername = userDomain + "_" + loginName;
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                userIden.toSecurityUsername(), password);
+                securityUsername, password);
         try {
             final Authentication authentication = authenticationmanager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -255,31 +274,37 @@ public class LoginHelper {
         return null;
     }
 
-    public UserIden getLoginUserIden() {
+    /**
+     * 获取当前登录用户ID（全局唯一主键）
+     *
+     * @deprecated 使用 getLoginUserId() 代替
+     */
+
+    /**
+     * 获取当前登录用户ID（全局唯一主键）
+     */
+    public String getLoginUserId() {
         LoginUser loginUser = getLoginUser();
         if (loginUser != null) {
-            return loginUser.getUserIden();
-        } else {
-            return null;
+            return loginUser.getUserId();
         }
+        return null;
     }
 
     public String getUserDomain() {
-        UserIden loginUserIden = getLoginUserIden();
-        if (loginUserIden != null) {
-            return loginUserIden.getUserDomain();
-        } else {
-            return null;
+        LoginUser loginUser = getLoginUser();
+        if (loginUser != null) {
+            return loginUser.getUserDomain();
         }
+        return null;
     }
 
     public String getLoginName() {
-        UserIden loginUserIden = getLoginUserIden();
-        if (loginUserIden != null) {
-            return loginUserIden.getLoginName();
-        } else {
-            return null;
+        LoginUser loginUser = getLoginUser();
+        if (loginUser != null) {
+            return loginUser.getLoginName();
         }
+        return null;
     }
 
     public UserEntity getUserEntity() {
@@ -291,15 +316,14 @@ public class LoginHelper {
         }
     }
 
-    public boolean isCurrentUser(UserIden userIden) {
-        String userDomain = getUserDomain();
-        String userId = getLoginName();
-        if (StringUtils.equals(userDomain, userIden.getUserDomain())
-                && StringUtils.equals(userId, userIden.getLoginName())) {
-            return true;
-        } else {
-            return false;
-        }
+    /**
+     * 判断是否为当前登录用户
+     */
+    public boolean isCurrentUser(String userDomain, String loginName) {
+        String currentDomain = getUserDomain();
+        String currentLoginName = getLoginName();
+        return StringUtils.equals(currentDomain, userDomain)
+                && StringUtils.equals(currentLoginName, loginName);
     }
 
     public String[] getPermissions() {
@@ -322,8 +346,8 @@ public class LoginHelper {
                 com.adminpro.system.rbac.domains.entity.user.UserEntity user = UserService.getInstance()
                         .findById(userTokenEntity.getUserId());
                 if (user != null) {
-                    AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE,
-                            new UserIden(user.getUserDomain(), user.getLoginName()).toSecurityUsername());
+                    String securityUsername = user.getUserDomain() + "_" + user.getLoginName();
+                    AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, securityUsername);
                 }
             }
             SecurityContextHolder.getContext().setAuthentication(null);

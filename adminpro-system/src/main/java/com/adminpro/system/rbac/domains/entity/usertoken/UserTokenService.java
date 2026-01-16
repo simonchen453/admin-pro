@@ -8,7 +8,6 @@ import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.security.auth.TokenHelper;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,19 +74,19 @@ public class UserTokenService extends BaseService<UserTokenEntity, String> {
         super.update(entity);
     }
 
+    /**
+     * 通过用户ID停用所有活动Token
+     * 
+     * @param userId 用户ID（全局唯一主键）
+     */
     @Transactional
-    public void inactive(UserIden userIden) {
-        com.adminpro.system.rbac.domains.entity.user.UserEntity user = com.adminpro.system.rbac.domains.entity.user.UserService
-                .getInstance().findByIden(userIden);
-        if (user == null) {
+    public void inactiveByUserId(String userId) {
+        if (userId == null) {
             return;
         }
-        // Use PK instead of loginName+domain
-        List<UserTokenEntity> list = dao.findByUserIdAndStatus(user.getId(), UserTokenEntity.STATUS_ACTIVITY);
-
+        List<UserTokenEntity> list = dao.findByUserIdAndStatus(userId, UserTokenEntity.STATUS_ACTIVITY);
         if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                UserTokenEntity userTokenEntity = list.get(i);
+            for (UserTokenEntity userTokenEntity : list) {
                 inactive(userTokenEntity);
                 AppCache.getInstance().delete(RbacCacheConstants.AUTH_TOKEN_CACHE, userTokenEntity.getToken());
             }

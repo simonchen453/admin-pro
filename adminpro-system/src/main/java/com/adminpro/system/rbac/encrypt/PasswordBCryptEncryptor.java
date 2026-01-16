@@ -1,12 +1,11 @@
 package com.adminpro.system.rbac.encrypt;
 
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * BCrypt encryptor
+ * BCrypt 密码加密器
  *
  * @author simon
  */
@@ -16,7 +15,8 @@ public class PasswordBCryptEncryptor implements PasswordEncryptor {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Override
-    public String encrypt(UserIden userIden, String pwd) {
+    public String encrypt(String userDomain, String loginName, String pwd) {
+        // BCrypt 不需要用户信息，直接加密密码
         return encoder.encode(pwd);
     }
 

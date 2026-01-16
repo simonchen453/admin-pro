@@ -2,7 +2,6 @@ package com.adminpro.system.rbac.api;
 
 import com.adminpro.system.core.common.helper.ConfigHelper;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import com.adminpro.system.rbac.encrypt.PasswordEncryptExecutor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -14,7 +13,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by simon on 2017/6/9.
+ * 密码助手
+ * 
+ * @author simon
  */
 public class PasswordHelper {
     protected static final Logger logger = LoggerFactory.getLogger(PasswordHelper.class);
@@ -38,20 +39,21 @@ public class PasswordHelper {
     /**
      * 加密登录密码
      *
-     * @param userIden
-     * @param pwd
-     * @return
+     * @param userDomain 用户域
+     * @param loginName  登录名
+     * @param pwd        原始密码
+     * @return 加密后的密码
      */
-    public static String encryptPwd(UserIden userIden, String pwd) {
-        return PasswordEncryptExecutor.getInstance().encryptPwd(userIden, pwd);
+    public static String encryptPwd(String userDomain, String loginName, String pwd) {
+        return PasswordEncryptExecutor.getInstance().encryptPwd(userDomain, loginName, pwd);
     }
 
     /**
      * 校验登录密码
      *
-     * @param userEntity
-     * @param pwd
-     * @return
+     * @param userEntity 用户实体
+     * @param pwd        原始密码
+     * @return 是否匹配
      */
     public static boolean checkPwd(UserEntity userEntity, String pwd) {
         if (userEntity == null || StringUtils.isEmpty(pwd)) {
@@ -63,34 +65,35 @@ public class PasswordHelper {
     /**
      * 加密支付密码
      *
-     * @param userIden
-     * @param pwd
-     * @return
+     * @param userDomain 用户域
+     * @param loginName  登录名
+     * @param pwd        原始密码
+     * @return 加密后的密码
      */
-    public static String encryptPayPwd(UserIden userIden, String pwd) {
-        return PasswordEncryptExecutor.getInstance().encryptPwd(userIden, pwd);
+    public static String encryptPayPwd(String userDomain, String loginName, String pwd) {
+        return PasswordEncryptExecutor.getInstance().encryptPwd(userDomain, loginName, pwd);
     }
 
     /**
      * 校验支付密码
      *
-     * @param userEntity
-     * @param paypwd
-     * @return
+     * @param userEntity 用户实体
+     * @param paypwd     支付密码
+     * @return 是否匹配
      */
     public static boolean checkPayPwd(UserEntity userEntity, String paypwd) {
         if (userEntity == null || StringUtils.isEmpty(paypwd)) {
             return false;
         }
-        String encryptPwd = encryptPayPwd(new UserIden(userEntity.getUserDomain(), userEntity.getLoginName()), paypwd);
+        String encryptPwd = encryptPayPwd(userEntity.getUserDomain(), userEntity.getLoginName(), paypwd);
         return StringUtils.equals(encryptPwd, userEntity.getPayPwd());
     }
 
     /**
      * 生成随机密码
      *
-     * @param length
-     * @return
+     * @param length 密码长度
+     * @return 随机密码
      */
     public static String genRandom(int length) {
         Validate.isTrue(length >= 6, "password's length must greater or equal 6");

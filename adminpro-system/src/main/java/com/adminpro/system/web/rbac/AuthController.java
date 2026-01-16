@@ -20,7 +20,7 @@ import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
+
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.domains.vo.login.LoginResponse;
 import com.adminpro.system.rbac.domains.vo.login.LoginUserVo;
@@ -106,8 +106,8 @@ public class AuthController extends BaseController {
             if (userEntity == null) {
                 return R.error("用户名未注册");
             }
-            UserIden userIden = new UserIden(userEntity.getUserDomain(), userEntity.getLoginName());
-            String token = LoginHelper.getInstance().login(userIden, password, currentDevice);
+            String token = LoginHelper.getInstance().login(
+                    userEntity.getUserDomain(), userEntity.getLoginName(), password, currentDevice);
             if ("pending_active".equals(token)) {
                 return R.error("601", WebConstants.USER_PENDING_ACTIVE);
             } else if (RbacConstants.LOGIN_RESULT_USER_LOCKED.equals(token)) {
@@ -175,9 +175,8 @@ public class AuthController extends BaseController {
             if (loginUser == null) {
                 return R.error("未登录");
             }
-            UserIden userIden = loginUser.getUserIden();
-            UserEntity userEntity = userService.findByUserDomainAndLoginName(userIden.getUserDomain(),
-                    userIden.getLoginName());
+            UserEntity userEntity = userService.findByUserDomainAndLoginName(
+                    loginUser.getUserDomain(), loginUser.getLoginName());
             if (userEntity == null) {
                 return R.error("用户不存在");
             }
@@ -234,9 +233,8 @@ public class AuthController extends BaseController {
             if (loginUser == null) {
                 return R.error("未登录");
             }
-            UserIden userIden = loginUser.getUserIden();
-            UserEntity userEntity = userService.findByUserDomainAndLoginName(userIden.getUserDomain(),
-                    userIden.getLoginName());
+            UserEntity userEntity = userService.findByUserDomainAndLoginName(
+                    loginUser.getUserDomain(), loginUser.getLoginName());
             if (userEntity == null) {
                 return R.error("用户不存在");
             }

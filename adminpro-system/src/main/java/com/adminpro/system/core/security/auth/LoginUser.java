@@ -4,7 +4,7 @@ import com.adminpro.system.rbac.api.RbacHelper;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,10 +15,17 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * 登录用户信息
+ * 
  * @author simon
  */
 public class LoginUser implements UserDetails {
+    /** 用户ID（全局唯一主键） */
+    private final String userId;
+    /** 用户域 */
     private final String userDomain;
+    /** 登录名 */
+    private final String loginName;
     private final String deptNo;
     private final String deptName;
     private final String realName;
@@ -43,15 +50,16 @@ public class LoginUser implements UserDetails {
      * 操作系统
      */
     private String os;
-    private final UserIden userIden;
+
     private final UserEntity user;
 
     private final List<String> permissions;
 
-    public LoginUser(UserIden userIden, String password, String status, String deptNo,
+    public LoginUser(String userId, String userDomain, String loginName, String password, String status, String deptNo,
             String deptName, String realName, UserEntity user, List<String> permissions) {
-        this.userIden = userIden;
-        this.userDomain = userIden.getUserDomain();
+        this.userId = userId;
+        this.userDomain = userDomain;
+        this.loginName = loginName;
         this.password = password;
         this.status = status;
         this.permissions = permissions;
@@ -63,7 +71,7 @@ public class LoginUser implements UserDetails {
 
     @Override
     public String toString() {
-        return this.userIden.getLoginName();
+        return this.loginName;
     }
 
     public static LoginUser convertFrom(UserEntity user) {
@@ -78,7 +86,9 @@ public class LoginUser implements UserDetails {
             }
         }
         return new LoginUser(
-                new UserIden(user.getUserDomain(), user.getLoginName()),
+                user.getId(),
+                user.getUserDomain(),
+                user.getLoginName(),
                 user.getPassword(),
                 user.getStatus(),
                 deptNo,
@@ -89,12 +99,12 @@ public class LoginUser implements UserDetails {
     }
 
     public String toSecurityUserName() {
-        return userIden.toSecurityUsername();
+        return userDomain + "_" + loginName;
     }
 
     @Override
     public String getUsername() {
-        return userIden.getLoginName();
+        return loginName;
     }
 
     public String getStatus() {
@@ -142,13 +152,15 @@ public class LoginUser implements UserDetails {
         return password;
     }
 
-    @JsonIgnore
-    public UserIden getUserIden() {
-        return userIden;
+    /**
+     * 获取用户ID（全局唯一主键）
+     */
+    public String getUserId() {
+        return userId;
     }
 
     public String getLoginName() {
-        return userIden.getLoginName();
+        return loginName;
     }
 
     public String getDeptNo() {

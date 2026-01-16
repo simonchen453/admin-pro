@@ -7,7 +7,6 @@ import com.adminpro.system.core.common.helper.ConfigHelper;
 import com.adminpro.system.core.exceptions.InvalidAuthTokenException;
 import com.adminpro.system.rbac.api.Device;
 import com.adminpro.system.rbac.common.RbacConstants;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import com.adminpro.system.rbac.domains.entity.usertoken.UserTokenEntity;
 import com.adminpro.system.rbac.domains.entity.usertoken.UserTokenService;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * Token 助手类
+ * 用于生成、验证和管理用户认证Token
+ */
 @Component
 public class TokenHelper implements Serializable {
 
@@ -46,20 +49,33 @@ public class TokenHelper implements Serializable {
 
     private static Logger logger = LoggerFactory.getLogger(TokenHelper.class);
 
-    public UserIden getUserIdenByToken(String token) {
+    /**
+     * 通过Token获取用户ID
+     * 
+     * @param token 认证Token
+     * @return 用户ID（全局唯一主键），如无效则返回null
+     */
+    public String getUserIdByToken(String token) {
         UserTokenEntity byToken = userTokenService.findByToken(token);
         if (byToken == null || !byToken.isValid()) {
-            // throw new
-            // InvalidAuthTokenException(WebConstants.INVALID_AUTH_TOKEN_EXCEPTION);
             logger.info(WebConstants.INVALID_AUTH_TOKEN_EXCEPTION);
             return null;
         }
+        return byToken.getUserId();
+    }
 
-        com.adminpro.system.rbac.domains.entity.user.UserEntity user = userService.findById(byToken.getUserId());
-        if (user == null) {
+    /**
+     * 通过Token获取用户实体
+     * 
+     * @param token 认证Token
+     * @return 用户实体，如无效则返回null
+     */
+    public com.adminpro.system.rbac.domains.entity.user.UserEntity getUserByToken(String token) {
+        String userId = getUserIdByToken(token);
+        if (userId == null) {
             return null;
         }
-        return new UserIden(user.getUserDomain(), user.getLoginName());
+        return userService.findById(userId);
     }
 
     public UserTokenEntity getByToken(String token) {
@@ -67,7 +83,6 @@ public class TokenHelper implements Serializable {
         if (byToken == null || !byToken.isValid()) {
             throw new InvalidAuthTokenException(WebConstants.INVALID_AUTH_TOKEN_EXCEPTION);
         }
-
         return byToken;
     }
 
@@ -92,22 +107,23 @@ public class TokenHelper implements Serializable {
         return audience;
     }
 
+    /**
+     * 通过用户ID生成Token
+     * 
+     * @param userId 用户ID（全局唯一主键）
+     * @param device 设备类型
+     * @return Token实体
+     */
     @Transactional
-    public UserTokenEntity generateToken(UserIden userIden, Device device) {
+    public UserTokenEntity generateTokenByUserId(String userId, Device device) {
         String token = TokenGenerator.generateValue();
         Date now = new Date();
         boolean deactive = ConfigHelper.getBoolean(RbacConstants.KILL_SESSION_WHEN_LOGIN, false);
         if (deactive) {
-            userTokenService.inactive(userIden);
+            userTokenService.inactiveByUserId(userId);
         }
         UserTokenEntity userTokenEntity = new UserTokenEntity();
-
-        // Resolve User ID
-        com.adminpro.system.rbac.domains.entity.user.UserEntity user = userService.findByIden(userIden);
-        if (user != null) {
-            userTokenEntity.setUserId(user.getId());
-        }
-
+        userTokenEntity.setUserId(userId);
         userTokenEntity.setToken(token);
         String deviceType = generateAudience(device);
         userTokenEntity.setDevice(deviceType);
@@ -120,32 +136,53 @@ public class TokenHelper implements Serializable {
         return userTokenEntity;
     }
 
+    /**
+     * 通过用户域和登录名生成Token（用于登录场景）
+     * 
+     * @param userDomain 用户域
+     * @param loginName  登录名
+     * @param device     设备类型
+     * @return Token实体
+     */
     @Transactional
-    public UserTokenEntity generateToken(UserIden userIden) {
+    public UserTokenEntity generateToken(String userDomain, String loginName, Device device) {
+        com.adminpro.system.rbac.domains.entity.user.UserEntity user = userService
+                .findByUserDomainAndLoginName(userDomain, loginName);
+        if (user == null) {
+            throw new IllegalArgumentException("用户不存在: " + userDomain + "/" + loginName);
+        }
+        return generateTokenByUserId(user.getId(), device);
+    }
+
+    /**
+     * 通过用户ID生成Token（Web端）
+     */
+    @Transactional
+    public UserTokenEntity generateTokenByUserId(String userId) {
         String token = TokenGenerator.generateValue();
-        return generateToken(userIden, token);
+        return generateTokenByUserId(userId, token);
     }
 
+    /**
+     * 通过用户ID和指定Token生成Token实体
+     */
     @Transactional
-    public UserTokenEntity generateToken(UserIden userIden, String token) {
-        return generateToken(userIden, token, AUDIENCE_WEB);
+    public UserTokenEntity generateTokenByUserId(String userId, String token) {
+        return generateTokenByUserId(userId, token, AUDIENCE_WEB);
     }
 
+    /**
+     * 通过用户ID、指定Token和设备类型生成Token实体
+     */
     @Transactional
-    public UserTokenEntity generateToken(UserIden userIden, String token, String deviceType) {
+    public UserTokenEntity generateTokenByUserId(String userId, String token, String deviceType) {
         Date now = new Date();
         boolean deactive = ConfigHelper.getBoolean(RbacConstants.KILL_SESSION_WHEN_LOGIN, false);
         if (deactive) {
-            userTokenService.inactive(userIden);
+            userTokenService.inactiveByUserId(userId);
         }
         UserTokenEntity userTokenEntity = new UserTokenEntity();
-
-        // Resolve User ID
-        com.adminpro.system.rbac.domains.entity.user.UserEntity user = userService.findByIden(userIden);
-        if (user != null) {
-            userTokenEntity.setUserId(user.getId());
-        }
-
+        userTokenEntity.setUserId(userId);
         userTokenEntity.setToken(token);
         userTokenEntity.setDevice(deviceType != null ? deviceType : AUDIENCE_WEB);
         userTokenEntity.setStatus(UserTokenEntity.STATUS_ACTIVITY);
@@ -157,11 +194,41 @@ public class TokenHelper implements Serializable {
         return userTokenEntity;
     }
 
+    /**
+     * 通过用户域和登录名生成Token（Web端，用于登录场景）
+     */
+    @Transactional
+    public UserTokenEntity generateToken(String userDomain, String loginName) {
+        String token = TokenGenerator.generateValue();
+        return generateToken(userDomain, loginName, token);
+    }
+
+    /**
+     * 通过用户域、登录名和指定Token生成Token实体
+     */
+    @Transactional
+    public UserTokenEntity generateToken(String userDomain, String loginName, String token) {
+        return generateToken(userDomain, loginName, token, AUDIENCE_WEB);
+    }
+
+    /**
+     * 通过用户域、登录名、指定Token和设备类型生成Token实体
+     */
+    @Transactional
+    public UserTokenEntity generateToken(String userDomain, String loginName, String token, String deviceType) {
+        com.adminpro.system.rbac.domains.entity.user.UserEntity user = userService
+                .findByUserDomainAndLoginName(userDomain, loginName);
+        if (user == null) {
+            throw new IllegalArgumentException("用户不存在: " + userDomain + "/" + loginName);
+        }
+        return generateTokenByUserId(user.getId(), token, deviceType);
+    }
+
     public Boolean validateToken(String token, LoginUser authUser) {
         UserTokenEntity byToken = userTokenService.findByToken(token);
         String userId = byToken.getUserId();
         Date expireTime = byToken.getExpireTime();
-        if (StringUtils.equals(userId, authUser.getUser().getId())
+        if (StringUtils.equals(userId, authUser.getUserId())
                 && !expireTime.before(new Date())
                 && StringUtils.equals(byToken.getStatus(), UserTokenEntity.STATUS_ACTIVITY)) {
             refreshToken(token);
@@ -184,10 +251,6 @@ public class TokenHelper implements Serializable {
 
     /**
      * 根据设备类型获取Token过期时间（秒）
-     * 移动端使用更长的过期时间，Web端使用较短的过期时间
-     *
-     * @param deviceType 设备类型（mobile/tablet/web/unknown）
-     * @return 过期时间（秒）
      */
     public int getExpireSeconds(String deviceType) {
         if (AUDIENCE_MOBILE.equals(deviceType) || AUDIENCE_TABLET.equals(deviceType)) {
@@ -207,6 +270,5 @@ public class TokenHelper implements Serializable {
         } else {
             throw new LogoutException("非法Token");
         }
-
     }
 }

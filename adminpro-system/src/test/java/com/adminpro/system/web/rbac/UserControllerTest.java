@@ -1,10 +1,15 @@
 package com.adminpro.system.web.rbac;
 
-import com.adminpro.framework.base.entity.R;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
-import com.adminpro.system.rbac.domains.vo.user.UserListResponseVo;
-import com.adminpro.framework.jdbc.query.QueryResultSet;
+import com.adminpro.system.rbac.domains.entity.userrole.UserRoleAssignService;
+import com.adminpro.system.rbac.domains.entity.userpost.UserPostAssignService;
+import com.adminpro.system.rbac.domains.entity.dept.DeptService;
+import com.adminpro.system.rbac.domains.entity.post.PostService;
+import com.adminpro.system.rbac.domains.entity.role.RoleService;
+import com.adminpro.system.rbac.domains.vo.user.UserCreateValidator;
+import com.adminpro.system.rbac.domains.vo.user.UserUpdateValidator;
+import com.adminpro.system.core.common.helper.FileHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +24,6 @@ import org.springframework.http.MediaType;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,6 +41,30 @@ public class UserControllerTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private UserRoleAssignService userRoleAssignService;
+
+    @Mock
+    private UserPostAssignService userPostAssignService;
+
+    @Mock
+    private DeptService deptService;
+
+    @Mock
+    private RoleService roleService;
+
+    @Mock
+    private PostService postService;
+
+    @Mock
+    private UserCreateValidator userCreateValidator;
+
+    @Mock
+    private UserUpdateValidator userUpdateValidator;
+
+    @Mock
+    private FileHelper fileHelper;
 
     @InjectMocks
     private UserController userController;

@@ -79,37 +79,40 @@ public class UserService extends BaseService<UserEntity, String> {
 
         dao.update(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE,
-                new UserIden(entity.getUserDomain(), entity.getLoginName()).toSecurityUsername());
+                getSecurityUsername(entity.getUserDomain(), entity.getLoginName()));
         logger.debug("更新用户成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
     }
 
+    private String getSecurityUsername(String userDomain, String loginName) {
+        return userDomain + ":" + loginName;
+    }
+
     @Transactional
-    public UserEntity resetPwd(UserIden userIden, String newPassword) {
-        UserEntity entity = findByIden(userIden);
+    public UserEntity resetPwd(String userDomain, String loginName, String newPassword) {
+        UserEntity entity = findByUserDomainAndLoginName(userDomain, loginName);
         if (entity == null) {
-            logger.warn("重置密码失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getLoginName());
+            logger.warn("重置密码失败，用户不存在: userDomain={}, loginName={}", userDomain, loginName);
             throw new BaseRuntimeException(RbacConstants.MSG_USER_NOT_FOUND);
         }
         logger.info("重置用户密码: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
-        String newPwd = PasswordHelper.encryptPwd(new UserIden(entity.getUserDomain(), entity.getLoginName()),
-                newPassword);
+        String newPwd = PasswordHelper.encryptPwd(entity.getUserDomain(), entity.getLoginName(), newPassword);
         entity.setPassword(newPwd);
         dao.update(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE,
-                new UserIden(entity.getUserDomain(), entity.getLoginName()).toSecurityUsername());
+                getSecurityUsername(entity.getUserDomain(), entity.getLoginName()));
         logger.info("重置用户密码成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
         return entity;
     }
 
-    public String authLogin(UserIden userIden, String password) {
+    public String authLogin(String userDomain, String loginName, String password) {
 
-        UserEntity entity = findByIden(userIden);
+        UserEntity entity = findByUserDomainAndLoginName(userDomain, loginName);
         if (entity == null) {
-            logger.warn("登录失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getLoginName());
+            logger.warn("登录失败，用户不存在: userDomain={}, loginName={}", userDomain, loginName);
             return null;
         }
         logger.debug("用户登录验证: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
-        String newPwd = PasswordHelper.encryptPwd(userIden, password);
+        String newPwd = PasswordHelper.encryptPwd(userDomain, loginName, password);
         boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
         if (isMobileRequest) {
             if (StringUtils.equals(newPwd, entity.getPassword())) {
@@ -128,22 +131,21 @@ public class UserService extends BaseService<UserEntity, String> {
     }
 
     @Transactional
-    public UserEntity changePwd(UserIden userIden, String oldPwd, String newPassword) {
-        UserEntity entity = findByIden(userIden);
+    public UserEntity changePwd(String userDomain, String loginName, String oldPwd, String newPassword) {
+        UserEntity entity = findByUserDomainAndLoginName(userDomain, loginName);
 
         if (entity == null) {
-            logger.warn("修改密码失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getLoginName());
+            logger.warn("修改密码失败，用户不存在: userDomain={}, loginName={}", userDomain, loginName);
             throw new BaseRuntimeException(RbacConstants.MSG_USER_NOT_FOUND);
         }
         logger.info("修改用户密码: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
-        String encryptPwd = PasswordHelper.encryptPayPwd(userIden, oldPwd);
-        String newPwd = PasswordHelper.encryptPwd(new UserIden(entity.getUserDomain(), entity.getLoginName()),
-                newPassword);
+        String encryptPwd = PasswordHelper.encryptPayPwd(userDomain, loginName, oldPwd);
+        String newPwd = PasswordHelper.encryptPwd(entity.getUserDomain(), entity.getLoginName(), newPassword);
         if (StringUtils.equals(encryptPwd, entity.getPassword())) {
             entity.setPassword(newPwd);
             dao.update(entity);
             AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE,
-                    new UserIden(entity.getUserDomain(), entity.getLoginName()).toSecurityUsername());
+                    getSecurityUsername(entity.getUserDomain(), entity.getLoginName()));
             logger.info("修改用户密码成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
             return entity;
         } else {
@@ -159,7 +161,7 @@ public class UserService extends BaseService<UserEntity, String> {
         if (StringUtils.isEmpty(password)) {
             entity.setPassword(ConfigHelper.getString(RbacConstants.USER_DEFAULT_PASSWORD));
         }
-        String encryptPwd = PasswordHelper.encryptPwd(new UserIden(entity.getUserDomain(), entity.getLoginName()),
+        String encryptPwd = PasswordHelper.encryptPwd(entity.getUserDomain(), entity.getLoginName(),
                 entity.getPassword());
         entity.setPassword(encryptPwd);
 
@@ -178,12 +180,8 @@ public class UserService extends BaseService<UserEntity, String> {
 
         dao.create(entity);
         AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE,
-                new UserIden(entity.getUserDomain(), entity.getLoginName()).toSecurityUsername());
+                getSecurityUsername(entity.getUserDomain(), entity.getLoginName()));
         logger.info("创建用户成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
-    }
-
-    public UserEntity findByIden(UserIden userIden) {
-        return dao.findByIden(userIden);
     }
 
     public UserEntity findById(String id) {
@@ -255,8 +253,8 @@ public class UserService extends BaseService<UserEntity, String> {
     }
 
     @Transactional
-    public void delete(UserIden userIden) {
-        dao.delete(userIden);
+    public void delete(String userDomain, String loginName) {
+        dao.delete(userDomain, loginName);
     }
 
     /**
@@ -266,14 +264,14 @@ public class UserService extends BaseService<UserEntity, String> {
      * @param password
      * @return
      */
-    public boolean authenticate(UserIden userIden, String password) {
-        UserEntity userEntity = findByIden(userIden);
+    public boolean authenticate(String userDomain, String loginName, String password) {
+        UserEntity userEntity = findByUserDomainAndLoginName(userDomain, loginName);
         if (userEntity == null) {
-            logger.warn("验证密码失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getLoginName());
+            logger.warn("验证密码失败，用户不存在: userDomain={}, loginName={}", userDomain, loginName);
             return false;
         }
         logger.debug("验证用户密码: userDomain={}, loginName={}", userEntity.getUserDomain(), userEntity.getLoginName());
-        String encryptPwd = PasswordHelper.encryptPwd(userIden, password);
+        String encryptPwd = PasswordHelper.encryptPwd(userDomain, loginName, password);
         boolean result = StringUtils.equals(encryptPwd, userEntity.getPassword());
         logger.debug("验证用户密码结果: userDomain={}, loginName={}, result={}", userEntity.getUserDomain(),
                 userEntity.getLoginName(), result);
@@ -403,7 +401,7 @@ public class UserService extends BaseService<UserEntity, String> {
         }
         if (StringUtils.isNotEmpty(importVo.getPassword())) {
             String encryptPwd = PasswordHelper.encryptPwd(
-                    new UserIden(existingUser.getUserDomain(), existingUser.getLoginName()), importVo.getPassword());
+                    existingUser.getUserDomain(), existingUser.getLoginName(), importVo.getPassword());
             existingUser.setPassword(encryptPwd);
         }
     }

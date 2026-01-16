@@ -23,7 +23,7 @@ import com.adminpro.system.rbac.domains.entity.post.PostService;
 import com.adminpro.system.rbac.domains.entity.role.RoleEntity;
 import com.adminpro.system.rbac.domains.entity.role.RoleService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
+
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.domains.entity.userpost.UserPostAssignEntity;
 import com.adminpro.system.rbac.domains.entity.userpost.UserPostAssignService;
@@ -47,7 +47,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -181,7 +181,7 @@ public class UserController extends BaseController {
                     logger.warn("重置用户密码失败，用户不存在: userId={}", userId);
                     return R.error(RbacConstants.MSG_USER_NOT_FOUND);
                 }
-                userService.resetPwd(new UserIden(userEntity.getUserDomain(), userEntity.getLoginName()), newPassword);
+                userService.resetPwd(userEntity.getUserDomain(), userEntity.getLoginName(), newPassword);
                 logger.info("重置用户密码成功: userDomain={}, userId={}", userDomain, userId);
                 return R.ok();
             } else {

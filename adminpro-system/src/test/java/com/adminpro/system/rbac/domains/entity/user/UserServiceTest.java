@@ -27,7 +27,6 @@ public class UserServiceTest {
     private UserService userService;
 
     private UserEntity testUser;
-    private UserIden testUserIden;
 
     @BeforeEach
     void setUp() {
@@ -40,7 +39,6 @@ public class UserServiceTest {
         testUser.setMobileNo("13800138000");
         testUser.setStatus("active");
 
-        testUserIden = new UserIden("kaizen_default", "testuser");
     }
 
     @Test
@@ -74,51 +72,8 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("根据UserIden查询用户")
-    void findByIden_ReturnsUser() {
-        // Arrange
-        when(userDao.findByIden(testUserIden)).thenReturn(testUser);
-
-        // Act
-        UserEntity result = userService.findByIden(testUserIden);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals("testuser", result.getLoginName());
-        verify(userDao, times(1)).findByIden(testUserIden);
-    }
-
-    @Test
-    @DisplayName("根据域和用户ID查询用户 - 用户存在且域匹配")
-    void findByUserDomainAndUserId_WhenMatches_ReturnsUser() {
-        // Arrange
-        when(userDao.findById("test-user-id-001")).thenReturn(testUser);
-
-        // Act
-        UserEntity result = userService.findByUserDomainAndUserId("kaizen_default", "test-user-id-001");
-
-        // Assert
-        assertNotNull(result);
-        assertEquals("kaizen_default", result.getUserDomain());
-        verify(userDao, times(1)).findById("test-user-id-001");
-    }
-
-    @Test
-    @DisplayName("根据域和用户ID查询用户 - 域不匹配")
-    void findByUserDomainAndUserId_WhenDomainMismatch_ReturnsNull() {
-        // Arrange
-        when(userDao.findById("test-user-id-001")).thenReturn(testUser);
-
-        // Act
-        UserEntity result = userService.findByUserDomainAndUserId("other_domain", "test-user-id-001");
-
-        // Assert
-        assertNull(result);
-    }
-
-    @Test
-    @DisplayName("根据域和登录名查询用户")
-    void findByUserDomainAndLoginName_ReturnsUser() {
+    @DisplayName("根据域和登录名查询用户 - 用户存在")
+    void findByUserDomainAndLoginName_WhenUserExists_ReturnsUser() {
         // Arrange
         when(userDao.findByUserDomainAndLoginName("kaizen_default", "testuser")).thenReturn(testUser);
 
@@ -128,19 +83,21 @@ public class UserServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals("testuser", result.getLoginName());
+        assertEquals("kaizen_default", result.getUserDomain());
         verify(userDao, times(1)).findByUserDomainAndLoginName("kaizen_default", "testuser");
     }
 
     @Test
-    @DisplayName("验证密码 - 用户不存在返回false")
-    void authenticate_WhenUserNotExists_ReturnsFalse() {
+    @DisplayName("根据域和登录名查询用户 - 用户不存在")
+    void findByUserDomainAndLoginName_WhenUserNotExists_ReturnsNull() {
         // Arrange
-        when(userDao.findByIden(testUserIden)).thenReturn(null);
+        when(userDao.findByUserDomainAndLoginName("kaizen_default", "nonexistent")).thenReturn(null);
 
         // Act
-        boolean result = userService.authenticate(testUserIden, "password123");
+        UserEntity result = userService.findByUserDomainAndLoginName("kaizen_default", "nonexistent");
 
         // Assert
-        assertFalse(result);
+        assertNull(result);
+        verify(userDao, times(1)).findByUserDomainAndLoginName("kaizen_default", "nonexistent");
     }
 }

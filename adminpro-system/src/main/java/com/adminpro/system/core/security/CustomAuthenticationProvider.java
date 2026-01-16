@@ -2,7 +2,7 @@ package com.adminpro.system.core.security;
 
 import com.adminpro.system.core.security.auth.AuthToken;
 import com.adminpro.system.core.security.auth.LoginUser;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
+
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
@@ -35,13 +35,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         // 认证逻辑
         LoginUser authUser = (LoginUser) userDetailsService.loadUserByUsername(name);
         if (null != authUser) {
-            UserIden userIden = new UserIden(authUser.getUserDomain(), authUser.getUsername());
+            String userDomain = authUser.getUserDomain();
+            String loginName = authUser.getUsername();
 
-            String token = UserService.getInstance().authLogin(userIden, password);
+            String token = UserService.getInstance().authLogin(userDomain, loginName, password);
             if (StringUtils.isNotEmpty(token)) {
                 // 生成令牌
                 Authentication auth = new UsernamePasswordAuthenticationToken(
-                        new AuthToken(userIden.getUserDomain(), userIden.getLoginName(), token), password,
+                        new AuthToken(userDomain, loginName, token), password,
                         authUser.getAuthorities());
                 return auth;
             } else {

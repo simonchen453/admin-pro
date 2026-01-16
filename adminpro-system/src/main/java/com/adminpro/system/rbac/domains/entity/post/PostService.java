@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -55,14 +56,19 @@ public class PostService extends BaseService<PostEntity, String> {
         super.create(entity);
     }
 
+    /**
+     * 批量删除职位（优化：使用批量删除SQL提升性能）
+     *
+     * @param ids 职位ID字符串，格式：id1,id2,id3
+     */
     @Transactional
     public void deleteByIds(String ids) {
         if (StringUtils.isEmpty(ids)) {
             return;
         }
-        String[] split = ids.split(",");
-        for (int i = 0; i < split.length; i++) {
-            dao.delete(split[i]);
+        String[] idArray = ids.split(",");
+        if (idArray.length > 0) {
+            dao.deleteByIds(Arrays.asList(idArray));
         }
     }
 

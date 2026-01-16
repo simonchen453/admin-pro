@@ -190,6 +190,16 @@ public class UserService extends BaseService<UserEntity, String> {
         return dao.findById(id);
     }
 
+    /**
+     * 根据ID列表批量查询用户
+     *
+     * @param ids 用户ID列表
+     * @return 用户列表
+     */
+    public List<UserEntity> findByIds(List<String> ids) {
+        return dao.findByIds(ids);
+    }
+
     public List<UserEntity> findByDomain(String domain) {
         return dao.findByDomain(domain);
     }

@@ -196,6 +196,20 @@ public class PostDao extends BaseDao<PostEntity, String> {
     }
 
     /**
+     * 批量删除职位
+     *
+     * @param ids 职位ID列表
+     */
+    public void deleteByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        DeleteBuilder delete = new DeleteBuilder(PostEntity.TABLE_NAME);
+        delete.addWhereAnd(PostEntity.COL_ID + " IN ", ids.toArray());
+        execute(delete);
+    }
+
+    /**
      * PostEntity表映射关系
      *
      * @return

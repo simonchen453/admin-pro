@@ -100,6 +100,22 @@ public class UserDao extends BaseDao<UserEntity, String> {
         return executeSingle(select);
     }
 
+    /**
+     * 根据ID列表批量查询用户
+     *
+     * @param ids 用户ID列表
+     * @return 用户列表
+     */
+    public List<UserEntity> findByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new java.util.ArrayList<>();
+        }
+        SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
+        select.setTable(UserEntity.TABLE_NAME);
+        select.addWhereAnd(UserEntity.COL_ID + IN, ids.toArray());
+        return execute(select);
+    }
+
     public List<UserEntity> findByDomain(String domain) {
         SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
         select.setTable(UserEntity.TABLE_NAME);

@@ -1,6 +1,7 @@
 package com.adminpro.system.tools.domains.entity.syslog;
 
 import com.adminpro.framework.base.entity.R;
+import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.DateUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 系统日志 信息操作处理
@@ -66,7 +68,8 @@ public class SysLogController extends BaseController {
     @RequestMapping(value = "/deletemany", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteManyLogs(@RequestParam String ids) {
         try {
-            sysLogService.deleteByIds(ids);
+            List<String> idList = BatchOperationValidator.validateAndParseIds(ids);
+            sysLogService.deleteByIds(String.join(",", idList));
         } catch (Exception e) {
             return R.error(e);
         }

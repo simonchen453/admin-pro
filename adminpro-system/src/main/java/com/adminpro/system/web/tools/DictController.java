@@ -3,6 +3,7 @@ package com.adminpro.system.web.tools;
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.enums.CommonStatus;
 import com.adminpro.framework.base.message.MessageBundle;
+import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -15,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 字典类型 信息操作处理
@@ -146,7 +149,9 @@ public class DictController extends BaseController {
     @SysLog("删除字典")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public R remove(@RequestParam("ids") String ids) {
-        dictService.deleteByIds(ids);
+        // 使用验证工具类解析和验证参数
+        List<String> dictIdList = BatchOperationValidator.validateAndParseIds(ids);
+        dictService.deleteByIds(StringUtils.join(dictIdList, ","));
         return R.ok();
     }
 

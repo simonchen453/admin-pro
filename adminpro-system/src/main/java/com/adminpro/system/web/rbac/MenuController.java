@@ -2,6 +2,7 @@ package com.adminpro.system.web.rbac;
 
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.message.MessageBundle;
+import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -198,7 +199,9 @@ public class MenuController extends BaseController {
     @SysLog("批量删除菜单")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public R remove(@RequestParam("ids") String ids) {
-        menuService.deleteByIds(ids);
+        // 使用验证工具类解析和验证参数
+        List<String> menuIdList = BatchOperationValidator.validateAndParseIds(ids);
+        menuService.deleteByIds(StringUtils.join(menuIdList, ","));
         return R.ok();
     }
 

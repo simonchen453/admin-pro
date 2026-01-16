@@ -3,6 +3,7 @@ package com.adminpro.system.web.rbac;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.message.MessageBundle;
+import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.BeanUtil;
 import org.springframework.beans.BeanUtils;
 import com.adminpro.framework.base.util.IdGenerator;
@@ -46,6 +47,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -259,8 +261,10 @@ public class UserController extends BaseController {
     public R deleteMany(@RequestParam String users) {
         logger.info("批量删除用户: users={}", users);
         try {
-            userService.deleteMany(users);
-            logger.info("批量删除用户成功: users={}", users);
+            // 使用验证工具类解析和验证参数
+            List<String> userIds = BatchOperationValidator.validateAndParseIds(users);
+            userService.deleteMany(StringUtils.join(userIds, ","));
+            logger.info("批量删除用户成功: count={}", userIds.size());
             return R.ok();
         } catch (Exception e) {
             logger.error("批量删除用户失败: users={}", users, e);
@@ -377,13 +381,11 @@ public class UserController extends BaseController {
     public void exportUser(@RequestParam(required = false) String ids, HttpServletResponse response) throws Exception {
         List<UserEntity> list = new ArrayList<>();
         if (StringUtils.isNotEmpty(ids)) {
-            String[] userIdArray = StringUtils.split(ids, ",");
-            for (String userId : userIdArray) {
-                UserEntity userEntity = userService.findById(userId);
-                if (userEntity != null) {
-                    list.add(userEntity);
-                }
-            }
+            // 使用验证工具类解析和验证参数
+            List<String> userIds = BatchOperationValidator.validateAndParseIds(ids);
+            // 使用批量查询优化 N+1 问题
+            List<UserEntity> users = userService.findByIds(userIds);
+            list.addAll(users);
         }
         userService.exportExcel(response, list);
     }

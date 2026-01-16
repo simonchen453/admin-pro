@@ -1,6 +1,7 @@
 package com.adminpro.system.web.tools;
 
 import com.adminpro.framework.base.entity.R;
+import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -18,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -81,10 +84,10 @@ public class OssController extends BaseController {
     @Transactional
     @RequestMapping(value = "/deletemany", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteMany(@RequestParam String ids) {
-        String[] split = ids.split(",");
+        // 使用验证工具类解析和验证参数
+        List<String> ossIdList = BatchOperationValidator.validateAndParseIds(ids);
         try {
-            for (int i = 0; i < split.length; i++) {
-                String id = split[i];
+            for (String id : ossIdList) {
                 OSSEntity ossEntity = ossService.findById(id);
                 if (ossEntity != null) {
                     ossService.delete(ossEntity);

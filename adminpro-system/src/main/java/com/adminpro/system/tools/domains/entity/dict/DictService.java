@@ -103,24 +103,40 @@ public class DictService extends BaseService<DictEntity, String> {
         return dictEntity;
     }
 
+    /**
+     * 批量删除字典（优化：避免嵌套循环，使用 deleteByKey 批量删除字典数据）
+     *
+     * @param ids 字典ID字符串，格式：id1,id2,id3
+     */
     @CacheEvict(value = RbacCacheConstants.DICT_CACHE, allEntries = true)
     @Transactional
     public void deleteByIds(String ids) {
         if (StringUtils.isEmpty(ids)) {
             return;
         }
-        String[] split = ids.split(",");
-        for (int i = 0; i < split.length; i++) {
-            String id = split[i];
+
+        // 批量查询所有字典
+        String[] idArray = ids.split(",");
+        List<DictEntity> entities = new ArrayList<>();
+        for (String id : idArray) {
             DictEntity entity = dao.findById(id);
             if (entity != null) {
-                List<DictDataEntity> data = dataDao.findByKey(entity.getKey());
-                for (int j = 0; j < data.size(); j++) {
-                    DictDataEntity dictDataEntity = data.get(j);
-                    dataDao.delete(dictDataEntity.getId());
-                }
-                dao.delete(entity.getId());
+                entities.add(entity);
             }
+        }
+
+        if (entities.isEmpty()) {
+            return;
+        }
+
+        // 批量删除字典数据（使用 deleteByKey，一次删除所有相同 key 的数据）
+        for (DictEntity entity : entities) {
+            dataDao.deleteByKey(entity.getKey());
+        }
+
+        // 批量删除字典
+        for (DictEntity entity : entities) {
+            dao.delete(entity.getId());
         }
     }
 

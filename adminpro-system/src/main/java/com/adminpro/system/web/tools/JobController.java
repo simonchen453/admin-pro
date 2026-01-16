@@ -2,6 +2,7 @@ package com.adminpro.system.web.tools;
 
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.message.MessageBundle;
+import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -100,7 +101,9 @@ public class JobController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteMany(@RequestParam String ids) {
         try {
-            scheduleJobService.deleteMany(ids);
+            // 使用验证工具类解析和验证参数
+            List<String> jobIdList = BatchOperationValidator.validateAndParseIds(ids);
+            scheduleJobService.deleteMany(StringUtils.join(jobIdList, ","));
         } catch (Exception e) {
             return R.error(e);
         }
@@ -169,7 +172,9 @@ public class JobController extends BaseController {
     @RequestMapping(value = "/log/delete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteManyLogs(@RequestParam String ids) {
         try {
-            scheduleJobLogService.deleteMany(ids);
+            // 使用验证工具类解析和验证参数
+            List<String> logIdList = BatchOperationValidator.validateAndParseIds(ids);
+            scheduleJobLogService.deleteMany(StringUtils.join(logIdList, ","));
         } catch (Exception e) {
             return R.error(e);
         }

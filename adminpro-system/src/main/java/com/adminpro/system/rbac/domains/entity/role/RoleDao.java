@@ -3,8 +3,10 @@ package com.adminpro.system.rbac.domains.entity.role;
 import com.adminpro.framework.base.entity.BaseDao;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
+import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
 import com.adminpro.system.core.common.helper.StringHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -137,5 +139,19 @@ public class RoleDao extends BaseDao<RoleEntity, String> {
 
         select.addOrderByAscending(RoleEntity.COL_NAME);
         return search(select);
+    }
+
+    /**
+     * 批量删除角色
+     *
+     * @param ids 角色ID列表
+     */
+    public void deleteByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        DeleteBuilder delete = new DeleteBuilder(RoleEntity.TABLE_NAME);
+        delete.addWhereAnd(RoleEntity.COL_ID + " IN ", ids.toArray());
+        execute(delete);
     }
 }

@@ -2,6 +2,7 @@ package com.adminpro.system.web.rbac;
 
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.message.MessageBundle;
+import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 用户域环境配置 信息操作处理
@@ -151,7 +154,8 @@ public class UserDomainEnvController extends BaseController {
      */
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public R remove(@RequestParam("ids") String ids) {
-        userDomainEnvService.deleteByIds(ids);
+        List<String> idList = BatchOperationValidator.validateAndParseIds(ids);
+        userDomainEnvService.deleteByIds(String.join(",", idList));
         return R.ok();
     }
 

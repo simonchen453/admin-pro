@@ -72,14 +72,19 @@ public class MenuService extends BaseService<MenuEntity, String> {
         super.delete(id);
     }
 
+    /**
+     * 批量删除菜单（优化：使用批量删除SQL提升性能）
+     *
+     * @param ids 菜单ID字符串，格式：id1,id2,id3
+     */
     @Transactional
     public void deleteByIds(String ids) {
         if (StringUtils.isEmpty(ids)) {
             return;
         }
-        String[] split = ids.split(",");
-        for (int i = 0; i < split.length; i++) {
-            dao.delete(split[i]);
+        String[] idArray = ids.split(",");
+        if (idArray.length > 0) {
+            dao.deleteByIds(Arrays.asList(idArray));
         }
     }
 

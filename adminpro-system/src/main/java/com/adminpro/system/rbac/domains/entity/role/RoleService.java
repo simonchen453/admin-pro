@@ -62,11 +62,20 @@ public class RoleService extends BaseService<RoleEntity, String> {
         return dao.findByIds(ids);
     }
 
+    /**
+     * 批量删除角色（优化：使用批量删除SQL提升性能）
+     *
+     * @param roleIds 角色ID字符串，格式：roleId,roleId,roleId
+     */
     @Transactional
-    public void deleteMany(String roleIds) {
+    public void deleteByIds(String roleIds) {
+        if (StringUtils.isEmpty(roleIds)) {
+            return;
+        }
         String[] idArray = StringUtils.split(roleIds, ",");
-        for (String id : idArray) {
-            delete(id);
+        if (idArray.length > 0) {
+            dao.deleteByIds(Arrays.asList(idArray));
+            logger.info("批量删除角色成功: count={}", idArray.length);
         }
     }
 

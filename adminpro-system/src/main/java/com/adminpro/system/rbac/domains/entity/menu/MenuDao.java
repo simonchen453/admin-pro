@@ -3,6 +3,7 @@ package com.adminpro.system.rbac.domains.entity.menu;
 import com.adminpro.framework.base.entity.BaseDao;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
+import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
 import com.adminpro.system.rbac.domains.entity.rolemenu.RoleMenuAssignEntity;
 import com.adminpro.system.rbac.domains.entity.userrole.UserRoleAssignEntity;
@@ -120,5 +121,19 @@ public class MenuDao extends BaseDao<MenuEntity, String> {
         select.setQuery(sql);
         select.addWhereAnd("rma.col_role_id = ?", roleId);
         return execute(select);
+    }
+
+    /**
+     * 批量删除菜单
+     *
+     * @param ids 菜单ID列表
+     */
+    public void deleteByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        DeleteBuilder delete = new DeleteBuilder(MenuEntity.TABLE_NAME);
+        delete.addWhereAnd(MenuEntity.COL_ID + " IN ", ids.toArray());
+        execute(delete);
     }
 }

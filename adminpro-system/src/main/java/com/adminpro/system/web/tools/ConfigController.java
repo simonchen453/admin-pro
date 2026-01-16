@@ -2,6 +2,7 @@ package com.adminpro.system.web.tools;
 
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.message.MessageBundle;
+import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 参数配置 信息操作处理
@@ -152,7 +155,9 @@ public class ConfigController extends BaseController {
     @SysLog("删除配置")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public R remove(@RequestParam("ids") String ids) {
-        configService.deleteByIds(ids);
+        // 使用验证工具类解析和验证参数
+        List<String> configIdList = BatchOperationValidator.validateAndParseIds(ids);
+        configService.deleteByIds(StringUtils.join(configIdList, ","));
         return R.ok();
     }
 

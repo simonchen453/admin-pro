@@ -2,6 +2,7 @@ package com.adminpro.system.web.rbac;
 
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.message.MessageBundle;
+import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -19,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 角色 信息操作处理
@@ -151,7 +154,9 @@ public class RoleController extends BaseController {
     @SysLog("删除角色")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public R remove(@RequestParam("ids") String ids) {
-        roleService.deleteMany(ids);
+        // 使用验证工具类解析和验证参数
+        List<String> roleIdList = BatchOperationValidator.validateAndParseIds(ids);
+        roleService.deleteByIds(StringUtils.join(roleIdList, ","));
         return R.ok();
     }
 

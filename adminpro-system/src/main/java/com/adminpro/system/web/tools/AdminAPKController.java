@@ -2,6 +2,7 @@ package com.adminpro.system.web.tools;
 
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.message.MessageBundle;
+import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.util.DateUtil;
 import com.adminpro.framework.base.util.FileUtil;
@@ -188,8 +189,8 @@ public class AdminAPKController extends BaseController {
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     @Transactional
     public R remove(@RequestParam("ids") String ids) {
-        String[] idArr = ids.split("-");
-        for (String id : idArr) {
+        List<String> idList = BatchOperationValidator.validateAndParseIds(ids);
+        for (String id : idList) {
             APKEntity apkEntity = apkService.findById(id);
             if (apkEntity != null) {
                 apkService.delete(id);

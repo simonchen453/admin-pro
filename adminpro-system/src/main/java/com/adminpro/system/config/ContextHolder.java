@@ -30,7 +30,7 @@ public class ContextHolder implements IContextHolder {
                 ctx = new AppContext();
                 ctx.setLoginName(loginUser.getLoginName());
                 ctx.setRealName(loginUser.getRealName());
-                ctx.setUserId(loginUser.getUserIden().getUserId());
+                ctx.setId(loginUser.getUser().getId());
                 ctx.setUserDomain(loginUser.getUserIden().getUserDomain());
             }
         }

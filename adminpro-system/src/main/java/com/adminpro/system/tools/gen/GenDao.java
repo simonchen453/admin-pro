@@ -82,7 +82,8 @@ public class GenDao extends SqlExecutor<TableInfo, String> {
     public List<ColumnInfo> findTableColumnsByName(String tableName) {
         SelectBuilder<ColumnInfo> selectBuilder = new SelectBuilder<>(getColumnInfoRowMapper());
         StringBuilder sql = new StringBuilder();
-        sql.append("select column_name, data_type, column_comment, character_maximum_length, is_nullable from information_schema.columns ");
+        sql.append(
+                "select column_name, data_type, column_comment, character_maximum_length, is_nullable from information_schema.columns ");
         sql.append("where table_name = ? and table_schema = (select database()) order by ordinal_position ");
         selectBuilder.setQuery(sql.toString());
         selectBuilder.getWhereValues().add(tableName);
@@ -96,8 +97,8 @@ public class GenDao extends SqlExecutor<TableInfo, String> {
                 TableInfo entity = new TableInfo();
                 entity.setTableName(resultSet.getString("table_name"));
                 entity.setTableComment(resultSet.getString("table_comment"));
-                entity.setCreatedDate(resultSet.getTimestamp("create_time"));
-                entity.setUpdatedDate(resultSet.getTimestamp("update_time"));
+                entity.setCreatedAt(resultSet.getTimestamp("create_time"));
+                entity.setUpdatedAt(resultSet.getTimestamp("update_time"));
                 return entity;
             }
         };

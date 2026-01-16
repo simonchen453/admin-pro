@@ -216,7 +216,7 @@ const UserList: React.FC = () => {
       onOk: async () => {
         try {
           if (!user.userIden) return;
-          const result = await activeUserApi(user.userIden.userDomain, user.userIden.userId);
+          const result = await activeUserApi(user.userIden.userId);
           if (result.success) {
             message.success('用户激活成功');
             fetchUserList(searchForm);
@@ -241,7 +241,7 @@ const UserList: React.FC = () => {
       onOk: async () => {
         try {
           if (!user.userIden) return;
-          const result = await inactiveUserApi(user.userIden.userDomain, user.userIden.userId);
+          const result = await inactiveUserApi(user.userIden.userId);
           if (result.success) {
             message.success('用户停用成功');
             fetchUserList(searchForm);

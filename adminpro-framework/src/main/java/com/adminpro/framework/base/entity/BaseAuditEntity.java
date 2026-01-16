@@ -1,6 +1,5 @@
 package com.adminpro.framework.base.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
@@ -9,82 +8,60 @@ import java.util.Date;
  * 添加审查字段，创建者，创建时间，更新者，更新时间
  */
 public abstract class BaseAuditEntity extends BaseEntity {
-    private String createdByUserId;
-    private String createdByUserDomain;
-    private Date createdDate;
+    private String createdBy;
+    private Date createdAt;
 
-    private String updatedByUserId;
-    private String updatedByUserDomain;
-    private Date updatedDate;
+    private String updatedBy;
+    private Date updatedAt;
 
-    public static final String COL_CREATED_DATE = "COL_CREATED_DATE";
-    public static final String COL_CREATED_BY_USER_ID = "COL_CREATED_BY_USER_ID";
-    public static final String COL_CREATED_BY_USER_DOMAIN = "COL_CREATED_BY_USER_DOMAIN";
-    public static final String COL_UPDATED_DATE = "COL_UPDATED_DATE";
-    public static final String COL_UPDATED_BY_USER_ID = "COL_UPDATED_BY_USER_ID";
-    public static final String COL_UPDATED_BY_USER_DOMAIN = "COL_UPDATED_BY_USER_DOMAIN";
+    public static final String COL_CREATED_AT = "COL_CREATED_AT";
+    public static final String COL_CREATED_BY = "COL_CREATED_BY";
+    public static final String COL_UPDATED_AT = "COL_UPDATED_AT";
+    public static final String COL_UPDATED_BY = "COL_UPDATED_BY";
 
-    public String getCreatedByUserId() {
-        return createdByUserId;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setCreatedByUserId(String createdByUserId) {
-        this.createdByUserId = createdByUserId;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public String getCreatedByUserDomain() {
-        return createdByUserDomain;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
 
-    public void setCreatedByUserDomain(String createdByUserDomain) {
-        this.createdByUserDomain = createdByUserDomain;
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedByUserId() {
-        return updatedByUserId;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setUpdatedByUserId(String updatedByUserId) {
-        this.updatedByUserId = updatedByUserId;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public String getUpdatedByUserDomain() {
-        return updatedByUserDomain;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdatedByUserDomain(String updatedByUserDomain) {
-        this.updatedByUserDomain = updatedByUserDomain;
-    }
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Date getUpdatedDate() {
-        return updatedDate;
-    }
-
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @JsonIgnore
     public void emptyAuditTime() {
-        this.createdDate = null;
-        this.updatedDate = null;
+        this.createdAt = null;
+        this.updatedAt = null;
     }
 
     @JsonIgnore
     public void emptyAudit() {
-        this.createdDate = null;
-        this.updatedDate = null;
-        this.createdByUserDomain = null;
-        this.createdByUserId = null;
-        this.updatedByUserDomain = null;
-        this.updatedByUserId = null;
+        this.createdAt = null;
+        this.updatedAt = null;
+        this.createdBy = null;
+        this.updatedBy = null;
     }
 }

@@ -66,7 +66,8 @@ public class UserService extends BaseService<UserEntity, String> {
 
         String partyPwd = entity.getThirdPartyPwd();
         try {
-            boolean thirdPartyEncryptPwdEnabled = ConfigHelper.getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
+            boolean thirdPartyEncryptPwdEnabled = ConfigHelper
+                    .getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
             String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, "szyh$123");
             if (thirdPartyEncryptPwdEnabled && StringUtils.isNotEmpty(partyPwd)) {
                 byte[] encrypt = CryptUtil.encrypt(partyPwd.getBytes(), thirdPartyEncryptPwd);
@@ -77,7 +78,8 @@ public class UserService extends BaseService<UserEntity, String> {
         }
 
         dao.update(entity);
-        AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
+        AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE,
+                new UserIden(entity.getUserDomain(), entity.getLoginName()).toSecurityUsername());
         logger.debug("更新用户成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
     }
 
@@ -85,15 +87,17 @@ public class UserService extends BaseService<UserEntity, String> {
     public UserEntity resetPwd(UserIden userIden, String newPassword) {
         UserEntity entity = findByIden(userIden);
         if (entity == null) {
-            logger.warn("重置密码失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            logger.warn("重置密码失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getLoginName());
             throw new BaseRuntimeException(RbacConstants.MSG_USER_NOT_FOUND);
         }
         logger.info("重置用户密码: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
-        String newPwd = PasswordHelper.encryptPwd(entity.getUserIden(), newPassword);
+        String newPwd = PasswordHelper.encryptPwd(new UserIden(entity.getUserDomain(), entity.getLoginName()),
+                newPassword);
         entity.setPassword(newPwd);
         dao.update(entity);
-        AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
-        logger.info("重置用户密码成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getUserId());
+        AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE,
+                new UserIden(entity.getUserDomain(), entity.getLoginName()).toSecurityUsername());
+        logger.info("重置用户密码成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
         return entity;
     }
 
@@ -101,7 +105,7 @@ public class UserService extends BaseService<UserEntity, String> {
 
         UserEntity entity = findByIden(userIden);
         if (entity == null) {
-            logger.warn("登录失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            logger.warn("登录失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getLoginName());
             return null;
         }
         logger.debug("用户登录验证: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
@@ -128,16 +132,18 @@ public class UserService extends BaseService<UserEntity, String> {
         UserEntity entity = findByIden(userIden);
 
         if (entity == null) {
-            logger.warn("修改密码失败，用户不存在: userDomain={}, userId={}", userIden.getUserDomain(), userIden.getUserId());
+            logger.warn("修改密码失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getLoginName());
             throw new BaseRuntimeException(RbacConstants.MSG_USER_NOT_FOUND);
         }
         logger.info("修改用户密码: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
         String encryptPwd = PasswordHelper.encryptPayPwd(userIden, oldPwd);
-        String newPwd = PasswordHelper.encryptPwd(entity.getUserIden(), newPassword);
+        String newPwd = PasswordHelper.encryptPwd(new UserIden(entity.getUserDomain(), entity.getLoginName()),
+                newPassword);
         if (StringUtils.equals(encryptPwd, entity.getPassword())) {
             entity.setPassword(newPwd);
             dao.update(entity);
-            AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
+            AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE,
+                    new UserIden(entity.getUserDomain(), entity.getLoginName()).toSecurityUsername());
             logger.info("修改用户密码成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
             return entity;
         } else {
@@ -148,17 +154,19 @@ public class UserService extends BaseService<UserEntity, String> {
 
     @Transactional
     public void create(UserEntity entity) {
-        logger.info("创建用户: userDomain={}, loginName={}, loginName={}", entity.getUserDomain(), entity.getUserId(), entity.getLoginName());
+        logger.info("创建用户: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
         String password = entity.getPassword();
         if (StringUtils.isEmpty(password)) {
             entity.setPassword(ConfigHelper.getString(RbacConstants.USER_DEFAULT_PASSWORD));
         }
-        String encryptPwd = PasswordHelper.encryptPwd(entity.getUserIden(), entity.getPassword());
+        String encryptPwd = PasswordHelper.encryptPwd(new UserIden(entity.getUserDomain(), entity.getLoginName()),
+                entity.getPassword());
         entity.setPassword(encryptPwd);
 
         String partyPwd = entity.getThirdPartyPwd();
         try {
-            boolean thirdPartyEncryptPwdEnabled = ConfigHelper.getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
+            boolean thirdPartyEncryptPwdEnabled = ConfigHelper
+                    .getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
             String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, "szyh$123");
             if (thirdPartyEncryptPwdEnabled && StringUtils.isNotEmpty(partyPwd)) {
                 byte[] encrypt = CryptUtil.encrypt(partyPwd.getBytes(), thirdPartyEncryptPwd);
@@ -168,10 +176,10 @@ public class UserService extends BaseService<UserEntity, String> {
             logger.error("第三方密码加密失败：", e);
         }
 
-
         dao.create(entity);
-        AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, entity.getUserIden().toSecurityUsername());
-        logger.info("创建用户成功: userDomain={}, loginName={}, loginName={}", entity.getUserDomain(), entity.getUserId(), entity.getLoginName());
+        AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE,
+                new UserIden(entity.getUserDomain(), entity.getLoginName()).toSecurityUsername());
+        logger.info("创建用户成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
     }
 
     public UserEntity findByIden(UserIden userIden) {
@@ -187,7 +195,11 @@ public class UserService extends BaseService<UserEntity, String> {
     }
 
     public UserEntity findByUserDomainAndUserId(String userDomain, String userId) {
-        return dao.findByIden(new UserIden(userDomain, userId));
+        UserEntity user = dao.findById(userId);
+        if (user != null && StringUtils.equals(user.getUserDomain(), userDomain)) {
+            return user;
+        }
+        return null;
     }
 
     public UserEntity findByUserDomainAndLoginName(String userDomain, String loginName) {
@@ -218,14 +230,12 @@ public class UserService extends BaseService<UserEntity, String> {
         return dao.findByDomainAndLikeMobileNo(domain, mobileNoLike);
     }
 
-    public List<UserEntity> findByDomainAndLikeUserId(String domain, String userIdLike) {
-        return dao.findByDomainAndLikeUserId(domain, userIdLike);
-    }
-
     /**
      * 批量删除用户（优化：使用批量删除SQL提升性能）
      *
-     * @param users 用户ID字符串，格式：userDomain_userId,userDomain_userId
+     * @param users 用户ID字符串，格式：userDomain_userId,userDomain_userId.
+     *              Note: In new single ID strategy, we should ideally use ids.
+     *              Compatibility: If we receive domain_id, we try to extract id.
      */
     @Transactional
     public void deleteMany(String users) {
@@ -234,22 +244,23 @@ public class UserService extends BaseService<UserEntity, String> {
             logger.warn("批量删除用户失败，参数为空");
             return;
         }
-        
+
         String[] userDomainIdArray = StringUtils.split(users, ",");
-        List<UserIden> userIdens = new ArrayList<>();
-        
+        List<String> ids = new ArrayList<>();
+
         for (String userDomainId : userDomainIdArray) {
             String[] split = userDomainId.split("_");
             if (split.length == 2) {
-                userIdens.add(new UserIden(split[0], split[1]));
+                // Assuming split[1] is the ID in the new system context
+                ids.add(split[1]);
             } else {
                 logger.warn("删除用户失败，格式不正确: userDomainId={}", userDomainId);
             }
         }
-        
-        if (!userIdens.isEmpty()) {
-            dao.deleteMany(userIdens);
-            logger.info("批量删除用户成功: count={}", userIdens.size());
+
+        if (!ids.isEmpty()) {
+            dao.deleteByIds(ids);
+            logger.info("批量删除用户成功: count={}", ids.size());
         } else {
             logger.warn("批量删除用户失败，没有有效的用户ID");
         }
@@ -270,13 +281,14 @@ public class UserService extends BaseService<UserEntity, String> {
     public boolean authenticate(UserIden userIden, String password) {
         UserEntity userEntity = findByIden(userIden);
         if (userEntity == null) {
-            logger.warn("验证密码失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getUserId());
+            logger.warn("验证密码失败，用户不存在: userDomain={}, loginName={}", userIden.getUserDomain(), userIden.getLoginName());
             return false;
         }
         logger.debug("验证用户密码: userDomain={}, loginName={}", userEntity.getUserDomain(), userEntity.getLoginName());
         String encryptPwd = PasswordHelper.encryptPwd(userIden, password);
         boolean result = StringUtils.equals(encryptPwd, userEntity.getPassword());
-        logger.debug("验证用户密码结果: userDomain={}, loginName={}, result={}", userEntity.getUserDomain(), userEntity.getLoginName(), result);
+        logger.debug("验证用户密码结果: userDomain={}, loginName={}, result={}", userEntity.getUserDomain(),
+                userEntity.getLoginName(), result);
         return result;
     }
 
@@ -286,50 +298,65 @@ public class UserService extends BaseService<UserEntity, String> {
         int successCount = 0;
         int skipCount = 0;
         int updateCount = 0;
-        
+
         for (UserImportVo importVo : importList) {
             if (StringUtils.isEmpty(importVo.getUserDomain()) || StringUtils.isEmpty(importVo.getLoginName())) {
                 skipCount++;
                 logger.warn("跳过无效用户数据: userDomain={}, loginName={}", importVo.getUserDomain(), importVo.getLoginName());
                 continue;
             }
-            
+
             try {
-                UserEntity existingUser = findByUserDomainAndLoginName(importVo.getUserDomain(), importVo.getLoginName());
+                UserEntity existingUser = findByUserDomainAndLoginName(importVo.getUserDomain(),
+                        importVo.getLoginName());
                 if (existingUser == null) {
                     UserEntity user = buildUserFromImportVo(importVo);
                     create(user);
                     successCount++;
-                    logger.debug("导入新用户成功: userDomain={}, loginName={}", importVo.getUserDomain(), importVo.getLoginName());
+                    logger.debug("导入新用户成功: userDomain={}, loginName={}", importVo.getUserDomain(),
+                            importVo.getLoginName());
                 } else {
                     updateUserFromImportVo(existingUser, importVo);
                     update(existingUser);
                     updateCount++;
-                    logger.debug("更新用户成功: userDomain={}, loginName={}", importVo.getUserDomain(), importVo.getLoginName());
+                    logger.debug("更新用户成功: userDomain={}, loginName={}", importVo.getUserDomain(),
+                            importVo.getLoginName());
                 }
             } catch (Exception e) {
-                logger.error("导入用户失败: userDomain={}, loginName={}", importVo.getUserDomain(), importVo.getLoginName(), e);
+                logger.error("导入用户失败: userDomain={}, loginName={}", importVo.getUserDomain(), importVo.getLoginName(),
+                        e);
                 skipCount++;
             }
         }
-        
-        logger.info("导入用户完成: 总数={}, 成功={}, 更新={}, 跳过={}", 
+
+        logger.info("导入用户完成: 总数={}, 成功={}, 更新={}, 跳过={}",
                 importList.size(), successCount, updateCount, skipCount);
     }
-    
+
     /**
      * 从导入VO构建用户实体
      */
     private UserEntity buildUserFromImportVo(UserImportVo importVo) {
         UserEntity user = new UserEntity();
-        user.setUserIden(new UserIden(importVo.getUserDomain(), IdGenerator.getInstance().nextStringId()));
+        // user.setUserIden(...) is removed.
+        // We do not need to set ID here if it is auto-generated by DB or framework?
+        // UserEntity.id is AutoGeneratedKey.
+        // But previously we customized ID?
+        // IdGenerator.getInstance().nextStringId() was used.
+        // We should set ID explicitly if we want to control it, or let DB handle it.
+        // The old code set userId to nextStringId().
+        // We will set ID to nextStringId() as well for consistency with framework
+        // typical usage.
+        user.setId(IdGenerator.getInstance().nextStringId());
+
         user.setUserDomain(importVo.getUserDomain());
         user.setLoginName(importVo.getLoginName());
         user.setRealName(importVo.getRealName());
         user.setDisplay(StringUtils.isNotEmpty(importVo.getDisplay()) ? importVo.getDisplay() : importVo.getRealName());
         user.setEmail(importVo.getEmail());
         user.setMobileNo(importVo.getMobileNo());
-        user.setStatus(StringUtils.isNotEmpty(importVo.getStatus()) ? importVo.getStatus() : UserStatus.ACTIVE.getCode());
+        user.setStatus(
+                StringUtils.isNotEmpty(importVo.getStatus()) ? importVo.getStatus() : UserStatus.ACTIVE.getCode());
         user.setSex(importVo.getSex());
         user.setDescription(importVo.getDescription());
         user.setDeptNo(importVo.getDeptNo());
@@ -337,7 +364,7 @@ public class UserService extends BaseService<UserEntity, String> {
         user.setAddress(importVo.getAddress());
         user.setBirthday(importVo.getBirthday());
         user.setIdNo(importVo.getIdNo());
-        
+
         if (StringUtils.isNotEmpty(importVo.getPassword())) {
             user.setPassword(importVo.getPassword());
         } else {
@@ -345,7 +372,7 @@ public class UserService extends BaseService<UserEntity, String> {
         }
         return user;
     }
-    
+
     /**
      * 从导入VO更新用户实体
      */
@@ -387,7 +414,8 @@ public class UserService extends BaseService<UserEntity, String> {
             existingUser.setIdNo(importVo.getIdNo());
         }
         if (StringUtils.isNotEmpty(importVo.getPassword())) {
-            String encryptPwd = PasswordHelper.encryptPwd(existingUser.getUserIden(), importVo.getPassword());
+            String encryptPwd = PasswordHelper.encryptPwd(
+                    new UserIden(existingUser.getUserDomain(), existingUser.getLoginName()), importVo.getPassword());
             existingUser.setPassword(encryptPwd);
         }
     }
@@ -400,8 +428,9 @@ public class UserService extends BaseService<UserEntity, String> {
         response.setContentType("application/x-msdownload");
         String fileName = RbacConstants.MSG_EXPORT_FILE_NAME;
         fileName = fileName + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-        response.setHeader("Content-disposition", "attachment; filename=" + new String(fileName.getBytes("gb2312"), "ISO-8859-1") + ".xls");
-        
+        response.setHeader("Content-disposition",
+                "attachment; filename=" + new String(fileName.getBytes("gb2312"), "ISO-8859-1") + ".xls");
+
         try (ServletOutputStream outStream = response.getOutputStream()) {
             book.write(outStream);
         } finally {
@@ -442,7 +471,7 @@ public class UserService extends BaseService<UserEntity, String> {
             vo.setBirthday(user.getBirthday());
             vo.setIdNo(user.getIdNo());
             vo.setLatestLoginTime(user.getLatestLoginTime());
-            vo.setCreatedDate(user.getCreatedDate());
+            vo.setCreatedAt(user.getCreatedAt());
             exportList.add(vo);
         }
         return exportList;

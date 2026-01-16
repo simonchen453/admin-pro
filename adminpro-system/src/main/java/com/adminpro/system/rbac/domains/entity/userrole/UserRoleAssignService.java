@@ -3,7 +3,6 @@ package com.adminpro.system.rbac.domains.entity.userrole;
 import com.adminpro.framework.base.entity.BaseService;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -23,28 +22,28 @@ public class UserRoleAssignService extends BaseService<UserRoleAssignEntity, Str
     }
 
     @Transactional
-    @CacheEvict(value = {RbacCacheConstants.PROCESS_RESOURCE_CACHE, RbacCacheConstants.MENU_CACHE}, allEntries = true)
+    @CacheEvict(value = { RbacCacheConstants.PROCESS_RESOURCE_CACHE, RbacCacheConstants.MENU_CACHE }, allEntries = true)
     public void create(UserRoleAssignEntity entity) {
         entity.setId(IdGenerator.getInstance().nextStringId());
         dao.create(entity);
     }
 
     @Transactional
-    @CacheEvict(value = {RbacCacheConstants.PROCESS_RESOURCE_CACHE, RbacCacheConstants.MENU_CACHE}, allEntries = true)
+    @CacheEvict(value = { RbacCacheConstants.PROCESS_RESOURCE_CACHE, RbacCacheConstants.MENU_CACHE }, allEntries = true)
     public void update(UserRoleAssignEntity entity) {
         dao.update(entity);
     }
 
-    public UserRoleAssignEntity findByUserDomainAndUserIdAndRoleId(String userDomain, String userId, String roleId) {
-        return dao.findByUserDomainAndUserIdAndRoleId(userDomain, userId, roleId);
+    public UserRoleAssignEntity findByUserIdAndRoleId(String userId, String roleId) {
+        return dao.findByUserIdAndRoleId(userId, roleId);
     }
 
-    public List<UserRoleAssignEntity> findByUserIden(UserIden userIden) {
-        return dao.findByUserDomainAndUserId(userIden.getUserDomain(), userIden.getUserId());
+    public List<UserRoleAssignEntity> findByUserId(String userId) {
+        return dao.findByUserId(userId);
     }
 
     @Transactional
-    public void deleteByUserIden(UserIden userIden) {
-        dao.deleteByUserIden(userIden);
+    public void deleteByUserId(String userId) {
+        dao.deleteByUserId(userId);
     }
 }

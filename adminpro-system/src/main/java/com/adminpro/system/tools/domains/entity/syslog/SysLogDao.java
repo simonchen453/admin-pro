@@ -23,7 +23,7 @@ import java.util.Map;
 public class SysLogDao extends BaseDao<SysLogEntity, String> {
 
     private String sql = "select sl.*, u.col_login_name from sys_sys_log_tbl sl " +
-            " left join sys_user_tbl u on sl.col_created_by_user_id = u.col_user_id and sl.col_created_by_user_domain = u.col_user_domain";
+            " left join sys_user_tbl u on sl.col_user_id = u.col_id";
 
     public QueryResultSet<SysLogDTO> search(SearchParam param) {
         SelectBuilder<SysLogDTO> select = new SelectBuilder<SysLogDTO>(getSysLogDTORowMapper());
@@ -44,14 +44,14 @@ public class SysLogDao extends BaseDao<SysLogEntity, String> {
         }
 
         if (startTime != null) {
-            select.addWhereAnd("sl." + SysLogEntity.COL_CREATED_DATE + " >= ?", startTime);
+            select.addWhereAnd("sl." + SysLogEntity.COL_CREATED_AT + " >= ?", startTime);
         }
 
         if (endTime != null) {
-            select.addWhereAnd("sl." + SysLogEntity.COL_CREATED_DATE + " <= ?", endTime);
+            select.addWhereAnd("sl." + SysLogEntity.COL_CREATED_AT + " <= ?", endTime);
         }
 
-        select.addOrderByDescending("sl." + SysLogEntity.COL_CREATED_DATE);
+        select.addOrderByDescending("sl." + SysLogEntity.COL_CREATED_AT);
 
         return search(select);
     }
@@ -68,7 +68,6 @@ public class SysLogDao extends BaseDao<SysLogEntity, String> {
                 SysLogDTO dto = new SysLogDTO();
 
                 dto.setId(resultSet.getString(SysLogEntity.COL_ID));
-                dto.setUserDomain(resultSet.getString(SysLogEntity.COL_USER_DOMAIN));
                 dto.setUserId(resultSet.getString(SysLogEntity.COL_USER_ID));
                 dto.setIp(resultSet.getString(SysLogEntity.COL_IP));
                 dto.setMethod(resultSet.getString(SysLogEntity.COL_METHOD));
@@ -83,7 +82,7 @@ public class SysLogDao extends BaseDao<SysLogEntity, String> {
                 dto.setModule(resultSet.getString(SysLogEntity.COL_MODULE));
                 dto.setStatus(resultSet.getString(SysLogEntity.COL_STATUS));
 
-                //处理日志字段
+                // 处理日志字段
                 retrieveAuditField(dto, resultSet);
 
                 return dto;
@@ -98,7 +97,6 @@ public class SysLogDao extends BaseDao<SysLogEntity, String> {
                 SysLogEntity entity = new SysLogEntity();
 
                 entity.setId(resultSet.getString(SysLogEntity.COL_ID));
-                entity.setUserDomain(resultSet.getString(SysLogEntity.COL_USER_DOMAIN));
                 entity.setUserId(resultSet.getString(SysLogEntity.COL_USER_ID));
                 entity.setIp(resultSet.getString(SysLogEntity.COL_IP));
                 entity.setMethod(resultSet.getString(SysLogEntity.COL_METHOD));
@@ -112,7 +110,7 @@ public class SysLogDao extends BaseDao<SysLogEntity, String> {
                 entity.setModule(resultSet.getString(SysLogEntity.COL_MODULE));
                 entity.setStatus(resultSet.getString(SysLogEntity.COL_STATUS));
 
-                //处理日志字段
+                // 处理日志字段
                 retrieveAuditField(entity, resultSet);
 
                 return entity;

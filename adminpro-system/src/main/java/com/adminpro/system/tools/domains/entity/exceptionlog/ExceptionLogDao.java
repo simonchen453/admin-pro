@@ -33,14 +33,14 @@ public class ExceptionLogDao extends BaseDao<ExceptionLogEntity, String> {
         }
 
         if (startTime != null) {
-            select.addWhereAnd(ExceptionLogEntity.COL_CREATED_DATE + " >= ?", startTime);
+            select.addWhereAnd(ExceptionLogEntity.COL_CREATED_AT + " >= ?", startTime);
         }
 
         if (endTime != null) {
-            select.addWhereAnd(ExceptionLogEntity.COL_CREATED_DATE + " <= ?", endTime);
+            select.addWhereAnd(ExceptionLogEntity.COL_CREATED_AT + " <= ?", endTime);
         }
 
-        select.addOrderByDescending(ExceptionLogEntity.COL_CREATED_DATE);
+        select.addOrderByDescending(ExceptionLogEntity.COL_CREATED_AT);
         return search(select);
     }
 }

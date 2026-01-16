@@ -115,8 +115,8 @@ const SysLogView: React.FC = () => {
 
       <Card>
         <Descriptions column={1} labelStyle={{ width: '200px' }} bordered>
-          <Descriptions.Item label="用户域">
-            {sysLog.userDomain || '-'}
+          <Descriptions.Item label="登录名">
+            {sysLog.loginName || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="用户ID">
             {sysLog.userId || '-'}
@@ -183,4 +183,3 @@ const SysLogView: React.FC = () => {
 };
 
 export default SysLogView;
-

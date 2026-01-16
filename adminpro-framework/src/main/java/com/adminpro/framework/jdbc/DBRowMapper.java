@@ -93,16 +93,38 @@ public class DBRowMapper<E> implements RowMapper<E> {
             }
             if (entity != null && rs != null && entity instanceof BaseAuditEntity) {
                 BaseAuditEntity ae = (BaseAuditEntity) entity;
-                ae.setCreatedByUserId(rs.getString(BaseAuditEntity.COL_CREATED_BY_USER_ID));
-                ae.setCreatedByUserDomain(rs.getString(BaseAuditEntity.COL_CREATED_BY_USER_DOMAIN));
-                ae.setCreatedDate(rs.getTimestamp(BaseAuditEntity.COL_CREATED_DATE));
-                ae.setUpdatedByUserId(rs.getString(BaseAuditEntity.COL_UPDATED_BY_USER_ID));
-                ae.setUpdatedByUserDomain(rs.getString(BaseAuditEntity.COL_UPDATED_BY_USER_DOMAIN));
-                ae.setUpdatedDate(rs.getTimestamp(BaseAuditEntity.COL_UPDATED_DATE));
+                try {
+                    // Check if columns exist before retrieving to avoid SQLException if columns are
+                    // missing in projection
+                    if (hasColumn(rs, BaseAuditEntity.COL_CREATED_BY)) {
+                        ae.setCreatedBy(rs.getString(BaseAuditEntity.COL_CREATED_BY));
+                    }
+                    if (hasColumn(rs, BaseAuditEntity.COL_CREATED_AT)) {
+                        ae.setCreatedAt(rs.getTimestamp(BaseAuditEntity.COL_CREATED_AT));
+                    }
+                    if (hasColumn(rs, BaseAuditEntity.COL_UPDATED_BY)) {
+                        ae.setUpdatedBy(rs.getString(BaseAuditEntity.COL_UPDATED_BY));
+                    }
+                    if (hasColumn(rs, BaseAuditEntity.COL_UPDATED_AT)) {
+                        ae.setUpdatedAt(rs.getTimestamp(BaseAuditEntity.COL_UPDATED_AT));
+                    }
+                } catch (Exception e) {
+                    // Log or handle exception appropriately, for now silent as it might be common
+                    // in partial selects
+                }
             }
         } catch (Exception x) {
             throw new SQLException(String.format("Failed to create map row for type [%s].", entity.getClass()), x);
         }
         return entity;
+    }
+
+    private boolean hasColumn(ResultSet rs, String columnName) {
+        try {
+            rs.findColumn(columnName);
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 }

@@ -19,7 +19,7 @@ export interface RoleEntity {
   display: string;
   status: string;
   system: string;
-  menuNames?: string[];
+  menuIds?: string[];
   code?: string;
 }
 
@@ -109,6 +109,6 @@ export const getMenuTreeApi = (): Promise<MenuTreeResponse> => {
 };
 
 // 根据角色获取菜单树结构
-export const getRoleMenuTreeApi = (roleName: string): Promise<RoleMenuTreeResponse> => {
-  return request.get(`/common/menu/roleMenuTreeSelect/${roleName}`);
+export const getRoleMenuTreeApi = (roleId: string): Promise<RoleMenuTreeResponse> => {
+  return request.get(`/common/menu/roleMenuTreeSelect/${roleId}`);
 };

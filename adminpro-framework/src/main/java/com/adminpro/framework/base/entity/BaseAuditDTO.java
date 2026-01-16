@@ -1,6 +1,5 @@
 package com.adminpro.framework.base.entity;
 
-
 import java.util.Date;
 
 /**
@@ -9,59 +8,41 @@ import java.util.Date;
  * @author simon
  */
 public abstract class BaseAuditDTO extends BaseDTO {
-    private String createdByUserId;
-    private String createdByUserDomain;
-    private Date createdDate;
+    private String createdBy;
+    private Date createdAt;
 
-    private String updatedByUserId;
-    private String updatedByUserDomain;
-    private Date updatedDate;
+    private String updatedBy;
+    private Date updatedAt;
 
-    public String getCreatedByUserId() {
-        return createdByUserId;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setCreatedByUserId(String createdByUserId) {
-        this.createdByUserId = createdByUserId;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public String getCreatedByUserDomain() {
-        return createdByUserDomain;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreatedByUserDomain(String createdByUserDomain) {
-        this.createdByUserDomain = createdByUserDomain;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Date getCreatedDate() {
-        return createdDate;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
 
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedByUserId() {
-        return updatedByUserId;
+    public Date getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdatedByUserId(String updatedByUserId) {
-        this.updatedByUserId = updatedByUserId;
-    }
-
-    public String getUpdatedByUserDomain() {
-        return updatedByUserDomain;
-    }
-
-    public void setUpdatedByUserDomain(String updatedByUserDomain) {
-        this.updatedByUserDomain = updatedByUserDomain;
-    }
-
-    public Date getUpdatedDate() {
-        return updatedDate;
-    }
-
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

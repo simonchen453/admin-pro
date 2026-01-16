@@ -40,7 +40,7 @@ public class AuthUserDetailServiceImpl implements UserDetailsService {
         }
 
         String[] split = username.split(RbacConstants.SPRING_SECURITY_USERIDEN_SPLIT);
-        UserEntity user = userService.findByUserDomainAndUserId(split[0], split[1]);
+        UserEntity user = userService.findByUserDomainAndLoginName(split[0], split[1]);
         if (user == null) {
             //throw new UsernameNotFoundException("找不到此用户");
             return null;

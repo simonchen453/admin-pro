@@ -15,10 +15,12 @@ import java.util.Map;
 public class PasswordEncryptExecutor {
     public static final String PWD_ENCRYPT_TYPE = "app.pwd.encrypt.type";
     public static final String PWD_ENCRYPT_SHA256 = "SHA256";
+    public static final String PWD_ENCRYPT_BCRYPT = "BCRYPT";
     public static final Map<String, Class<? extends PasswordEncryptor>> MAP = new HashMap<>();
 
     static {
-        MAP.put(PWD_ENCRYPT_SHA256, PasswordSHA256Encryptor.class);
+
+        MAP.put(PWD_ENCRYPT_BCRYPT, PasswordBCryptEncryptor.class);
     }
 
     private static PasswordEncryptExecutor instance;
@@ -32,7 +34,7 @@ public class PasswordEncryptExecutor {
     }
 
     private PasswordEncryptor getPwdEncryptor() {
-        String string = ConfigHelper.getString(PWD_ENCRYPT_TYPE, PWD_ENCRYPT_SHA256);
+        String string = ConfigHelper.getString(PWD_ENCRYPT_TYPE, PWD_ENCRYPT_BCRYPT);
         Class<? extends PasswordEncryptor> aClass = MAP.get(string);
         PasswordEncryptor encryptor = SpringUtil.getBean(aClass);
         return encryptor;

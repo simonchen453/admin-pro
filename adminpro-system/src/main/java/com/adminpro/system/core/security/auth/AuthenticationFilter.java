@@ -1,9 +1,7 @@
 package com.adminpro.system.core.security.auth;
 
 import com.adminpro.framework.client.helper.ClientHelper;
-import com.adminpro.framework.exceptions.BaseRuntimeException;
-import com.adminpro.system.core.common.constants.WebConstants;
-import com.adminpro.system.core.common.helper.WebHelper;
+
 import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import jakarta.servlet.FilterChain;
@@ -33,15 +31,18 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     TokenHelper tokenHelper;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         String authToken = extractToken(request);
         if (ClientHelper.isMobileRequest(request) && StringUtils.isNotEmpty(authToken)) {
             UserIden userIden = TokenHelper.getInstance().getUserIdenByToken(authToken);
             if (userIden != null) {
-                LoginUser authUser = (LoginUser) this.userDetailsService.loadUserByUsername(userIden.toSecurityUsername());
+                LoginUser authUser = (LoginUser) this.userDetailsService
+                        .loadUserByUsername(userIden.toSecurityUsername());
                 if (authUser != null) {
                     if (tokenHelper.validateToken(authToken, authUser)) {
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authUser, null, authUser.getAuthorities());
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                authUser, null, authUser.getAuthorities());
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     } else {
@@ -56,7 +57,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         } else {
             LoginUser authUser = LoginHelper.getInstance().getLoginUser();
             if (authUser != null) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authUser, null, authUser.getAuthorities());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authUser,
+                        null, authUser.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else {
@@ -66,7 +68,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, response);
     }
-    
+
     /**
      * 从请求中提取Token
      * 支持多种方式：
@@ -82,17 +84,17 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.isNotEmpty(authHeader) && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }
-        
+
         authHeader = request.getHeader("x-access-token");
         if (StringUtils.isNotEmpty(authHeader)) {
             return authHeader;
         }
-        
+
         authHeader = request.getParameter("x-access-token");
         if (StringUtils.isNotEmpty(authHeader)) {
             return authHeader;
         }
-        
+
         return null;
     }
 }

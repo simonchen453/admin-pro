@@ -16,7 +16,6 @@ import com.adminpro.system.rbac.api.PasswordValidator;
 import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
-import com.adminpro.system.rbac.domains.entity.domain.DomainService;
 import com.adminpro.system.rbac.domains.entity.post.PostEntity;
 import com.adminpro.system.rbac.domains.entity.post.PostService;
 import com.adminpro.system.rbac.domains.entity.role.RoleEntity;
@@ -97,32 +96,32 @@ public class UserController extends BaseController {
     }
 
     @SysLog("停用用户")
-    @RequestMapping(value = "/inactive/{userDomain}/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
-    public R inactive(@PathVariable String userDomain, @PathVariable String userId) {
-        logger.info("停用用户: userDomain={}, userId={}", userDomain, userId);
-        UserEntity userEntity = userService.findByUserDomainAndUserId(userDomain, userId);
+    @RequestMapping(value = "/inactive/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
+    public R inactive(@PathVariable String userId) {
+        logger.info("停用用户: userId={}", userId);
+        UserEntity userEntity = userService.findById(userId);
         if (userEntity == null) {
-            logger.warn("用户不存在: userDomain={}, userId={}", userDomain, userId);
+            logger.warn("用户不存在: userId={}", userId);
             return R.error(RbacConstants.MSG_USER_NOT_FOUND);
         }
         userEntity.setStatus(UserStatus.INACTIVE.getCode());
         userService.update(userEntity);
-        logger.info("停用用户成功: userDomain={}, userId={}", userDomain, userId);
+        logger.info("停用用户成功: userId={}", userId);
         return R.ok();
     }
 
     @SysLog("激活用户")
-    @RequestMapping(value = "/active/{userDomain}/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
-    public R active(@PathVariable("userDomain") String userDomain, @PathVariable("userId") String userId) {
-        logger.info("激活用户: userDomain={}, userId={}", userDomain, userId);
-        UserEntity userEntity = userService.findByUserDomainAndUserId(userDomain, userId);
+    @RequestMapping(value = "/active/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
+    public R active(@PathVariable("userId") String userId) {
+        logger.info("激活用户: userId={}", userId);
+        UserEntity userEntity = userService.findById(userId);
         if (userEntity == null) {
-            logger.warn("用户不存在: userDomain={}, userId={}", userDomain, userId);
+            logger.warn("用户不存在: userId={}", userId);
             return R.error(RbacConstants.MSG_USER_NOT_FOUND);
         }
         userEntity.setStatus(UserStatus.ACTIVE.getCode());
         userService.update(userEntity);
-        logger.info("激活用户成功: userDomain={}, userId={}", userDomain, userId);
+        logger.info("激活用户成功: userId={}", userId);
         return R.ok();
     }
 
@@ -169,12 +168,12 @@ public class UserController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/detail/{userDomain}/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public R<UserDetailVO> view(@PathVariable String userDomain, @PathVariable String userId) {
-        logger.debug("查询用户详情: userDomain={}, userId={}", userDomain, userId);
-        UserEntity userEntity = userService.findByUserDomainAndUserId(userDomain, userId);
+    @RequestMapping(value = "/detail/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public R<UserDetailVO> view(@PathVariable String userId) {
+        logger.debug("查询用户详情: userId={}", userId);
+        UserEntity userEntity = userService.findById(userId);
         if (userEntity == null) {
-            logger.warn("用户不存在: userDomain={}, userId={}", userDomain, userId);
+            logger.warn("用户不存在: userId={}", userId);
             return R.error(RbacConstants.MSG_USER_NOT_FOUND);
         }
 
@@ -183,9 +182,9 @@ public class UserController extends BaseController {
         sysUserResponseVo.setAvatarUrl(userEntity.getAvatarUrl());
         sysUserResponseVo.setRealName(userEntity.getRealName());
         sysUserResponseVo.setMobileNo(userEntity.getMobileNo());
-        if (userEntity.getUserIden() != null) {
-            sysUserResponseVo.setUserDomain(userEntity.getUserIden().getUserDomain());
-            sysUserResponseVo.setUserId(userEntity.getUserIden().getUserId());
+        if (userEntity != null) {
+            sysUserResponseVo.setUserDomain(userEntity.getUserDomain());
+            sysUserResponseVo.setUserId(userEntity.getId());
         }
         sysUserResponseVo.setDescription(userEntity.getDescription());
         sysUserResponseVo.setLatestLoginTime(userEntity.getLatestLoginTime());
@@ -203,18 +202,10 @@ public class UserController extends BaseController {
         }
 
         // 批量查询角色（优化N+1问题）
-        List<UserRoleAssignEntity> assignedRoles = userRoleAssignService.findByUserIden(userEntity.getUserIden());
+        List<UserRoleAssignEntity> assignedRoles = userRoleAssignService.findByUserId(userEntity.getId());
         if (assignedRoles != null && !assignedRoles.isEmpty()) {
-            List<String> roleNames = assignedRoles.stream()
-                    .map(UserRoleAssignEntity::getRoleName)
-                    .filter(StringUtils::isNotEmpty)
-                    .collect(Collectors.toList());
-            List<RoleEntity> roleEntities = roleService.findByNames(roleNames);
-            Map<String, String> roleNameToIdMap = roleEntities.stream()
-                    .collect(Collectors.toMap(RoleEntity::getName, RoleEntity::getId));
             List<String> roleIds = assignedRoles.stream()
-                    .map(UserRoleAssignEntity::getRoleName)
-                    .map(roleNameToIdMap::get)
+                    .map(UserRoleAssignEntity::getRoleId)
                     .filter(StringUtils::isNotEmpty)
                     .collect(Collectors.toList());
             sysUserResponseVo.setRoleIds(roleIds);
@@ -223,18 +214,10 @@ public class UserController extends BaseController {
         }
 
         // 批量查询岗位（优化N+1问题）
-        List<UserPostAssignEntity> assignPosts = userPostAssignService.findByUserIden(userEntity.getUserIden());
+        List<UserPostAssignEntity> assignPosts = userPostAssignService.findByUserId(userEntity.getId());
         if (assignPosts != null && !assignPosts.isEmpty()) {
-            List<String> postCodes = assignPosts.stream()
-                    .map(UserPostAssignEntity::getPostCode)
-                    .filter(StringUtils::isNotEmpty)
-                    .collect(Collectors.toList());
-            List<PostEntity> postEntities = postService.findByCodes(postCodes);
-            Map<String, String> postCodeToIdMap = postEntities.stream()
-                    .collect(Collectors.toMap(PostEntity::getCode, PostEntity::getId));
             List<String> postIds = assignPosts.stream()
-                    .map(UserPostAssignEntity::getPostCode)
-                    .map(postCodeToIdMap::get)
+                    .map(UserPostAssignEntity::getPostId)
                     .filter(StringUtils::isNotEmpty)
                     .collect(Collectors.toList());
             sysUserResponseVo.setPostIds(postIds);
@@ -242,7 +225,7 @@ public class UserController extends BaseController {
             sysUserResponseVo.setPostIds(new ArrayList<>());
         }
 
-        logger.debug("查询用户详情成功: userDomain={}, userId={}", userDomain, userId);
+        logger.debug("查询用户详情成功: userId={}", userId);
         return R.ok(sysUserResponseVo);
     }
 
@@ -290,7 +273,7 @@ public class UserController extends BaseController {
             assignPostsToUser(user, userRequestVo.getPostIds());
 
             logger.info("创建用户成功: loginName={}, userDomain={}, userId={}",
-                    userRequestVo.getLoginName(), userRequestVo.getUserDomain(), user.getUserId());
+                    userRequestVo.getLoginName(), userRequestVo.getUserDomain(), user.getId());
             return R.ok();
         } else {
             logger.warn("创建用户验证失败: loginName={}, errors={}", userRequestVo.getLoginName(),
@@ -319,10 +302,10 @@ public class UserController extends BaseController {
             updateUserEntity(userEntity, userRequestVo);
             userService.update(userEntity);
 
-            userRoleAssignService.deleteByUserIden(userEntity.getUserIden());
+            userRoleAssignService.deleteByUserId(userEntity.getId());
             assignRolesToUser(userEntity, userRequestVo.getRoleIds());
 
-            userPostAssignService.deleteByUserIden(userEntity.getUserIden());
+            userPostAssignService.deleteByUserId(userEntity.getId());
             assignPostsToUser(userEntity, userRequestVo.getPostIds());
 
             logger.info("更新用户成功: userDomain={}, userId={}", userRequestVo.getUserDomain(), userRequestVo.getUserId());
@@ -425,7 +408,9 @@ public class UserController extends BaseController {
     private UserEntity buildUserEntity(UserCreateVo userRequestVo) {
         UserEntity user = new UserEntity();
         user.setLoginName(userRequestVo.getLoginName());
-        user.setUserIden(new UserIden(userRequestVo.getUserDomain(), IdGenerator.getInstance().nextStringId()));
+        user.setUserDomain(userRequestVo.getUserDomain());
+        user.setId(StringUtils.isNotEmpty(userRequestVo.getUserId()) ? userRequestVo.getUserId()
+                : IdGenerator.getInstance().nextStringId());
         user.setStatus(userRequestVo.getStatus());
         user.setRealName(userRequestVo.getRealName());
         user.setDescription(userRequestVo.getDescription());
@@ -483,9 +468,8 @@ public class UserController extends BaseController {
             RoleEntity roleEntity = roleMap.get(roleId);
             if (roleEntity != null) {
                 UserRoleAssignEntity assignEntity = new UserRoleAssignEntity();
-                assignEntity.setUserDomain(user.getUserDomain());
-                assignEntity.setUserId(user.getUserId());
-                assignEntity.setRoleName(roleEntity.getName());
+                assignEntity.setUserId(user.getId());
+                assignEntity.setRoleId(roleEntity.getId());
                 userRoleAssignService.create(assignEntity);
             }
         }
@@ -507,9 +491,8 @@ public class UserController extends BaseController {
             PostEntity postEntity = postMap.get(postId);
             if (postEntity != null) {
                 UserPostAssignEntity assignEntity = new UserPostAssignEntity();
-                assignEntity.setUserDomain(user.getUserDomain());
-                assignEntity.setUserId(user.getUserId());
-                assignEntity.setPostCode(postEntity.getCode());
+                assignEntity.setUserId(user.getId());
+                assignEntity.setPostId(postEntity.getId());
                 userPostAssignService.create(assignEntity);
             }
         }

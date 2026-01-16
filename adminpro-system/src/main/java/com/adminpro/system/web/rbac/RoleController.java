@@ -93,7 +93,7 @@ public class RoleController extends BaseController {
             entity.setSystem(isSystem);
             entity.setStatus(role.getStatus());
             entity.setSystem(role.isSystem());
-            entity.setMenuNames(role.getMenuNames());
+            entity.setMenuIds(role.getMenuIds());
             roleService.create(entity);
             return R.ok();
         }
@@ -122,7 +122,7 @@ public class RoleController extends BaseController {
             entity.setDisplay(display);
             entity.setSystem(isSystem);
             entity.setStatus(role.getStatus());
-            entity.setMenuNames(role.getMenuNames());
+            entity.setMenuIds(role.getMenuIds());
             roleService.update(entity);
             return R.ok();
         }

@@ -19,12 +19,12 @@ import java.util.regex.Pattern;
 public class PasswordHelper {
     protected static final Logger logger = LoggerFactory.getLogger(PasswordHelper.class);
 
-    private static final char[] CHARS_ALPHA_UPPER = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-    private static final char[] CHARS_ALPHA_LOWER = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
-    private static final char[] CHARS_DIGIT = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    private static final char[] CHARS_SPECIAL = {'*', '@', '$', '_', '#', '&', '^', '!'};
+    private static final char[] CHARS_ALPHA_UPPER = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+    private static final char[] CHARS_ALPHA_LOWER = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+    private static final char[] CHARS_DIGIT = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+    private static final char[] CHARS_SPECIAL = { '*', '@', '$', '_', '#', '&', '^', '!' };
 
     private static final String STRONG_PWD_DEFAULT = "^(?![a-zA-z]{6,12}+$)(?!\\d{6,12}+$)(?![!@#$%^&*]{6,12}+$)(?![a-zA-z\\d]{6,12}+$)(?![a-zA-z!@#$%^&*]{6,12}+$)(?![\\d!@#$%^&*]{6,12}+$)[a-zA-Z\\d!@#$%^&*]{6,12}+$";
 
@@ -82,7 +82,7 @@ public class PasswordHelper {
         if (userEntity == null || StringUtils.isEmpty(paypwd)) {
             return false;
         }
-        String encryptPwd = encryptPayPwd(userEntity.getUserIden(), paypwd);
+        String encryptPwd = encryptPayPwd(new UserIden(userEntity.getUserDomain(), userEntity.getLoginName()), paypwd);
         return StringUtils.equals(encryptPwd, userEntity.getPayPwd());
     }
 

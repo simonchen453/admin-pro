@@ -9,6 +9,7 @@ import com.adminpro.framework.jdbc.annotation.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 用户角色分配表 sys_user_role_assign_tbl
@@ -17,6 +18,7 @@ import lombok.Data;
  * @date 2018-09-06
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Table(name = UserRoleAssignEntity.TABLE_NAME)
 public class UserRoleAssignEntity extends BaseAuditEntity {
     private static final long serialVersionUID = 1L;
@@ -30,17 +32,13 @@ public class UserRoleAssignEntity extends BaseAuditEntity {
      */
     public static final String COL_ID = "COL_ID";
     /**
-     * 用户域
-     */
-    public static final String COL_USER_DOMAIN = "COL_USER_DOMAIN";
-    /**
      * 用户ID
      */
     public static final String COL_USER_ID = "COL_USER_ID";
     /**
-     * 角色Name
+     * 角色ID
      */
-    public static final String COL_ROLE_NAME = "COL_ROLE_NAME";
+    public static final String COL_ROLE_ID = "COL_ROLE_ID";
     /**
      * 备注
      */
@@ -56,13 +54,6 @@ public class UserRoleAssignEntity extends BaseAuditEntity {
     @Column(name = COL_ID, type = Column.Type.STRING)
     private String id;
     /**
-     * 用户域
-     */
-    @NotBlank
-    @Size(max = 64)
-    @Column(name = COL_USER_DOMAIN, type = Column.Type.STRING)
-    private String userDomain;
-    /**
      * 用户ID
      */
     @NotBlank
@@ -70,12 +61,12 @@ public class UserRoleAssignEntity extends BaseAuditEntity {
     @Column(name = COL_USER_ID, type = Column.Type.STRING)
     private String userId;
     /**
-     * 角色Name
+     * 角色ID
      */
     @NotBlank
     @Size(max = 64)
-    @Column(name = COL_ROLE_NAME, type = Column.Type.STRING)
-    private String roleName;
+    @Column(name = COL_ROLE_ID, type = Column.Type.STRING)
+    private String roleId;
     /**
      * 备注
      */

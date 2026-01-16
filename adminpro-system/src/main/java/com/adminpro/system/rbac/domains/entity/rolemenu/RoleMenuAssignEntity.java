@@ -32,11 +32,11 @@ public class RoleMenuAssignEntity extends BaseAuditEntity {
     /**
      * 角色ID
      */
-    public static final String COL_ROLE_NAME = "COL_ROLE_NAME";
+    public static final String COL_ROLE_ID = "COL_ROLE_ID";
     /**
      * 菜单ID
      */
-    public static final String COL_MENU_NAME = "COL_MENU_NAME";
+    public static final String COL_MENU_ID = "COL_MENU_ID";
 
     /**
      * ID
@@ -48,17 +48,17 @@ public class RoleMenuAssignEntity extends BaseAuditEntity {
     @Column(name = COL_ID, type = Column.Type.STRING)
     private String id;
     /**
-     * 角色名称
+     * 角色ID
      */
     @NotBlank
     @Size(max = 64)
-    @Column(name = COL_ROLE_NAME, type = Column.Type.STRING)
-    private String roleName;
+    @Column(name = COL_ROLE_ID, type = Column.Type.STRING)
+    private String roleId;
     /**
-     * 菜单名称
+     * 菜单ID
      */
     @NotBlank
     @Size(max = 64)
-    @Column(name = COL_MENU_NAME, type = Column.Type.STRING)
-    private String menuName;
+    @Column(name = COL_MENU_ID, type = Column.Type.STRING)
+    private String menuId;
 }

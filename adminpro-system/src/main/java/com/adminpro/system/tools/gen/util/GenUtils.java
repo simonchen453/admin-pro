@@ -20,10 +20,9 @@ import java.util.Map;
  */
 public class GenUtils {
 
-    public static final String[] AUDIT_COLS = new String[]{
-            BaseAuditEntity.COL_CREATED_BY_USER_ID, BaseAuditEntity.COL_CREATED_BY_USER_DOMAIN,
-            BaseAuditEntity.COL_UPDATED_BY_USER_ID, BaseAuditEntity.COL_UPDATED_BY_USER_DOMAIN,
-            BaseAuditEntity.COL_CREATED_DATE, BaseAuditEntity.COL_UPDATED_DATE
+    public static final String[] AUDIT_COLS = new String[] {
+            BaseAuditEntity.COL_CREATED_BY, BaseAuditEntity.COL_UPDATED_BY,
+            BaseAuditEntity.COL_CREATED_AT, BaseAuditEntity.COL_UPDATED_AT
     };
 
     /**
@@ -35,7 +34,6 @@ public class GenUtils {
      * mybatis空间路径
      */
     private static final String MYBATIS_PATH = "main/resources/mybatis";
-
 
     private static final String RESOURCES_PATH = "main/resources/";
     /**
@@ -71,7 +69,8 @@ public class GenUtils {
 
     public static ColumnInfo transferColumn(ColumnInfo column) {
         // 列名转换成Java属性名
-        String attrName = StringHelper.convertToCamelCase(column.getColumnName().toLowerCase().replace(GenConfig.getInstance().getColPrefix(), ""));
+        String attrName = StringHelper.convertToCamelCase(
+                column.getColumnName().toLowerCase().replace(GenConfig.getInstance().getColPrefix(), ""));
         column.setAttrName(attrName);
         column.setAttrname(StringUtils.uncapitalize(attrName));
         column.setColumnNameUp(StringUtils.upperCase(column.getColumnName()));
@@ -125,7 +124,7 @@ public class GenUtils {
     protected static String parentEntity(List<ColumnInfo> cols) {
         for (int i = 0; i < cols.size(); i++) {
             ColumnInfo columnInfo = cols.get(i);
-            if (StringUtils.equals(columnInfo.getColumnNameUp(), BaseAuditEntity.COL_CREATED_BY_USER_DOMAIN)) {
+            if (StringUtils.equals(columnInfo.getColumnNameUp(), BaseAuditEntity.COL_CREATED_BY)) {
                 return "BaseAuditEntity";
             }
         }

@@ -52,25 +52,23 @@ public class UserTagDao extends BaseDao<UserTagEntity, String> {
      * @return
      */
     private void prepareSelectBuilder(SelectBuilder select, SearchParam param) {
-        //TODO 页面过滤条件
+        // TODO 页面过滤条件
         Map<String, Object> filters = param.getFilters();
         String condition = (String) filters.get("condition");
         if (StringUtils.isNotEmpty(condition)) {
-            //select.addWhereAnd(UserTagEntity.COL_TITLE + " like ?", "%" + condition+"%");
+            // select.addWhereAnd(UserTagEntity.COL_TITLE + " like ?", "%" + condition+"%");
         }
     }
 
-    public List<UserTagEntity> findByUserIden(UserIden userIden) {
+    public List<UserTagEntity> findByUserId(String userId) {
         SelectBuilder<UserTagEntity> select = new SelectBuilder<UserTagEntity>(UserTagEntity.class);
-        select.addWhereAnd(UserTagEntity.COL_USER_DOMAIN + " = ? ", userIden.getUserDomain());
-        select.addWhereAnd(UserTagEntity.COL_USER_ID + " = ? ", userIden.getUserId());
+        select.addWhereAnd(UserTagEntity.COL_USER_ID + " = ? ", userId);
         return execute(select);
     }
 
-    public void deleteByUserIden(UserIden userIden) {
+    public void deleteByUserId(String userId) {
         DeleteBuilder delete = new DeleteBuilder(UserTagEntity.TABLE_NAME);
-        delete.addWhereAnd(UserTagEntity.COL_USER_DOMAIN + " = ? ", userIden.getUserDomain());
-        delete.addWhereAnd(UserTagEntity.COL_USER_ID + " = ? ", userIden.getUserId());
+        delete.addWhereAnd(UserTagEntity.COL_USER_ID + " = ? ", userId);
         execute(delete);
     }
 }

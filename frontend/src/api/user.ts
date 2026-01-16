@@ -1,11 +1,11 @@
 import request from './request';
 import { config as appConfig } from '../config/env';
-import type { 
-  UserSearchForm, 
-  UserListResponse, 
-  UserCreateRequest, 
-  UserUpdateRequest, 
-  UserDetailResponse, 
+import type {
+  UserSearchForm,
+  UserListResponse,
+  UserCreateRequest,
+  UserUpdateRequest,
+  UserDetailResponse,
   UserResetPasswordRequest,
   UserStatusChangeResponse,
   ApiResponse,
@@ -33,8 +33,8 @@ export const updateUserApi = async (userData: UserUpdateRequest): Promise<ApiRes
 };
 
 // 激活用户
-export const activeUserApi = async (userDomain: string, userId: string): Promise<UserStatusChangeResponse> => {
-  const response = await request.patch<ApiResponse>(`/admin/user/active/${userDomain}/${userId}`);
+export const activeUserApi = async (userId: string): Promise<UserStatusChangeResponse> => {
+  const response = await request.patch<ApiResponse>(`/admin/user/active/${userId}`);
   return {
     success: response.restCode === '200' || response.restCode === '0',
     message: response.message
@@ -42,8 +42,8 @@ export const activeUserApi = async (userDomain: string, userId: string): Promise
 };
 
 // 停用用户
-export const inactiveUserApi = async (userDomain: string, userId: string): Promise<UserStatusChangeResponse> => {
-  const response = await request.patch<ApiResponse>(`/admin/user/inactive/${userDomain}/${userId}`);
+export const inactiveUserApi = async (userId: string): Promise<UserStatusChangeResponse> => {
+  const response = await request.patch<ApiResponse>(`/admin/user/inactive/${userId}`);
   return {
     success: response.restCode === '200' || response.restCode === '0',
     message: response.message
@@ -57,8 +57,8 @@ export const resetPasswordApi = async (resetData: UserResetPasswordRequest): Pro
 };
 
 // 获取用户详情
-export const getUserDetailApi = async (userDomain: string, userId: string): Promise<UserDetailResponse> => {
-  const response = await request.get<ApiResponse<UserDetailResponse>>(`/admin/user/detail/${userDomain}/${userId}`);
+export const getUserDetailApi = async (userId: string): Promise<UserDetailResponse> => {
+  const response = await request.get<ApiResponse<UserDetailResponse>>(`/admin/user/detail/${userId}`);
   return response.data;
 };
 
@@ -107,8 +107,8 @@ export const deleteUserApi = async (userIds: string): Promise<ApiResponse> => {
 };
 
 // 获取用户域列表
-export const getDomainListApi = async (): Promise<Array<{ id: string; name: string;display: string }>> => {
-  const response = await request.get<ApiResponse<Array<{ id: string; name: string;display: string }>>>('/common/domains');
+export const getDomainListApi = async (): Promise<Array<{ id: string; name: string; display: string }>> => {
+  const response = await request.get<ApiResponse<Array<{ id: string; name: string; display: string }>>>('/common/domains');
   return response.data;
 };
 
@@ -132,13 +132,13 @@ export const exportUserApi = async (userIds: string): Promise<void> => {
       responseType: 'blob',
       withCredentials: true,
     });
-    
+
     if (response.data.type === 'application/json') {
       const text = await response.data.text();
       const errorData = JSON.parse(text);
       throw new Error(errorData.message || '导出失败');
     }
-    
+
     const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -169,19 +169,19 @@ export const exportAllUserApi = async (searchForm: UserSearchForm): Promise<void
   if (searchForm.deptId) params.append('deptId', searchForm.deptId);
   if (searchForm.page) params.append('page', searchForm.page.toString());
   if (searchForm.pageSize) params.append('pageSize', searchForm.pageSize.toString());
-  
+
   try {
     const response = await axios.get(`${appConfig.API_BASE_URL}/admin/user/excelAll?${params.toString()}`, {
       responseType: 'blob',
       withCredentials: true,
     });
-    
+
     if (response.data.type === 'application/json') {
       const text = await response.data.text();
       const errorData = JSON.parse(text);
       throw new Error(errorData.message || '导出失败');
     }
-    
+
     const blob = new Blob([response.data], { type: 'application/vnd.ms-excel' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');

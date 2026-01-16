@@ -41,10 +41,10 @@ const UserEdit: React.FC = () => {
   // 获取用户详情
   const fetchUserDetail = async () => {
     if (!userDomain || !userId) return;
-    
+
     setLoading(true);
     try {
-      const detail = await getUserDetailApi(userDomain, userId);
+      const detail = await getUserDetailApi(userId);
       // 转换为UserEntity格式
       const userEntity: UserEntity = {
         userDomain: detail.userDomain,

@@ -28,7 +28,7 @@ public class OSSDao extends BaseDao<OSSEntity, String> {
     public QueryResultSet<ListOssDto> search(SearchParam param) {
         String sql = "select o.*, u.col_display, u.col_login_name " +
                 "from sys_oss_tbl o left join sys_user_tbl u on " +
-                "o.col_created_by_user_id=u.col_user_id and o.col_created_by_user_domain=u.col_user_domain";
+                "o.col_created_by=u.col_id";
         SelectBuilder<ListOssDto> select = new SelectBuilder<ListOssDto>(new RowMapper<ListOssDto>() {
             @Override
             public ListOssDto mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -41,21 +41,21 @@ public class OSSDao extends BaseDao<OSSEntity, String> {
                 dto.setStatus(resultSet.getString(OSSEntity.COL_STATUS));
                 dto.setType(resultSet.getString(OSSEntity.COL_TYPE));
                 dto.setSize(resultSet.getLong(OSSEntity.COL_SIZE));
-                dto.setCreatedDate(resultSet.getTimestamp(BaseAuditEntity.COL_CREATED_DATE));
+                dto.setCreatedAt(resultSet.getTimestamp(BaseAuditEntity.COL_CREATED_AT));
                 dto.setCreatedBy(resultSet.getString("col_display"));
                 return dto;
             }
         });
         select.setQuery(sql);
         select.setSearchParam(param);
-        select.addOrderByDescending(OSSEntity.COL_CREATED_DATE);
+        select.addOrderByDescending(OSSEntity.COL_CREATED_AT);
         return search(select);
     }
 
     public List<OSSEntity> findByBatchId(String batchId) {
         SelectBuilder<OSSEntity> select = new SelectBuilder<OSSEntity>(OSSEntity.class);
         select.addWhereAnd(OSSEntity.COL_BATCH_ID + " = ? ", batchId);
-        select.addOrderByAscending(OSSEntity.COL_CREATED_DATE);
+        select.addOrderByAscending(OSSEntity.COL_CREATED_AT);
         return execute(select);
     }
 

@@ -73,68 +73,77 @@ public class LoginHelper {
     @Autowired
     private TokenHelper tokenHelper;
 
-    @Autowired
-    private UserService userService;
-
-    public String login(UserIden userIden, String password, String userDomain) throws APIException {
-        return login(userIden, password, userDomain, null);
+    public String login(UserIden userIden, String password) throws APIException {
+        return login(userIden, password, null);
     }
 
-    public String login(UserIden userIden, String password, String userDomain, Device device) throws APIException {
-        logger.info(MessageFormat.format("用户{0}尝试登陆{1}", userIden.toSecurityUsername(), userDomain));
+    public String login(UserIden userIden, String password, Device device) throws APIException {
+        logger.info(MessageFormat.format("用户{0}尝试登陆{1}", userIden.toSecurityUsername(), userIden.getUserDomain()));
         boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
 
         Authentication authentication = verifyAccount(userIden, password);
 
         final LoginUser userDetails = (LoginUser) userDetailsService.loadUserByUsername(userIden.toSecurityUsername());
         if (authentication == null || userDetails == null) {
-            return "no_match";
+            return RbacConstants.LOGIN_RESULT_NO_MATCH;
         }
         if (StringHelper.equals(userDetails.getStatus(), UserStatus.LOCKED.getCode())) {
             logger.error("用户{0}, 账户锁定", userIden.toSecurityUsername());
-            return "user_locked";
+            return RbacConstants.LOGIN_RESULT_USER_LOCKED;
         }
         if (StringHelper.equals(userDetails.getStatus(), UserStatus.INACTIVE.getCode())) {
             logger.error("用户{0}, 账户停用", userIden.toSecurityUsername());
-            return "user_inactive";
-        }
-
-        if (!StringUtils.equals(userDomain, userIden.getUserDomain())) {
-            logger.error("用户{0}, 没有权限登陆", userIden.toSecurityUsername());
-            return "no_privilege";
+            return RbacConstants.LOGIN_RESULT_USER_INACTIVE;
         }
 
         logger.info(MessageFormat.format("用户{0}登陆成功", userIden.getUserDomain() + "/" + userDetails.getLoginName()));
         if (isMobileRequest) {
-            AuthToken principal = (AuthToken) authentication.getPrincipal();
-            String token = principal.getToken();
-            String deviceType = device != null ? tokenHelper.generateAudience(device) : TokenHelper.AUDIENCE_WEB;
-            tokenHelper.generateToken(userIden, token, deviceType);
-            UserEntity userEntity = UserService.getInstance().findByIden(userIden);
-            userEntity.setLatestLoginTime(new Date());
-            UserService.getInstance().update(userEntity);
-            AuditLogHelper.log(AuditLogHelper.CATEGORY_ADMIN, "User Management", "login", "success", JsonUtil.toJson(userIden));
-            return token;
+            return handleMobileLogin(userIden, authentication, device);
         } else {
-            HttpSession session = WebHelper.getHttpRequest().getSession();
-            AuthToken principal = (AuthToken) authentication.getPrincipal();
-            String token = principal.getToken();
-            if (StringUtils.equals(token, "success")) {
-                setUserAgent(userDetails);
-                session.setAttribute(LOGIN_AUTH_USER_KEY, userDetails);
-                renewSession(session, WebHelper.getHttpRequest());
-                UserEntity userEntity = UserService.getInstance().findByIden(userIden);
-                userEntity.setLatestLoginTime(new Date());
-                UserService.getInstance().update(userEntity);
-                loginUserSession(userDetails);
-                AuditLogHelper.log(AuditLogHelper.CATEGORY_ADMIN, "User Management", "login", "success", JsonUtil.toJson(userIden));
-            }
-            return token;
+            return handleWebLogin(userIden, authentication, userDetails);
         }
     }
 
+    private String handleMobileLogin(UserIden userIden, Authentication authentication, Device device) {
+        AuthToken principal = (AuthToken) authentication.getPrincipal();
+        String token = principal.getToken();
+        String deviceType = device != null ? tokenHelper.generateAudience(device) : TokenHelper.AUDIENCE_WEB;
+        tokenHelper.generateToken(userIden, token, deviceType);
+        UserEntity userEntity = UserService.getInstance().findByIden(userIden);
+        userEntity.setLatestLoginTime(new Date());
+        UserService.getInstance().update(userEntity);
+        AuditLogHelper.log(AuditLogHelper.CATEGORY_ADMIN, RbacConstants.AUDIT_MODULE_USER,
+                RbacConstants.AUDIT_ACTION_LOGIN, RbacConstants.LOGIN_RESULT_SUCCESS,
+                JsonUtil.toJson(userIden));
+        return token;
+    }
+
+    private String handleWebLogin(UserIden userIden, Authentication authentication, LoginUser userDetails) {
+        HttpSession session = WebHelper.getHttpRequest().getSession();
+        Object principal = authentication.getPrincipal();
+        String token = RbacConstants.LOGIN_RESULT_SUCCESS;
+        if (principal instanceof AuthToken) {
+            token = ((AuthToken) principal).getToken();
+        }
+        if (StringUtils.equals(token, RbacConstants.LOGIN_RESULT_SUCCESS)) {
+            setUserAgent(userDetails);
+            session.setAttribute(LOGIN_AUTH_USER_KEY, userDetails);
+            renewSession(session, WebHelper.getHttpRequest());
+            UserEntity userEntity = UserService.getInstance().findByIden(userIden);
+            userEntity.setLatestLoginTime(new Date());
+            UserService.getInstance().update(userEntity);
+            loginUserSession(userDetails);
+            AuditLogHelper.log(AuditLogHelper.CATEGORY_ADMIN, RbacConstants.AUDIT_MODULE_USER,
+                    RbacConstants.AUDIT_ACTION_LOGIN,
+                    RbacConstants.LOGIN_RESULT_SUCCESS,
+                    JsonUtil.toJson(userIden));
+        }
+        return token;
+    }
+
     private Authentication verifyAccount(UserIden userIden, String password) throws APIException {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userIden.toSecurityUsername(), password);
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                userIden.toSecurityUsername(), password);
         try {
             final Authentication authentication = authenticationmanager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -166,10 +175,8 @@ public class LoginHelper {
     private static void loginUserSession(LoginUser loginUser) {
         UserEntity user = loginUser.getUser();
         SessionEntity sessionEntity = new SessionEntity();
-        sessionEntity.setUserDomain(user.getUserDomain());
-        sessionEntity.setUserId(user.getUserId());
+        sessionEntity.setUserId(user.getId());
         sessionEntity.setDeptNo(user.getDeptNo());
-        sessionEntity.setLoginName(user.getLoginName());
         sessionEntity.setStatus(SessionStatus.ACTIVE.getCode());
         sessionEntity.setSessionId(WebHelper.getSessionId());
         sessionEntity.setIpAddr(loginUser.getIpAddr());
@@ -266,10 +273,10 @@ public class LoginHelper {
         }
     }
 
-    public String getUserId() {
+    public String getLoginName() {
         UserIden loginUserIden = getLoginUserIden();
         if (loginUserIden != null) {
-            return loginUserIden.getUserId();
+            return loginUserIden.getLoginName();
         } else {
             return null;
         }
@@ -286,9 +293,9 @@ public class LoginHelper {
 
     public boolean isCurrentUser(UserIden userIden) {
         String userDomain = getUserDomain();
-        String userId = getUserId();
+        String userId = getLoginName();
         if (StringUtils.equals(userDomain, userIden.getUserDomain())
-                && StringUtils.equals(userId, userIden.getUserId())) {
+                && StringUtils.equals(userId, userIden.getLoginName())) {
             return true;
         } else {
             return false;
@@ -312,7 +319,12 @@ public class LoginHelper {
             String authToken = getAuthToken();
             UserTokenEntity userTokenEntity = TokenHelper.getInstance().deactiveToken(authToken);
             if (userTokenEntity != null) {
-                AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, new UserIden(userTokenEntity.getUserDomain(), userTokenEntity.getUserId()).toSecurityUsername());
+                com.adminpro.system.rbac.domains.entity.user.UserEntity user = UserService.getInstance()
+                        .findById(userTokenEntity.getUserId());
+                if (user != null) {
+                    AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE,
+                            new UserIden(user.getUserDomain(), user.getLoginName()).toSecurityUsername());
+                }
             }
             SecurityContextHolder.getContext().setAuthentication(null);
             return true;
@@ -374,18 +386,18 @@ public class LoginHelper {
             logger.debug("验证码验证时 session 不存在");
             return false;
         }
-        
+
         try {
             String c = (String) session.getAttribute(RbacCacheConstants.CAPTCHA_CACHE);
             logger.debug("session中的Captcha：" + c);
             logger.debug("用户输入的Captcha：" + captcha);
             boolean isValid = StringUtils.equalsIgnoreCase(captcha, c);
-            
+
             // 验证后清除验证码，防止重复使用
             if (isValid) {
                 session.removeAttribute(RbacCacheConstants.CAPTCHA_CACHE);
             }
-            
+
             return isValid;
         } catch (IllegalStateException e) {
             logger.debug("验证码验证时 session 已失效");

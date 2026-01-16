@@ -1,15 +1,14 @@
 package com.adminpro.framework.base.entity;
 
-
 /**
  * 需要显示审查字段的公共父类
  */
 public abstract class BaseAuditVO extends BaseVO {
     private String createdBy;
-    private String createdDate;
+    private String createdAt;
 
     private String updatedBy;
-    private String updatedDate;
+    private String updatedAt;
 
     public String getCreatedBy() {
         return createdBy;
@@ -19,12 +18,12 @@ public abstract class BaseAuditVO extends BaseVO {
         this.createdBy = createdBy;
     }
 
-    public String getCreatedDate() {
-        return createdDate;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreatedDate(String createdDate) {
-        this.createdDate = createdDate;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getUpdatedBy() {
@@ -35,11 +34,11 @@ public abstract class BaseAuditVO extends BaseVO {
         this.updatedBy = updatedBy;
     }
 
-    public String getUpdatedDate() {
-        return updatedDate;
+    public String getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdatedDate(String updatedDate) {
-        this.updatedDate = updatedDate;
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

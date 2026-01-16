@@ -11,23 +11,23 @@ import java.io.Serializable;
  * Created by simon on 2017/5/29.
  */
 public class UserIden implements Serializable {
-    private String userId;
+    private String loginName;
     private String userDomain;
 
     public UserIden() {
     }
 
-    public UserIden(String userDomain, String userId) {
-        this.userId = userId;
+    public UserIden(String userDomain, String loginName) {
+        this.loginName = loginName;
         this.userDomain = userDomain;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getLoginName() {
+        return loginName;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
     }
 
     public String getUserDomain() {
@@ -50,7 +50,7 @@ public class UserIden implements Serializable {
 
         UserIden userIden = (UserIden) o;
 
-        if (!StringUtils.equals(userIden.userId, userId)) {
+        if (!StringUtils.equals(userIden.loginName, loginName)) {
             return false;
         }
         return StringUtils.equals(userIden.userDomain, userDomain);
@@ -58,14 +58,14 @@ public class UserIden implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = userId.hashCode();
-        result = 31 * result + userDomain.hashCode();
+        int result = loginName != null ? loginName.hashCode() : 0;
+        result = 31 * result + (userDomain != null ? userDomain.hashCode() : 0);
         return result;
     }
 
     @JsonIgnore
     public String toSecurityUsername() {
-        return userDomain + RbacConstants.SPRING_SECURITY_USERIDEN_SPLIT + userId;
+        return userDomain + RbacConstants.SPRING_SECURITY_USERIDEN_SPLIT + loginName;
     }
 
     @JsonIgnore

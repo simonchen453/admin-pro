@@ -18,12 +18,10 @@ import java.util.List;
  * @author simon
  */
 public class LoginUser implements UserDetails {
-    private final String username;
     private final String userDomain;
     private final String deptNo;
     private final String deptName;
     private final String realName;
-    private final String loginName;
     private final String password;
     private final String status;
     /**
@@ -50,14 +48,13 @@ public class LoginUser implements UserDetails {
 
     private final List<String> permissions;
 
-    public LoginUser(UserIden userIden, String loginName, String password, String status, String deptNo, String deptName, String realName, UserEntity user, List<String> permissions) {
+    public LoginUser(UserIden userIden, String password, String status, String deptNo,
+            String deptName, String realName, UserEntity user, List<String> permissions) {
         this.userIden = userIden;
-        this.username = userIden.getUserId();
         this.userDomain = userIden.getUserDomain();
         this.password = password;
         this.status = status;
         this.permissions = permissions;
-        this.loginName = loginName;
         this.deptNo = deptNo;
         this.deptName = deptName;
         this.realName = realName;
@@ -66,11 +63,12 @@ public class LoginUser implements UserDetails {
 
     @Override
     public String toString() {
-        return this.username;
+        return this.userIden.getLoginName();
     }
 
     public static LoginUser convertFrom(UserEntity user) {
-        String[] permissions = RbacHelper.getInstance().getAccessibleAllPermissionsByUser(user.getUserIden());
+        String[] permissions = RbacHelper.getInstance().getAccessibleAllPermissionsByUser(user.getId(),
+                user.getUserDomain());
         String deptNo = user.getDeptNo();
         String deptName = "";
         if (StringUtils.isNotEmpty(deptNo)) {
@@ -80,25 +78,23 @@ public class LoginUser implements UserDetails {
             }
         }
         return new LoginUser(
-                user.getUserIden(),
-                user.getLoginName(),
+                new UserIden(user.getUserDomain(), user.getLoginName()),
                 user.getPassword(),
                 user.getStatus(),
                 deptNo,
                 deptName,
                 user.getRealName(),
                 user,
-                Arrays.asList(permissions)
-        );
+                Arrays.asList(permissions));
     }
 
     public String toSecurityUserName() {
-        return new UserIden(userDomain, username).toSecurityUsername();
+        return userIden.toSecurityUsername();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return userIden.getLoginName();
     }
 
     public String getStatus() {
@@ -152,7 +148,7 @@ public class LoginUser implements UserDetails {
     }
 
     public String getLoginName() {
-        return loginName;
+        return userIden.getLoginName();
     }
 
     public String getDeptNo() {

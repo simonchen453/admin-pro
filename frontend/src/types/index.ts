@@ -389,7 +389,7 @@ export interface RoleEntity {
   display: string;
   status: string;
   system: string;
-  menuNames?: string[];
+  menuIds?: string[];
   code?: string;
 }
 
@@ -810,7 +810,6 @@ export const JobLogStatus = {
 // Session管理相关类型
 export interface SessionSearchForm {
   sessionId?: string;
-  userDomain?: string;
   loginName?: string;
   status?: string;
   ipAddr?: string;
@@ -823,7 +822,6 @@ export interface SessionSearchForm {
 export interface SessionEntity {
   id: string;
   sessionId: string;
-  userDomain: string;
   loginName: string;
   deptNo?: string;
   ipAddr?: string;
@@ -923,7 +921,6 @@ export interface SysLogSearchForm {
 
 export interface SysLogEntity {
   id?: string;
-  userDomain?: string;
   userId?: string;
   loginName?: string;
   ip?: string;

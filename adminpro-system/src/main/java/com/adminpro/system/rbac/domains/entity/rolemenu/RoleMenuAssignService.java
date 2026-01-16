@@ -63,15 +63,15 @@ public class RoleMenuAssignService extends BaseService<RoleMenuAssignEntity, Str
         }
     }
 
-    public List<RoleMenuAssignEntity> findByRoleName(String roleName) {
-        return dao.findByRoleName(roleName);
+    public List<RoleMenuAssignEntity> findByRoleId(String roleId) {
+        return dao.findByRoleId(roleId);
     }
 
-    public List<RoleMenuAssignEntity> findByMenuName(String menuName) {
-        return dao.findByMenuName(menuName);
+    public List<RoleMenuAssignEntity> findByMenuId(String menuId) {
+        return dao.findByMenuId(menuId);
     }
 
-    public void deleteByRoleName(String roleName) {
-        dao.deleteByRoleName(roleName);
+    public void deleteByRoleId(String roleId) {
+        dao.deleteByRoleId(roleId);
     }
 }

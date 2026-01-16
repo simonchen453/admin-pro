@@ -15,10 +15,6 @@ public class SysLogDTO extends BaseAuditDTO {
      */
     private String id;
     /**
-     * 用户域
-     */
-    private String userDomain;
-    /**
      * 用户ID
      */
     private String userId;

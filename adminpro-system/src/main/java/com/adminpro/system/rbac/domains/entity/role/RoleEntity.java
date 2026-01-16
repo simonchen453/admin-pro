@@ -84,5 +84,5 @@ public class RoleEntity extends BaseAuditEntity {
     @Column(name = COL_IS_SYSTEM, type = Column.Type.BOOLEAN)
     private boolean system;
 
-    private List<String> menuNames;
+    private List<String> menuIds;
 }

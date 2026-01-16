@@ -4,7 +4,7 @@ import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.util.JsonUtil;
 import com.adminpro.system.core.common.helper.WebHelper;
 import com.adminpro.system.rbac.api.LoginHelper;
-import jakarta.servlet.http.Cookie;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,8 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
      * @return
      */
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) {
         try {
             // 执行登出
             LoginHelper.getInstance().logout();

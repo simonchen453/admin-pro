@@ -29,7 +29,7 @@ public class NotificationDao extends BaseDao<NotificationEntity, String> {
         if (StringUtils.isNotEmpty(condition)) {
             select.addWhereAnd(NotificationEntity.COL_TITLE + " like ?", "%" + condition + "%");
         }
-        select.addOrderByDescending(NotificationEntity.COL_CREATED_DATE);
+        select.addOrderByDescending(NotificationEntity.COL_CREATED_AT);
         return search(select);
     }
 
@@ -39,7 +39,7 @@ public class NotificationDao extends BaseDao<NotificationEntity, String> {
         param.setPageSize(3);
         SelectBuilder<NotificationEntity> select = new SelectBuilder<NotificationEntity>(NotificationEntity.class);
         select.setSearchParam(param);
-        select.addOrderByDescending(NotificationEntity.COL_CREATED_DATE);
+        select.addOrderByDescending(NotificationEntity.COL_CREATED_AT);
         List<NotificationEntity> execute = execute(select);
         return execute;
     }

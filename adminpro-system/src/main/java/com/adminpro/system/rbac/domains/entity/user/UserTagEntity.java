@@ -30,10 +30,6 @@ public class UserTagEntity extends BaseEntity {
      */
     public static final String COL_ID = "COL_ID";
     /**
-     * 用户域
-     */
-    public static final String COL_USER_DOMAIN = "COL_USER_DOMAIN";
-    /**
      * 用户ID
      */
     public static final String COL_USER_ID = "COL_USER_ID";
@@ -51,13 +47,6 @@ public class UserTagEntity extends BaseEntity {
     @PrimaryKey
     @Column(name = COL_ID, type = Column.Type.STRING)
     private String id;
-    /**
-     * 用户域
-     */
-    @NotBlank
-    @Size(max = 64)
-    @Column(name = COL_USER_DOMAIN, type = Column.Type.STRING)
-    private String userDomain;
     /**
      * 用户ID
      */

@@ -303,39 +303,29 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
         if (entity instanceof BaseAuditEntity) {
             BaseAuditEntity obj = (BaseAuditEntity) entity;
             AppContext appContext = CommonUtil.getAppContext();
-            String userId = "";
-            String userDomain = "";
+            String currentUserId = "";
             if (appContext != null) {
-                userId = appContext.getUserId();
-                userDomain = appContext.getUserDomain();
+                currentUserId = appContext.getId();
             }
             Date now = new Date();
-            if (obj.getCreatedDate() == null) {
-                obj.setCreatedDate(now);
-                insert.addColumnValue(BaseAuditEntity.COL_CREATED_DATE, now);
+            if (obj.getCreatedAt() == null) {
+                obj.setCreatedAt(now);
+                insert.addColumnValue(BaseAuditEntity.COL_CREATED_AT, now);
             }
 
-            if (StringUtils.isEmpty(obj.getCreatedByUserId())) {
-                obj.setCreatedByUserId(userId);
-                insert.addColumnValue(BaseAuditEntity.COL_CREATED_BY_USER_ID, obj.getCreatedByUserId());
-            }
-            if (StringUtils.isEmpty(obj.getCreatedByUserDomain())) {
-                obj.setCreatedByUserDomain(userDomain);
-                insert.addColumnValue(BaseAuditEntity.COL_CREATED_BY_USER_DOMAIN, obj.getCreatedByUserDomain());
+            if (StringUtils.isEmpty(obj.getCreatedBy())) {
+                obj.setCreatedBy(currentUserId);
+                insert.addColumnValue(BaseAuditEntity.COL_CREATED_BY, obj.getCreatedBy());
             }
 
-            if (obj.getUpdatedDate() == null) {
-                obj.setUpdatedDate(now);
-                insert.addColumnValue(BaseAuditEntity.COL_UPDATED_DATE, now);
+            if (obj.getUpdatedAt() == null) {
+                obj.setUpdatedAt(now);
+                insert.addColumnValue(BaseAuditEntity.COL_UPDATED_AT, now);
             }
 
-            if (StringUtils.isEmpty(obj.getUpdatedByUserId())) {
-                obj.setUpdatedByUserId(userId);
-                insert.addColumnValue(BaseAuditEntity.COL_UPDATED_BY_USER_ID, obj.getUpdatedByUserId());
-            }
-            if (StringUtils.isEmpty(obj.getUpdatedByUserDomain())) {
-                obj.setUpdatedByUserDomain(userDomain);
-                insert.addColumnValue(BaseAuditEntity.COL_UPDATED_BY_USER_DOMAIN, obj.getUpdatedByUserDomain());
+            if (StringUtils.isEmpty(obj.getUpdatedBy())) {
+                obj.setUpdatedBy(currentUserId);
+                insert.addColumnValue(BaseAuditEntity.COL_UPDATED_BY, obj.getUpdatedBy());
             }
         }
     }
@@ -343,27 +333,20 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
     protected void handleAuditColumnValues(UpdateBuilder update, IEntity entity) {
         if (entity instanceof BaseAuditEntity) {
             AppContext appContext = CommonUtil.getAppContext();
-            String userId = "";
-            String userDomain = "";
+            String currentUserId = "";
             if (appContext != null) {
-                userId = appContext.getUserId();
-                userDomain = appContext.getUserDomain();
+                currentUserId = appContext.getId();
             }
 
             BaseAuditEntity obj = (BaseAuditEntity) entity;
             Date now = new Date();
 
-            obj.setUpdatedDate(now);
-            update.addColumnValue(BaseAuditEntity.COL_UPDATED_DATE, now);
+            obj.setUpdatedAt(now);
+            update.addColumnValue(BaseAuditEntity.COL_UPDATED_AT, now);
 
-            if (StringUtils.isEmpty(obj.getCreatedByUserId())) {
-                obj.setUpdatedByUserId(userId);
-                update.addColumnValue(BaseAuditEntity.COL_UPDATED_BY_USER_ID, obj.getUpdatedByUserId());
-            }
-
-            if (StringUtils.isEmpty(obj.getCreatedByUserDomain())) {
-                obj.setUpdatedByUserDomain(userDomain);
-                update.addColumnValue(BaseAuditEntity.COL_UPDATED_BY_USER_DOMAIN, obj.getUpdatedByUserDomain());
+            if (StringUtils.isEmpty(obj.getUpdatedBy())) {
+                obj.setUpdatedBy(currentUserId);
+                update.addColumnValue(BaseAuditEntity.COL_UPDATED_BY, obj.getUpdatedBy());
             }
         }
     }
@@ -372,15 +355,30 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
         if (entity instanceof BaseAuditEntity) {
             BaseAuditEntity auditEntity = (BaseAuditEntity) entity;
             try {
-                auditEntity.setCreatedByUserDomain(resultSet.getString(BaseAuditEntity.COL_CREATED_BY_USER_DOMAIN));
-                auditEntity.setCreatedByUserId(resultSet.getString(BaseAuditEntity.COL_CREATED_BY_USER_ID));
-                auditEntity.setUpdatedByUserDomain(resultSet.getString(BaseAuditEntity.COL_UPDATED_BY_USER_DOMAIN));
-                auditEntity.setUpdatedByUserId(resultSet.getString(BaseAuditEntity.COL_UPDATED_BY_USER_ID));
-                auditEntity.setCreatedDate(resultSet.getTimestamp(BaseAuditEntity.COL_CREATED_DATE));
-                auditEntity.setUpdatedDate(resultSet.getTimestamp(BaseAuditEntity.COL_UPDATED_DATE));
+                if (checkHasColumn(resultSet, BaseAuditEntity.COL_CREATED_BY)) {
+                    auditEntity.setCreatedBy(resultSet.getString(BaseAuditEntity.COL_CREATED_BY));
+                }
+                if (checkHasColumn(resultSet, BaseAuditEntity.COL_UPDATED_BY)) {
+                    auditEntity.setUpdatedBy(resultSet.getString(BaseAuditEntity.COL_UPDATED_BY));
+                }
+                if (checkHasColumn(resultSet, BaseAuditEntity.COL_CREATED_AT)) {
+                    auditEntity.setCreatedAt(resultSet.getTimestamp(BaseAuditEntity.COL_CREATED_AT));
+                }
+                if (checkHasColumn(resultSet, BaseAuditEntity.COL_UPDATED_AT)) {
+                    auditEntity.setUpdatedAt(resultSet.getTimestamp(BaseAuditEntity.COL_UPDATED_AT));
+                }
             } catch (SQLException e) {
                 logger.error("Failed to retrieve audit field from ResultSet", e);
             }
+        }
+    }
+
+    private boolean checkHasColumn(ResultSet rs, String columnName) {
+        try {
+            rs.findColumn(columnName);
+            return true;
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -388,12 +386,18 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
         if (entity instanceof BaseAuditDTO) {
             BaseAuditDTO auditEntity = (BaseAuditDTO) entity;
             try {
-                auditEntity.setCreatedByUserDomain(resultSet.getString(BaseAuditEntity.COL_CREATED_BY_USER_DOMAIN));
-                auditEntity.setCreatedByUserId(resultSet.getString(BaseAuditEntity.COL_CREATED_BY_USER_ID));
-                auditEntity.setUpdatedByUserDomain(resultSet.getString(BaseAuditEntity.COL_UPDATED_BY_USER_DOMAIN));
-                auditEntity.setUpdatedByUserId(resultSet.getString(BaseAuditEntity.COL_UPDATED_BY_USER_ID));
-                auditEntity.setCreatedDate(resultSet.getTimestamp(BaseAuditEntity.COL_CREATED_DATE));
-                auditEntity.setUpdatedDate(resultSet.getTimestamp(BaseAuditEntity.COL_UPDATED_DATE));
+                if (checkHasColumn(resultSet, BaseAuditEntity.COL_CREATED_BY)) {
+                    auditEntity.setCreatedBy(resultSet.getString(BaseAuditEntity.COL_CREATED_BY));
+                }
+                if (checkHasColumn(resultSet, BaseAuditEntity.COL_UPDATED_BY)) {
+                    auditEntity.setUpdatedBy(resultSet.getString(BaseAuditEntity.COL_UPDATED_BY));
+                }
+                if (checkHasColumn(resultSet, BaseAuditEntity.COL_CREATED_AT)) {
+                    auditEntity.setCreatedAt(resultSet.getTimestamp(BaseAuditEntity.COL_CREATED_AT));
+                }
+                if (checkHasColumn(resultSet, BaseAuditEntity.COL_UPDATED_AT)) {
+                    auditEntity.setUpdatedAt(resultSet.getTimestamp(BaseAuditEntity.COL_UPDATED_AT));
+                }
             } catch (SQLException e) {
                 logger.error("Failed to retrieve audit field from ResultSet", e);
             }
@@ -401,12 +405,13 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
     }
 
     public void create(final E entity) {
-        if(entity == null){
+        if (entity == null) {
             throw new IllegalArgumentException(String.format("entity cannot be null."));
         }
         Table tbl = genericType.getAnnotation(Table.class);
         if (tbl == null) {
-            throw new IllegalArgumentException(String.format("Table is not specified for entity %s.", genericType.getClass()));
+            throw new IllegalArgumentException(
+                    String.format("Table is not specified for entity %s.", genericType.getClass()));
         }
 
         InsertBuilder insert = new InsertBuilder(tbl.name());
@@ -425,7 +430,8 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
                             throw new BaseRuntimeException("Failed to get field value.", ex);
                         }
                         if (field.isAnnotationPresent(AutoGeneratedKey.class)) {
-                            if (value == null || StringUtils.isBlank(value.toString()) || "0".equals(String.valueOf(value))) {
+                            if (value == null || StringUtils.isBlank(value.toString())
+                                    || "0".equals(String.valueOf(value))) {
                                 autoGenFields.add(field);
                                 if (field.isAnnotationPresent(PrimaryKey.class)) {
                                     insert.setAutoGeneratedType(field.getType().getName());
@@ -460,18 +466,26 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
                         for (int i = 0; i < autoGenFields.size(); i++) {
                             cols[i] = autoGenFields.get(i).getName();
                         }
-                        String sql = String.format("SELECT %s FROM %s WHERE %s = ?", StringUtils.join(cols), entity.getClass().getDeclaredField("TABLE_NAME").get(null), insert.getAutoGeneratedKey());
-                        com.adminpro.framework.jdbc.Column[] keys = queryForObject(sql, new Object[]{insert.getAutoGeneratedValue()}, new RowMapper<com.adminpro.framework.jdbc.Column[]>() {
-                            @Override
-                            public com.adminpro.framework.jdbc.Column[] mapRow(ResultSet rs, int rowNum) throws SQLException {
-                                com.adminpro.framework.jdbc.Column[] vals = new com.adminpro.framework.jdbc.Column[autoGenFields.size()];
-                                for (int i = 0; i < autoGenFields.size(); i++) {
-                                    Field autoGenField = autoGenFields.get(i);
-                                    vals[i] = new com.adminpro.framework.jdbc.Column(autoGenField.getName(), autoGenField.getType().getName(), rs.getObject(autoGenField.getName()));
-                                }
-                                return vals;
-                            }
-                        });
+                        String sql = String.format("SELECT %s FROM %s WHERE %s = ?", StringUtils.join(cols),
+                                entity.getClass().getDeclaredField("TABLE_NAME").get(null),
+                                insert.getAutoGeneratedKey());
+                        com.adminpro.framework.jdbc.Column[] keys = queryForObject(sql,
+                                new Object[] { insert.getAutoGeneratedValue() },
+                                new RowMapper<com.adminpro.framework.jdbc.Column[]>() {
+                                    @Override
+                                    public com.adminpro.framework.jdbc.Column[] mapRow(ResultSet rs, int rowNum)
+                                            throws SQLException {
+                                        com.adminpro.framework.jdbc.Column[] vals = new com.adminpro.framework.jdbc.Column[autoGenFields
+                                                .size()];
+                                        for (int i = 0; i < autoGenFields.size(); i++) {
+                                            Field autoGenField = autoGenFields.get(i);
+                                            vals[i] = new com.adminpro.framework.jdbc.Column(autoGenField.getName(),
+                                                    autoGenField.getType().getName(),
+                                                    rs.getObject(autoGenField.getName()));
+                                        }
+                                        return vals;
+                                    }
+                                });
                         for (Field autoGenField : autoGenFields) {
                             String fieldName = autoGenField.getName();
                             for (com.adminpro.framework.jdbc.Column key : keys) {
@@ -490,7 +504,8 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
         }
     }
 
-    private void setAutoGeneratedFieldValue(Field autoGenField, Object entity, Object value) throws IllegalAccessException {
+    private void setAutoGeneratedFieldValue(Field autoGenField, Object entity, Object value)
+            throws IllegalAccessException {
         String autoGenFieldType = autoGenField.getType().getName();
         if ("long".equals(autoGenFieldType)) {
             autoGenField.set(entity, Long.valueOf(value.toString()));
@@ -520,7 +535,8 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
     public E retrieve(final ID id) {
         Table tbl = genericType.getAnnotation(Table.class);
         if (tbl == null) {
-            throw new IllegalArgumentException(String.format("Table is not specified for entity %s.", genericType.getClass()));
+            throw new IllegalArgumentException(
+                    String.format("Table is not specified for entity %s.", genericType.getClass()));
         }
 
         SelectBuilder<E> select = new SelectBuilder<>(getDefaultRowMapper());
@@ -543,7 +559,8 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
     public List<E> retrieveAll() {
         Table tbl = genericType.getAnnotation(Table.class);
         if (tbl == null) {
-            throw new IllegalArgumentException(String.format("Table is not specified for entity %s.", genericType.getClass()));
+            throw new IllegalArgumentException(
+                    String.format("Table is not specified for entity %s.", genericType.getClass()));
         }
 
         SelectBuilder<E> select = new SelectBuilder<>(getDefaultRowMapper());
@@ -553,7 +570,8 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
     public void delete(final ID id) {
         Table tbl = genericType.getAnnotation(Table.class);
         if (tbl == null) {
-            throw new IllegalArgumentException(String.format("Table is not specified for entity %s.", genericType.getClass()));
+            throw new IllegalArgumentException(
+                    String.format("Table is not specified for entity %s.", genericType.getClass()));
         }
 
         DeleteBuilder delete = new DeleteBuilder(tbl.name());
@@ -574,12 +592,13 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
     }
 
     public void update(final E entity, String... columns) {
-        if(entity == null){
+        if (entity == null) {
             throw new IllegalArgumentException(String.format("entity cannot be null."));
         }
         Table tbl = genericType.getAnnotation(Table.class);
         if (tbl == null) {
-            throw new IllegalArgumentException(String.format("Table is not specified for entity %s.", genericType.getClass()));
+            throw new IllegalArgumentException(
+                    String.format("Table is not specified for entity %s.", genericType.getClass()));
         }
 
         Field[] fields = null;
@@ -599,7 +618,7 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
         }
         UpdateBuilder update = new UpdateBuilder(tbl.name());
         if (fields == null || fields.length == 0) {
-            //full table update
+            // full table update
             fields = ClassUtil.getAllFields(genericType);
         }
         if (fields != null && fields.length > 0) {
@@ -614,7 +633,8 @@ public abstract class SqlExecutor<E extends IEntity, ID extends Serializable> im
                             } else {
                                 String colField = col.field();
                                 if (StringUtils.isNotBlank(colField) && field.get(entity) != null) {
-                                    update.addColumnValue(col.name(), ReflectUtil.getFieldValue(field.get(entity), colField));
+                                    update.addColumnValue(col.name(),
+                                            ReflectUtil.getFieldValue(field.get(entity), colField));
                                 } else {
                                     update.addColumnValue(col.name(), field.get(entity));
                                 }

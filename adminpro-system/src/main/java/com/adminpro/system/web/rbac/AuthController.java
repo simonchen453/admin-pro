@@ -16,6 +16,7 @@ import com.adminpro.system.rbac.api.Device;
 import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.rbac.api.PasswordValidator;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
+import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
@@ -90,7 +91,8 @@ public class AuthController extends BaseController {
 
             boolean isMobileApp = ClientHelper.isMobileAppRequest(request);
             boolean isMiniProgram = ClientHelper.isMiniProgramRequest(request);
-            if (!isMobileApp && !isMiniProgram && !WebHelper.isDevModel() && LoginHelper.getInstance().needCheckCapture(userDomain)) {
+            if (!isMobileApp && !isMiniProgram && !WebHelper.isDevModel()
+                    && LoginHelper.getInstance().needCheckCapture(userDomain)) {
                 if (StringUtils.isEmpty(captcha)) {
                     return R.error("验证码不正确");
                 }
@@ -100,25 +102,23 @@ public class AuthController extends BaseController {
                 }
             }
 
-            /*if (!LoginHelper.getInstance().isSystemUser(userDomain) && !ValidationUtil.isValidateMobile(loginName)) {
-                return R.error("601", "请输入正确手机号");
-            }*/
             UserEntity userEntity = userService.findByUserDomainAndLoginName(userDomain, loginName);
             if (userEntity == null) {
                 return R.error("用户名未注册");
             }
-            String token = LoginHelper.getInstance().login(userEntity.getUserIden(), password, userDomain, currentDevice);
+            UserIden userIden = new UserIden(userEntity.getUserDomain(), userEntity.getLoginName());
+            String token = LoginHelper.getInstance().login(userIden, password, currentDevice);
             if ("pending_active".equals(token)) {
                 return R.error("601", WebConstants.USER_PENDING_ACTIVE);
-            } else if ("user_locked".equals(token)) {
+            } else if (RbacConstants.LOGIN_RESULT_USER_LOCKED.equals(token)) {
                 return R.error("601", WebConstants.USER_LOCKED);
-            } else if ("no_privilege".equals(token)) {
+            } else if (RbacConstants.LOGIN_RESULT_USER_INACTIVE.equals(token)) {
                 return R.error("601", WebConstants.USER_HAS_NO_PRIVILEGE);
-            } else if ("no_match".equals(token)) {
+            } else if (RbacConstants.LOGIN_RESULT_NO_MATCH.equals(token)) {
                 return R.error("601", WebConstants.USER_NOT_MATCHED);
             }
 
-            loginResponse.setId(userEntity.getUserIden().getUserId());
+            loginResponse.setId(userEntity.getId());
             loginResponse.setUserId(loginName);
             loginResponse.setToken(token);
             loginResponse.setHasPayPwd(!StringUtils.isEmpty(userEntity.getPayPwd()));
@@ -176,15 +176,16 @@ public class AuthController extends BaseController {
                 return R.error("未登录");
             }
             UserIden userIden = loginUser.getUserIden();
-            UserEntity userEntity = userService.findByUserDomainAndUserId(userIden.getUserDomain(), userIden.getUserId());
+            UserEntity userEntity = userService.findByUserDomainAndLoginName(userIden.getUserDomain(),
+                    userIden.getLoginName());
             if (userEntity == null) {
                 return R.error("用户不存在");
             }
-            
+
             // 构建响应VO
             UserInfoResponseVo userInfoVo = new UserInfoResponseVo();
-            userInfoVo.setUserId(userEntity.getUserIden().getUserId());
-            userInfoVo.setUserDomain(userEntity.getUserIden().getUserDomain());
+            userInfoVo.setUserId(userEntity.getId());
+            userInfoVo.setUserDomain(userEntity.getUserDomain());
             userInfoVo.setLoginName(userEntity.getLoginName());
             userInfoVo.setRealName(userEntity.getRealName());
             userInfoVo.setMobileNo(userEntity.getMobileNo());
@@ -203,7 +204,7 @@ public class AuthController extends BaseController {
                     userInfoVo.setDeptName(deptEntity.getName());
                 }
             }
-            
+
             return R.ok(userInfoVo);
         } catch (Exception e) {
             logger.error("获取用户信息失败", e);
@@ -234,7 +235,8 @@ public class AuthController extends BaseController {
                 return R.error("未登录");
             }
             UserIden userIden = loginUser.getUserIden();
-            UserEntity userEntity = userService.findByUserDomainAndUserId(userIden.getUserDomain(), userIden.getUserId());
+            UserEntity userEntity = userService.findByUserDomainAndLoginName(userIden.getUserDomain(),
+                    userIden.getLoginName());
             if (userEntity == null) {
                 return R.error("用户不存在");
             }
@@ -282,7 +284,7 @@ public class AuthController extends BaseController {
         bi = captchaProducerMath.createImage(capStr);
 
         logger.debug("生成验证码：" + code);
-        
+
         // 获取或创建 session，确保验证码存储在其中
         HttpSession session = request.getSession();
         // 如果 session 不存在或无效，创建新 session

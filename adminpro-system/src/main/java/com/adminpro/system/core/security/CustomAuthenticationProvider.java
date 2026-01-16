@@ -40,7 +40,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             String token = UserService.getInstance().authLogin(userIden, password);
             if (StringUtils.isNotEmpty(token)) {
                 // 生成令牌
-                Authentication auth = new UsernamePasswordAuthenticationToken(new AuthToken(userIden.getUserDomain(), userIden.getUserId(), token), password, authUser.getAuthorities());
+                Authentication auth = new UsernamePasswordAuthenticationToken(
+                        new AuthToken(userIden.getUserDomain(), userIden.getLoginName(), token), password,
+                        authUser.getAuthorities());
                 return auth;
             } else {
                 throw new BadCredentialsException("密码不正确");
@@ -48,7 +50,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         } else {
             throw new UsernameNotFoundException("用户不存在~");
         }
-//        return  null;
+        // return null;
     }
 
     // 是否可以提供输入类型的认证服务

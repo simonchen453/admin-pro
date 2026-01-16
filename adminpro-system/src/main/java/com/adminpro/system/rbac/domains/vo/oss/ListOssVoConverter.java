@@ -18,7 +18,7 @@ public class ListOssVoConverter implements IModelConverter<ListOssDto, ListOssVo
         listVo.setId(entity.getId());
         listVo.setUrl(entity.getUrl());
         listVo.setSize(FileUtils.byteCountToDisplaySize(entity.getSize()));
-        listVo.setCreatedDate(DateUtil.formatDateTime(entity.getCreatedDate()));
+        listVo.setCreatedAt(DateUtil.formatDateTime(entity.getCreatedAt()));
         listVo.setCreatedBy(entity.getCreatedBy());
         listVo.setKey(entity.getKey());
         listVo.setHash(entity.getHash());

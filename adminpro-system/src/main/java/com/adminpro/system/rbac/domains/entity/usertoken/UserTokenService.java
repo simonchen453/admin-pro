@@ -51,7 +51,7 @@ public class UserTokenService extends BaseService<UserTokenEntity, String> {
         Integer expireSeconds = calculateCacheExpire(entity);
         AppCache.getInstance().set(RbacCacheConstants.AUTH_TOKEN_CACHE, entity.getToken(), entity, expireSeconds);
     }
-    
+
     /**
      * 根据token的过期时间计算缓存过期时间（秒）
      * 如果token有过期时间，则使用token过期时间；否则使用默认过期时间
@@ -77,7 +77,14 @@ public class UserTokenService extends BaseService<UserTokenEntity, String> {
 
     @Transactional
     public void inactive(UserIden userIden) {
-        List<UserTokenEntity> list = dao.findByUserDomainAndUserIdAndStatus(userIden.getUserDomain(), userIden.getUserId(), UserTokenEntity.STATUS_ACTIVITY);
+        com.adminpro.system.rbac.domains.entity.user.UserEntity user = com.adminpro.system.rbac.domains.entity.user.UserService
+                .getInstance().findByIden(userIden);
+        if (user == null) {
+            return;
+        }
+        // Use PK instead of loginName+domain
+        List<UserTokenEntity> list = dao.findByUserIdAndStatus(user.getId(), UserTokenEntity.STATUS_ACTIVITY);
+
         if (list != null) {
             for (int i = 0; i < list.size(); i++) {
                 UserTokenEntity userTokenEntity = list.get(i);
@@ -88,7 +95,8 @@ public class UserTokenService extends BaseService<UserTokenEntity, String> {
     }
 
     public UserTokenEntity findByToken(String token) {
-        UserTokenEntity tokenEntity = AppCache.getInstance().get(RbacCacheConstants.AUTH_TOKEN_CACHE, token, UserTokenEntity.class);
+        UserTokenEntity tokenEntity = AppCache.getInstance().get(RbacCacheConstants.AUTH_TOKEN_CACHE, token,
+                UserTokenEntity.class);
         if (tokenEntity != null) {
             return tokenEntity;
         } else {

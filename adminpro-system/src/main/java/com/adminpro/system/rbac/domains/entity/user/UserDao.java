@@ -5,9 +5,7 @@ import com.adminpro.framework.base.util.CryptUtil;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
-import com.adminpro.framework.jdbc.sqlbuilder.InsertBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
-import com.adminpro.framework.jdbc.sqlbuilder.UpdateBuilder;
 import com.adminpro.system.core.common.helper.ConfigHelper;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.web.BaseConstants;
@@ -31,6 +29,7 @@ import java.util.Map;
 public class UserDao extends BaseDao<UserEntity, String> {
 
     private static final String SQL_USER_LIST = "select u.* from sys_user_tbl u left join sys_dept_tbl d on u.col_dept_no = d.col_no";
+    private static final String IN = " IN ";
 
     public QueryResultSet<UserEntity> search(SearchParam param) {
         SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
@@ -67,7 +66,9 @@ public class UserDao extends BaseDao<UserEntity, String> {
             select.addWhereAnd("u." + UserEntity.COL_USER_DOMAIN + EQ, userDomain);
         }
         if (StringUtils.isNotEmpty(deptId)) {
-            select.addWhereAnd("(d." + DeptEntity.COL_ID + " = ? or d.col_id in (select t.col_id from sys_dept_tbl t where find_in_set (?, col_ancestors)))", deptId, deptId);
+            select.addWhereAnd("(d." + DeptEntity.COL_ID
+                    + " = ? or d.col_id in (select t.col_id from sys_dept_tbl t where find_in_set (?, col_ancestors)))",
+                    deptId, deptId);
         }
     }
 
@@ -81,7 +82,7 @@ public class UserDao extends BaseDao<UserEntity, String> {
         SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
         select.setTable(UserEntity.TABLE_NAME);
         select.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, userIden.getUserDomain());
-        select.addWhereAnd(UserEntity.COL_USER_ID + EQ, userIden.getUserId());
+        select.addWhereAnd(UserEntity.COL_LOGIN_NAME + EQ, userIden.getLoginName());
         return executeSingle(select);
     }
 
@@ -167,14 +168,6 @@ public class UserDao extends BaseDao<UserEntity, String> {
         return execute(select);
     }
 
-    public List<UserEntity> findByDomainAndLikeUserId(String domain, String userIdLike) {
-        SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
-        select.setTable(UserEntity.TABLE_NAME);
-        select.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, domain);
-        select.addWhereAnd(UserEntity.COL_USER_ID + LIKE, userIdLike);
-        return execute(select);
-    }
-
     /**
      * 删除UserEntity
      *
@@ -184,42 +177,28 @@ public class UserDao extends BaseDao<UserEntity, String> {
     public void delete(UserIden userIden) {
         DeleteBuilder delete = new DeleteBuilder(UserEntity.TABLE_NAME);
         delete.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, userIden.getUserDomain());
-        delete.addWhereAnd(UserEntity.COL_USER_ID + EQ, userIden.getUserId());
+        delete.addWhereAnd(UserEntity.COL_LOGIN_NAME + EQ, userIden.getLoginName());
         execute(delete);
     }
 
     @Override
     public void delete(String id) {
         DeleteBuilder delete = new DeleteBuilder(UserEntity.TABLE_NAME);
-        delete.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, id);
+        delete.addWhereAnd(UserEntity.COL_ID + EQ, id);
         execute(delete);
     }
 
     /**
      * 批量删除UserEntity（优化性能）
      *
-     * @param userIdens 用户标识列表
+     * @param ids 用户ID列表
      */
-    public void deleteMany(List<UserIden> userIdens) {
-        if (userIdens == null || userIdens.isEmpty()) {
+    public void deleteByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
             return;
         }
-        // 由于是复合主键，需要构建复杂的WHERE条件
-        // 使用OR条件组合多个(userDomain, userId)对
         DeleteBuilder delete = new DeleteBuilder(UserEntity.TABLE_NAME);
-        StringBuilder whereClause = new StringBuilder("(");
-        List<Object> params = new ArrayList<>();
-        for (int i = 0; i < userIdens.size(); i++) {
-            if (i > 0) {
-                whereClause.append(" OR ");
-            }
-            whereClause.append("(").append(UserEntity.COL_USER_DOMAIN).append(EQ).append("? AND ")
-                    .append(UserEntity.COL_USER_ID).append(EQ).append("?)");
-            params.add(userIdens.get(i).getUserDomain());
-            params.add(userIdens.get(i).getUserId());
-        }
-        whereClause.append(")");
-        delete.setWhereClause(whereClause.toString(), params.toArray());
+        delete.addWhereAnd(UserEntity.COL_ID + IN, ids.toArray());
         execute(delete);
     }
 
@@ -236,11 +215,8 @@ public class UserDao extends BaseDao<UserEntity, String> {
 
                 String id = resultSet.getString(UserEntity.COL_ID);
                 String userDomain = resultSet.getString(UserEntity.COL_USER_DOMAIN);
-                String userId = resultSet.getString(UserEntity.COL_USER_ID);
                 entity.setId(id);
                 entity.setUserDomain(userDomain);
-                entity.setUserId(userId);
-                entity.setUserIden(new UserIden(userDomain, userId));
                 entity.setLoginName(resultSet.getString(UserEntity.COL_LOGIN_NAME));
                 entity.setDisplay(resultSet.getString(UserEntity.COL_DISPLAY));
                 entity.setRealName(resultSet.getString(UserEntity.COL_REAL_NAME));
@@ -279,7 +255,8 @@ public class UserDao extends BaseDao<UserEntity, String> {
                 entity.setThirdPartyUserName(resultSet.getString(UserEntity.COL_THIRD_PARTY_USER_NAME));
                 String partyPwd = resultSet.getString(UserEntity.COL_THIRD_PARTY_PWD);
                 try {
-                    boolean encryptPwdEnabled = ConfigHelper.getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
+                    boolean encryptPwdEnabled = ConfigHelper
+                            .getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
                     String encryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, "szyh$123");
                     if (encryptPwdEnabled && StringUtils.isNotEmpty(partyPwd)) {
                         byte[] decrypt = CryptUtil.decrypt(CryptUtil.decodeBase64(partyPwd), encryptPwd);
@@ -291,7 +268,7 @@ public class UserDao extends BaseDao<UserEntity, String> {
                     logger.error("第三方密码解密失败：", e);
                 }
 
-                //处理日志字段
+                // 处理日志字段
                 retrieveAuditField(entity, resultSet);
 
                 return entity;

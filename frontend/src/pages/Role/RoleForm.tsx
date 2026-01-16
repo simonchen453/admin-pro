@@ -68,8 +68,8 @@ const RoleForm: React.FC<RoleFormProps> = ({ role, menuOptions, onSuccess, onCan
         });
 
         // 获取角色的菜单权限
-        if (roleData.name) {
-          fetchRoleMenus(roleData.name);
+        if (roleData.id) {
+          fetchRoleMenus(roleData.id);
         }
       } else {
         message.error(response.message || '获取角色详情失败');
@@ -81,9 +81,9 @@ const RoleForm: React.FC<RoleFormProps> = ({ role, menuOptions, onSuccess, onCan
   };
 
   // 获取角色的菜单权限
-  const fetchRoleMenus = async (roleName: string) => {
+  const fetchRoleMenus = async (roleId: string) => {
     try {
-      const response = await getRoleMenuTreeApi(roleName);
+      const response = await getRoleMenuTreeApi(roleId);
       if (response.restCode === '200') {
         setCheckedKeys(response.data.checkedKeys || []);
       } else {
@@ -121,7 +121,7 @@ const RoleForm: React.FC<RoleFormProps> = ({ role, menuOptions, onSuccess, onCan
         display: values.display || '',
         status: values.status || '',
         system: values.system || '',
-        menuNames: getAllCheckedKeys()
+        menuIds: getAllCheckedKeys()
       };
 
       let response: RoleCreateResponse;

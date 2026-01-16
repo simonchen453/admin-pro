@@ -45,21 +45,21 @@ public class RoleMenuAssignDao extends BaseDao<RoleMenuAssignEntity, String> {
         return execute(select);
     }
 
-    public List<RoleMenuAssignEntity> findByRoleName(String roleName) {
+    public List<RoleMenuAssignEntity> findByRoleId(String roleId) {
         SelectBuilder<RoleMenuAssignEntity> select = new SelectBuilder<RoleMenuAssignEntity>(RoleMenuAssignEntity.class);
-        select.addWhereAnd(RoleMenuAssignEntity.COL_ROLE_NAME + " = ?", roleName);
+        select.addWhereAnd(RoleMenuAssignEntity.COL_ROLE_ID + " = ?", roleId);
         return execute(select);
     }
 
-    public List<RoleMenuAssignEntity> findByMenuName(String menuName) {
+    public List<RoleMenuAssignEntity> findByMenuId(String menuId) {
         SelectBuilder<RoleMenuAssignEntity> select = new SelectBuilder<RoleMenuAssignEntity>(RoleMenuAssignEntity.class);
-        select.addWhereAnd(RoleMenuAssignEntity.COL_MENU_NAME + " = ?", menuName);
+        select.addWhereAnd(RoleMenuAssignEntity.COL_MENU_ID + " = ?", menuId);
         return execute(select);
     }
 
-    public void deleteByRoleName(String roleName) {
+    public void deleteByRoleId(String roleId) {
         DeleteBuilder delete = new DeleteBuilder(RoleMenuAssignEntity.TABLE_NAME);
-        delete.addWhereAnd(RoleMenuAssignEntity.COL_ROLE_NAME + " = ? ", roleName);
+        delete.addWhereAnd(RoleMenuAssignEntity.COL_ROLE_ID + " = ? ", roleId);
         execute(delete);
     }
 

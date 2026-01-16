@@ -43,7 +43,6 @@ public class SessionController extends BaseController {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String sessionId = searchForm.getSessionId();
         String status = searchForm.getStatus();
-        String userDomain = searchForm.getUserDomain();
         String loginName = searchForm.getLoginName();
         String ipAddr = searchForm.getIpAddr();
         String deptNo = searchForm.getDeptNo();
@@ -54,9 +53,6 @@ public class SessionController extends BaseController {
         }
         if (StringUtils.isNotEmpty(status)) {
             param.addFilter("status", status);
-        }
-        if (StringUtils.isNotEmpty(userDomain)) {
-            param.addFilter("userDomain", userDomain);
         }
         if (StringUtils.isNotEmpty(loginName)) {
             param.addFilter("loginName", loginName);
@@ -147,10 +143,6 @@ public class SessionController extends BaseController {
          */
         private String status;
         /**
-         * 用户域
-         */
-        private String userDomain;
-        /**
          * 用户登录名
          */
         private String loginName;
@@ -168,7 +160,6 @@ public class SessionController extends BaseController {
             return "SearchForm{" +
                     "sessionId='" + sessionId + '\'' +
                     ", status='" + status + '\'' +
-                    ", userDomain='" + userDomain + '\'' +
                     ", loginName='" + loginName + '\'' +
                     ", ipAddr='" + ipAddr + '\'' +
                     ", deptNo='" + deptNo + '\'' +

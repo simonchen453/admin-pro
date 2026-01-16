@@ -96,8 +96,7 @@ public class SysLogAspect {
         //用户名
         LoginUser loginUser = LoginHelper.getInstance().getLoginUser();
         if (loginUser != null) {
-            sysLog.setUserDomain(loginUser.getUserDomain());
-            sysLog.setUserId(loginUser.getUsername());
+            sysLog.setUserId(loginUser.getUser().getId());
         }
         sysLog.setTime(time);
 

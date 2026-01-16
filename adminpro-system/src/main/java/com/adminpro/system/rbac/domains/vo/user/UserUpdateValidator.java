@@ -41,26 +41,11 @@ public class UserUpdateValidator extends BaseValidator<UserCreateVo> {
                 msgBundle.addErrorMessage("realName", "用户姓名不能为空");
             }
         }
-        /*if (!msgBundle.hasErrorMessage("mobileNo")) {
-            if (StringUtils.isEmpty(model.getMobileNo())) {
-                msgBundle.addErrorMessage("mobileNo", "手机号码不能为空");
-            } else {
-                UserEntity userEntity = userService.findByDomainAndMobileNo(model.getUserDomain(), model.getMobileNo());
-                if (userEntity != null && !userEntity.getUserIden().equals(new UserIden(model.getUserDomain(), model.getUserId()))) {
-                    msgBundle.addErrorMessage("mobileNo", "手机号码不能重复");
-                }
-            }
-        }*/
         if (!msgBundle.hasErrorMessage("roleIds")) {
             if (CollectionUtils.isEmpty(model.getRoleIds())) {
                 msgBundle.addErrorMessage("roleIds", "角色不能为空");
             }
         }
-        /*if (!msgBundle.hasErrorMessage("postIds")) {
-            if (CollectionUtils.isEmpty(model.getPostIds())) {
-                msgBundle.addErrorMessage("postIds", "职位不能为空");
-            }
-        }*/
         if (!msgBundle.hasErrorMessage("status")) {
             if (StringUtils.isEmpty(model.getStatus())) {
                 msgBundle.addErrorMessage("status", "状态不能为空");
@@ -69,23 +54,25 @@ public class UserUpdateValidator extends BaseValidator<UserCreateVo> {
             }
         }
         if (!msgBundle.hasErrorMessage("loginName")) {
-            //create
+            // create
             if (StringUtils.isEmpty(model.getUserId())) {
                 if (StringUtils.isEmpty(model.getLoginName())) {
                     msgBundle.addErrorMessage("loginName", "登录账号不能为空");
                 } else {
-                    UserEntity userEntity = userService.findByUserDomainAndLoginName(model.getUserDomain(), model.getLoginName());
+                    UserEntity userEntity = userService.findByUserDomainAndLoginName(model.getUserDomain(),
+                            model.getLoginName());
                     if (userEntity != null) {
                         msgBundle.addErrorMessage("loginName", "登录账号已存在");
                     }
                 }
             } else {
-                //update
+                // update
                 if (StringUtils.isEmpty(model.getLoginName())) {
                     msgBundle.addErrorMessage("loginName", "登录账号不能为空");
                 } else {
-                    UserEntity userEntity = userService.findByUserDomainAndLoginName(model.getUserDomain(), model.getLoginName());
-                    if (userEntity != null && !userEntity.getUserIden().getUserId().equals(model.getUserId())) {
+                    UserEntity userEntity = userService.findByUserDomainAndLoginName(model.getUserDomain(),
+                            model.getLoginName());
+                    if (userEntity != null && !userEntity.getId().equals(model.getUserId())) {
                         msgBundle.addErrorMessage("loginName", "登录账号已存在");
                     }
                 }

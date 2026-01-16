@@ -31,7 +31,7 @@ public class RbacConstants {
     public static final String USER_DEFAULT_PASSWORD = "password$1";
 
     // ========== 默认值配置 ==========
-    
+
     /**
      * 获取默认民族代码
      * 
@@ -105,7 +105,7 @@ public class RbacConstants {
     }
 
     // ========== 应用配置 ==========
-    
+
     /**
      * 获取文件上传目录
      * 
@@ -125,7 +125,7 @@ public class RbacConstants {
     }
 
     // ========== 部门配置 ==========
-    
+
     /**
      * 获取部门超级父级 ID（根部门 ID）
      * 
@@ -136,7 +136,7 @@ public class RbacConstants {
     }
 
     // ========== 验证码配置 ==========
-    
+
     /**
      * 获取验证码过期时间（单位：分钟）
      * 
@@ -169,6 +169,16 @@ public class RbacConstants {
     public static final String MSG_PARAM_VALIDATION_FAILED = "参数验证失败";
     public static final String MSG_PARAM_BIND_FAILED = "参数绑定失败";
     public static final String MSG_CONSTRAINT_VALIDATION_FAILED = "约束验证失败";
+
+    // ========== 登录结果常量 ==========
+    public static final String LOGIN_RESULT_SUCCESS = "success";
+    public static final String LOGIN_RESULT_NO_MATCH = "no_match";
+    public static final String LOGIN_RESULT_USER_LOCKED = "user_locked";
+    public static final String LOGIN_RESULT_USER_INACTIVE = "user_inactive";
+
+    // ========== 审计日志常量 ==========
+    public static final String AUDIT_MODULE_USER = "User Management";
+    public static final String AUDIT_ACTION_LOGIN = "login";
 
     /**
      * 云服务商

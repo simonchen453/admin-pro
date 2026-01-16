@@ -30,17 +30,13 @@ public class UserMenuAssignEntity extends BaseAuditEntity {
      */
     public static final String COL_ID = "COL_ID";
     /**
-     * 用户域
-     */
-    public static final String COL_USER_DOMAIN = "COL_USER_DOMAIN";
-    /**
      * 用户ID
      */
     public static final String COL_USER_ID = "COL_USER_ID";
     /**
-     * 菜单名称
+     * 菜单ID
      */
-    public static final String COL_MENU_NAME = "COL_MENU_NAME";
+    public static final String COL_MENU_ID = "COL_MENU_ID";
     /**
      * 备注
      */
@@ -56,13 +52,6 @@ public class UserMenuAssignEntity extends BaseAuditEntity {
     @Column(name = COL_ID, type = Column.Type.STRING)
     private String id;
     /**
-     * 用户域
-     */
-    @NotBlank
-    @Size(max = 64)
-    @Column(name = COL_USER_DOMAIN, type = Column.Type.STRING)
-    private String userDomain;
-    /**
      * 用户ID
      */
     @NotBlank
@@ -70,12 +59,12 @@ public class UserMenuAssignEntity extends BaseAuditEntity {
     @Column(name = COL_USER_ID, type = Column.Type.STRING)
     private String userId;
     /**
-     * 菜单名称
+     * 菜单ID
      */
     @NotBlank
-    @Size(max = 128)
-    @Column(name = COL_MENU_NAME, type = Column.Type.STRING)
-    private String menuName;
+    @Size(max = 64)
+    @Column(name = COL_MENU_ID, type = Column.Type.STRING)
+    private String menuId;
     /**
      * 备注
      */

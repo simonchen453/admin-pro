@@ -129,7 +129,7 @@ public class CommonController extends BaseController {
                 activity.setType(determineActivityType(log.getDescription(), log.getMethod()));
                 activity.setTitle(determineActivityTitle(log.getDescription()));
                 activity.setDescription(buildActivityDescription(log));
-                activity.setTime(log.getCreatedDate());
+                activity.setTime(log.getCreatedAt());
                 activity.setUser(log.getLoginName());
                 activities.add(activity);
             }
@@ -196,9 +196,12 @@ public class CommonController extends BaseController {
      */
     @SysLog("修改密码")
     @PreAuthorize("@ss.hasPermission('common:changepwd')")
-    @RequestMapping(value = "/changepwd", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
-    public R<List<UserEntity>> changepwd(@RequestBody ChangePwdVo vo) {
-        UserIden userIden = LoginHelper.getInstance().getLoginUserIden();
+    public R<UserEntity> changepwd(@RequestBody ChangePwdVo vo) {
+        UserEntity userEntity = LoginHelper.getInstance().getUserEntity();
+        if (userEntity == null) {
+            return R.error("未登录");
+        }
+        UserIden userIden = new UserIden(userEntity.getUserDomain(), userEntity.getLoginName());
 
         String confirmNewPwd = vo.getConfirmNewPwd();
         String newPwd = vo.getNewPwd();
@@ -306,7 +309,8 @@ public class CommonController extends BaseController {
                     .getAttribute(RbacCacheConstants.SESSION_MENU_PARENT_CACHE);
 
             if (res == null || parentMenuIds == null) {
-                List<MenuEntity> menuEntityList = menuService.findMenuTreeByUserIden(userEntity.getUserIden());
+                List<MenuEntity> menuEntityList = menuService.findMenuTreeByUserId(userEntity.getId(),
+                        userEntity.getUserDomain());
                 res = menuService.buildMenus(menuEntityList);
                 parentMenuIds = menuService.getParentMenuIds(menuEntityList);
                 session.setAttribute(RbacCacheConstants.SESSION_MENU_CACHE, res);
@@ -373,20 +377,20 @@ public class CommonController extends BaseController {
      * 加载对应角色菜单列表树
      */
     @PreAuthorize("@ss.hasPermission('common:menu:roleMenuTreeSelect')")
-    @GetMapping(value = "/menu/roleMenuTreeSelect/{roleName}")
-    public R roleMenuTreeSelect(@PathVariable("roleName") String roleName) {
+    @GetMapping(value = "/menu/roleMenuTreeSelect/{roleId}")
+    public R roleMenuTreeSelect(@PathVariable("roleId") String roleId) {
         SearchParam param = startPaging();
         List<MenuEntity> list = menuService.findByParam(param);
 
         SearchParam param2 = startPaging();
-        param2.addFilter("roleName", roleName);
+        param2.addFilter("roleId", roleId);
         List<MenuEntity> list2 = menuService.findByParam(param2);
-        List<String> names = new ArrayList<>();
+        List<String> menuIds = new ArrayList<>();
         for (int i = 0; i < list2.size(); i++) {
-            names.add(list2.get(i).getName());
+            menuIds.add(list2.get(i).getId());
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("checkedKeys", names);
+        map.put("checkedKeys", menuIds);
         map.put("menus", menuService.buildMenuTreeSelect(list));
         return R.ok(map);
     }
@@ -431,8 +435,8 @@ public class CommonController extends BaseController {
     @RequestMapping(value = "/oss/delete/{id}", method = RequestMethod.DELETE)
     public R ossDeleteFile(@PathVariable String id) throws Exception {
         OSSEntity entity = ossService.findById(id);
-        UserIden loginUserIden = LoginHelper.getInstance().getLoginUserIden();
-        if (entity != null && entity.isOwner(loginUserIden)) {
+        UserEntity userEntity = LoginHelper.getInstance().getUserEntity();
+        if (entity != null && userEntity != null && entity.isOwner(userEntity.getId())) {
             ossService.delete(entity);
             return R.ok();
         }

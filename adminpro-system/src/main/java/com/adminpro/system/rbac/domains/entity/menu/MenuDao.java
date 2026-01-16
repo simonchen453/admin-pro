@@ -5,7 +5,6 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
 import com.adminpro.system.rbac.domains.entity.rolemenu.RoleMenuAssignEntity;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import com.adminpro.system.rbac.domains.entity.userrole.UserRoleAssignEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -25,14 +24,15 @@ import java.util.Map;
 @Repository
 public class MenuDao extends BaseDao<MenuEntity, String> {
 
-    public static final String MENU_LIST = "select distinct m.col_id, m.col_parent_id, m.col_name, m.col_display, m.col_url, m.col_visible, m.col_status, col_permission, m.col_is_frame, m.col_type, m.col_icon, " +
+    public static final String MENU_LIST = "select distinct m.col_id, m.col_parent_id, m.col_name, m.col_display, m.col_url, m.col_visible, m.col_status, col_permission, m.col_is_frame, m.col_type, m.col_icon, "
+            +
             "m.col_order_num,m.col_remark, " +
-            "m.col_created_by_user_domain, m.col_created_by_user_id, m.col_created_date, " +
-            "m.col_updated_by_user_domain, m.col_updated_by_user_id, m.col_updated_date " +
+            "m.col_created_by, m.col_created_at, " +
+            "m.col_updated_by, m.col_updated_at " +
             "from sys_menu_tbl m " +
-            "left join sys_role_menu_assign_tbl rm on rm.col_menu_name = m.col_name " +
-            "left join sys_user_role_assign_tbl ur on ur.col_role_name = rm.col_role_name " +
-            "left join sys_role_tbl r on r.col_name = ur.col_role_name ";
+            "left join sys_role_menu_assign_tbl rm on rm.col_menu_id = m.col_id " +
+            "left join sys_user_role_assign_tbl ur on ur.col_role_id = rm.col_role_id " +
+            "left join sys_role_tbl r on r.col_id = ur.col_role_id ";
 
     /**
      * 根据查询参数获取分页的记录
@@ -72,9 +72,9 @@ public class MenuDao extends BaseDao<MenuEntity, String> {
         String name = (String) filters.get("name");
         Boolean visible = (Boolean) filters.get("visible");
         String status = (String) filters.get("status");
-        UserIden userIden = (UserIden) filters.get("userIden");
-        String roleName = (String) filters.get("roleName");
-        String commonRole = (String) filters.get("commonRole");
+        String userId = (String) filters.get("userId");
+        String roleId = (String) filters.get("roleId");
+        String commonRoleId = (String) filters.get("commonRoleId");
         if (StringUtils.isNotEmpty(name)) {
             select.addWhereAnd("m." + MenuEntity.COL_DISPLAY + " like ?", "%" + name + "%");
         }
@@ -84,18 +84,19 @@ public class MenuDao extends BaseDao<MenuEntity, String> {
         if (visible != null) {
             select.addWhereAnd("m." + MenuEntity.COL_VISIBLE + " = ?", visible);
         }
-        if (userIden != null) {
-            select.addWhereAnd("ur." + UserRoleAssignEntity.COL_USER_DOMAIN + " = ?", userIden.getUserDomain());
-            select.addWhereAnd("ur." + UserRoleAssignEntity.COL_USER_ID + " = ?", userIden.getUserId());
+        if (StringUtils.isNotEmpty(userId)) {
+            select.addWhereAnd("ur." + UserRoleAssignEntity.COL_USER_ID + " = ?", userId);
         }
-        if (StringUtils.isNotEmpty(commonRole)) {
-            //查找common role下面的所有菜单，包含父菜单
-            select.addWhereAnd("rm." + RoleMenuAssignEntity.COL_ROLE_NAME + " = ?", commonRole);
+        if (StringUtils.isNotEmpty(commonRoleId)) {
+            // 查找common role下面的所有菜单，包含父菜单
+            select.addWhereAnd("rm." + RoleMenuAssignEntity.COL_ROLE_ID + " = ?", commonRoleId);
         }
-        if (StringUtils.isNotEmpty(roleName)) {
-            //查找单个role下面的子菜单，不包含父菜单
-            select.addWhereAnd("rm." + RoleMenuAssignEntity.COL_ROLE_NAME + " = ?", roleName);
-            select.addWhereAnd("m.col_id not in (select m.col_parent_id from sys_menu_tbl m inner join sys_role_menu_assign_tbl rm on m.col_name = rm.col_menu_name and rm.col_role_name = ?)", roleName);
+        if (StringUtils.isNotEmpty(roleId)) {
+            // 查找单个role下面的子菜单，不包含父菜单
+            select.addWhereAnd("rm." + RoleMenuAssignEntity.COL_ROLE_ID + " = ?", roleId);
+            select.addWhereAnd(
+                    "m.col_id not in (select m.col_parent_id from sys_menu_tbl m inner join sys_role_menu_assign_tbl rm on m.col_id = rm.col_menu_id and rm.col_role_id = ?)",
+                    roleId);
         }
         select.addOrderByAscending("m." + MenuEntity.COL_PARENT_ID);
         select.addOrderByAscending("m." + MenuEntity.COL_ORDER_NUM);
@@ -107,10 +108,9 @@ public class MenuDao extends BaseDao<MenuEntity, String> {
         return executeSingle(select);
     }
 
-    public List<String> findPermissionByRoleName(String roleName) {
+    public List<String> findPermissionByRoleId(String roleId) {
         String sql = "select m.col_permission from sys_menu_tbl m " +
-                "left join sys_role_menu_assign_tbl rma on rma.col_menu_name = m.col_name " +
-                "left join sys_role_tbl r on r.col_name = rma.col_role_name ";
+                "left join sys_role_menu_assign_tbl rma on rma.col_menu_id = m.col_id ";
         SelectBuilder<String> select = new SelectBuilder<String>(new RowMapper<String>() {
             @Override
             public String mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -118,7 +118,7 @@ public class MenuDao extends BaseDao<MenuEntity, String> {
             }
         });
         select.setQuery(sql);
-        select.addWhereAnd("r.col_name = ?", roleName);
+        select.addWhereAnd("rma.col_role_id = ?", roleId);
         return execute(select);
     }
 }

@@ -94,15 +94,17 @@ public class RoleService extends BaseService<RoleEntity, String> {
      */
     @Transactional
     public void create(RoleEntity entity) {
-        List<String> menuNames = entity.getMenuNames();
-        for (int i = 0; i < menuNames.size(); i++) {
-            String menuName = menuNames.get(i);
-            RoleMenuAssignEntity assignEntity = new RoleMenuAssignEntity();
-            assignEntity.setMenuName(menuName);
-            assignEntity.setRoleName(entity.getName());
-            RoleMenuAssignService.getInstance().create(assignEntity);
-        }
         dao.create(entity);
+        List<String> menuIds = entity.getMenuIds();
+        if (menuIds != null) {
+            for (int i = 0; i < menuIds.size(); i++) {
+                String menuId = menuIds.get(i);
+                RoleMenuAssignEntity assignEntity = new RoleMenuAssignEntity();
+                assignEntity.setMenuId(menuId);
+                assignEntity.setRoleId(entity.getId());
+                RoleMenuAssignService.getInstance().create(assignEntity);
+            }
+        }
     }
 
     /**
@@ -112,14 +114,16 @@ public class RoleService extends BaseService<RoleEntity, String> {
      */
     @Transactional
     public void update(RoleEntity entity) {
-        List<String> menuNames = entity.getMenuNames();
-        roleMenuAssignService.deleteByRoleName(entity.getName());
-        for (int i = 0; i < menuNames.size(); i++) {
-            String menuName = menuNames.get(i);
-            RoleMenuAssignEntity assignEntity = new RoleMenuAssignEntity();
-            assignEntity.setMenuName(menuName);
-            assignEntity.setRoleName(entity.getName());
-            roleMenuAssignService.create(assignEntity);
+        List<String> menuIds = entity.getMenuIds();
+        roleMenuAssignService.deleteByRoleId(entity.getId());
+        if (menuIds != null) {
+            for (int i = 0; i < menuIds.size(); i++) {
+                String menuId = menuIds.get(i);
+                RoleMenuAssignEntity assignEntity = new RoleMenuAssignEntity();
+                assignEntity.setMenuId(menuId);
+                assignEntity.setRoleId(entity.getId());
+                roleMenuAssignService.create(assignEntity);
+            }
         }
         dao.update(entity);
     }

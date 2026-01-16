@@ -23,14 +23,12 @@ import {
   LogoutOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { useNavigate } from 'react-router-dom';
 import {
   getSessionListApi,
   suspendSessionApi,
   unsuspendSessionApi,
   killSessionApi
 } from '../../api/session';
-import { getDomainListApi } from '../../api/user';
 import type {
   SessionEntity,
   SessionSearchForm
@@ -39,7 +37,6 @@ import type {
 const { Option } = Select;
 
 const SessionList: React.FC = () => {
-  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [sessionList, setSessionList] = useState<SessionEntity[]>([]);
@@ -47,22 +44,9 @@ const SessionList: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchForm, setSearchForm] = useState<SessionSearchForm>({});
-  const [domainList, setDomainList] = useState<Array<{ id: string; name: string; display: string }>>([]);
-
   useEffect(() => {
-    fetchDomainList();
     fetchSessionList();
   }, []);
-
-  const fetchDomainList = async () => {
-    try {
-      const domains = await getDomainListApi();
-      setDomainList(domains || []);
-    } catch (error) {
-      console.error('获取用户域列表失败:', error);
-      setDomainList([]);
-    }
-  };
 
   const fetchSessionList = async (searchParams?: SessionSearchForm, page?: number, size?: number) => {
     setLoading(true);
@@ -104,7 +88,6 @@ const SessionList: React.FC = () => {
     const emptyForm: SessionSearchForm = {
       sessionId: undefined,
       status: undefined,
-      userDomain: undefined,
       loginName: undefined,
       ipAddr: undefined,
       deptNo: undefined
@@ -215,16 +198,6 @@ const SessionList: React.FC = () => {
       key: 'sessionId',
       ellipsis: true,
       width: 200
-    },
-    {
-      title: '用户域',
-      dataIndex: 'userDomain',
-      key: 'userDomain',
-      width: 120,
-      render: (userDomain: string) => {
-        const domain = domainList.find(d => d.name === userDomain || d.id === userDomain);
-        return domain ? domain.display : userDomain;
-      }
     },
     {
       title: '登陆名',
@@ -338,17 +311,6 @@ const SessionList: React.FC = () => {
           style={{ marginBottom: 24 }}
         >
           <Row gutter={[16, 16]} style={{ width: '100%' }}>
-            <Col xs={24} sm={12} md={6} lg={4}>
-              <Form.Item name="userDomain" style={{ marginBottom: 0 }}>
-                <Select placeholder="用户域" allowClear style={{ width: '100%' }}>
-                  {domainList.map(domain => (
-                    <Option key={domain.name} value={domain.name}>
-                      {domain.display}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
             <Col xs={24} sm={12} md={6} lg={4}>
               <Form.Item name="loginName" style={{ marginBottom: 0 }}>
                 <Input placeholder="登陆名" allowClear />

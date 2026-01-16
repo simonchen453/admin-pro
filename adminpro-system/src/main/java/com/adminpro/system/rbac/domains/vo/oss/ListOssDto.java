@@ -9,7 +9,7 @@ public class ListOssDto {
     private String hash;
     private String type;
     private long size;
-    private Date createdDate;
+    private Date createdAt;
     private String createdBy;
     private String original;
     /**
@@ -57,12 +57,12 @@ public class ListOssDto {
         this.hash = hash;
     }
 
-    public Date getCreatedDate() {
-        return createdDate;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getCreatedBy() {

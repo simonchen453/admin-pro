@@ -4,7 +4,6 @@ import com.adminpro.framework.base.entity.BaseService;
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,12 +40,12 @@ public class UserPostAssignService extends BaseService<UserPostAssignEntity, Str
         return dao.findByParam(param);
     }
 
-    public List<UserPostAssignEntity> findByUserIden(UserIden userIden) {
-        return dao.findByUserIden(userIden);
+    public List<UserPostAssignEntity> findByUserId(String userId) {
+        return dao.findByUserId(userId);
     }
 
-    public void deleteByUserIden(UserIden userIden) {
-        dao.deleteByUserIden(userIden);
+    public void deleteByUserId(String userId) {
+        dao.deleteByUserId(userId);
     }
 
     @Transactional

@@ -64,38 +64,40 @@ public class WxMaUserController {
             logger.info("Union Id: " + session.getUnionid());
             UserEntity user = UserService.getInstance().findByExtUserId(session.getOpenid());
 
-
             if (user == null) {
                 user = new UserEntity();
                 user.setLoginName(session.getOpenid());
                 user.setExtUserId(session.getOpenid());
-                user.setUserIden(new UserIden(RbacConstants.INTERNET_DOMAIN, IdGenerator.getInstance().nextStringId()));
+                user.setUserDomain(RbacConstants.INTERNET_DOMAIN);
+                user.setId(IdGenerator.getInstance().nextStringId());
                 user.setStatus(UserStatus.ACTIVE.getCode());
                 user.setPassword(UUIDUtil.getUUID());
                 UserService.getInstance().create(user);
             }
 
-            UserTokenEntity token = TokenHelper.getInstance().generateToken(user.getUserIden());
+            UserTokenEntity token = TokenHelper.getInstance()
+                    .generateToken(new UserIden(user.getUserDomain(), user.getLoginName()));
 
             LoginResponse loginResponse = new LoginResponse();
-            loginResponse.setId(user.getUserIden().getUserId());
+            loginResponse.setId(user.getId());
             loginResponse.setUserId(user.getLoginName());
             loginResponse.setToken(token.getToken());
             loginResponse.setAuthed(user.isAuthenticated());
             loginResponse.setIdNo(user.getIdNo());
             loginResponse.setRealName(user.getRealName());
-            loginResponse.setDomain(user.getUserIden().getUserDomain());
+            loginResponse.setDomain(user.getUserDomain());
             loginResponse.setDisplay(user.getDisplay());
             loginResponse.setMobileNo(user.getMobileNo());
             loginResponse.setDate(DateUtil.formatDate(new Date()));
             loginResponse.setAvatarUrl(user.getAvatarUrl());
             loginResponse.setExtUserId(user.getExtUserId());
 
-            AppCache.getInstance().set(RbacCacheConstants.WX_SESSION_KEY_CACHE, token.getToken(), session, TokenHelper.getInstance().getExpireSeconds(ClientType.WECHAT_MINI_PROGRAM.getCode()));
+            AppCache.getInstance().set(RbacCacheConstants.WX_SESSION_KEY_CACHE, token.getToken(), session,
+                    TokenHelper.getInstance().getExpireSeconds(ClientType.WECHAT_MINI_PROGRAM.getCode()));
             return R.ok(loginResponse);
         } catch (WxErrorException e) {
             this.logger.error(e.getMessage(), e);
-            WxMaConfigHolder.remove();//清理ThreadLocal
+            WxMaConfigHolder.remove();// 清理ThreadLocal
             return R.error(e.toString());
         }
     }
@@ -106,15 +108,17 @@ public class WxMaUserController {
      * </pre>
      */
     @GetMapping("/info")
-    public R info(@RequestParam String signature, @RequestParam String rawData, @RequestParam String encryptedData, @RequestParam String iv) {
+    public R info(@RequestParam String signature, @RequestParam String rawData, @RequestParam String encryptedData,
+            @RequestParam String iv) {
         // 用户信息校验
         String authToken = LoginHelper.getInstance().getAuthToken();
         if (StringUtils.isEmpty(authToken)) {
-            WxMaConfigHolder.remove();//清理ThreadLocal
+            WxMaConfigHolder.remove();// 清理ThreadLocal
             return R.error("user check failed");
         }
 
-        WxMaJscode2SessionResult sessionResult = AppCache.getInstance().get(RbacCacheConstants.WX_SESSION_KEY_CACHE, authToken, WxMaJscode2SessionResult.class);
+        WxMaJscode2SessionResult sessionResult = AppCache.getInstance().get(RbacCacheConstants.WX_SESSION_KEY_CACHE,
+                authToken, WxMaJscode2SessionResult.class);
         String sessionKey = sessionResult.getSessionKey();
         String openid = sessionResult.getOpenid();
 
@@ -125,7 +129,7 @@ public class WxMaUserController {
         // 解密用户信息
         WxMaUserInfo userInfo = this.wxService.getUserService().getUserInfo(sessionKey, encryptedData, iv);
         logger.debug("获取用户信息：" + new Gson().toJson(userInfo));
-        WxMaConfigHolder.remove();//清理ThreadLocal
+        WxMaConfigHolder.remove();// 清理ThreadLocal
 
         String avatarUrl = userInfo.getAvatarUrl();
         String nickName = userInfo.getNickName();
@@ -151,13 +155,13 @@ public class WxMaUserController {
         }
 
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setId(user.getUserIden().getUserId());
+        loginResponse.setId(user.getId());
         loginResponse.setUserId(user.getLoginName());
         loginResponse.setToken(authToken);
         loginResponse.setAuthed(user.isAuthenticated());
         loginResponse.setIdNo(user.getIdNo());
         loginResponse.setRealName(user.getRealName());
-        loginResponse.setDomain(user.getUserIden().getUserDomain());
+        loginResponse.setDomain(user.getUserDomain());
         loginResponse.setDisplay(user.getDisplay());
         loginResponse.setMobileNo(user.getMobileNo());
         loginResponse.setDate(DateUtil.formatDate(new Date()));
@@ -176,7 +180,7 @@ public class WxMaUserController {
         // 用户信息校验
         String authToken = LoginHelper.getInstance().getAuthToken();
         if (StringUtils.isEmpty(authToken)) {
-            WxMaConfigHolder.remove();//清理ThreadLocal
+            WxMaConfigHolder.remove();// 清理ThreadLocal
             return R.error("user check failed");
         }
 
@@ -188,7 +192,8 @@ public class WxMaUserController {
             logger.error("", e);
         }
 
-        WxMaJscode2SessionResult sessionResult = AppCache.getInstance().get(RbacCacheConstants.WX_SESSION_KEY_CACHE, authToken, WxMaJscode2SessionResult.class);
+        WxMaJscode2SessionResult sessionResult = AppCache.getInstance().get(RbacCacheConstants.WX_SESSION_KEY_CACHE,
+                authToken, WxMaJscode2SessionResult.class);
         String openid = sessionResult.getOpenid();
 
         UserEntity user = UserService.getInstance().findByUserDomainAndLoginName(RbacConstants.INTERNET_DOMAIN, openid);
@@ -199,13 +204,13 @@ public class WxMaUserController {
         }
 
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setId(user.getUserIden().getUserId());
+        loginResponse.setId(user.getId());
         loginResponse.setUserId(user.getLoginName());
         loginResponse.setToken(authToken);
         loginResponse.setAuthed(user.isAuthenticated());
         loginResponse.setIdNo(user.getIdNo());
         loginResponse.setRealName(user.getRealName());
-        loginResponse.setDomain(user.getUserIden().getUserDomain());
+        loginResponse.setDomain(user.getUserDomain());
         loginResponse.setDisplay(user.getDisplay());
         loginResponse.setMobileNo(user.getMobileNo());
         loginResponse.setDate(DateUtil.formatDate(new Date()));

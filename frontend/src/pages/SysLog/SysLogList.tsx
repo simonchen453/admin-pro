@@ -172,13 +172,6 @@ const SysLogList: React.FC = () => {
       render: (value: number) => (currentPage - 1) * pageSize + value + 1
     },
     {
-      title: '用户域',
-      dataIndex: 'userDomain',
-      key: 'userDomain',
-      width: 100,
-      ellipsis: true
-    },
-    {
       title: '用户登录名',
       dataIndex: 'loginName',
       key: 'loginName',
@@ -356,4 +349,3 @@ const SysLogList: React.FC = () => {
 };
 
 export default SysLogList;
-

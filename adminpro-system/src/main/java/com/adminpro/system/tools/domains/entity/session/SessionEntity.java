@@ -42,17 +42,9 @@ public class SessionEntity extends BaseAuditEntity {
      */
     public static final String COL_STATUS = "COL_STATUS";
     /**
-     * 用户域
-     */
-    public static final String COL_USER_DOMAIN = "COL_USER_DOMAIN";
-    /**
      * 用户ID
      */
     public static final String COL_USER_ID = "COL_USER_ID";
-    /**
-     * 用户登录名
-     */
-    public static final String COL_LOGIN_NAME = "COL_LOGIN_NAME";
     /**
      * 登陆IP
      */
@@ -105,13 +97,6 @@ public class SessionEntity extends BaseAuditEntity {
     @Column(name = COL_STATUS, type = Column.Type.STRING)
     private String status;
     /**
-     * 用户域
-     */
-    @NotBlank
-    @Size(max = 64)
-    @Column(name = COL_USER_DOMAIN, type = Column.Type.STRING)
-    private String userDomain;
-    /**
      * 用户ID
      */
     @NotBlank
@@ -119,11 +104,8 @@ public class SessionEntity extends BaseAuditEntity {
     @Column(name = COL_USER_ID, type = Column.Type.STRING)
     private String userId;
     /**
-     * 登陆名
+     * 登陆名（来自关联用户表）
      */
-    @NotBlank
-    @Size(max = 255)
-    @Column(name = COL_LOGIN_NAME, type = Column.Type.STRING)
     private String loginName;
     /**
      * 登陆IP

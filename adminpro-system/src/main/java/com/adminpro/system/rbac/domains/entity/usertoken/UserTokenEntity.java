@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
-
 /**
  * 用户Token表 sys_user_token_tbl
  *
@@ -43,17 +42,10 @@ public class UserTokenEntity extends BaseEntity {
      */
     public static final String COL_TOKEN = "COL_TOKEN";
     /**
-     * 用户域
-     */
-    public static final String COL_USER_DOMAIN = "COL_USER_DOMAIN";
-    /**
      * 用户ID
      */
     public static final String COL_USER_ID = "COL_USER_ID";
-    /**
-     * 登录名
-     */
-    public static final String COL_LOGIN_NAME = "COL_LOGIN_NAME";
+
     /**
      * 登录设备
      */
@@ -88,25 +80,13 @@ public class UserTokenEntity extends BaseEntity {
     @Column(name = COL_TOKEN, type = Column.Type.STRING)
     private String token;
     /**
-     * 用户域
-     */
-    @NotBlank
-    @Size(max = 64)
-    @Column(name = COL_USER_DOMAIN, type = Column.Type.STRING)
-    private String userDomain;
-    /**
      * 用户ID
      */
     @NotBlank
     @Size(max = 64)
     @Column(name = COL_USER_ID, type = Column.Type.STRING)
     private String userId;
-    /**
-     * 登录名
-     */
-    @Size(max = 255)
-    @Column(name = COL_LOGIN_NAME, type = Column.Type.STRING)
-    private String loginName;
+
     /**
      * 登录设备
      */
@@ -129,7 +109,6 @@ public class UserTokenEntity extends BaseEntity {
      */
     @Column(name = COL_UPDATE_TIME, type = Column.Type.DATETIME)
     private Date updateTime;
-
 
     @JsonIgnore
     public boolean isValid() {

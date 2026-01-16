@@ -39,10 +39,6 @@ public class UserEntity extends BaseAuditEntity {
      */
     public static final String COL_USER_DOMAIN = "COL_USER_DOMAIN";
     /**
-     * 用户ID
-     */
-    public static final String COL_USER_ID = "COL_USER_ID";
-    /**
      * 用户登录名称
      */
     public static final String COL_LOGIN_NAME = "COL_LOGIN_NAME";
@@ -198,13 +194,6 @@ public class UserEntity extends BaseAuditEntity {
     @Size(max = 64)
     @Column(name = COL_USER_DOMAIN, type = Column.Type.STRING)
     private String userDomain;
-    /**
-     * 用户ID
-     */
-    @NotBlank
-    @Size(max = 64)
-    @Column(name = COL_USER_ID, type = Column.Type.STRING)
-    private String userId;
     /**
      * 用户登录名称
      */
@@ -431,26 +420,11 @@ public class UserEntity extends BaseAuditEntity {
     @Column(name = COL_ID, type = Column.Type.STRING)
     private String id;
 
-    public UserIden userIden;
-
-    public UserIden getUserIden() {
-        return userIden;
-    }
-
-    public void setUserIden(UserIden userIden) {
-        this.userIden = userIden;
-        if (userIden != null) {
-            this.userId = userIden.getUserId();
-            this.userDomain = userIden.getUserDomain();
-        }
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
                 .append("id", getId())
                 .append("userDomain", getUserDomain())
-                .append("userId", getUserId())
                 .append("loginName", getLoginName())
                 .append("display", getDisplay())
                 .append("realName", getRealName())
@@ -488,12 +462,10 @@ public class UserEntity extends BaseAuditEntity {
                 .append("province", getProvince())
                 .append("city", getCity())
                 .append("district", getDistrict())
-                .append("createdByUserDomain", getCreatedByUserDomain())
-                .append("createdByUserId", getCreatedByUserId())
-                .append("createdDate", getCreatedDate())
-                .append("updatedByUserDomain", getUpdatedByUserDomain())
-                .append("updatedByUserId", getUpdatedByUserId())
-                .append("updatedDate", getUpdatedDate())
+                .append("createdAt", getCreatedAt())
+                .append("createdBy", getCreatedBy())
+                .append("updatedAt", getUpdatedAt())
+                .append("updatedBy", getUpdatedBy())
                 .toString();
     }
 }

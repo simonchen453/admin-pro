@@ -21,9 +21,9 @@ import java.util.Map;
  */
 @Repository
 public class AuditLogDao extends BaseDao<AuditLogEntity, String> {
-    public static final String SQL = "select al.*, u.col_real_name from sys_audit_log_tbl al left join sys_user_tbl u " +
-            "on al.col_created_by_user_id = u.col_user_id and al.col_created_by_user_domain = u.col_user_domain";
-
+    public static final String SQL = "select al.*, u.col_real_name from sys_audit_log_tbl al left join sys_user_tbl u "
+            +
+            "on al.col_created_by = u.col_id";
 
     public QueryResultSet<AuditLogDTO> search(SearchParam param) {
 
@@ -45,7 +45,7 @@ public class AuditLogDao extends BaseDao<AuditLogEntity, String> {
                 if (!resultSet.wasNull()) {
                     dto.setExecutionTime(executionTime);
                 }
-                //处理日志字段
+                // 处理日志字段
                 retrieveAuditField(dto, resultSet);
                 return dto;
             }
@@ -78,12 +78,12 @@ public class AuditLogDao extends BaseDao<AuditLogEntity, String> {
             select.addWhereAnd("u." + UserEntity.COL_REAL_NAME + " like ?", "%" + user + "%");
         }
         if (startDate != null) {
-            select.addWhereAnd("al." + AuditLogEntity.COL_CREATED_DATE + " >= ?", startDate);
+            select.addWhereAnd("al." + AuditLogEntity.COL_CREATED_AT + " >= ?", startDate);
         }
         if (endDate != null) {
-            select.addWhereAnd("al." + AuditLogEntity.COL_CREATED_DATE + " <= ?", endDate);
+            select.addWhereAnd("al." + AuditLogEntity.COL_CREATED_AT + " <= ?", endDate);
         }
-        select.addOrderByDescending(AuditLogEntity.COL_CREATED_DATE);
+        select.addOrderByDescending(AuditLogEntity.COL_CREATED_AT);
         return search(select);
     }
 }

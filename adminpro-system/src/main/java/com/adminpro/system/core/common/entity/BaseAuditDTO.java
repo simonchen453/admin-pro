@@ -1,7 +1,5 @@
 package com.adminpro.system.core.common.entity;
 
-import com.adminpro.system.core.common.helper.StringHelper;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,25 +8,12 @@ import org.apache.commons.lang3.StringUtils;
  */
 public abstract class BaseAuditDTO extends com.adminpro.framework.base.entity.BaseAuditDTO {
 
-    public UserIden getCreatedUserIden() {
-        if (StringHelper.isNotEmpty(getCreatedByUserDomain()) && StringHelper.isNotEmpty(getCreatedByUserId())) {
-            return new UserIden(getCreatedByUserDomain(), getCreatedByUserId());
-        } else {
-            return null;
-        }
-    }
-
-    public UserIden getUpdatedUserIden() {
-        if (StringHelper.isNotEmpty(getUpdatedByUserDomain()) && StringHelper.isNotEmpty(getUpdatedByUserId())) {
-            return new UserIden(getUpdatedByUserDomain(), getUpdatedByUserId());
-        } else {
-            return null;
-        }
-    }
-
     @JsonIgnore
-    public boolean isOwner(UserIden userIden) {
-        if (StringUtils.equals(userIden.getUserDomain(), getCreatedByUserDomain()) && StringUtils.equals(userIden.getUserId(), getCreatedByUserId())) {
+    public boolean isOwner(String userId) {
+        if (StringUtils.isEmpty(userId)) {
+            return false;
+        }
+        if (StringUtils.equals(userId, getCreatedBy())) {
             return true;
         } else {
             return false;

@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-
 /**
  * 系统日志，切面处理类
  *
@@ -44,12 +43,12 @@ public class RestControllerLogAspect {
     public Object around(ProceedingJoinPoint point) throws Throwable {
 
         long beginTime = System.currentTimeMillis();
-        //执行方法
+        // 执行方法
         Object result = point.proceed();
-        //执行时长(毫秒)
+        // 执行时长(毫秒)
         long time = System.currentTimeMillis() - beginTime;
 
-        //输出日志
+        // 输出日志
         try {
             log(point, result, time);
         } catch (Exception e) {
@@ -64,12 +63,12 @@ public class RestControllerLogAspect {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         loggerDebug.debug("[" + id + "] " + "=======start=============================================");
-        //请求的方法名
+        // 请求的方法名
         String className = joinPoint.getTarget().getClass().getName();
         String methodName = signature.getName();
         loggerDebug.debug("[" + id + "] " + className + "." + methodName + "()");
 
-        //获取request
+        // 获取request
         HttpServletRequest request = WebHelper.getHttpRequest();
 
         String requestURI = request.getRequestURI();
@@ -83,7 +82,7 @@ public class RestControllerLogAspect {
                 if (args[i] instanceof BaseVO) {
                     try {
                         String params = JsonUtil.toJson(args[i]);
-                        //登录密码不能打印在日志里面
+                        // 登录密码不能打印在日志里面
                         Map map = JsonUtil.fromJson(params, Map.class);
                         for (int j = 0; j < stringArray.length; j++) {
                             map.remove(stringArray[j]);
@@ -99,14 +98,14 @@ public class RestControllerLogAspect {
             }
         }
 
-        //设置IP地址
+        // 设置IP地址
         loggerDebug.debug("[" + id + "] " + "ip: " + WebHelper.getIpAddr(request));
 
-        //用户名
+        // 用户名
         UserEntity userEntity = LoginHelper.getInstance().getUserEntity();
         if (userEntity != null) {
             loggerDebug.debug("[" + id + "] " + "user domain: " + userEntity.getUserDomain());
-            loggerDebug.debug("[" + id + "] " + "user id: " + userEntity.getUserId());
+            loggerDebug.debug("[" + id + "] " + "user id: " + userEntity.getId());
             if (StringUtils.isNotEmpty(userEntity.getDisplay())) {
                 loggerDebug.debug("[" + id + "] " + "user name: " + userEntity.getDisplay());
             }
@@ -127,6 +126,5 @@ public class RestControllerLogAspect {
         loggerPerformance.debug("[" + id + "] " + "uri: " + requestURI + ", time: " + time);
         loggerDebug.debug("[" + id + "] " + "=======end===============================================");
     }
-
 
 }

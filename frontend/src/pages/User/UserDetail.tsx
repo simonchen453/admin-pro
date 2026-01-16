@@ -42,10 +42,10 @@ const UserDetail: React.FC = () => {
   // 获取用户详情
   const fetchUserDetail = async () => {
     if (!userDomain || !userId) return;
-    
+
     setLoading(true);
     try {
-      const detail = await getUserDetailApi(userDomain, userId);
+      const detail = await getUserDetailApi(userId);
       setUserDetail(detail);
     } catch (error) {
       console.error('获取用户详情失败:', error);

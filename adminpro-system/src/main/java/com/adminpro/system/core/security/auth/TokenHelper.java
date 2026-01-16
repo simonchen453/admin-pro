@@ -1,6 +1,5 @@
 package com.adminpro.system.core.security.auth;
 
-
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.exceptions.LogoutException;
 import com.adminpro.system.core.common.constants.WebConstants;
@@ -40,6 +39,9 @@ public class TokenHelper implements Serializable {
     public final static int DEFAULT_EXPIRE_MOBILE = 30 * 24 * 60 * 60;
 
     @Autowired
+    private com.adminpro.system.rbac.domains.entity.user.UserService userService;
+
+    @Autowired
     private UserTokenService userTokenService;
 
     private static Logger logger = LoggerFactory.getLogger(TokenHelper.class);
@@ -47,12 +49,17 @@ public class TokenHelper implements Serializable {
     public UserIden getUserIdenByToken(String token) {
         UserTokenEntity byToken = userTokenService.findByToken(token);
         if (byToken == null || !byToken.isValid()) {
-            //throw new InvalidAuthTokenException(WebConstants.INVALID_AUTH_TOKEN_EXCEPTION);
+            // throw new
+            // InvalidAuthTokenException(WebConstants.INVALID_AUTH_TOKEN_EXCEPTION);
             logger.info(WebConstants.INVALID_AUTH_TOKEN_EXCEPTION);
             return null;
         }
 
-        return new UserIden(byToken.getUserDomain(), byToken.getUserId());
+        com.adminpro.system.rbac.domains.entity.user.UserEntity user = userService.findById(byToken.getUserId());
+        if (user == null) {
+            return null;
+        }
+        return new UserIden(user.getUserDomain(), user.getLoginName());
     }
 
     public UserTokenEntity getByToken(String token) {
@@ -94,8 +101,13 @@ public class TokenHelper implements Serializable {
             userTokenService.inactive(userIden);
         }
         UserTokenEntity userTokenEntity = new UserTokenEntity();
-        userTokenEntity.setUserDomain(userIden.getUserDomain());
-        userTokenEntity.setUserId(userIden.getUserId());
+
+        // Resolve User ID
+        com.adminpro.system.rbac.domains.entity.user.UserEntity user = userService.findByIden(userIden);
+        if (user != null) {
+            userTokenEntity.setUserId(user.getId());
+        }
+
         userTokenEntity.setToken(token);
         String deviceType = generateAudience(device);
         userTokenEntity.setDevice(deviceType);
@@ -118,7 +130,7 @@ public class TokenHelper implements Serializable {
     public UserTokenEntity generateToken(UserIden userIden, String token) {
         return generateToken(userIden, token, AUDIENCE_WEB);
     }
-    
+
     @Transactional
     public UserTokenEntity generateToken(UserIden userIden, String token, String deviceType) {
         Date now = new Date();
@@ -127,8 +139,13 @@ public class TokenHelper implements Serializable {
             userTokenService.inactive(userIden);
         }
         UserTokenEntity userTokenEntity = new UserTokenEntity();
-        userTokenEntity.setUserDomain(userIden.getUserDomain());
-        userTokenEntity.setUserId(userIden.getUserId());
+
+        // Resolve User ID
+        com.adminpro.system.rbac.domains.entity.user.UserEntity user = userService.findByIden(userIden);
+        if (user != null) {
+            userTokenEntity.setUserId(user.getId());
+        }
+
         userTokenEntity.setToken(token);
         userTokenEntity.setDevice(deviceType != null ? deviceType : AUDIENCE_WEB);
         userTokenEntity.setStatus(UserTokenEntity.STATUS_ACTIVITY);
@@ -142,11 +159,11 @@ public class TokenHelper implements Serializable {
 
     public Boolean validateToken(String token, LoginUser authUser) {
         UserTokenEntity byToken = userTokenService.findByToken(token);
-        String userDomain = byToken.getUserDomain();
         String userId = byToken.getUserId();
         Date expireTime = byToken.getExpireTime();
-        if (StringUtils.equals(userDomain, authUser.getUserDomain()) && StringUtils.equals(userId, authUser.getUsername())
-                && !expireTime.before(new Date()) && StringUtils.equals(byToken.getStatus(), UserTokenEntity.STATUS_ACTIVITY)) {
+        if (StringUtils.equals(userId, authUser.getUser().getId())
+                && !expireTime.before(new Date())
+                && StringUtils.equals(byToken.getStatus(), UserTokenEntity.STATUS_ACTIVITY)) {
             refreshToken(token);
             return true;
         } else {
@@ -164,7 +181,7 @@ public class TokenHelper implements Serializable {
         userTokenService.update(byToken);
         return byToken;
     }
-    
+
     /**
      * 根据设备类型获取Token过期时间（秒）
      * 移动端使用更长的过期时间，Web端使用较短的过期时间

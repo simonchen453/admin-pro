@@ -29,9 +29,8 @@ public class UserTokenDao extends BaseDao<UserTokenEntity, String> {
         return executeSingle(select);
     }
 
-    public List<UserTokenEntity> findByUserDomainAndUserIdAndStatus(String userDomain, String userId, String status) {
+    public List<UserTokenEntity> findByUserIdAndStatus(String userId, String status) {
         SelectBuilder<UserTokenEntity> select = new SelectBuilder<UserTokenEntity>(UserTokenEntity.class);
-        select.addWhereAnd(UserTokenEntity.COL_USER_DOMAIN + " = ? ", userDomain);
         select.addWhereAnd(UserTokenEntity.COL_USER_ID + " = ? ", userId);
         select.addWhereAnd(UserTokenEntity.COL_STATUS + " = ? ", status);
         return execute(select);

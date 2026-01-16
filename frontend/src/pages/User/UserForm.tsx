@@ -83,10 +83,15 @@ const UserForm: React.FC<UserFormProps> = ({
 
   // 获取用户详情（编辑时）
   useEffect(() => {
-    if (isEdit && user && user.userIden) {
+    if (isEdit && user && (user.userIden || user.userId)) {
       const fetchUserDetail = async () => {
         try {
-          const detail = await getUserDetailApi(user.userDomain, user.userId);
+          const userId = user.userIden?.userId || user.userId;
+          if (!userId) {
+            return;
+          }
+          const detailResponse = await getUserDetailApi(userId);
+          const detail = (detailResponse as any)?.data || detailResponse;
           form.setFieldsValue({
             ...detail,
             deptId: detail.deptId,
@@ -124,11 +129,17 @@ const UserForm: React.FC<UserFormProps> = ({
   const handleSubmit = async (values: UserFormData) => {
     setLoading(true);
     try {
-      if (isEdit && user?.userIden) {
+      if (isEdit) {
+        const userId = user?.userIden?.userId || user?.userId;
+        const userDomain = user?.userIden?.userDomain || user?.userDomain;
+        if (!userId || !userDomain) {
+          message.error('缺少用户标识，无法更新');
+          return;
+        }
         // 更新用户
         const updateData: UserUpdateRequest = {
-          userDomain: user.userIden.userDomain,
-          userId: user.userIden.userId,
+          userDomain,
+          userId,
           loginName: values.loginName,
           realName: values.realName,
           mobileNo: values.mobileNo,

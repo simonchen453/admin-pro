@@ -41,8 +41,8 @@ public class UserTagService extends BaseService<UserTagEntity, String> {
         return dao.findByParam(param);
     }
 
-    public List<String> findTagByUserIden(UserIden userIden) {
-        List<UserTagEntity> list = dao.findByUserIden(userIden);
+    public List<String> findTagByUserId(String userId) {
+        List<UserTagEntity> list = dao.findByUserId(userId);
         List<String> tags = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             tags.add(list.get(i).getTag());
@@ -50,14 +50,14 @@ public class UserTagService extends BaseService<UserTagEntity, String> {
         return tags;
     }
 
-    public List<UserTagEntity> findByUserIden(UserIden userIden) {
-        List<UserTagEntity> list = dao.findByUserIden(userIden);
+    public List<UserTagEntity> findByUserId(String userId) {
+        List<UserTagEntity> list = dao.findByUserId(userId);
         return list;
     }
 
     @Transactional
-    public void deleteByUserIden(UserIden userIden) {
-        dao.deleteByUserIden(userIden);
+    public void deleteByUserId(String userId) {
+        dao.deleteByUserId(userId);
     }
 
     @Transactional

@@ -5,7 +5,6 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
@@ -28,7 +27,8 @@ public class UserPostAssignDao extends BaseDao<UserPostAssignEntity, String> {
      * @return
      */
     public QueryResultSet<UserPostAssignEntity> search(SearchParam param) {
-        SelectBuilder<UserPostAssignEntity> select = new SelectBuilder<UserPostAssignEntity>(UserPostAssignEntity.class);
+        SelectBuilder<UserPostAssignEntity> select = new SelectBuilder<UserPostAssignEntity>(
+                UserPostAssignEntity.class);
         select.setSearchParam(param);
         prepareSelectBuilder(select, param);
         return search(select);
@@ -41,22 +41,24 @@ public class UserPostAssignDao extends BaseDao<UserPostAssignEntity, String> {
      * @return
      */
     public List<UserPostAssignEntity> findByParam(SearchParam param) {
-        SelectBuilder<UserPostAssignEntity> select = new SelectBuilder<UserPostAssignEntity>(UserPostAssignEntity.class);
+        SelectBuilder<UserPostAssignEntity> select = new SelectBuilder<UserPostAssignEntity>(
+                UserPostAssignEntity.class);
         prepareSelectBuilder(select, param);
         return execute(select);
     }
 
-    public List<UserPostAssignEntity> findByUserIden(UserIden userIden) {
-        SelectBuilder<UserPostAssignEntity> select = new SelectBuilder<UserPostAssignEntity>(UserPostAssignEntity.class);
-        select.addWhereAnd(UserPostAssignEntity.COL_USER_DOMAIN + " = ?", userIden.getUserDomain());
-        select.addWhereAnd(UserPostAssignEntity.COL_USER_ID + " = ?", userIden.getUserId());
+    public List<UserPostAssignEntity> findByUserId(String userId) {
+        SelectBuilder<UserPostAssignEntity> select = new SelectBuilder<UserPostAssignEntity>(
+                UserPostAssignEntity.class);
+        // select.addWhereAnd(UserPostAssignEntity.COL_USER_DOMAIN + " = ?",
+        // RbacConstants.INTERNET_DOMAIN); // Removed redundant filter
+        select.addWhereAnd(UserPostAssignEntity.COL_USER_ID + " = ?", userId);
         return execute(select);
     }
 
-    public void deleteByUserIden(UserIden userIden) {
+    public void deleteByUserId(String userId) {
         DeleteBuilder delete = new DeleteBuilder(UserPostAssignEntity.TABLE_NAME);
-        delete.addWhereAnd(UserPostAssignEntity.COL_USER_DOMAIN + " = ?", userIden.getUserDomain());
-        delete.addWhereAnd(UserPostAssignEntity.COL_USER_ID + " = ?", userIden.getUserId());
+        delete.addWhereAnd(UserPostAssignEntity.COL_USER_ID + " = ?", userId);
         execute(delete);
     }
 
@@ -67,11 +69,12 @@ public class UserPostAssignDao extends BaseDao<UserPostAssignEntity, String> {
      * @return
      */
     private void prepareSelectBuilder(SelectBuilder select, SearchParam param) {
-        //TODO 页面过滤条件
+        // TODO 页面过滤条件
         Map<String, Object> filters = param.getFilters();
         String condition = (String) filters.get("condition");
         if (StringUtils.isNotEmpty(condition)) {
-            //select.addWhereAnd(UserPostAssignEntity.COL_TITLE + " like ?", "%" + condition+"%");
+            // select.addWhereAnd(UserPostAssignEntity.COL_TITLE + " like ?", "%" +
+            // condition+"%");
         }
     }
 }

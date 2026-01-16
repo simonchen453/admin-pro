@@ -55,8 +55,8 @@ public class SessionService extends BaseService<SessionEntity, String> {
         }
     }
 
-    public List<SessionEntity> findByUser(String userDomain, String userId) {
-        return dao.findByUserDomainAndUserIdAndStatus(userDomain, userId, SessionStatus.ACTIVE.getCode());
+    public List<SessionEntity> findByUser(String userId) {
+        return dao.findByUserIdAndStatus(userId, SessionStatus.ACTIVE.getCode());
     }
 
     @Cacheable(value = RbacCacheConstants.SESSION_CACHE, key = "'session_' + #sessionId")

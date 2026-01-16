@@ -12,7 +12,6 @@ import com.adminpro.system.rbac.domains.entity.domain.UserDomainEnvEntity;
 import com.adminpro.system.rbac.domains.entity.domain.UserDomainEnvService;
 import com.adminpro.system.rbac.domains.entity.rolemenu.RoleMenuAssignEntity;
 import com.adminpro.system.rbac.domains.entity.rolemenu.RoleMenuAssignService;
-import com.adminpro.system.rbac.domains.entity.user.UserIden;
 import com.adminpro.system.rbac.domains.vo.menu.MenuTreeVo;
 import com.adminpro.system.rbac.domains.vo.tree.TreeSelect;
 import com.adminpro.system.rbac.enums.MenuDisplay;
@@ -67,7 +66,7 @@ public class MenuService extends BaseService<MenuEntity, String> {
         MenuEntity menuEntity = findById(id);
         if (menuEntity != null) {
             RoleMenuAssignService roleMenuAssignService = RoleMenuAssignService.getInstance();
-            List<RoleMenuAssignEntity> assignEntityList = roleMenuAssignService.findByMenuName(menuEntity.getName());
+            List<RoleMenuAssignEntity> assignEntityList = roleMenuAssignService.findByMenuId(menuEntity.getId());
             roleMenuAssignService.delete(assignEntityList);
         }
         super.delete(id);
@@ -97,7 +96,7 @@ public class MenuService extends BaseService<MenuEntity, String> {
      */
     public List<MenuEntity> buildMenuTree(List<MenuEntity> menus) {
         List<MenuEntity> returnList = new ArrayList<MenuEntity>();
-        for (Iterator<MenuEntity> iterator = menus.iterator(); iterator.hasNext(); ) {
+        for (Iterator<MenuEntity> iterator = menus.iterator(); iterator.hasNext();) {
             MenuEntity t = (MenuEntity) iterator.next();
             // 根据传入的某个父节点ID,遍历该父节点的所有子节点
             if (StringHelper.equals(t.getParentId(), "0")) {
@@ -120,7 +119,7 @@ public class MenuService extends BaseService<MenuEntity, String> {
      */
     public List<MenuEntity> getChildPerms(List<MenuEntity> list, String parentId) {
         List<MenuEntity> returnList = new ArrayList<MenuEntity>();
-        for (Iterator<MenuEntity> iterator = list.iterator(); iterator.hasNext(); ) {
+        for (Iterator<MenuEntity> iterator = list.iterator(); iterator.hasNext();) {
             MenuEntity t = (MenuEntity) iterator.next();
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点
             if (StringHelper.equals(t.getParentId(), parentId)) {
@@ -175,15 +174,15 @@ public class MenuService extends BaseService<MenuEntity, String> {
         return getChildList(list, t).size() > 0 ? true : false;
     }
 
-    public List<String> findPermissionByRoleName(String roleName) {
-        return dao.findPermissionByRoleName(roleName);
+    public List<String> findPermissionByRoleId(String roleId) {
+        return dao.findPermissionByRoleId(roleId);
     }
 
-    public List<MenuEntity> findMenuTreeByUserIden(UserIden userIden) {
-        UserDomainEnvEntity domainEnvEntity = userDomainEnvService.findByUserDomain(userIden.getUserDomain());
+    public List<MenuEntity> findMenuTreeByUserId(String userId, String userDomain) {
+        UserDomainEnvEntity domainEnvEntity = userDomainEnvService.findByUserDomain(userDomain);
         List<MenuEntity> menus = new ArrayList<>();
         SearchParam param = new SearchParam();
-        param.addFilter("userIden", userIden);
+        param.addFilter("userId", userId);
         param.addFilter("status", CommonStatus.ACTIVE.getCode());
         List<MenuEntity> menus1 = dao.findByParam(param);
         if (menus1 != null) {
@@ -191,10 +190,17 @@ public class MenuService extends BaseService<MenuEntity, String> {
         }
         if (domainEnvEntity != null) {
             param = new SearchParam();
-            param.addFilter("commonRole", domainEnvEntity.getCommonRole());
-            List<MenuEntity> menus2 = dao.findByParam(param);
-            if (menus2 != null) {
-                mergeMenuList(menus, menus2);
+            String commonRoleName = domainEnvEntity.getCommonRole();
+            if (StringHelper.isNotEmpty(commonRoleName)) {
+                com.adminpro.system.rbac.domains.entity.role.RoleEntity roleEntity = com.adminpro.system.rbac.domains.entity.role.RoleService
+                        .getInstance().findByName(commonRoleName);
+                if (roleEntity != null) {
+                    param.addFilter("commonRoleId", roleEntity.getId());
+                    List<MenuEntity> menus2 = dao.findByParam(param);
+                    if (menus2 != null) {
+                        mergeMenuList(menus, menus2);
+                    }
+                }
             }
         }
         Collections.sort(menus);
@@ -222,7 +228,8 @@ public class MenuService extends BaseService<MenuEntity, String> {
         for (MenuEntity menu : menus) {
             MenuTreeVo treeVo = new MenuTreeVo();
             if (MenuDisplay.isShow(menu.getVisible()) && !MenuType.isButton(menu.getType())) {
-                treeVo.setUrl(StringUtils.capitalize(menu.getUrl()) + "?" + RbacConstants.MENU_SESSION_KEY + "=" + menu.getId());
+                treeVo.setUrl(StringUtils.capitalize(menu.getUrl()) + "?" + RbacConstants.MENU_SESSION_KEY + "="
+                        + menu.getId());
                 String icon1 = menu.getIcon();
                 if (StringUtils.isNotEmpty(icon1) && icon1.startsWith("/")) {
                     icon1 = WebHelper.getContextPath() + icon1;
@@ -234,7 +241,7 @@ public class MenuService extends BaseService<MenuEntity, String> {
                 treeVo.setId(menu.getId());
                 List<MenuEntity> cMenus = menu.getChildren();
                 if (MenuType.isCategory(menu.getType())) {
-                    //没有子元素的目录就忽略
+                    // 没有子元素的目录就忽略
                     if (cMenus != null && !cMenus.isEmpty()) {
                         List<MenuTreeVo> menuTreeVos = buildMenus(cMenus);
                         if (menuTreeVos != null && !menuTreeVos.isEmpty()) {

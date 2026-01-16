@@ -135,7 +135,6 @@ public class NotificationEntity extends BaseAuditEntity {
         return endTime;
     }
 
-
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -145,12 +144,10 @@ public class NotificationEntity extends BaseAuditEntity {
                 .append("userDomain", getUserDomain())
                 .append("startTime", getStartTime())
                 .append("endTime", getEndTime())
-                .append("createdByUserDomain", getCreatedByUserDomain())
-                .append("createdByUserId", getCreatedByUserId())
-                .append("createdDate", getCreatedDate())
-                .append("updatedByUserDomain", getUpdatedByUserDomain())
-                .append("updatedByUserId", getUpdatedByUserId())
-                .append("updatedDate", getUpdatedDate())
+                .append("createdAt", getCreatedAt())
+                .append("createdBy", getCreatedBy())
+                .append("updatedAt", getUpdatedAt())
+                .append("updatedBy", getUpdatedBy())
                 .toString();
     }
 }

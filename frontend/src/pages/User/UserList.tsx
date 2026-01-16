@@ -207,7 +207,8 @@ const UserList: React.FC = () => {
 
   // 激活用户
   const handleActive = (user: UserEntity) => {
-    if (!user.userIden) return;
+    const userId = user.userId || user.userIden?.userId;
+    if (!userId) return;
     Modal.confirm({
       title: '确认启用',
       content: `确定要启用用户 ${user.realName} 吗？`,
@@ -215,8 +216,7 @@ const UserList: React.FC = () => {
       cancelText: '取消',
       onOk: async () => {
         try {
-          if (!user.userIden) return;
-          const result = await activeUserApi(user.userIden.userId);
+          const result = await activeUserApi(userId);
           if (result.success) {
             message.success('用户激活成功');
             fetchUserList(searchForm);
@@ -232,7 +232,8 @@ const UserList: React.FC = () => {
 
   // 停用用户
   const handleInactive = (user: UserEntity) => {
-    if (!user.userIden) return;
+    const userId = user.userId || user.userIden?.userId;
+    if (!userId) return;
     Modal.confirm({
       title: '确认停用',
       content: `确定要停用用户 ${user.realName} 吗？`,
@@ -240,8 +241,7 @@ const UserList: React.FC = () => {
       cancelText: '取消',
       onOk: async () => {
         try {
-          if (!user.userIden) return;
-          const result = await inactiveUserApi(user.userIden.userId);
+          const result = await inactiveUserApi(userId);
           if (result.success) {
             message.success('用户停用成功');
             fetchUserList(searchForm);
@@ -263,15 +263,19 @@ const UserList: React.FC = () => {
   };
 
   const handleResetPwdSubmit = async () => {
-    if (!resetTargetUser || !resetTargetUser.userIden) {
+    if (!resetTargetUser) return;
+    const userId = resetTargetUser.userId || resetTargetUser.userIden?.userId;
+    const userDomain = resetTargetUser.userDomain || resetTargetUser.userIden?.userDomain;
+
+    if (!userId || !userDomain) {
       return;
     }
     try {
       const values = await resetForm.validateFields();
       setResetLoading(true);
       await resetPasswordApi({
-        userDomain: resetTargetUser.userIden.userDomain,
-        userId: resetTargetUser.userIden.userId,
+        userDomain,
+        userId,
         newPassword: values.newPassword,
         confirmPassword: values.confirmPassword
       });
@@ -323,16 +327,10 @@ const UserList: React.FC = () => {
       return;
     }
 
-    let ids = '';
-    for (let i = 0; i < selectedUsers.length; i++) {
-      const user = selectedUsers[i];
-      if (user.userIden) {
-        ids += user.userIden.userDomain + '_' + user.userIden.userId + ',';
-      }
-    }
-    if (ids.indexOf(',') !== -1) {
-      ids = ids.slice(0, ids.length - 1);
-    }
+    const ids = selectedUsers
+      .map(user => user.userId)
+      .filter(Boolean)
+      .join(',');
 
     Modal.confirm({
       title: '确认删除',
@@ -358,14 +356,15 @@ const UserList: React.FC = () => {
 
   // 单个删除
   const handleDelete = (user: UserEntity) => {
-    if (!user.userIden) return;
+    const userId = user.userId;
+
+    if (!userId) return;
+
     Modal.confirm({
       title: '确认删除',
       content: `是否删除用户(${user.realName})？`,
       onOk: async () => {
         try {
-          if (!user.userIden) return;
-          const userId = user.userIden.userDomain + '_' + user.userIden.userId;
           const response = await deleteUserApi(userId);
           if (response.restCode === '200') {
             fetchUserList(searchForm);
@@ -418,16 +417,10 @@ const UserList: React.FC = () => {
       return;
     }
     try {
-      let ids = '';
-      for (let i = 0; i < selectedUsers.length; i++) {
-        const user = selectedUsers[i];
-        if (user.userIden) {
-          ids += user.userIden.userDomain + '_' + user.userIden.userId + ',';
-        }
-      }
-      if (ids.indexOf(',') !== -1) {
-        ids = ids.slice(0, ids.length - 1);
-      }
+      const ids = selectedUsers
+        .map(user => user.userId)
+        .filter(Boolean)
+        .join(',');
       await exportUserApi(ids);
       message.success('用户导出成功');
     } catch (error) {
@@ -677,6 +670,9 @@ const UserList: React.FC = () => {
             dataSource={userList}
             loading={loading}
             rowKey={(record) => {
+              if (record.userId && record.userDomain) {
+                return `${record.userDomain}-${record.userId}`;
+              }
               if (record?.userIden?.userDomain && record?.userIden?.userId) {
                 return `${record.userIden.userDomain}-${record.userIden.userId}`;
               }
@@ -717,7 +713,7 @@ const UserList: React.FC = () => {
         width={800}
       >
         <UserForm
-          key={editingUser ? `edit-${editingUser.userIden?.userDomain}-${editingUser.userIden?.userId}` : `new-${formKey}`}
+          key={editingUser ? `edit-${editingUser.userDomain || editingUser.userIden?.userDomain}-${editingUser.userId || editingUser.userIden?.userId}` : `new-${formKey}`}
           user={editingUser}
           deptTreeData={convertToTreeSelectData(deptTreeData)}
           roleList={roleList}

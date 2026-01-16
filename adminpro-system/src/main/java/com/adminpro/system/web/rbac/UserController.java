@@ -4,6 +4,7 @@ import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.util.BeanUtil;
+import org.springframework.beans.BeanUtils;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -91,8 +92,26 @@ public class UserController extends BaseController {
         logger.debug("查询用户列表: searchForm={}", searchForm);
         SearchParam param = buildSearchParam(searchForm);
         QueryResultSet<UserEntity> search = userService.search(param);
+
+        List<UserListResponseVo> list = new ArrayList<>();
+        if (search.getRecords() != null) {
+            for (UserEntity entity : search.getRecords()) {
+                UserListResponseVo vo = new UserListResponseVo();
+                BeanUtils.copyProperties(entity, vo);
+                vo.setUserId(entity.getId());
+                list.add(vo);
+            }
+        }
+
+        QueryResultSet<UserListResponseVo> result = new QueryResultSet<>();
+        result.setRecords(list);
+        result.setTotalCount(search.getTotalCount());
+        result.setCurrentPage(search.getCurrentPage());
+        result.setPageSize(search.getPageSize());
+        result.setTotalPage(search.getTotalPage());
+
         logger.debug("查询用户列表成功: count={}", search.getTotalCount());
-        return R.ok(search);
+        return R.ok(result);
     }
 
     @SysLog("停用用户")
@@ -154,7 +173,13 @@ public class UserController extends BaseController {
                 }
             }
             if (!messageBundle.hasErrorMessage()) {
-                userService.resetPwd(new UserIden(userDomain, userId), newPassword);
+                // userId 是主键ID，需要先获取用户再构造 UserIden
+                UserEntity userEntity = userService.findById(userId);
+                if (userEntity == null) {
+                    logger.warn("重置用户密码失败，用户不存在: userId={}", userId);
+                    return R.error(RbacConstants.MSG_USER_NOT_FOUND);
+                }
+                userService.resetPwd(new UserIden(userEntity.getUserDomain(), userEntity.getLoginName()), newPassword);
                 logger.info("重置用户密码成功: userDomain={}, userId={}", userDomain, userId);
                 return R.ok();
             } else {
@@ -291,8 +316,8 @@ public class UserController extends BaseController {
         MessageBundle messageBundle = getMessageBundle();
         userUpdateValidator.validate(userRequestVo, messageBundle);
         if (!messageBundle.hasErrorMessage()) {
-            UserEntity userEntity = userService
-                    .findByIden(new UserIden(userRequestVo.getUserDomain(), userRequestVo.getUserId()));
+            // userId 是主键ID，直接使用 findById
+            UserEntity userEntity = userService.findById(userRequestVo.getUserId());
             if (userEntity == null) {
                 logger.warn("更新用户失败，用户不存在: userDomain={}, userId={}", userRequestVo.getUserDomain(),
                         userRequestVo.getUserId());
@@ -352,14 +377,11 @@ public class UserController extends BaseController {
     public void exportUser(@RequestParam(required = false) String ids, HttpServletResponse response) throws Exception {
         List<UserEntity> list = new ArrayList<>();
         if (StringUtils.isNotEmpty(ids)) {
-            String[] userDomainIdArray = StringUtils.split(ids, ",");
-            for (String userDomainId : userDomainIdArray) {
-                String[] split = userDomainId.split("_");
-                if (split.length == 2) {
-                    UserEntity userEntity = userService.findByUserDomainAndUserId(split[0], split[1]);
-                    if (userEntity != null) {
-                        list.add(userEntity);
-                    }
+            String[] userIdArray = StringUtils.split(ids, ",");
+            for (String userId : userIdArray) {
+                UserEntity userEntity = userService.findById(userId);
+                if (userEntity != null) {
+                    list.add(userEntity);
                 }
             }
         }

@@ -194,14 +194,6 @@ public class UserService extends BaseService<UserEntity, String> {
         return dao.findByDomain(domain);
     }
 
-    public UserEntity findByUserDomainAndUserId(String userDomain, String userId) {
-        UserEntity user = dao.findById(userId);
-        if (user != null && StringUtils.equals(user.getUserDomain(), userDomain)) {
-            return user;
-        }
-        return null;
-    }
-
     public UserEntity findByUserDomainAndLoginName(String userDomain, String loginName) {
         return dao.findByUserDomainAndLoginName(userDomain, loginName);
     }
@@ -233,9 +225,7 @@ public class UserService extends BaseService<UserEntity, String> {
     /**
      * 批量删除用户（优化：使用批量删除SQL提升性能）
      *
-     * @param users 用户ID字符串，格式：userDomain_userId,userDomain_userId.
-     *              Note: In new single ID strategy, we should ideally use ids.
-     *              Compatibility: If we receive domain_id, we try to extract id.
+     * @param users 用户ID字符串，格式：userId,userId,userId
      */
     @Transactional
     public void deleteMany(String users) {
@@ -245,22 +235,10 @@ public class UserService extends BaseService<UserEntity, String> {
             return;
         }
 
-        String[] userDomainIdArray = StringUtils.split(users, ",");
-        List<String> ids = new ArrayList<>();
-
-        for (String userDomainId : userDomainIdArray) {
-            String[] split = userDomainId.split("_");
-            if (split.length == 2) {
-                // Assuming split[1] is the ID in the new system context
-                ids.add(split[1]);
-            } else {
-                logger.warn("删除用户失败，格式不正确: userDomainId={}", userDomainId);
-            }
-        }
-
-        if (!ids.isEmpty()) {
-            dao.deleteByIds(ids);
-            logger.info("批量删除用户成功: count={}", ids.size());
+        String[] userIdArray = StringUtils.split(users, ",");
+        if (userIdArray.length > 0) {
+            dao.deleteByIds(Arrays.asList(userIdArray));
+            logger.info("批量删除用户成功: count={}", userIdArray.length);
         } else {
             logger.warn("批量删除用户失败，没有有效的用户ID");
         }

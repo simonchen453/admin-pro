@@ -272,6 +272,30 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * 批量删除用户 (RESTful 风格，使用 List 参数)
+     * 推荐使用此接口，更符合 RESTful 规范
+     * 
+     * @param userIds 用户ID列表，格式: ["userDomain_userId", ...]
+     * @return 操作结果
+     */
+    @SysLog("删除用户")
+    @RequestMapping(value = "/batch-delete", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    public R batchDelete(@RequestBody List<String> userIds) {
+        logger.info("批量删除用户(RESTful): count={}", userIds != null ? userIds.size() : 0);
+        try {
+            if (userIds == null || userIds.isEmpty()) {
+                return R.error("用户ID列表不能为空");
+            }
+            userService.deleteMany(StringUtils.join(userIds, ","));
+            logger.info("批量删除用户成功: count={}", userIds.size());
+            return R.ok();
+        } catch (Exception e) {
+            logger.error("批量删除用户失败: userIds={}", userIds, e);
+            return R.error(e);
+        }
+    }
+
     @RequestMapping(value = "/prepare", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public R<Map<String, Object>> prepare() {
         Map<String, Object> map = new HashMap<>();

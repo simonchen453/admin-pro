@@ -148,26 +148,52 @@ export interface UserSearchForm {
   pageSize?: number;
 }
 
+/**
+ * 用户实体类型
+ * 
+ * 注意：优先使用顶层的 userId 和 userDomain 字段
+ * userIden 是历史遗留结构，保留用于向后兼容
+ */
 export interface UserEntity {
+  /** 用户域（主字段） */
   userDomain: string;
+  /** 用户ID（主字段，全局唯一） */
   userId: string;
+  /** 
+   * @deprecated 优先使用顶层的 userId 和 userDomain
+   * 保留用于向后兼容旧接口
+   */
   userIden?: {
     userDomain: string;
     userId: string;
   };
+  /** 登录名 */
   loginName: string;
+  /** 真实姓名 */
   realName: string;
+  /** 手机号 */
   mobileNo?: string;
+  /** 邮箱 */
   email?: string;
+  /** 头像URL */
   avatarUrl?: string;
+  /** 用户状态 */
   status: string;
+  /** 性别 */
   sex?: string;
+  /** 描述 */
   description?: string;
+  /** 部门编号 */
   deptNo?: string;
+  /** 部门名称 */
   deptName?: string;
+  /** 最后登录时间 */
   latestLoginTime?: string;
+  /** 密码（仅创建/更新时使用） */
   password?: string;
+  /** 角色名称 */
   roleName?: string;
+  /** 列表索引 */
   index?: number;
 }
 

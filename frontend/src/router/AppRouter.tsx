@@ -4,6 +4,7 @@ import { Spin } from 'antd';
 import Layout from '../pages/Layout';
 import ProtectedRoute from '../components/ProtectedRoute';
 import PublicRoute from '../components/PublicRoute';
+import { config } from '../config/env';
 
 // 懒加载页面组件
 const Login = lazy(() => import('../pages/Login/Login.tsx'));
@@ -44,7 +45,7 @@ const LoadingSpinner = () => (
 
 function AppRouter() {
     return (
-        <BrowserRouter basename="/adminpro">
+        <BrowserRouter basename={config.BASE_PATH}>
             <Routes>
                 <Route
                     path="/login"

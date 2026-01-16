@@ -140,6 +140,41 @@ app:
     quartz:
         # Quartz 启动延迟时间（秒），默认 5 秒（从原来的 30 秒优化）
         startup-delay: ${APP_QUARTZ_STARTUP_DELAY:5}
+    # 安全配置 - 支持配置公开接口（无需认证）
+    # 二次开发时可以在此添加自定义公开接口
+    security:
+        # 是否启用认证（全局开关）
+        # true: 默认所有接口需要认证，除了 public-urls 中配置的接口
+        # false: 默认所有接口都允许访问（兼容旧模式，不推荐用于生产）
+        auth-required: ${APP_SECURITY_AUTH_REQUIRED:true}
+        # 公开接口列表（无需认证即可访问）
+        # 支持 Ant 风格路径匹配：** 匹配多级路径，* 匹配单级路径
+        public-urls:
+            - /auth/login
+            - /auth/logout
+            - /auth/captcha/**
+            - /common/**
+            - /public/**
+            - /error
+            - /favicon.ico
+            - /v3/api-docs/**
+            - /swagger-ui/**
+            - /swagger-ui.html
+            - /doc.html
+        # 匿名接口（健康检查等）
+        anonymous-urls:
+            - /actuator/health
+            - /actuator/info
+        # 静态资源路径
+        static-urls:
+            - /js/**
+            - /plugins/**
+            - /css/**
+            - /images/**
+            - /img/**
+            - /icons/**
+            - /static/**
+            - /assets/**
 gen:
     # 作者
     author: ${GEN_AUTHOR:AdminPro}

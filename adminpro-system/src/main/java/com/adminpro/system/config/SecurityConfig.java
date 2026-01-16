@@ -66,14 +66,18 @@ public class SecurityConfig {
     @Autowired
     protected CustomAuthenticationProvider customAuthenticationProvider;
 
+    @Autowired
+    private SecurityProperties securityProperties;
+
     @Value("${app.cors.allowed-origins:http://localhost:3000,http://localhost:5173}")
     private String allowedOrigins;
-    
+
     @Value("${app.cors.allow-all-origins:false}")
     private boolean allowAllOrigins;
 
     /**
      * 配置安全过滤器链
+     * 支持通过 application.yml 配置公开接口
      *
      * @param httpSecurity HttpSecurity
      * @return SecurityFilterChain
@@ -89,20 +93,30 @@ public class SecurityConfig {
 
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                        .contentTypeOptions(contentType -> {})
+                        .contentTypeOptions(contentType -> {
+                        })
                         .httpStrictTransportSecurity(hsts -> hsts
                                 .maxAgeInSeconds(31536000)))
 
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                // .sessionManagement(session ->
+                // session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
-                .authorizeHttpRequests(auth -> auth
-                        // 静态资源允许所有访问
-                        .requestMatchers("/js/**", "/plugins/**", "/css/**", "/images/**", "/img/**", "/icons/**")
-                        .permitAll()
-                        // 默认所有接口都允许访问（不强制认证）
-                        // 通过 @PreAuthorize 注解来控制需要权限的接口
-                        .anyRequest().permitAll()
-                )
+                .authorizeHttpRequests(auth -> {
+                    // 配置公开接口（从 application.yml 读取）
+                    String[] publicUrls = securityProperties.getAllPublicUrls();
+                    if (publicUrls.length > 0) {
+                        auth.requestMatchers(publicUrls).permitAll();
+                    }
+
+                    // 根据配置决定是否要求认证
+                    if (securityProperties.isAuthRequired()) {
+                        // 默认所有接口需要认证
+                        auth.anyRequest().authenticated();
+                    } else {
+                        // 兼容模式：所有接口允许访问（通过 @PreAuthorize 注解控制）
+                        auth.anyRequest().permitAll();
+                    }
+                })
 
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -110,7 +124,7 @@ public class SecurityConfig {
                         .logoutSuccessHandler(logoutSuccessHandler))
                 .authenticationProvider(customAuthenticationProvider)
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
         return httpSecurity.build();
     }
 
@@ -151,18 +165,17 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        
+
         List<String> miniProgramOrigins = Arrays.asList(
-            "https://servicewechat.com",
-            "https://servicewechat.net",
-            "https://*.servicewechat.com",
-            "https://*.servicewechat.net",
-            "https://alipay.com",
-            "https://alipaydev.com",
-            "https://*.alipay.com",
-            "https://*.alipaydev.com"
-        );
-        
+                "https://servicewechat.com",
+                "https://servicewechat.net",
+                "https://*.servicewechat.com",
+                "https://*.servicewechat.net",
+                "https://alipay.com",
+                "https://alipaydev.com",
+                "https://*.alipay.com",
+                "https://*.alipaydev.com");
+
         if (allowAllOrigins) {
             config.setAllowedOriginPatterns(Collections.singletonList("*"));
         } else if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
@@ -177,11 +190,11 @@ public class SecurityConfig {
             defaultOrigins.addAll(miniProgramOrigins);
             config.setAllowedOrigins(defaultOrigins);
         }
-        
+
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setMaxAge(3600L);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

@@ -20,8 +20,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,18 +40,19 @@ import java.util.List;
 @RestController
 @RequestMapping(UserDomainEnvController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:user_domain_env')")
+/**
+ * 使用 Lombok @RequiredArgsConstructor 自动生成构造器进行依赖注入。
+ * 所有 final 字段将通过构造器自动注入，无需显式编写 @Autowired。
+ * 添加新依赖时，只需添加 private final 字段即可。
+ */
+@RequiredArgsConstructor
 public class UserDomainEnvController extends BaseController {
     protected static final String PREFIX_URL = "/api/v1/domain-envs";
     protected static final String SEARCH_FORM_KEY = "userDomainEnvSearchForm";
 
-    @Autowired
-    private UserDomainEnvService userDomainEnvService;
-
-    @Autowired
-    private UserDomainEnvCreateValidator userDomainEnvCreateValidator;
-
-    @Autowired
-    private UserDomainEnvUpdateValidator userDomainEnvUpdateValidator;
+    private final UserDomainEnvService userDomainEnvService;
+    private final UserDomainEnvCreateValidator userDomainEnvCreateValidator;
+    private final UserDomainEnvUpdateValidator userDomainEnvUpdateValidator;
 
     /**
      * 查询用户域环境配置列表

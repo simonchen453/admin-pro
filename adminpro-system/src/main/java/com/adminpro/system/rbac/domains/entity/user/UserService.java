@@ -64,9 +64,11 @@ import java.util.*;
 @Service
 public class UserService extends BaseService<UserEntity, String> {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    
+    // FIXME: Remove default value in production. This should be configured in application.yml
+    private static final String DEFAULT_THIRD_PARTY_ENCRYPT_PWD = "szyh$123";
 
-    @Autowired
-    private UserDao dao;
+    private final UserDao dao;
 
     @Autowired
     protected UserService(UserDao dao) {
@@ -129,7 +131,7 @@ public class UserService extends BaseService<UserEntity, String> {
         try {
             boolean thirdPartyEncryptPwdEnabled = ConfigHelper
                     .getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
-            String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, "szyh$123");
+            String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, DEFAULT_THIRD_PARTY_ENCRYPT_PWD);
             if (thirdPartyEncryptPwdEnabled && StringUtils.isNotEmpty(partyPwd)) {
                 byte[] encrypt = CryptUtil.encrypt(partyPwd.getBytes(), thirdPartyEncryptPwd);
                 entity.setThirdPartyPwd(CryptUtil.encodeBase64(encrypt));
@@ -288,7 +290,7 @@ public class UserService extends BaseService<UserEntity, String> {
         try {
             boolean thirdPartyEncryptPwdEnabled = ConfigHelper
                     .getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
-            String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, "szyh$123");
+            String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, DEFAULT_THIRD_PARTY_ENCRYPT_PWD);
             if (thirdPartyEncryptPwdEnabled && StringUtils.isNotEmpty(partyPwd)) {
                 byte[] encrypt = CryptUtil.encrypt(partyPwd.getBytes(), thirdPartyEncryptPwd);
                 entity.setThirdPartyPwd(CryptUtil.encodeBase64(encrypt));

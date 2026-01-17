@@ -16,8 +16,8 @@ import com.adminpro.system.rbac.domains.entity.role.RoleUpdateValidator;
 import com.adminpro.system.rbac.domains.vo.role.ListRoleVo;
 import com.adminpro.system.rbac.domains.vo.role.ListRoleVoConverter;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,18 +32,19 @@ import java.util.List;
 @RestController
 @RequestMapping(RoleController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:role')")
+/**
+ * 使用 Lombok @RequiredArgsConstructor 自动生成构造器进行依赖注入。
+ * 所有 final 字段将通过构造器自动注入，无需显式编写 @Autowired。
+ * 添加新依赖时，只需添加 private final 字段即可。
+ */
+@RequiredArgsConstructor
 public class RoleController extends BaseController {
     protected static final String PREFIX_URL = "/api/v1/roles";
     protected static final String SEARCH_FORM_KEY = "roleSearchForm";
 
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private RoleCreateValidator roleCreateValidator;
-
-    @Autowired
-    private RoleUpdateValidator roleUpdateValidator;
+    private final RoleService roleService;
+    private final RoleCreateValidator roleCreateValidator;
+    private final RoleUpdateValidator roleUpdateValidator;
 
     /**
      * 查询角色列表

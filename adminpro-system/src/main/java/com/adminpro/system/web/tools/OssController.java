@@ -20,8 +20,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,15 +48,18 @@ import java.util.List;
 @RestController
 @RequestMapping(value = OssController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:oss')")
+/**
+ * 使用 Lombok @RequiredArgsConstructor 自动生成构造器进行依赖注入。
+ * 所有 final 字段将通过构造器自动注入，无需显式编写 @Autowired。
+ * 添加新依赖时，只需添加 private final 字段即可。
+ */
+@RequiredArgsConstructor
 public class OssController extends BaseController {
 
     protected static final String PREFIX_URL = "/api/v1/tools/oss";
 
-    @Autowired
-    private FileHelper fileHelper;
-
-    @Autowired
-    private OSSService ossService;
+    private final FileHelper fileHelper;
+    private final OSSService ossService;
 
     /**
      * 分页查询文件列表

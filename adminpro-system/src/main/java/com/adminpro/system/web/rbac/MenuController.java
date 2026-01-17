@@ -23,8 +23,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,18 +43,19 @@ import java.util.List;
 @RestController
 @RequestMapping(MenuController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:menu')")
+/**
+ * 使用 Lombok @RequiredArgsConstructor 自动生成构造器进行依赖注入。
+ * 所有 final 字段将通过构造器自动注入，无需显式编写 @Autowired。
+ * 添加新依赖时，只需添加 private final 字段即可。
+ */
+@RequiredArgsConstructor
 public class MenuController extends BaseController {
     protected static final String PREFIX_URL = "/api/v1/menus";
     protected static final String SEARCH_FORM_KEY = "menuSearchForm";
 
-    @Autowired
-    private MenuService menuService;
-
-    @Autowired
-    private MenuCreateValidator menuCreateValidator;
-
-    @Autowired
-    private MenuUpdateValidator menuUpdateValidator;
+    private final MenuService menuService;
+    private final MenuCreateValidator menuCreateValidator;
+    private final MenuUpdateValidator menuUpdateValidator;
 
     /**
      * 查询菜单权限列表

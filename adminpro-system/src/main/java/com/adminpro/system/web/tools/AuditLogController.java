@@ -16,8 +16,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,13 +43,18 @@ import java.util.Date;
 @RestController
 @RequestMapping(AuditLogController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:audit')")
+/**
+ * 使用 Lombok @RequiredArgsConstructor 自动生成构造器进行依赖注入。
+ * 所有 final 字段将通过构造器自动注入，无需显式编写 @Autowired。
+ * 添加新依赖时，只需添加 private final 字段即可。
+ */
+@RequiredArgsConstructor
 public class AuditLogController extends BaseController {
 
     protected static final String PREFIX_URL = "/api/v1/tools/audit-logs";
     protected static final String SEARCH_FORM_KEY = "auditLogSearchForm";
 
-    @Autowired
-    private AuditLogService auditLogService;
+    private final AuditLogService auditLogService;
 
     /**
      * 查询审计日志列表

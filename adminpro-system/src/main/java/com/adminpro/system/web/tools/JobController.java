@@ -23,9 +23,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -53,25 +53,22 @@ import java.util.List;
 @RestController
 @RequestMapping(JobController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:job')")
+/**
+ * 使用 Lombok @RequiredArgsConstructor 自动生成构造器进行依赖注入。
+ * 所有 final 字段将通过构造器自动注入，无需显式编写 @Autowired。
+ * 添加新依赖时，只需添加 private final 字段即可。
+ */
+@RequiredArgsConstructor
 public class JobController extends BaseController {
 
     protected static final String PREFIX_URL = "/api/v1/tools/jobs";
     protected static final String SEARCH_FORM_KEY = "jobSearchForm";
 
-    @Autowired
-    private ScheduleJobService scheduleJobService;
-
-    @Autowired
-    private ScheduleJobLogService scheduleJobLogService;
-
-    @Autowired
-    private JobVoConverter jobVoConverter;
-
-    @Autowired
-    private JobCreateValidator jobCreateValidator;
-
-    @Autowired
-    private JobUpdateValidator jobUpdateValidator;
+    private final ScheduleJobService scheduleJobService;
+    private final ScheduleJobLogService scheduleJobLogService;
+    private final JobVoConverter jobVoConverter;
+    private final JobCreateValidator jobCreateValidator;
+    private final JobUpdateValidator jobUpdateValidator;
 
     /**
      * 分页查询定时任务列表

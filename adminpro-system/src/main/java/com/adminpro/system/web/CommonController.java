@@ -39,10 +39,10 @@ import com.adminpro.system.tools.domains.enums.SessionStatus;
 import com.adminpro.system.web.vo.RecentActivityVO;
 import com.adminpro.system.web.vo.ReleaseInfo;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -54,31 +54,22 @@ import java.util.*;
 
 @RestController
 @RequestMapping(value = "/api/v1/common")
+/**
+ * 使用 Lombok @RequiredArgsConstructor 自动生成构造器进行依赖注入。
+ * 所有 final 字段将通过构造器自动注入，无需显式编写 @Autowired。
+ * 添加新依赖时，只需添加 private final 字段即可。
+ */
+@RequiredArgsConstructor
 public class CommonController extends BaseController {
 
-    @Autowired
-    private DeptService deptService;
-
-    @Autowired
-    private MenuService menuService;
-
-    @Autowired
-    private FileHelper fileHelper;
-
-    @Autowired
-    private OSSService ossService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private SessionService sessionService;
-
-    @Autowired
-    private SysLogService sysLogService;
+    private final DeptService deptService;
+    private final MenuService menuService;
+    private final FileHelper fileHelper;
+    private final OSSService ossService;
+    private final UserService userService;
+    private final RoleService roleService;
+    private final SessionService sessionService;
+    private final SysLogService sysLogService;
 
     /**
      * 获取首页统计数据

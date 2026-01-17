@@ -161,17 +161,13 @@ const UserList: React.FC = () => {
         pageSize: params.pageSize ?? pageSize
       });
 
-      const responseData = response as any;
-      const list = responseData?.list || responseData?.records || responseData?.data?.list || responseData?.data?.records || [];
-      const total = responseData?.pagination?.total || responseData?.totalCount || responseData?.data?.pagination?.total || responseData?.data?.totalCount || 0;
+      // response 已经是 response.data (UserListResponse 即 QueryResultSet<UserEntity>)
+      // 由 user.ts 中的 getUserListApi 处理: return response.data
+      const list = response.records || [];
+      const total = response.totalCount || 0;
 
-      if (Array.isArray(list)) {
-        setUserList(list.map((item: any, index: number) => ({ ...item, index })));
-        setTotal(total);
-      } else {
-        setUserList([]);
-        setTotal(0);
-      }
+      setUserList(list.map((item, index) => ({ ...item, index })));
+      setTotal(total);
     } catch (error) {
       console.error('获取用户列表失败:', error);
       setUserList([]);

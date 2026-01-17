@@ -6,7 +6,7 @@ import com.adminpro.system.rbac.domains.entity.city.CityEntity;
 import com.adminpro.system.rbac.domains.entity.city.CityService;
 import com.adminpro.system.rbac.domains.vo.city.CityVo;
 import com.adminpro.system.rbac.domains.vo.city.CityVoConverter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +14,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/city")
+/**
+ * 使用 Lombok @RequiredArgsConstructor 自动生成构造器进行依赖注入。
+ * 所有 final 字段将通过构造器自动注入，无需显式编写 @Autowired。
+ * 添加新依赖时，只需添加 private final 字段即可。
+ */
+@RequiredArgsConstructor
 public class CityController extends BaseController {
 
-    @Autowired
-    private CityService cityService;
-
-    @Autowired
-    private CityVoConverter cityVoConverter;
+    private final CityService cityService;
+    private final CityVoConverter cityVoConverter;
 
     /**
      * 查询省一级区划
@@ -104,7 +107,7 @@ public class CityController extends BaseController {
      */
     @RequestMapping(value = "/ids", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<String[]> city(@RequestParam String address, @RequestParam String certNo) {
-        String[] rs = new String[4];//省、市、区、地址
+        String[] rs = new String[4];// 省、市、区、地址
         String[] strings = parseAddress(address);
         String province = strings[0];
         String city = strings[1];
@@ -177,7 +180,7 @@ public class CityController extends BaseController {
             }
         }
 
-        return new String[]{province, city, district, address};
+        return new String[] { province, city, district, address };
     }
 
     private String[] handleCertNo(String certNo, String detail) {

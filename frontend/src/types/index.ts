@@ -187,14 +187,16 @@ export interface UserEntity {
   index?: number;
 }
 
-export interface UserListResponse {
-  list: UserEntity[];
-  pagination: {
-    page: number;
-    pageSize: number;
-    total: number;
-  };
+// 通用分页查询结果
+export interface QueryResultSet<T> {
+  records: T[];
+  totalCount: number;
+  currentPage: number;
+  pageSize: number;
+  totalPage: number;
 }
+
+export type UserListResponse = QueryResultSet<UserEntity>;
 
 export interface UserCreateRequest {
   userDomain: string;

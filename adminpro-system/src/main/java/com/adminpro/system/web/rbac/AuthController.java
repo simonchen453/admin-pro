@@ -33,9 +33,9 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -62,13 +62,17 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping("/api/v1/auth")
+/**
+ * 使用 Lombok @RequiredArgsConstructor 自动生成构造器进行依赖注入。
+ * 所有 final 字段将通过构造器自动注入，无需显式编写 @Autowired。
+ * 添加新依赖时，只需添加 private final 字段即可。
+ * 注意：captchaProducerMath 使用 @Resource 注入，不能使用 final。
+ */
+@RequiredArgsConstructor
 public class AuthController extends BaseController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private DeptService deptService;
+    private final UserService userService;
+    private final DeptService deptService;
 
     @Resource(name = "captchaProducerMath")
     private Producer captchaProducerMath;

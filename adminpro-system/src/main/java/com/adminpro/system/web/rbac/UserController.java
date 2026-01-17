@@ -33,11 +33,11 @@ import com.adminpro.system.tools.domains.entity.oss.OSSEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,38 +63,27 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(UserController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:user')")
+/**
+ * 使用 Lombok @RequiredArgsConstructor 自动生成构造器进行依赖注入。
+ * 所有 final 字段将通过构造器自动注入，无需显式编写 @Autowired。
+ * 添加新依赖时，只需添加 private final 字段即可。
+ */
+@RequiredArgsConstructor
 public class UserController extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     protected static final String PREFIX_URL = "/api/v1/users";
     protected static final String SEARCH_FORM_KEY = "userSearchForm";
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private UserRoleAssignService userRoleAssignService;
-
-    @Autowired
-    private UserPostAssignService userPostAssignService;
-
-    @Autowired
-    private UserCreateValidator userCreateValidator;
-
-    @Autowired
-    private UserUpdateValidator userUpdateValidator;
-
-    @Autowired
-    private FileHelper fileHelper;
-
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
-    private DeptService deptService;
-
-    @Autowired
-    private PostService postService;
+    private final UserService userService;
+    private final UserRoleAssignService userRoleAssignService;
+    private final UserPostAssignService userPostAssignService;
+    private final UserCreateValidator userCreateValidator;
+    private final UserUpdateValidator userUpdateValidator;
+    private final FileHelper fileHelper;
+    private final RoleService roleService;
+    private final DeptService deptService;
+    private final PostService postService;
 
     /**
      * 查询用户列表

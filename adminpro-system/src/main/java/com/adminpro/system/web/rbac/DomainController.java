@@ -161,8 +161,10 @@ public class DomainController extends BaseController {
             @ApiResponse(responseCode = "404", description = "用户域不存在")
     })
     @SysLog("更新用户域")
-    @PatchMapping(value = "/edit")
-    public R editSave(@Parameter(description = "用户域实体信息", required = true) @RequestBody DomainEntity userDomain) {
+    @PutMapping(value = "/{id}")
+    public R editSave(@PathVariable String id,
+            @Parameter(description = "用户域实体信息", required = true) @RequestBody DomainEntity userDomain) {
+        userDomain.setId(id);
         BeanUtil.beanAttributeValueTrim(userDomain);
         MessageBundle messageBundle = getMessageBundle();
 
@@ -209,6 +211,34 @@ public class DomainController extends BaseController {
             return R.ok(entity);
         } else {
             return R.error("对象不存在");
+        }
+    }
+
+    /**
+     * 删除用户域
+     * <p>
+     * 根据用户域ID删除用户域
+     * </p>
+     *
+     * @param id 用户域ID
+     * @return 操作结果
+     */
+    @Operation(summary = "删除用户域", description = "根据用户域ID删除用户域")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "删除成功"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "用户域不存在")
+    })
+    @SysLog("删除用户域")
+    @DeleteMapping(value = "/{id}")
+    public R delete(@Parameter(description = "用户域ID", required = true) @PathVariable String id) {
+        DomainEntity entity = domainService.findById(id);
+        if (entity != null) {
+            domainService.delete(entity);
+            return R.ok();
+        } else {
+            return R.error("用户域不存在");
         }
     }
 

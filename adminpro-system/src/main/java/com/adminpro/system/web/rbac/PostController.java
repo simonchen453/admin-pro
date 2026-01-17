@@ -215,6 +215,33 @@ public class PostController extends BaseController {
      * @param ids 职位ID列表，多个ID用逗号分隔
      * @return 操作结果
      */
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "删除成功"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "职位不存在")
+    })
+    @SysLog("删除职位")
+    @DeleteMapping(value = "/{id}")
+    public R delete(@Parameter(description = "职位ID", required = true) @PathVariable String id) {
+        PostEntity entity = postService.findById(id);
+        if (entity != null) {
+            postService.delete(id);
+            return R.ok();
+        } else {
+            return R.error("职位不存在");
+        }
+    }
+
+    /**
+     * 批量删除职位
+     * <p>
+     * 根据多个职位ID批量删除职位，ID之间用逗号分隔
+     * </p>
+     *
+     * @param ids 职位ID列表，多个ID用逗号分隔
+     * @return 操作结果
+     */
     @Operation(summary = "批量删除职位", description = "根据多个职位ID批量删除职位，ID之间用逗号分隔")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
@@ -222,7 +249,7 @@ public class PostController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @SysLog("删除职位")
+    @SysLog("批量删除职位")
     @DeleteMapping
     public R remove(
             @Parameter(description = "职位ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {

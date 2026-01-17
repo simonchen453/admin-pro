@@ -25,6 +25,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import {
   deletePostApi,
+  batchDeletePostApi,
   getPostListApi
 } from '../../api/post';
 import {
@@ -133,7 +134,7 @@ const PostList: React.FC = () => {
           }
 
           const ids = validIds.join(',');
-          const response = await deletePostApi(ids);
+          const response = await batchDeletePostApi(ids);
           if (response.restCode === '200') {
             message.success('批量删除成功');
             setSelectedPosts([]);

@@ -151,9 +151,10 @@ public class UserDomainEnvController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "用户域环境配置不存在")
     })
-    @PatchMapping(value = "/edit")
-    public R editSave(
+    @PutMapping(value = "/{id}")
+    public R editSave(@PathVariable String id,
             @Parameter(description = "用户域环境配置实体信息", required = true) @RequestBody UserDomainEnvEntity userDomainEnv) {
+        userDomainEnv.setId(id);
         BeanUtil.beanAttributeValueTrim(userDomainEnv);
         MessageBundle messageBundle = getMessageBundle();
 

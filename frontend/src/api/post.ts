@@ -29,7 +29,12 @@ export const updatePostApi = (params: PostEntity): Promise<PostCreateResponse> =
 };
 
 // 删除岗位
-export const deletePostApi = (ids: string): Promise<ApiResponse> => {
+export const deletePostApi = (id: string): Promise<ApiResponse> => {
+  return request.delete(`/api/v1/posts/${id}`);
+};
+
+// 批量删除岗位
+export const batchDeletePostApi = (ids: string): Promise<ApiResponse> => {
   return request.delete(`/api/v1/posts?ids=${ids}`);
 };
 

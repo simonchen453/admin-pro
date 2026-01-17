@@ -8,7 +8,7 @@ import type {
 } from '../types';
 
 export const getDomainEnvListApi = (params: DomainEnvSearchForm): Promise<DomainEnvListResponse> => {
-  return request.post('/api/v1/domain-envs', params);
+  return request.post('/api/v1/domain-envs/list', params);
 };
 
 export const getDomainEnvDetailApi = (id: string): Promise<DomainEnvDetailResponse> => {

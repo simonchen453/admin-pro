@@ -84,6 +84,27 @@ public class DomainController extends BaseController {
     }
 
     /**
+     * 获取所有用户域列表（简化版）
+     * <p>
+     * 获取所有用户域的简化列表，用于下拉选择等场景
+     * </p>
+     *
+     * @return 用户域列表
+     */
+    @Operation(summary = "获取所有用户域", description = "获取所有用户域的简化列表")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功"),
+            @ApiResponse(responseCode = "401", description = "未授权")
+    })
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    public R<java.util.List<DomainEntity>> getAllDomains() {
+        SearchParam param = new SearchParam();
+        java.util.List<DomainEntity> domains = domainService.findAll();
+        return R.ok(domains);
+    }
+
+    /**
      * 创建用户域
      * <p>
      * 新增一个用户域，包含域名称、显示名称、是否系统域等信息

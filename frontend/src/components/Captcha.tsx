@@ -25,7 +25,7 @@ const Captcha = forwardRef<CaptchaRef, CaptchaProps>(({ onCaptchaChange, classNa
     const newKey = generateCaptchaKey();
     setCaptchaKey(newKey);
     // 使用配置的API基础路径
-    setImageUrl(`${config.API_BASE_URL}/auth/captcha.jpg?key=${newKey}`);
+    setImageUrl(`/api/v1/auth/captcha.jpg?key=${newKey}`);
     onCaptchaChange?.(newKey);
   };
 

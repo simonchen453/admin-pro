@@ -23,7 +23,7 @@ export const getMenuList = async (): Promise<BackendMenuItem[]> => {
 
 // 获取菜单管理列表（树形结构）
 export const getMenuTreeListApi = (params?: MenuSearchForm): Promise<MenuListResponse> => {
-  return request.post('/api/v1/menus', params || {});
+  return request.post('/api/v1/menus/search', params || {});
 };
 
 // 获取菜单详情
@@ -33,7 +33,7 @@ export const getMenuDetailApi = (id: string): Promise<MenuDetailResponse> => {
 
 // 创建菜单
 export const createMenuApi = (params: MenuEntity): Promise<MenuCreateResponse> => {
-  return request.post('/api/v1/menus/create', params);
+  return request.post('/api/v1/menus', params);
 };
 
 // 更新菜单

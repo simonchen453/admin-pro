@@ -105,7 +105,7 @@ public class UserController extends BaseController {
      * @param searchForm 查询条件表单
      * @return 分页查询结果
      */
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<UserListResponseVo>> search(@RequestBody SearchForm searchForm) {
         logger.debug("查询用户列表: searchForm={}", searchForm);
         SearchParam param = buildSearchParam(searchForm);

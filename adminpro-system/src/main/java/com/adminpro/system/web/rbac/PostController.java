@@ -68,7 +68,7 @@ public class PostController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @PostMapping
+    @PostMapping(value = "/search")
     public R<QueryResultSet<PostEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -134,7 +134,7 @@ public class PostController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("创建职位")
-    @PostMapping(value = "/create")
+    @PostMapping
     public R create(@Parameter(description = "职位实体信息", required = true) @RequestBody PostEntity post) {
         BeanUtil.beanAttributeValueTrim(post);
         MessageBundle messageBundle = getMessageBundle();

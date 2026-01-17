@@ -351,6 +351,27 @@ public class AuthController extends BaseController {
     }
 
     /**
+     * 用户登出
+     * <p>
+     * 处理用户登出请求，清除session和token
+     * </p>
+     *
+     * @return 登出结果
+     */
+    @SysLog("用户登出")
+    @RequestMapping(value = "/logout", method = { RequestMethod.POST,
+            RequestMethod.GET }, produces = MediaType.APPLICATION_JSON_VALUE)
+    public R<String> logout() {
+        try {
+            LoginHelper.getInstance().logout();
+            return R.ok("登出成功");
+        } catch (Exception e) {
+            logger.error("登出异常：", e);
+            return R.error("登出失败: " + e.getMessage());
+        }
+    }
+
+    /**
      * 根据请求创建设备信息
      * <p>
      * 从User-Agent中解析设备类型（PC、手机、平板）

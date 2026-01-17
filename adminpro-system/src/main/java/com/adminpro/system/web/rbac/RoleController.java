@@ -48,7 +48,7 @@ public class RoleController extends BaseController {
     /**
      * 查询角色列表
      */
-    @PostMapping
+    @PostMapping(value = "/search")
     public R<QueryResultSet<ListRoleVo>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -78,7 +78,7 @@ public class RoleController extends BaseController {
      * 新增保存角色
      */
     @SysLog("创建角色")
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @PostMapping
     public R create(@RequestBody RoleEntity role) {
         BeanUtil.beanAttributeValueTrim(role);
         MessageBundle messageBundle = getMessageBundle();

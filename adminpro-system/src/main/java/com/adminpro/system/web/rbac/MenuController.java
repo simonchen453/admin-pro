@@ -12,7 +12,10 @@ import com.adminpro.system.rbac.domains.entity.menu.MenuCreateValidator;
 import com.adminpro.system.rbac.domains.entity.menu.MenuEntity;
 import com.adminpro.system.rbac.domains.entity.menu.MenuService;
 import com.adminpro.system.rbac.domains.entity.menu.MenuUpdateValidator;
+import com.adminpro.system.rbac.domains.vo.menu.MenuTreeVo;
 import com.adminpro.system.rbac.enums.MenuType;
+import com.adminpro.system.core.security.auth.LoginUser;
+import com.adminpro.system.rbac.api.LoginHelper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -68,7 +71,7 @@ public class MenuController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @PostMapping
+    @PostMapping(value = "/search")
     public R<List<MenuEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -88,6 +91,38 @@ public class MenuController extends BaseController {
         }
         List<MenuEntity> list = menuService.findByParam(param);
         return R.ok(list);
+    }
+
+    /**
+     * 获取当前用户的菜单列表
+     * <p>
+     * 根据当前登录用户获取其可访问的菜单树形结构
+     * </p>
+     *
+     * @return 当前用户的菜单树列表
+     */
+    @Operation(summary = "获取当前用户菜单", description = "根据当前登录用户获取其可访问的菜单树形结构")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功"),
+            @ApiResponse(responseCode = "401", description = "未授权")
+    })
+    @GetMapping(value = "/current-user")
+    @PreAuthorize("isAuthenticated()")
+    public R<List<MenuTreeVo>> getCurrentUserMenus() {
+        try {
+            LoginUser loginUser = LoginHelper.getInstance().getLoginUser();
+            if (loginUser == null) {
+                return R.error("401", "用户未登录");
+            }
+            String userId = loginUser.getUserId();
+            String userDomain = loginUser.getUserDomain();
+            List<MenuEntity> menuTree = menuService.findMenuTreeByUserId(userId, userDomain);
+            List<MenuTreeVo> menus = menuService.buildMenus(menuTree);
+            return R.ok(menus);
+        } catch (Exception e) {
+            logger.error("获取当前用户菜单失败：", e);
+            return R.error("获取菜单失败: " + e.getMessage());
+        }
     }
 
     /**
@@ -160,7 +195,7 @@ public class MenuController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("创建菜单")
-    @PostMapping(value = "/create")
+    @PostMapping
     public R create(@Parameter(description = "菜单实体信息", required = true) @RequestBody MenuEntity menu) {
         BeanUtil.beanAttributeValueTrim(menu);
 

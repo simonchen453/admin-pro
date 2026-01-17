@@ -1,7 +1,7 @@
 // 环境变量配置
 export const config = {
   // API配置 (优先使用 window._env_ 中的运行时配置，其次使用构建时注入的环境变量)
-  API_BASE_URL: window._env_?.API_BASE_URL || import.meta.env.VITE_API_BASE || '/api',
+  API_BASE_URL: window._env_?.API_BASE_URL || import.meta.env.VITE_API_BASE || '',
 
   // 应用配置
   APP_TITLE: window._env_?.APP_TITLE || import.meta.env.VITE_APP_TITLE || 'Admin Pro 管理系统',

@@ -10,7 +10,7 @@ import type {
 
 // 查询岗位列表
 export const getPostListApi = (params: PostSearchForm): Promise<PostListResponse> => {
-  return request.post('/api/v1/posts', params);
+  return request.post('/api/v1/posts/search', params);
 };
 
 // 获取岗位详情
@@ -20,7 +20,7 @@ export const getPostDetailApi = (id: string): Promise<PostDetailResponse> => {
 
 // 创建岗位
 export const createPostApi = (params: PostEntity): Promise<PostCreateResponse> => {
-  return request.post('/api/v1/posts/create', params);
+  return request.post('/api/v1/posts', params);
 };
 
 // 更新岗位

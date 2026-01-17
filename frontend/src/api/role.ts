@@ -80,7 +80,7 @@ export interface RoleMenuTreeResponse {
 
 // 查询角色列表
 export const getRoleListApi = (params: RoleSearchForm): Promise<RoleListResponse> => {
-  return request.post('/api/v1/roles', params);
+  return request.post('/api/v1/roles/search', params);
 };
 
 // 获取角色详情
@@ -90,7 +90,7 @@ export const getRoleDetailApi = (id: string): Promise<RoleDetailResponse> => {
 
 // 创建角色
 export const createRoleApi = (params: RoleEntity): Promise<RoleCreateResponse> => {
-  return request.post('/api/v1/roles/create', params);
+  return request.post('/api/v1/roles', params);
 };
 
 // 更新角色

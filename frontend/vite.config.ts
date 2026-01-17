@@ -43,7 +43,7 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: 'http://127.0.0.1:8080',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '/adminpro'),
+          rewrite: (path) => path.replace(/^\/api/, '/adminpro/api'),
           configure: (proxy, _options) => {
             proxy.on('error', (err, _req, _res) => {
               console.log('proxy error', err);

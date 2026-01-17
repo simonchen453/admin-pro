@@ -22,6 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,19 +35,19 @@ import java.util.List;
  * <p>
  * 该配置类负责配置应用程序的安全认证和授权机制，主要功能包括：
  * <ul>
- *   <li>配置HTTP安全过滤器链，定义URL访问权限规则</li>
- *   <li>集成自定义认证提供者和用户详情服务</li>
- *   <li>配置密码加密器（BCrypt）</li>
- *   <li>配置跨域资源共享（CORS）策略</li>
- *   <li>配置认证入口点和退出登录处理器</li>
- *   <li>支持方法级别的安全注解（@PreAuthorize、@Secured等）</li>
+ * <li>配置HTTP安全过滤器链，定义URL访问权限规则</li>
+ * <li>集成自定义认证提供者和用户详情服务</li>
+ * <li>配置密码加密器（BCrypt）</li>
+ * <li>配置跨域资源共享（CORS）策略</li>
+ * <li>配置认证入口点和退出登录处理器</li>
+ * <li>支持方法级别的安全注解（@PreAuthorize、@Secured等）</li>
  * </ul>
  * <p>
  * 该配置通过 {@link SecurityProperties} 从 application.yml 读取公开接口列表，
  * 支持灵活的权限控制策略：
  * <ul>
- *   <li>严格模式：所有接口都需要认证（公开接口除外）</li>
- *   <li>兼容模式：所有接口允许访问，通过注解控制权限</li>
+ * <li>严格模式：所有接口都需要认证（公开接口除外）</li>
+ * <li>兼容模式：所有接口允许访问，通过注解控制权限</li>
  * </ul>
  *
  * @author simon
@@ -132,13 +134,13 @@ public class SecurityConfig {
      * <p>
      * 该方法定义了应用程序的HTTP安全规则，包括：
      * <ul>
-     *   <li>启用CORS跨域支持</li>
-     *   <li>禁用CSRF防护（使用JWT token，不需要CSRF）</li>
-     *   <li>配置认证失败处理</li>
-     *   <li>配置响应头（X-Frame-Options、HSTS等）</li>
-     *   <li>配置URL访问权限（公开接口和认证接口）</li>
-     *   <li>配置退出登录逻辑</li>
-     *   <li>添加自定义认证过滤器</li>
+     * <li>启用CORS跨域支持</li>
+     * <li>禁用CSRF防护（使用JWT token，不需要CSRF）</li>
+     * <li>配置认证失败处理</li>
+     * <li>配置响应头（X-Frame-Options、HSTS等）</li>
+     * <li>配置URL访问权限（公开接口和认证接口）</li>
+     * <li>配置退出登录逻辑</li>
+     * <li>添加自定义认证过滤器</li>
      * </ul>
      * <p>
      * 支持通过 application.yml 配置公开接口列表，灵活控制接口访问权限
@@ -169,7 +171,11 @@ public class SecurityConfig {
                     // 配置公开接口（从 application.yml 读取）
                     String[] publicUrls = securityProperties.getAllPublicUrls();
                     if (publicUrls.length > 0) {
-                        auth.requestMatchers(publicUrls).permitAll();
+                        List<RequestMatcher> matchers = new ArrayList<>();
+                        for (String url : publicUrls) {
+                            matchers.add(new AntPathRequestMatcher(url));
+                        }
+                        auth.requestMatchers(matchers.toArray(new RequestMatcher[0])).permitAll();
                     }
 
                     // 根据配置决定是否要求认证
@@ -198,10 +204,10 @@ public class SecurityConfig {
      * BCrypt是一种强散列哈希加密算法，专门用于密码加密存储。
      * 特点：
      * <ul>
-     *   <li>自带盐值，每次加密结果都不同</li>
-     *   <li>可调整加密强度（默认10）</li>
-     *   <li>单向加密，无法解密</li>
-     *   <li>抗彩虹表攻击</li>
+     * <li>自带盐值，每次加密结果都不同</li>
+     * <li>可调整加密强度（默认10）</li>
+     * <li>单向加密，无法解密</li>
+     * <li>抗彩虹表攻击</li>
      * </ul>
      *
      * @return BCryptPasswordEncoder实例，用于密码加密和验证
@@ -217,9 +223,9 @@ public class SecurityConfig {
      * AuthenticationManager是Spring Security的核心认证接口，
      * 负责协调认证过程，包括：
      * <ul>
-     *   <li>使用UserDetailsService加载用户信息</li>
-     *   <li>使用PasswordEncoder验证密码</li>
-     *   <li>处理认证成功或失败的结果</li>
+     * <li>使用UserDetailsService加载用户信息</li>
+     * <li>使用PasswordEncoder验证密码</li>
+     * <li>处理认证成功或失败的结果</li>
      * </ul>
      *
      * @param httpSecurity HttpSecurity构建器
@@ -241,24 +247,24 @@ public class SecurityConfig {
      * <p>
      * 该方法配置应用程序的CORS策略，支持：
      * <ul>
-     *   <li>通过配置文件指定允许的源列表</li>
-     *   <li>允许所有源（开发模式）</li>
-     *   <li>支持移动端应用调用</li>
-     *   <li>支持微信小程序和支付宝小程序</li>
-     *   <li>允许携带凭证（Cookie等）</li>
-     *   <li>允许所有HTTP方法和请求头</li>
+     * <li>通过配置文件指定允许的源列表</li>
+     * <li>允许所有源（开发模式）</li>
+     * <li>支持移动端应用调用</li>
+     * <li>支持微信小程序和支付宝小程序</li>
+     * <li>允许携带凭证（Cookie等）</li>
+     * <li>允许所有HTTP方法和请求头</li>
      * </ul>
      * <p>
      * 小程序域名支持：
      * <ul>
-     *   <li>微信小程序：servicewechat.com、servicewechat.net及其子域名</li>
-     *   <li>支付宝小程序：alipay.com、alipaydev.com及其子域名</li>
+     * <li>微信小程序：servicewechat.com、servicewechat.net及其子域名</li>
+     * <li>支付宝小程序：alipay.com、alipaydev.com及其子域名</li>
      * </ul>
      * <p>
      * 配置参数：
      * <ul>
-     *   <li>app.cors.allowed-origins：允许的源列表，逗号分隔</li>
-     *   <li>app.cors.allow-all-origins：是否允许所有源（默认false）</li>
+     * <li>app.cors.allowed-origins：允许的源列表，逗号分隔</li>
+     * <li>app.cors.allow-all-origins：是否允许所有源（默认false）</li>
      * </ul>
      *
      * @return 配置好的CorsConfigurationSource实例

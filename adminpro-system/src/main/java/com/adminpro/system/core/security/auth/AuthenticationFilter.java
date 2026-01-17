@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -56,6 +57,46 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     TokenHelper tokenHelper;
+
+    private static final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    /**
+     * 公开接口路径模式（无需认证）
+     */
+    private static final String[] PUBLIC_PATTERNS = {
+            "/api/v1/auth/login",
+            "/api/v1/auth/logout",
+            "/api/v1/auth/captcha.jpg",
+            "/api/v1/auth/captcha/**",
+            "/api/v1/common/**",
+            "/api/v1/public/**",
+            "/error",
+            "/favicon.ico",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/doc.html",
+            "/actuator/**",
+            "/js/**",
+            "/css/**",
+            "/images/**",
+            "/static/**",
+            "/assets/**"
+    };
+
+    /**
+     * 判断请求是否应该跳过认证过滤
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        for (String pattern : PUBLIC_PATTERNS) {
+            if (pathMatcher.match(pattern, path)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * 执行过滤逻辑

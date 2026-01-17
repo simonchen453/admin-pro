@@ -385,7 +385,6 @@ const UserForm: React.FC<UserFormProps> = ({
           <Form.Item
             name="postIds"
             label="岗位"
-            rules={[{ required: true, message: '请选择岗位' }]}
           >
             <Select
               mode="multiple"

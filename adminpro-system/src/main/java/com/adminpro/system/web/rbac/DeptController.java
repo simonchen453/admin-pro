@@ -77,7 +77,7 @@ public class DeptController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @PostMapping
+    @PostMapping(value = "/search")
     public R<List<DeptEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -97,6 +97,27 @@ public class DeptController extends BaseController {
     }
 
     /**
+     * 获取部门树选择数据
+     * <p>
+     * 获取所有部门的树形结构数据，用于下拉选择
+     * </p>
+     *
+     * @return 部门树形选择列表
+     */
+    @Operation(summary = "获取部门树", description = "获取所有部门的树形结构数据")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功"),
+            @ApiResponse(responseCode = "401", description = "未授权")
+    })
+    @GetMapping(value = "/tree")
+    @PreAuthorize("isAuthenticated()")
+    public R<List<com.adminpro.system.rbac.domains.vo.tree.TreeSelect>> getTreeSelect() {
+        List<DeptEntity> depts = deptService.findAll();
+        List<com.adminpro.system.rbac.domains.vo.tree.TreeSelect> treeSelect = deptService.buildDeptTreeSelect(depts);
+        return R.ok(treeSelect);
+    }
+
+    /**
      * 创建部门
      * <p>
      * 新增一个部门，包含部门编号、名称、上级部门、联系人等信息
@@ -113,7 +134,7 @@ public class DeptController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("创建部门")
-    @PostMapping(value = "/create")
+    @PostMapping
     public R create(@Parameter(description = "部门实体信息", required = true) @RequestBody DeptEntity dept) {
         MessageBundle messageBundle = getMessageBundle();
         BeanUtil.beanAttributeValueTrim(dept);

@@ -9,7 +9,7 @@ import type {
 } from '../types';
 
 export const getDeptListApi = (params: DeptSearchForm): Promise<DeptListResponse> => {
-  return request.post('/api/v1/departments', params);
+  return request.post('/api/v1/departments/search', params);
 };
 
 export const getDeptDetailApi = (id: string): Promise<DeptDetailResponse> => {
@@ -17,7 +17,7 @@ export const getDeptDetailApi = (id: string): Promise<DeptDetailResponse> => {
 };
 
 export const createDeptApi = (params: DeptEntity): Promise<DeptCreateResponse> => {
-  return request.post('/api/v1/departments/create', params);
+  return request.post('/api/v1/departments', params);
 };
 
 export const updateDeptApi = (params: DeptEntity): Promise<DeptCreateResponse> => {

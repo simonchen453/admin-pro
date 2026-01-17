@@ -16,7 +16,7 @@ import type {
 
 // 用户列表查询
 export const getUserListApi = async (searchForm: UserSearchForm): Promise<UserListResponse> => {
-  const response = await request.post<ApiResponse<UserListResponse>>('/api/v1/users', searchForm);
+  const response = await request.post<ApiResponse<UserListResponse>>('/api/v1/users/search', searchForm);
   return response.data;
 };
 

@@ -51,7 +51,7 @@ import org.springframework.web.multipart.MultipartFile;
 @PreAuthorize("@ss.hasPermission('system:oss')")
 public class OssController extends BaseController {
 
-    protected static final String PREFIX_URL = "/api/v1/oss";
+    protected static final String PREFIX_URL = "/api/v1/tools/oss";
 
     @Autowired
     private FileHelper fileHelper;
@@ -74,7 +74,7 @@ public class OssController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<ListOssVo>> paging(HttpServletRequest request) {
         SearchParam param = startPaging();
         QueryResultSet<ListOssVo> map = ossService.search(param).map(ListOssVoConverter.class);
@@ -103,7 +103,7 @@ public class OssController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
             throw new BaseRuntimeException("上传文件不能为空");
@@ -148,7 +148,7 @@ public class OssController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "文件不存在")
     })
-    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public R delete(@PathVariable String id) {
         OSSEntity entity = ossService.findById(id);
         if (entity != null) {
@@ -176,7 +176,7 @@ public class OssController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @Transactional
-    @RequestMapping(value = "/deletemany", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteMany(@RequestParam String ids) {
         // 使用验证工具类解析和验证参数
         List<String> ossIdList = BatchOperationValidator.validateAndParseIds(ids);

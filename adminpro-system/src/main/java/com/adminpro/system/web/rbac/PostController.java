@@ -134,7 +134,7 @@ public class PostController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("创建职位")
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @PostMapping(value = "/create")
     public R create(@Parameter(description = "职位实体信息", required = true) @RequestBody PostEntity post) {
         BeanUtil.beanAttributeValueTrim(post);
         MessageBundle messageBundle = getMessageBundle();

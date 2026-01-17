@@ -51,7 +51,7 @@ import java.util.List;
 @RequestMapping(DeptController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:dept')")
 public class DeptController extends BaseController {
-    protected static final String PREFIX_URL = "/api/v1/depts";
+    protected static final String PREFIX_URL = "/api/v1/departments";
     protected static final String SEARCH_FORM_KEY = "deptSearchForm";
 
     @Autowired
@@ -117,7 +117,7 @@ public class DeptController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("创建部门")
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @PostMapping(value = "/create")
     public R create(@Parameter(description = "部门实体信息", required = true) @RequestBody DeptEntity dept) {
         MessageBundle messageBundle = getMessageBundle();
         BeanUtil.beanAttributeValueTrim(dept);
@@ -260,7 +260,7 @@ public class DeptController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("部门Logo上传")
-    @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R uploadFile(@Parameter(description = "Logo图片文件", required = true) @RequestParam("file") MultipartFile file)
             throws Exception {
         if (file.isEmpty()) {

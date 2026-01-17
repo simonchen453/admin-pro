@@ -6,18 +6,18 @@ import type {
 } from '../types';
 
 export const getSessionListApi = (searchForm: SessionSearchForm): Promise<SessionListResponse> => {
-  return request.post('/api/v1/sessions', searchForm);
+  return request.post('/api/v1/tools/sessions', searchForm);
 };
 
 export const suspendSessionApi = (id: string): Promise<ApiResponse> => {
-  return request.patch(`/api/v1/sessions/${id}/suspend`);
+  return request.patch(`/api/v1/tools/sessions/${id}/suspend`);
 };
 
 export const unsuspendSessionApi = (id: string): Promise<ApiResponse> => {
-  return request.patch(`/api/v1/sessions/${id}/unsuspend`);
+  return request.patch(`/api/v1/tools/sessions/${id}/unsuspend`);
 };
 
 export const killSessionApi = (id: string): Promise<ApiResponse> => {
-  return request.patch(`/api/v1/sessions/${id}/kill`);
+  return request.patch(`/api/v1/tools/sessions/${id}/kill`);
 };
 

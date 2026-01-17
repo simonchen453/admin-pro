@@ -49,7 +49,7 @@ import java.util.List;
 @PreAuthorize("@ss.hasPermission('system:config')")
 public class ConfigController extends BaseController {
 
-    protected static final String PREFIX_URL = "/api/v1/configs";
+    protected static final String PREFIX_URL = "/api/v1/tools/config";
     protected static final String SEARCH_FORM_KEY = "configSearchForm";
 
     @Autowired
@@ -77,7 +77,7 @@ public class ConfigController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @PostMapping
+    @PostMapping("/search")
     public R<QueryResultSet<ConfigEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -117,7 +117,7 @@ public class ConfigController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("创建配置")
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @PostMapping
     public R create(@RequestBody ConfigEntity config) {
         BeanUtil.beanAttributeValueTrim(config);
         MessageBundle messageBundle = getMessageBundle();

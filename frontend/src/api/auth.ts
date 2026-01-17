@@ -9,7 +9,7 @@ export const loginApi = async (data: LoginRequest): Promise<LoginResponse> => {
 
 // 登出接口
 export const logoutApi = async (): Promise<void> => {
-  await request.post('/logout');
+  await request.post('/api/v1/auth/logout');
 };
 
 // 用户信息类型

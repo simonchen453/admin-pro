@@ -44,7 +44,7 @@ import java.util.Date;
 @PreAuthorize("@ss.hasPermission('system:audit')")
 public class AuditLogController extends BaseController {
 
-    protected static final String PREFIX_URL = "/api/v1/audit-logs";
+    protected static final String PREFIX_URL = "/api/v1/tools/audit-logs";
     protected static final String SEARCH_FORM_KEY = "auditLogSearchForm";
 
     @Autowired
@@ -66,7 +66,7 @@ public class AuditLogController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @PostMapping
+    @PostMapping("/search")
     public R<QueryResultSet<AuditLogDTO>> search(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         SearchParam param = startPaging(searchForm);

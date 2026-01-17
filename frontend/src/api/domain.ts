@@ -8,11 +8,11 @@ import type {
 } from '../types';
 
 export const getDomainListApi = (params: DomainSearchForm): Promise<DomainListResponse> => {
-  return request.post('/api/v1/domains/list', params);
+  return request.post('/api/v1/domains', params);
 };
 
 export const getDomainDetailApi = (id: string): Promise<DomainDetailResponse> => {
-  return request.get(`/api/v1/domains/detail/${id}`);
+  return request.get(`/api/v1/domains/${id}`);
 };
 
 export const createDomainApi = (params: DomainEntity): Promise<DomainCreateResponse> => {
@@ -20,10 +20,10 @@ export const createDomainApi = (params: DomainEntity): Promise<DomainCreateRespo
 };
 
 export const updateDomainApi = (params: DomainEntity): Promise<DomainCreateResponse> => {
-  return request.patch('/api/v1/domains/edit', params);
+  return request.put(`/api/v1/domains/${params.id}`, params);
 };
 
 export const deleteDomainApi = (id: string): Promise<DomainCreateResponse> => {
-  return request.post(`/api/v1/domains/delete/${id}`);
+  return request.delete(`/api/v1/domains/${id}`);
 };
 

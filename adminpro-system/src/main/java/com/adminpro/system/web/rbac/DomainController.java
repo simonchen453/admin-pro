@@ -65,7 +65,7 @@ public class DomainController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @PostMapping(value = "/list")
     public R<QueryResultSet<DomainEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -100,7 +100,7 @@ public class DomainController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("创建用户域")
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @PostMapping(value = "/create")
     public R create(@Parameter(description = "用户域实体信息", required = true) @RequestBody DomainEntity userDomain) {
         BeanUtil.beanAttributeValueTrim(userDomain);
         MessageBundle messageBundle = getMessageBundle();
@@ -140,7 +140,7 @@ public class DomainController extends BaseController {
             @ApiResponse(responseCode = "404", description = "用户域不存在")
     })
     @SysLog("更新用户域")
-    @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
+    @PatchMapping(value = "/edit")
     public R editSave(@Parameter(description = "用户域实体信息", required = true) @RequestBody DomainEntity userDomain) {
         BeanUtil.beanAttributeValueTrim(userDomain);
         MessageBundle messageBundle = getMessageBundle();
@@ -180,7 +180,7 @@ public class DomainController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "用户域不存在")
     })
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}")
     public R<DomainEntity> detail(@Parameter(description = "用户域ID", required = true) @PathVariable String id) {
         DomainEntity entity = domainService.findById(id);
         if (entity != null) {

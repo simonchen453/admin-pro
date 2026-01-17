@@ -9,4 +9,5 @@
     <include file="classpath:changelog/sql/quartz.sql" relativeToChangelogFile="false"/>
     <include file="classpath:changelog/sql/city.sql" relativeToChangelogFile="false"/>
     <include file="classpath:changelog/sql/changelog-function.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:changelog/sql/drop_apk_table.sql" relativeToChangelogFile="false"/>
 </databaseChangeLog>

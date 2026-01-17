@@ -56,7 +56,7 @@ import java.util.List;
 @PreAuthorize("@ss.hasPermission('system:job')")
 public class JobController extends BaseController {
 
-    protected static final String PREFIX_URL = "/api/v1/jobs";
+    protected static final String PREFIX_URL = "/api/v1/tools/jobs";
     protected static final String SEARCH_FORM_KEY = "jobSearchForm";
 
     @Autowired
@@ -90,7 +90,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<JobVo>> paging(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String condition = searchForm.getCondition();
@@ -120,7 +120,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R create(@RequestBody JobVo jobVo) {
         BeanUtil.beanAttributeValueTrim(jobVo);
         MessageBundle bundle = getMessageBundle();
@@ -192,7 +192,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public R deleteMany(@RequestParam String ids) {
+    public R deleteMany(@RequestParam("ids") String ids) {
         try {
             // 使用验证工具类解析和验证参数
             List<String> jobIdList = BatchOperationValidator.validateAndParseIds(ids);
@@ -220,7 +220,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "任务不存在")
     })
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}")
     public R detail(@PathVariable String id) {
         ScheduleJobEntity entity = scheduleJobService.findById(id);
         JobVo convert = jobVoConverter.convert(entity);
@@ -244,7 +244,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/run", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/run", produces = MediaType.APPLICATION_JSON_VALUE)
     public R run(@RequestBody String ids) {
         try {
             String[] split = ids.split(",");
@@ -274,7 +274,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/pause", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/pause", produces = MediaType.APPLICATION_JSON_VALUE)
     public R pause(@RequestBody String ids) {
         try {
             String[] split = ids.split(",");
@@ -304,7 +304,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/resume", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/resume", produces = MediaType.APPLICATION_JSON_VALUE)
     public R resume(@RequestBody String ids) {
         try {
             String[] split = ids.split(",");
@@ -333,7 +333,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @PostMapping(value = "/logs", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/logs/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<JobLogVo>> logs(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String condition = searchForm.getCondition();
@@ -364,7 +364,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @DeleteMapping(value = "/logs", produces = MediaType.APPLICATION_JSON_VALUE)
-    public R deleteManyLogs(@RequestParam String ids) {
+    public R deleteManyLogs(@RequestParam("ids") String ids) {
         try {
             // 使用验证工具类解析和验证参数
             List<String> logIdList = BatchOperationValidator.validateAndParseIds(ids);
@@ -415,7 +415,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/nextTime", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/next-time", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<Date> getNextValidTime() {
         String cronExpression = request.getParameter("cronExpression");
         Date nextExecution = CronUtils.getNextExecution(cronExpression);

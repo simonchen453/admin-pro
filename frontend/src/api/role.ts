@@ -105,10 +105,10 @@ export const deleteRoleApi = (ids: string): Promise<ApiResponse<{ success: boole
 
 // 获取菜单树结构
 export const getMenuTreeApi = (): Promise<MenuTreeResponse> => {
-  return request.get('/common/menu/treeselect');
+  return request.get('/api/v1/menus/tree');
 };
 
 // 根据角色获取菜单树结构
 export const getRoleMenuTreeApi = (roleId: string): Promise<RoleMenuTreeResponse> => {
-  return request.get(`/common/menu/roleMenuTreeSelect/${roleId}`);
+  return request.get(`/api/v1/menus/tree/role/${roleId}`);
 };

@@ -160,7 +160,7 @@ public class MenuController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("创建菜单")
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @PostMapping(value = "/create")
     public R create(@Parameter(description = "菜单实体信息", required = true) @RequestBody MenuEntity menu) {
         BeanUtil.beanAttributeValueTrim(menu);
 

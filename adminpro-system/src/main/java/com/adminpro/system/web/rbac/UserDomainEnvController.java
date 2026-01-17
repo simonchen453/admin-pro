@@ -39,7 +39,7 @@ import java.util.List;
 @RequestMapping(UserDomainEnvController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:user_domain_env')")
 public class UserDomainEnvController extends BaseController {
-    protected static final String PREFIX_URL = "/api/v1/user-domain-envs";
+    protected static final String PREFIX_URL = "/api/v1/domain-envs";
     protected static final String SEARCH_FORM_KEY = "userDomainEnvSearchForm";
 
     @Autowired
@@ -66,7 +66,7 @@ public class UserDomainEnvController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @PostMapping(value = "/list")
     public R<QueryResultSet<UserDomainEnvEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -97,7 +97,7 @@ public class UserDomainEnvController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @PostMapping(value = "/create")
     public R create(
             @Parameter(description = "用户域环境配置实体信息", required = true) @RequestBody UserDomainEnvEntity userDomainEnv) {
         BeanUtil.beanAttributeValueTrim(userDomainEnv);
@@ -149,7 +149,7 @@ public class UserDomainEnvController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "用户域环境配置不存在")
     })
-    @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
+    @PatchMapping(value = "/edit")
     public R editSave(
             @Parameter(description = "用户域环境配置实体信息", required = true) @RequestBody UserDomainEnvEntity userDomainEnv) {
         BeanUtil.beanAttributeValueTrim(userDomainEnv);
@@ -202,7 +202,7 @@ public class UserDomainEnvController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "用户域环境配置不存在")
     })
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}")
     public R<UserDomainEnvEntity> detail(
             @Parameter(description = "用户域环境配置ID", required = true) @PathVariable String id) {
         UserDomainEnvEntity entity = userDomainEnvService.findById(id);
@@ -229,7 +229,7 @@ public class UserDomainEnvController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping
     public R remove(
             @Parameter(description = "用户域环境配置ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {
         List<String> idList = BatchOperationValidator.validateAndParseIds(ids);

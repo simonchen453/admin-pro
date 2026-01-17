@@ -48,7 +48,7 @@ import java.util.List;
 @PreAuthorize("@ss.hasPermission('system:dict')")
 public class DictController extends BaseController {
 
-    protected static final String PREFIX_URL = "/api/v1/dicts";
+    protected static final String PREFIX_URL = "/api/v1/tools/dict";
     protected static final String SEARCH_FORM_KEY = "dictSearchForm";
 
     @Autowired
@@ -76,7 +76,7 @@ public class DictController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @PostMapping
+    @PostMapping("/search")
     public R<QueryResultSet<DictEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -115,7 +115,7 @@ public class DictController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("创建字典")
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @PostMapping
     public R create(@RequestBody DictEntity dict) {
         BeanUtil.beanAttributeValueTrim(dict);
         MessageBundle messageBundle = getMessageBundle();
@@ -258,7 +258,7 @@ public class DictController extends BaseController {
             @ApiResponse(responseCode = "404", description = "字典不存在")
     })
     @SysLog("激活字典")
-    @RequestMapping(value = "/active/{id}", method = RequestMethod.PATCH)
+    @PatchMapping("/{id}/active")
     public R<DictEntity> active(@PathVariable String id) {
         DictEntity entity = dictService.findById(id);
         if (entity != null) {
@@ -288,7 +288,7 @@ public class DictController extends BaseController {
             @ApiResponse(responseCode = "404", description = "字典不存在")
     })
     @SysLog("停用字典")
-    @RequestMapping(value = "/inactive/{id}", method = RequestMethod.PATCH)
+    @PatchMapping("/{id}/inactive")
     public R<DictEntity> inactive(@PathVariable String id) {
         DictEntity entity = dictService.findById(id);
         if (entity != null) {

@@ -11,10 +11,35 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * 用户域表 sys_user_domain_tbl
+ * 用户域实体类
+ * <p>
+ * 该实体对应系统用户域表(SYS_USER_DOMAIN_TBL)，用于存储系统的用户域信息。
+ * 用户域是多租户系统中的核心概念，用于实现数据隔离和资源划分，不同域之间的数据相互独立。
+ * </p>
+ * <p>
+ * 主要功能包括：
+ * <ul>
+ * <li>域基本信息：域名称、显示名称等</li>
+ * <li>系统域标识：区分系统内置域和自定义域</li>
+ * <li>用户关联：用户通过userDomain字段关联到具体的域</li>
+ * </ul>
+ * </p>
+ * <p>
+ * 通过用户域可以实现：
+ * <ul>
+ * <li>多租户数据隔离：不同域的数据相互独立，互不干扰</li>
+ * <li>权限隔离：用户只能访问所属域内的资源</li>
+ * <li>资源分组：将系统资源按域进行分组管理</li>
+ * </ul>
+ * </p>
+ * <p>
+ * 继承自BaseAuditEntity，自动包含创建时间、创建人、更新时间、更新人等审计字段。
+ * 使用Lombok的@Data注解自动生成getter/setter、toString、equals、hashCode等方法。
+ * </p>
  *
  * @author simon
  * @date 2018-09-06
+ * @see com.adminpro.framework.base.entity.BaseAuditEntity
  */
 @Data
 @Table(name = DomainEntity.TABLE_NAME)

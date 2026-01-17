@@ -19,7 +19,35 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
+ * 认证过滤器
+ * <p>
+ * 继承Spring Security的OncePerRequestFilter，确保每个请求只执行一次过滤。
+ * 负责从请求中提取Token，验证用户身份，并将认证信息设置到SecurityContext中。
+ * <p>
+ * 支持两种认证模式：
+ * <ul>
+ * <li>移动端模式：基于Token的无状态认证</li>
+ * <li>Web端模式：基于Session的有状态认证</li>
+ * </ul>
+ * <p>
+ * Token提取支持多种方式（按优先级）：
+ * <ol>
+ * <li>Authorization: Bearer {token} - 标准HTTP Header方式（推荐移动端使用）</li>
+ * <li>x-access-token Header - 兼容现有前端</li>
+ * <li>x-access-token Query参数 - 兼容旧版本</li>
+ * </ol>
+ * <p>
+ * 安全特性：
+ * <ul>
+ * <li>自动检测请求类型，选择合适的认证方式</li>
+ * <li>Token验证失败时清除认证信息</li>
+ * <li>支持Token自动刷新机制</li>
+ * </ul>
+ *
  * @author simon
+ * @see org.springframework.web.filter.OncePerRequestFilter
+ * @see TokenHelper
+ * @see LoginUser
  */
 @Component
 public class AuthenticationFilter extends OncePerRequestFilter {
@@ -30,6 +58,25 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     TokenHelper tokenHelper;
 
+    /**
+     * 执行过滤逻辑
+     * <p>
+     * 处理流程：
+     * <ol>
+     * <li>从请求中提取Token</li>
+     * <li>判断请求类型（移动端/Web端）</li>
+     * <li>移动端：验证Token并加载用户信息</li>
+     * <li>Web端：从Session中获取用户信息</li>
+     * <li>将认证信息设置到SecurityContext</li>
+     * <li>继续执行后续过滤器</li>
+     * </ol>
+     *
+     * @param request  HTTP请求
+     * @param response HTTP响应
+     * @param chain    过滤器链
+     * @throws IOException      如果发生I/O错误
+     * @throws ServletException 如果发生Servlet相关错误
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {

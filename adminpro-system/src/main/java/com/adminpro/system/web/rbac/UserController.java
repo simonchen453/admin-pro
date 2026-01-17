@@ -53,6 +53,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 用户管理控制器
+ * <p>
+ * 提供用户的增删改查、导入导出、状态管理等功能
+ * </p>
+ *
+ * @author system
+ * @since 1.0.0
+ */
 @RestController
 @RequestMapping(UserController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:user')")
@@ -89,6 +98,15 @@ public class UserController extends BaseController {
     @Autowired
     private PostService postService;
 
+    /**
+     * 查询用户列表
+     * <p>
+     * 根据查询条件分页查询用户列表，支持按用户域、登录名、真实姓名、状态、部门等条件筛选
+     * </p>
+     *
+     * @param searchForm 查询条件表单
+     * @return 分页查询结果
+     */
     @RequestMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public R<QueryResultSet<UserListResponseVo>> search(@RequestBody SearchForm searchForm) {
         logger.debug("查询用户列表: searchForm={}", searchForm);
@@ -116,6 +134,13 @@ public class UserController extends BaseController {
         return R.ok(result);
     }
 
+    /**
+     * 停用用户
+     * <p>将指定用户状态设置为停用，停用后用户无法登录系统</p>
+     *
+     * @param userId 用户ID
+     * @return 操作结果
+     */
     @SysLog("停用用户")
     @RequestMapping(value = "/inactive/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
     public R inactive(@PathVariable String userId) {
@@ -131,6 +156,13 @@ public class UserController extends BaseController {
         return R.ok();
     }
 
+    /**
+     * 激活用户
+     * <p>将指定用户状态设置为激活，激活后用户可以正常登录系统</p>
+     *
+     * @param userId 用户ID
+     * @return 操作结果
+     */
     @SysLog("激活用户")
     @RequestMapping(value = "/active/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
     public R active(@PathVariable("userId") String userId) {
@@ -146,6 +178,13 @@ public class UserController extends BaseController {
         return R.ok();
     }
 
+    /**
+     * 重置用户密码
+     * <p>管理员重置指定用户的密码，新密码需符合系统密码规则</p>
+     *
+     * @param userResetPwdRequestVo 密码重置请求参数，包含用户ID、新密码、确认密码
+     * @return 操作结果
+     */
     @SysLog("重置用户密码")
     @RequestMapping(value = "/resetpwd", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R resetPwd(@Valid @RequestBody UserResetPwdRequestVo userResetPwdRequestVo) {
@@ -175,7 +214,7 @@ public class UserController extends BaseController {
                 }
             }
             if (!messageBundle.hasErrorMessage()) {
-                // userId 是主键ID，需要先获取用户再构造 UserIden
+                // userId 是主键ID，需要先获取用户
                 UserEntity userEntity = userService.findById(userId);
                 if (userEntity == null) {
                     logger.warn("重置用户密码失败，用户不存在: userId={}", userId);
@@ -195,6 +234,13 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * 查询用户详情
+     * <p>根据用户ID查询用户的详细信息，包括基本资料、角色、岗位等</p>
+     *
+     * @param userId 用户ID
+     * @return 用户详细信息
+     */
     @RequestMapping(value = "/detail/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public R<UserDetailVO> view(@PathVariable String userId) {
         logger.debug("查询用户详情: userId={}", userId);
@@ -256,6 +302,13 @@ public class UserController extends BaseController {
         return R.ok(sysUserResponseVo);
     }
 
+    /**
+     * 批量删除用户
+     * <p>根据用户ID列表批量删除用户（使用逗号分隔的字符串格式）</p>
+     *
+     * @param users 用户ID列表，逗号分隔，例如: "id1,id2,id3"
+     * @return 操作结果
+     */
     @SysLog("删除用户")
     @RequestMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
     public R deleteMany(@RequestParam String users) {
@@ -273,10 +326,10 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 批量删除用户 (RESTful 风格，使用 List 参数)
-     * 推荐使用此接口，更符合 RESTful 规范
-     * 
-     * @param userIds 用户ID列表，格式: ["userDomain_userId", ...]
+     * 批量删除用户 (RESTful风格)
+     * <p>根据用户ID列表批量删除用户（使用JSON数组格式）</p>
+     *
+     * @param userIds 用户ID列表，JSON数组格式: ["id1", "id2", "id3"]
      * @return 操作结果
      */
     @SysLog("删除用户")
@@ -296,6 +349,12 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * 准备用户创建/编辑页面数据
+     * <p>获取创建或编辑用户时所需的基础数据，包括角色列表和岗位列表</p>
+     *
+     * @return 包含角色列表和岗位列表的映射
+     */
     @RequestMapping(value = "/prepare", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public R<Map<String, Object>> prepare() {
         Map<String, Object> map = new HashMap<>();
@@ -310,6 +369,13 @@ public class UserController extends BaseController {
         return R.ok(map);
     }
 
+    /**
+     * 创建用户
+     * <p>创建新用户，包括基本信息、角色分配、岗位分配等</p>
+     *
+     * @param userRequestVo 用户创建请求参数
+     * @return 操作结果
+     */
     @SysLog("创建用户")
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     @Transactional
@@ -335,6 +401,13 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * 更新用户
+     * <p>更新用户基本信息、角色分配、岗位分配等</p>
+     *
+     * @param userRequestVo 用户更新请求参数
+     * @return 操作结果
+     */
     @SysLog("更新用户")
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
     @Transactional
@@ -370,6 +443,14 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * 用户头像上传
+     * <p>上传用户头像图片到OSS存储</p>
+     *
+     * @param file             上传的文件
+     * @param multipartRequest 多部分请求对象
+     * @return OSS文件访问URL
+     */
     @SysLog("用户头像上传")
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R uploadFile(@RequestParam MultipartFile file, MultipartHttpServletRequest multipartRequest) {
@@ -382,6 +463,13 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * 导入用户
+     * <p>从Excel文件批量导入用户数据</p>
+     *
+     * @param file Excel文件
+     * @return 操作结果
+     */
     @SysLog("导入用户")
     @RequestMapping(value = "/import", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R importUser(@RequestParam("file") MultipartFile file) {
@@ -400,6 +488,14 @@ public class UserController extends BaseController {
         }
     }
 
+    /**
+     * 导出用户
+     * <p>根据用户ID列表导出用户数据到Excel文件</p>
+     *
+     * @param ids     用户ID列表，逗号分隔（可选）
+     * @param response HTTP响应对象
+     * @throws Exception 导出异常
+     */
     @SysLog("导出用户")
     @RequestMapping(value = "/export", method = RequestMethod.GET)
     public void exportUser(@RequestParam(required = false) String ids, HttpServletResponse response) throws Exception {
@@ -414,6 +510,14 @@ public class UserController extends BaseController {
         userService.exportExcel(response, list);
     }
 
+    /**
+     * 导出所有用户
+     * <p>根据查询条件导出所有符合条件的用户数据到Excel文件</p>
+     *
+     * @param searchForm 查询条件表单
+     * @param response   HTTP响应对象
+     * @throws Exception 导出异常
+     */
     @SysLog("导出所有用户")
     @RequestMapping(value = "/excelAll", method = RequestMethod.GET)
     public void exportAllUser(SearchForm searchForm, HttpServletResponse response) throws Exception {

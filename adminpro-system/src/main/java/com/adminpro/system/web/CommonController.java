@@ -291,9 +291,9 @@ public class CommonController extends BaseController {
     @PreAuthorize("@ss.hasPermission('common:menu:treeselect')")
     @GetMapping("/menu/treeselect")
     public R menuTreeSelect() {
-        // 获取当前登录用户信息（已不再使用 UserIden）
+
         SearchParam param = startPaging();
-        // param.addFilter("userIden", loginUserIden);
+
         List<MenuEntity> list = menuService.findByParam(param);
         List<TreeSelect> treeSelects = menuService.buildMenuTreeSelect(list);
         return R.ok(treeSelects);

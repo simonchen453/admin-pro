@@ -15,16 +15,48 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Date;
 
 /**
- * 用户Token表 sys_user_token_tbl
+ * 用户Token实体类
+ * <p>
+ * 该实体对应系统用户Token表(SYS_USER_TOKEN_TBL)，用于存储用户的登录令牌信息。
+ * Token是无状态认证机制的核心，用于在前后端分离架构中维持用户的登录状态。
+ * </p>
+ * <p>
+ * 主要功能包括：
+ * <ul>
+ * <li>Token基本信息：Token值、关联的用户ID等</li>
+ * <li>Token有效期管理：过期时间控制，支持Token自动续期</li>
+ * <li>Token状态管理：活动状态、非活动状态</li>
+ * <li>设备信息管理：记录登录设备信息，支持多端登录控制</li>
+ * <li>Token校验：通过isValid()方法校验Token是否有效</li>
+ * </ul>
+ * </p>
+ * <p>
+ * Token有效性判断标准：
+ * <ul>
+ * <li>状态为活动状态(STATUS_ACTIVITY)</li>
+ * <li>未超过过期时间</li>
+ * </ul>
+ * </p>
+ * <p>
+ * 继承自BaseEntity，包含基础的创建时间等字段。
+ * 使用Lombok的@Data注解自动生成getter/setter、toString、equals、hashCode等方法。
+ * </p>
  *
  * @author simon
  * @date 2018-09-03
+ * @see com.adminpro.framework.base.entity.BaseEntity
  */
 @Data
 @Table(name = UserTokenEntity.TABLE_NAME)
 public class UserTokenEntity extends BaseEntity {
 
+    /**
+     * Token活动状态标识
+     */
     public static final String STATUS_ACTIVITY = "activity";
+    /**
+     * Token非活动状态标识
+     */
     public static final String STATUS_INACTIVITY = "inactivity";
 
     private static final long serialVersionUID = 1L;
@@ -110,6 +142,22 @@ public class UserTokenEntity extends BaseEntity {
     @Column(name = COL_UPDATE_TIME, type = Column.Type.DATETIME)
     private Date updateTime;
 
+    /**
+     * 校验Token是否有效
+     * <p>
+     * Token有效的条件：
+     * <ul>
+     * <li>Token状态为活动状态(STATUS_ACTIVITY)</li>
+     * <li>当前时间未超过Token的过期时间</li>
+     * </ul>
+     * </p>
+     * <p>
+     * 该方法使用@JsonIgnore注解，在序列化为JSON时会被忽略，
+     * 避免Token信息在API响应中泄露。
+     * </p>
+     *
+     * @return 如果Token有效返回true，否则返回false
+     */
     @JsonIgnore
     public boolean isValid() {
         return StringUtils.equals(getStatus(), STATUS_ACTIVITY) && !expireTime.before(new Date());

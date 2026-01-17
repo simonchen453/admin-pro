@@ -52,6 +52,13 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Date;
 
+/**
+ * 认证控制器
+ * <p>提供用户登录、登出、获取用户信息、验证码等认证相关的API接口</p>
+ *
+ * @author system
+ * @since 1.0.0
+ */
 @RestController
 @RequestMapping("/auth")
 public class AuthController extends BaseController {
@@ -65,6 +72,14 @@ public class AuthController extends BaseController {
     @Resource(name = "captchaProducerMath")
     private Producer captchaProducerMath;
 
+    /**
+     * 用户登录
+     * <p>处理用户登录请求，支持用户名/邮箱/手机号登录，验证码验证</p>
+     *
+     * @param request  HTTP请求对象，用于检测设备类型
+     * @param loginUserVo 登录请求参数，包含用户名、密码、域、验证码等信息
+     * @return 登录结果，包含token、用户基本信息、权限信息等
+     */
     @SysLog("用户登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R<LoginResponse> login(HttpServletRequest request, @RequestBody LoginUserVo loginUserVo) {
@@ -166,6 +181,12 @@ public class AuthController extends BaseController {
         }
     }
 
+    /**
+     * 获取当前登录用户信息
+     * <p>根据当前登录token获取用户的详细信息，包括基本资料、部门信息等</p>
+     *
+     * @return 用户详细信息
+     */
     @PreAuthorize("@ss.hasPermission('system:common')")
     @RequestMapping(value = "/userinfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<UserInfoResponseVo> getUserInfo() {
@@ -211,6 +232,12 @@ public class AuthController extends BaseController {
         }
     }
 
+    /**
+     * 获取密码规则
+     * <p>获取系统当前配置的密码强度规则，包括长度、复杂度等要求</p>
+     *
+     * @return 密码规则配置信息
+     */
     @PreAuthorize("@ss.hasPermission('system:common')")
     @RequestMapping(value = "/password-rule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<PasswordRuleVo> getPasswordRule() {
@@ -223,6 +250,13 @@ public class AuthController extends BaseController {
         }
     }
 
+    /**
+     * 更新个人资料
+     * <p>允许当前登录用户更新自己的基本资料信息</p>
+     *
+     * @param updateProfileVo 个人资料更新请求参数
+     * @return 操作结果
+     */
     @PreAuthorize("@ss.hasPermission('system:common')")
     @SysLog("更新个人资料")
     @RequestMapping(value = "/profile", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -267,6 +301,14 @@ public class AuthController extends BaseController {
         }
     }
 
+    /**
+     * 生成验证码图片
+     * <p>生成数学运算类型的验证码图片，用于登录安全验证</p>
+     *
+     * @param response HTTP响应对象，用于输出验证码图片
+     * @throws ServletException Servlet异常
+     * @throws IOException      IO异常
+     */
     @RequestMapping(value = "/captcha.jpg", method = RequestMethod.GET)
     public void captcha(HttpServletResponse response) throws ServletException, IOException {
         response.setHeader("Cache-Control", "no-store, no-cache");
@@ -298,7 +340,13 @@ public class AuthController extends BaseController {
         IOUtils.closeQuietly(out);
     }
 
-    // spring-mobile-device 已停止维护，使用 Device 接口
+    /**
+     * 根据请求创建设备信息
+     * <p>从User-Agent中解析设备类型（PC、手机、平板）</p>
+     *
+     * @param request HTTP请求对象
+     * @return 设备信息对象
+     */
     private Device createDeviceFromRequest(HttpServletRequest request) {
         String userAgent = request.getHeader("User-Agent");
         if (userAgent == null) {

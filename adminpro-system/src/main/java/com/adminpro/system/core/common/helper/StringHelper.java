@@ -22,7 +22,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 字串工具类
+ * 字符串工具类
+ * <p>
+ * 本类继承Apache Commons Lang的StringUtils，提供额外的字符串处理工具方法。
+ * 包含类型转换、格式化、验证、路径处理等常用功能
+ * <p>
+ * 主要功能：
+ * <ul>
+ * <li>字符串与基本类型的转换</li>
+ * <li>字符串验证（邮箱、数字、长度等）</li>
+ * <li>字符串格式化（数字格式化、驼峰转换等）</li>
+ * <li>加密解密（MD5等）</li>
+ * <li>HTML处理</li>
+ * <li>文件路径处理</li>
+ * </ul>
+ * <p>
+ * 使用场景：
+ * <ul>
+ * <li>参数类型转换</li>
+ * <li>数据格式化显示</li>
+ * <li>输入验证</li>
+ * <li>数据清洗</li>
+ * </ul>
+ * <p>
+ * 注意：所有方法都是静态工具方法
  */
 public class StringHelper extends StringUtils {
 

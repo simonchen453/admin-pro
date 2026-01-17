@@ -10,6 +10,12 @@ import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.tools.domains.entity.auditlog.AuditLogDTO;
 import com.adminpro.system.tools.domains.entity.auditlog.AuditLogEntity;
 import com.adminpro.system.tools.domains.entity.auditlog.AuditLogService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +26,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 
 /**
- * 日志 日志管理
+ * 审计日志管理控制器
+ * <p>
+ * 提供系统审计日志的查询功能，包括：
+ * <ul>
+ * <li>审计日志列表查询（支持分页和多条件筛选）</li>
+ * <li>支持按状态、事件、模块、类别、用户、时间范围等条件筛选</li>
+ * </ul>
+ * </p>
  *
  * @author dongqin
  * @date 2019-10-21
  */
+@Tag(name = "审计日志管理", description = "系统审计日志管理接口，提供日志查询功能")
 @RestController
 @RequestMapping(AuditLogController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:audit')")
@@ -37,10 +51,26 @@ public class AuditLogController extends BaseController {
     private AuditLogService auditLogService;
 
     /**
-     * 查询日志
+     * 查询审计日志列表
+     * <p>
+     * 支持按状态、事件、模块、类别、用户、时间范围等条件进行分页查询审计日志
+     * </p>
      *
-     * @return
+     * @param searchForm 搜索表单，包含分页信息和筛选条件
+     * @return 包含审计日志列表和分页信息的查询结果集
      */
+    @Operation(summary = "查询审计日志列表", description = "支持按状态、事件、模块、类别、用户、时间范围等条件进行分页查询审计日志")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        description = "搜索条件",
+        required = true,
+        content = @Content(schema = @Schema(implementation = SearchForm.class))
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "查询成功",
+            content = @Content(schema = @Schema(implementation = R.class))),
+        @ApiResponse(responseCode = "401", description = "未授权"),
+        @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     public R<QueryResultSet<AuditLogEntity>> search(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);

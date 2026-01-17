@@ -15,10 +15,29 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 部门表 sys_dept_tbl
+ * 部门实体类
+ * <p>
+ * 该实体对应系统部门表(SYS_DEPT_TBL)，用于存储组织架构中的部门信息。
+ * 部门是组织管理的基础单元，用于实现用户与组织的关联，支持多级部门树形结构。
+ * </p>
+ * <p>
+ * 主要功能包括：
+ * <ul>
+ * <li>部门层级结构：通过parentId和ancestors构建多级部门树</li>
+ * <li>部门基本信息：部门编号、名称、显示顺序等</li>
+ * <li>部门联系信息：联系人、联系方式、电话、邮箱等</li>
+ * <li>部门状态管理：启用/禁用状态、删除标志等</li>
+ * <li>部门扩展信息：部门描述、部门图标、自定义登录等</li>
+ * </ul>
+ * </p>
+ * <p>
+ * 继承自BaseAuditEntity，自动包含创建时间、创建人、更新时间、更新人等审计字段。
+ * 使用Lombok的@Data注解自动生成getter/setter、toString、equals、hashCode等方法。
+ * </p>
  *
  * @author simon
  * @date 2020-05-24
+ * @see com.adminpro.framework.base.entity.BaseAuditEntity
  */
 @Data
 @Table(name = DeptEntity.TABLE_NAME)
@@ -85,7 +104,9 @@ public class DeptEntity extends BaseAuditEntity {
      * 部门图标
      */
     public static final String COL_LOGO_PATH = "COL_LOGO_PATH";
-
+    /**
+     * 是否自定义登录页面
+     */
     public static final String COL_CUSTOM_LOGIN = "COL_CUSTOM_LOGIN";
 
     /**
@@ -174,12 +195,26 @@ public class DeptEntity extends BaseAuditEntity {
     @Column(name = COL_STATUS, type = Column.Type.STRING)
     private String status;
 
+    /**
+     * 部门图标路径
+     */
+    @Size(max = 255)
     @Column(name = COL_LOGO_PATH, type = Column.Type.STRING)
     private String logoPath;
 
+    /**
+     * 是否自定义登录页面
+     */
     @Column(name = COL_CUSTOM_LOGIN, type = Column.Type.BOOLEAN)
     private boolean customLogin;
 
+    /**
+     * 子部门列表
+     * <p>
+     * 用于构建树形部门结构，包含当前部门的所有直接子部门。
+     * 该字段不在数据库中存储，仅在运行时用于构建部门树。
+     * </p>
+     */
     private List<DeptEntity> children;
 
 }

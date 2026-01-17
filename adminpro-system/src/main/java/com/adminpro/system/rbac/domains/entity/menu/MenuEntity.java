@@ -14,10 +14,31 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 菜单权限表 sys_menu_tbl
+ * 菜单权限实体类
+ * <p>
+ * 该实体对应系统菜单权限表(SYS_MENU_TBL)，用于存储系统的菜单结构和权限信息。
+ * 菜单是前端页面展示的基础，同时也是权限控制的载体，用于实现页面级和功能级的权限控制。
+ * </p>
+ * <p>
+ * 主要功能包括：
+ * <ul>
+ * <li>菜单层级结构：通过parentId构建树形菜单结构</li>
+ * <li>菜单类型管理：支持目录(M)、菜单(C)、按钮(F)三种类型</li>
+ * <li>菜单显示控制：控制菜单的显示顺序、可见性、图标等</li>
+ * <li>权限标识配置：配置菜单对应的权限标识，用于后端接口权限校验</li>
+ * <li>外链支持：支持配置外部链接</li>
+ * </ul>
+ * </p>
+ * <p>
+ * 实现了Comparable接口，支持根据orderNum字段进行排序。
+ * 继承自BaseAuditEntity，自动包含创建时间、创建人、更新时间、更新人等审计字段。
+ * 使用Lombok的@Data注解自动生成getter/setter、toString、equals、hashCode等方法。
+ * </p>
  *
  * @author simon
  * @date 2020-05-21
+ * @see com.adminpro.framework.base.entity.BaseAuditEntity
+ * @see Comparable
  */
 @Data
 @Table(name = MenuEntity.TABLE_NAME)
@@ -167,8 +188,24 @@ public class MenuEntity extends BaseAuditEntity implements Comparable<MenuEntity
     @Column(name = COL_REMARK, type = Column.Type.STRING)
     private String remark;
 
+    /**
+     * 子菜单列表
+     * <p>
+     * 用于构建树形菜单结构，包含当前菜单的所有直接子菜单。
+     * 该字段不在数据库中存储，仅在运行时用于构建菜单树。
+     * </p>
+     */
     private List<MenuEntity> children;
 
+    /**
+     * 比较两个菜单的排序顺序
+     * <p>
+     * 根据orderNum字段进行比较，用于菜单列表的排序。
+     * </p>
+     *
+     * @param m 要比较的菜单对象
+     * @return 如果当前菜单的orderNum小于参数菜单的orderNum，返回负数；相等返回0；否则返回正数
+     */
     @Override
     public int compareTo(MenuEntity m) {
         return this.getOrderNum() - m.getOrderNum();

@@ -41,8 +41,44 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Web请求辅助工具类
+ * <p>
+ * 本类提供HTTP请求处理相关的工具方法，包括：
+ * <ul>
+ * <li>请求和响应对象的获取</li>
+ * <li>参数获取和转换</li>
+ * <li>IP地址获取</li>
+ * <li>浏览器和操作系统信息识别</li>
+ * <li>国际化（i18n）支持</li>
+ * <li>页面跳转和渲染</li>
+ * </ul>
+ * <p>
+ * 主要功能：
+ * <ul>
+ * <li>获取当前HTTP请求/响应对象</li>
+ * <li>获取请求参数并类型转换</li>
+ * <li>获取客户端真实IP地址</li>
+ * <li>识别浏览器类型和版本</li>
+ * <li>识别操作系统</li>
+ * <li>设置和获取国际化信息</li>
+ * </ul>
+ * <p>
+ * 使用场景：
+ * <ul>
+ * <li>Controller中获取请求信息</li>
+ * <li>日志记录中获取客户端信息</li>
+ * <li>权限验证中获取IP</li>
+ * <li>国际化切换</li>
+ * </ul>
+ * <p>
+ * 注意：本类为Spring组件，通过依赖注入使用
+ */
 @Component
 public class WebHelper {
+    /**
+     * 正则表达式：占位符格式 {数字}
+     */
     public static final String REGEX = "\\{(\\d)\\}";
     private static Logger logger = LoggerFactory.getLogger(WebHelper.class);
     private static final String ATTR_REST_MARKER = "$$REST";

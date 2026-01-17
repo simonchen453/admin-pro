@@ -16,10 +16,26 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import java.util.Date;
 
 /**
- * 用户表 sys_user_tbl
+ * 用户实体类
+ * <p>
+ * 该实体对应系统用户表(SYS_USER_TBL)，用于存储系统用户的基本信息、认证信息、个人信息等。
+ * 主要功能包括：
+ * <ul>
+ * <li>用户基本信息：用户名、昵称、真实姓名、邮箱、手机号等</li>
+ * <li>用户认证信息：登录密码、支付密码、实名认证状态等</li>
+ * <li>用户个人信息：生日、性别、民族、地址、头像等</li>
+ * <li>用户扩展信息：工号、职位、职业、积分、分享码等</li>
+ * <li>用户组织信息：所属部门、上级分享码等</li>
+ * </ul>
+ * </p>
+ * <p>
+ * 继承自BaseAuditEntity，自动包含创建时间、创建人、更新时间、更新人等审计字段。
+ * 使用Lombok的@Data注解自动生成getter/setter、toString、equals、hashCode等方法。
+ * </p>
  *
  * @author simon
  * @date 2020-05-21
+ * @see com.adminpro.framework.base.entity.BaseAuditEntity
  */
 @Data
 @Table(name = UserEntity.TABLE_NAME)
@@ -420,6 +436,15 @@ public class UserEntity extends BaseAuditEntity {
     @Column(name = COL_ID, type = Column.Type.STRING)
     private String id;
 
+    /**
+     * 将用户对象转换为字符串格式
+     * <p>
+     * 使用ToStringBuilder以多行格式输出用户的所有属性信息，
+     * 包括基本信息、认证信息、个人信息、扩展信息等。
+     * </p>
+     *
+     * @return 格式化后的字符串，包含用户的所有字段信息
+     */
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)

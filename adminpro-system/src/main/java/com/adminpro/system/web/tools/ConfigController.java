@@ -13,6 +13,13 @@ import com.adminpro.system.tools.domains.entity.config.ConfigCreateValidator;
 import com.adminpro.system.tools.domains.entity.config.ConfigEntity;
 import com.adminpro.system.tools.domains.entity.config.ConfigService;
 import com.adminpro.system.tools.domains.entity.config.ConfigUpdateValidator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +30,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 参数配置 信息操作处理
+ * 参数配置管理控制器
+ * <p>
+ * 提供系统参数配置的增删改查功能，包括：
+ * <ul>
+ * <li>参数配置列表查询（支持分页和多条件筛选）</li>
+ * <li>参数配置详情查看</li>
+ * <li>参数配置的新增、修改、删除</li>
+ * </ul>
+ * </p>
  *
  * @author simon
  * @date 2020-06-15
  */
+@Tag(name = "参数配置管理", description = "系统参数配置管理接口，提供参数配置的增删改查功能")
 @RestController
 @RequestMapping(ConfigController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:config')")
@@ -47,7 +63,25 @@ public class ConfigController extends BaseController {
 
     /**
      * 查询参数配置列表
+     * <p>
+     * 支持按参数名称、参数键、参数值等条件进行分页查询
+     * </p>
+     *
+     * @param searchForm 搜索表单，包含分页信息和筛选条件
+     * @return 包含参数配置列表和分页信息的查询结果集
      */
+    @Operation(summary = "查询参数配置列表", description = "支持按参数名称、参数键、参数值等条件进行分页查询")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        description = "搜索条件",
+        required = true,
+        content = @Content(schema = @Schema(implementation = SearchForm.class))
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "查询成功",
+            content = @Content(schema = @Schema(implementation = R.class))),
+        @ApiResponse(responseCode = "401", description = "未授权"),
+        @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     public R<QueryResultSet<ConfigEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -72,7 +106,25 @@ public class ConfigController extends BaseController {
 
     /**
      * 新增保存参数配置
+     * <p>
+     * 创建新的系统参数配置，包含参数名称、参数键、参数值、系统标识及备注
+     * </p>
+     *
+     * @param config 配置实体对象，包含参数配置的信息
+     * @return 操作结果，成功返回空数据，失败返回错误信息
      */
+    @Operation(summary = "新增参数配置", description = "创建新的系统参数配置，包含参数名称、参数键、参数值、系统标识及备注")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        description = "配置实体对象",
+        required = true,
+        content = @Content(schema = @Schema(implementation = ConfigEntity.class))
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "创建成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "401", description = "未授权"),
+        @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @SysLog("创建配置")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public R create(@RequestBody ConfigEntity config) {
@@ -102,7 +154,26 @@ public class ConfigController extends BaseController {
 
     /**
      * 修改保存参数配置
+     * <p>
+     * 根据配置ID更新参数配置信息，包含参数名称、参数键、参数值、系统标识及备注
+     * </p>
+     *
+     * @param config 配置实体对象，必须包含ID字段
+     * @return 操作结果，成功返回空数据，失败返回错误信息
      */
+    @Operation(summary = "修改参数配置", description = "根据配置ID更新参数配置信息，包含参数名称、参数键、参数值、系统标识及备注")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        description = "配置实体对象，必须包含ID字段",
+        required = true,
+        content = @Content(schema = @Schema(implementation = ConfigEntity.class))
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "更新成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "401", description = "未授权"),
+        @ApiResponse(responseCode = "403", description = "无权限访问"),
+        @ApiResponse(responseCode = "404", description = "配置不存在")
+    })
     @SysLog("更新配置")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
     public R editSave(@RequestBody ConfigEntity config) {
@@ -134,10 +205,22 @@ public class ConfigController extends BaseController {
 
     /**
      * 获取详细信息
+     * <p>
+     * 根据配置ID查询参数配置的详细信息
+     * </p>
      *
-     * @param id
-     * @return
+     * @param id 配置ID
+     * @return 配置实体对象，不包含审计时间字段
      */
+    @Operation(summary = "获取配置详情", description = "根据配置ID查询参数配置的详细信息")
+    @Parameter(name = "id", description = "配置ID", required = true, schema = @Schema(type = "string"))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "查询成功",
+            content = @Content(schema = @Schema(implementation = ConfigEntity.class))),
+        @ApiResponse(responseCode = "401", description = "未授权"),
+        @ApiResponse(responseCode = "403", description = "无权限访问"),
+        @ApiResponse(responseCode = "404", description = "配置不存在")
+    })
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
     public R<ConfigEntity> detail(@PathVariable String id) {
         ConfigEntity entity = configService.findById(id);
@@ -151,7 +234,21 @@ public class ConfigController extends BaseController {
 
     /**
      * 删除参数配置
+     * <p>
+     * 支持批量删除参数配置，多个ID用逗号分隔
+     * </p>
+     *
+     * @param ids 配置ID列表，多个ID用逗号分隔
+     * @return 操作结果，成功返回空数据，失败返回错误信息
      */
+    @Operation(summary = "删除参数配置", description = "支持批量删除参数配置，多个ID用逗号分隔")
+    @Parameter(name = "ids", description = "配置ID列表，多个ID用逗号分隔", required = true, schema = @Schema(type = "string"))
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "删除成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "401", description = "未授权"),
+        @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @SysLog("删除配置")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public R remove(@RequestParam("ids") String ids) {

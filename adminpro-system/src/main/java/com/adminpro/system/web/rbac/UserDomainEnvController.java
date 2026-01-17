@@ -9,6 +9,13 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.domain.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +26,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 用户域环境配置 信息操作处理
+ * 用户域环境配置管理控制器
+ * <p>提供用户域环境配置的增删改查功能，包括环境配置列表查询、环境配置详情查询、环境配置创建、环境配置更新、环境配置删除等操作</p>
  *
  * @author simon
  * @date 2020-06-14
  */
+@Tag(name = "用户域环境配置管理", description = "用户域环境配置的增删改查接口")
 @RestController
 @RequestMapping(UserDomainEnvController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:user_domain_env')")
@@ -42,9 +51,20 @@ public class UserDomainEnvController extends BaseController {
 
     /**
      * 查询用户域环境配置列表
+     * <p>根据查询条件获取用户域环境配置列表，支持按用户域进行过滤和分页查询</p>
+     *
+     * @param searchForm 查询条件表单，包含用户域等过滤条件
+     * @return 用户域环境配置查询结果集，包含数据和分页信息
      */
+    @Operation(summary = "查询用户域环境配置列表", description = "根据查询条件获取用户域环境配置列表，支持按用户域进行过滤和分页查询")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDomainEnvEntity.class))),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public R<QueryResultSet<UserDomainEnvEntity>> list(@RequestBody SearchForm searchForm) {
+    public R<QueryResultSet<UserDomainEnvEntity>> list(@Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String userDomain = searchForm.getUserDomain();
         SearchParam param = startPaging(searchForm);
@@ -58,10 +78,21 @@ public class UserDomainEnvController extends BaseController {
     }
 
     /**
-     * 新增保存用户域环境配置
+     * 创建用户域环境配置
+     * <p>新增一个用户域环境配置，包含登录URL、首页URL、错误页URL、布局等配置信息</p>
+     *
+     * @param userDomainEnv 用户域环境配置实体信息
+     * @return 操作结果
      */
+    @Operation(summary = "创建用户域环境配置", description = "新增一个用户域环境配置，包含登录URL、首页URL、错误页URL、布局等配置信息")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "创建成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public R create(@RequestBody UserDomainEnvEntity userDomainEnv) {
+    public R create(@Parameter(description = "用户域环境配置实体信息", required = true) @RequestBody UserDomainEnvEntity userDomainEnv) {
         BeanUtil.beanAttributeValueTrim(userDomainEnv);
         MessageBundle messageBundle = getMessageBundle();
         userDomainEnvCreateValidator.validate(userDomainEnv, messageBundle);
@@ -95,10 +126,22 @@ public class UserDomainEnvController extends BaseController {
     }
 
     /**
-     * 修改保存用户域环境配置
+     * 更新用户域环境配置
+     * <p>更新已有用户域环境配置的信息</p>
+     *
+     * @param userDomainEnv 用户域环境配置实体信息
+     * @return 操作结果
      */
+    @Operation(summary = "更新用户域环境配置", description = "更新已有用户域环境配置的信息")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "更新成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "用户域环境配置不存在")
+    })
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    public R editSave(@RequestBody UserDomainEnvEntity userDomainEnv) {
+    public R editSave(@Parameter(description = "用户域环境配置实体信息", required = true) @RequestBody UserDomainEnvEntity userDomainEnv) {
         BeanUtil.beanAttributeValueTrim(userDomainEnv);
         MessageBundle messageBundle = getMessageBundle();
 
@@ -134,13 +177,22 @@ public class UserDomainEnvController extends BaseController {
     }
 
     /**
-     * 获取详细信息
+     * 查询用户域环境配置详情
+     * <p>根据用户域环境配置ID获取配置的详细信息</p>
      *
-     * @param id
-     * @return
+     * @param id 用户域环境配置ID
+     * @return 用户域环境配置详细信息
      */
+    @Operation(summary = "查询用户域环境配置详情", description = "根据用户域环境配置ID获取配置的详细信息")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDomainEnvEntity.class))),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "用户域环境配置不存在")
+    })
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    public R<UserDomainEnvEntity> detail(@PathVariable String id) {
+    public R<UserDomainEnvEntity> detail(@Parameter(description = "用户域环境配置ID", required = true) @PathVariable String id) {
         UserDomainEnvEntity entity = userDomainEnvService.findById(id);
         if (entity != null) {
             return R.ok(entity);
@@ -150,10 +202,21 @@ public class UserDomainEnvController extends BaseController {
     }
 
     /**
-     * 删除用户域环境配置
+     * 批量删除用户域环境配置
+     * <p>根据多个配置ID批量删除用户域环境配置，ID之间用逗号分隔</p>
+     *
+     * @param ids 用户域环境配置ID列表，多个ID用逗号分隔
+     * @return 操作结果
      */
+    @Operation(summary = "批量删除用户域环境配置", description = "根据多个配置ID批量删除用户域环境配置，ID之间用逗号分隔")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "删除成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public R remove(@RequestParam("ids") String ids) {
+    public R remove(@Parameter(description = "用户域环境配置ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {
         List<String> idList = BatchOperationValidator.validateAndParseIds(ids);
         userDomainEnvService.deleteByIds(String.join(",", idList));
         return R.ok();

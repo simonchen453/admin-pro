@@ -13,6 +13,13 @@ import com.adminpro.system.rbac.domains.entity.menu.MenuEntity;
 import com.adminpro.system.rbac.domains.entity.menu.MenuService;
 import com.adminpro.system.rbac.domains.entity.menu.MenuUpdateValidator;
 import com.adminpro.system.rbac.enums.MenuType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,11 +28,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 菜单权限 信息操作处理
+ * 菜单权限管理控制器
+ * <p>提供菜单权限的增删改查功能，包括菜单列表查询、菜单详情查询、菜单创建、菜单更新、菜单删除等操作</p>
  *
  * @author simon
  * @date 2020-05-21
  */
+@Tag(name = "菜单权限管理", description = "菜单权限的增删改查接口")
 @RestController
 @RequestMapping(MenuController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:menu')")
@@ -44,9 +53,20 @@ public class MenuController extends BaseController {
 
     /**
      * 查询菜单权限列表
+     * <p>根据查询条件获取菜单权限列表，支持按名称、状态、可见性等条件进行过滤和分页查询</p>
+     *
+     * @param searchForm 查询条件表单，包含菜单名称、状态、可见性等过滤条件
+     * @return 菜单权限列表
      */
+    @Operation(summary = "查询菜单权限列表", description = "根据查询条件获取菜单权限列表，支持按名称、状态、可见性等条件进行过滤和分页查询")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MenuEntity.class))),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public R<List<MenuEntity>> list(@RequestBody SearchForm searchForm) {
+    public R<List<MenuEntity>> list(@Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
         String status = searchForm.getStatus();
@@ -68,9 +88,21 @@ public class MenuController extends BaseController {
 
     /**
      * 查询菜单详情
+     * <p>根据菜单ID获取菜单的详细信息</p>
+     *
+     * @param id 菜单ID
+     * @return 菜单详细信息
      */
+    @Operation(summary = "查询菜单详情", description = "根据菜单ID获取菜单的详细信息")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MenuEntity.class))),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "菜单不存在")
+    })
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    public R<List<MenuEntity>> detail(@PathVariable String id) {
+    public R<MenuEntity> detail(@Parameter(description = "菜单ID", required = true) @PathVariable String id) {
         MenuEntity entity = menuService.findById(id);
         if (entity != null) {
             entity.emptyAuditTime();
@@ -81,11 +113,21 @@ public class MenuController extends BaseController {
     }
 
     /**
-     * 查询菜单权限列表
+     * 删除单个菜单
+     * <p>根据菜单ID删除指定的菜单权限</p>
+     *
+     * @param id 菜单ID
+     * @return 被删除的菜单信息
      */
+    @Operation(summary = "删除单个菜单", description = "根据菜单ID删除指定的菜单权限")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "删除成功"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @SysLog("删除菜单")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-    public R<List<MenuEntity>> delete(@PathVariable String id) {
+    public R<MenuEntity> delete(@Parameter(description = "菜单ID", required = true) @PathVariable String id) {
         MenuEntity entity = menuService.findById(id);
         if (entity != null) {
             menuService.delete(entity.getId());
@@ -95,11 +137,22 @@ public class MenuController extends BaseController {
     }
 
     /**
-     * 新增保存菜单权限
+     * 创建菜单权限
+     * <p>新增一个菜单权限，支持目录、菜单、按钮等多种类型的菜单</p>
+     *
+     * @param menu 菜单实体信息
+     * @return 操作结果
      */
+    @Operation(summary = "创建菜单权限", description = "新增一个菜单权限，支持目录、菜单、按钮等多种类型的菜单")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "创建成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @SysLog("创建菜单")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public R create(@RequestBody MenuEntity menu) {
+    public R create(@Parameter(description = "菜单实体信息", required = true) @RequestBody MenuEntity menu) {
         BeanUtil.beanAttributeValueTrim(menu);
 
         if (MenuType.isButton(menu.getType()) && StringUtils.isEmpty(menu.getVisible())) {
@@ -144,11 +197,23 @@ public class MenuController extends BaseController {
     }
 
     /**
-     * 修改保存菜单权限
+     * 更新菜单权限
+     * <p>更新已有菜单权限的信息</p>
+     *
+     * @param menu 菜单实体信息
+     * @return 操作结果
      */
+    @Operation(summary = "更新菜单权限", description = "更新已有菜单权限的信息")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "更新成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "菜单不存在")
+    })
     @SysLog("更新菜单")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    public R editSave(@RequestBody MenuEntity menu) {
+    public R editSave(@Parameter(description = "菜单实体信息", required = true) @RequestBody MenuEntity menu) {
         BeanUtil.beanAttributeValueTrim(menu);
 
         if (MenuType.isButton(menu.getType()) && StringUtils.isEmpty(menu.getVisible())) {
@@ -194,11 +259,22 @@ public class MenuController extends BaseController {
     }
 
     /**
-     * 删除菜单权限
+     * 批量删除菜单权限
+     * <p>根据多个菜单ID批量删除菜单权限，ID之间用逗号分隔</p>
+     *
+     * @param ids 菜单ID列表，多个ID用逗号分隔
+     * @return 操作结果
      */
+    @Operation(summary = "批量删除菜单权限", description = "根据多个菜单ID批量删除菜单权限，ID之间用逗号分隔")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "删除成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @SysLog("批量删除菜单")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public R remove(@RequestParam("ids") String ids) {
+    public R remove(@Parameter(description = "菜单ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {
         // 使用验证工具类解析和验证参数
         List<String> menuIdList = BatchOperationValidator.validateAndParseIds(ids);
         menuService.deleteByIds(StringUtils.join(menuIdList, ","));

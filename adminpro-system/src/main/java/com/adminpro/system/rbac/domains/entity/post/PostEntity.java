@@ -11,10 +11,28 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * 职位表 sys_post_tbl
+ * 职位实体类
+ * <p>
+ * 该实体对应系统职位表(SYS_POST_TBL)，用于存储组织中的职位信息。
+ * 职位是组织架构中的重要概念，用于定义员工的工作岗位和职责，通常与部门和角色关联使用。
+ * </p>
+ * <p>
+ * 主要功能包括：
+ * <ul>
+ * <li>职位基本信息：职位编码、职位名称等</li>
+ * <li>职位显示控制：通过sort字段控制职位的显示顺序</li>
+ * <li>职位状态管理：启用/禁用状态</li>
+ * <li>职位描述：通过remark字段记录职位的详细说明</li>
+ * </ul>
+ * </p>
+ * <p>
+ * 继承自BaseAuditEntity，自动包含创建时间、创建人、更新时间、更新人等审计字段。
+ * 使用Lombok的@Data注解自动生成getter/setter、toString、equals、hashCode等方法。
+ * </p>
  *
  * @author simon
  * @date 2020-05-21
+ * @see com.adminpro.framework.base.entity.BaseAuditEntity
  */
 @Data
 @Table(name = PostEntity.TABLE_NAME)

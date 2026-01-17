@@ -23,13 +23,51 @@ import java.io.*;
 import java.util.Date;
 
 /**
- * 上传下载帮助类
+ * 文件上传下载辅助类
+ * <p>
+ * 本类提供文件的上传、下载、URL处理等功能，支持：
+ * <ul>
+ * <li>本地文件系统存储（公共/私有目录）</li>
+ * <li>OSS云存储</li>
+ * <li>图片压缩和缩略图生成</li>
+ * <li>Base64图片上传</li>
+ * <li>视频封面提取</li>
+ * </ul>
+ * <p>
+ * 主要功能：
+ * <ul>
+ * <li>文件上传（公共文件/私有文件）</li>
+ * <li>Base64图片上传</li>
+ * <li>OSS云存储管理</li>
+ * <li>文件下载</li>
+ * <li>URL前缀处理</li>
+ * </ul>
+ * <p>
+ * 使用场景：
+ * <ul>
+ * <li>用户头像上传</li>
+ * <li>附件上传下载</li>
+ * <li>图片存储和处理</li>
+ * <li>视频存储</li>
+ * </ul>
  */
 @Component
 public class FileHelper {
 
     /**
-     * 给URL添加前缀 (用于返回给前端)
+     * 给URL添加前缀（用于返回给前端）
+     * <p>
+     * 将相对路径URL转换为包含上下文路径和前缀的完整URL。
+     * 如果URL已经是http开头的绝对路径，则不做处理
+     * <p>
+     * 使用场景：
+     * <ul>
+     * <li>返回文件访问URL给前端</li>
+     * <li>图片路径转换</li>
+     * </ul>
+     *
+     * @param url 文件相对路径或绝对URL
+     * @return 添加了前缀的完整URL，如果输入为null或已是http开头则原样返回
      */
     public String getUrlWithPrefix(String url) {
         if (url == null || url.startsWith("http")) {

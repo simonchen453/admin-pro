@@ -13,6 +13,13 @@ import com.adminpro.system.rbac.domains.entity.post.PostCreateValidator;
 import com.adminpro.system.rbac.domains.entity.post.PostEntity;
 import com.adminpro.system.rbac.domains.entity.post.PostService;
 import com.adminpro.system.rbac.domains.entity.post.PostUpdateValidator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,11 +28,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 职位 信息操作处理
+ * 职位管理控制器
+ * <p>提供职位的增删改查功能，包括职位列表查询、职位详情查询、职位创建、职位更新、职位删除等操作</p>
  *
  * @author simon
  * @date 2020-05-21
  */
+@Tag(name = "职位管理", description = "职位的增删改查接口")
 @RestController
 @RequestMapping(PostController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:post')")
@@ -44,9 +53,20 @@ public class PostController extends BaseController {
 
     /**
      * 查询职位列表
+     * <p>根据查询条件获取职位列表，支持按职位编码、名称、状态等条件进行过滤和分页查询</p>
+     *
+     * @param searchForm 查询条件表单，包含职位编码、名称、状态等过滤条件
+     * @return 职位查询结果集，包含数据和分页信息
      */
+    @Operation(summary = "查询职位列表", description = "根据查询条件获取职位列表，支持按职位编码、名称、状态等条件进行过滤和分页查询")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostEntity.class))),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public R<QueryResultSet<PostEntity>> list(@RequestBody SearchForm searchForm) {
+    public R<QueryResultSet<PostEntity>> list(@Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String code = searchForm.getCode();
         String name = searchForm.getName();
@@ -67,13 +87,22 @@ public class PostController extends BaseController {
     }
 
     /**
-     * 获取详细信息
+     * 查询职位详情
+     * <p>根据职位ID获取职位的详细信息</p>
      *
-     * @param id
-     * @return
+     * @param id 职位ID
+     * @return 职位详细信息
      */
+    @Operation(summary = "查询职位详情", description = "根据职位ID获取职位的详细信息")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostEntity.class))),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "职位不存在")
+    })
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    public R<PostEntity> detail(@PathVariable String id) {
+    public R<PostEntity> detail(@Parameter(description = "职位ID", required = true) @PathVariable String id) {
         PostEntity entity = postService.findById(id);
         if (entity != null) {
             entity.emptyAuditTime();
@@ -84,11 +113,22 @@ public class PostController extends BaseController {
     }
 
     /**
-     * 新增保存职位
+     * 创建职位
+     * <p>新增一个职位，包含职位编码、名称、排序、状态等信息</p>
+     *
+     * @param post 职位实体信息
+     * @return 操作结果
      */
+    @Operation(summary = "创建职位", description = "新增一个职位，包含职位编码、名称、排序、状态等信息")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "创建成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @SysLog("创建职位")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public R create(@RequestBody PostEntity post) {
+    public R create(@Parameter(description = "职位实体信息", required = true) @RequestBody PostEntity post) {
         BeanUtil.beanAttributeValueTrim(post);
         MessageBundle messageBundle = getMessageBundle();
         postCreateValidator.validate(post, messageBundle);
@@ -114,11 +154,23 @@ public class PostController extends BaseController {
     }
 
     /**
-     * 修改保存职位
+     * 更新职位
+     * <p>更新已有职位的信息</p>
+     *
+     * @param post 职位实体信息
+     * @return 操作结果
      */
+    @Operation(summary = "更新职位", description = "更新已有职位的信息")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "更新成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "职位不存在")
+    })
     @SysLog("更新职位")
     @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
-    public R editSave(@RequestBody PostEntity post) {
+    public R editSave(@Parameter(description = "职位实体信息", required = true) @RequestBody PostEntity post) {
         BeanUtil.beanAttributeValueTrim(post);
         MessageBundle messageBundle = getMessageBundle();
 
@@ -146,11 +198,22 @@ public class PostController extends BaseController {
     }
 
     /**
-     * 删除职位
+     * 批量删除职位
+     * <p>根据多个职位ID批量删除职位，ID之间用逗号分隔</p>
+     *
+     * @param ids 职位ID列表，多个ID用逗号分隔
+     * @return 操作结果
      */
+    @Operation(summary = "批量删除职位", description = "根据多个职位ID批量删除职位，ID之间用逗号分隔")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "删除成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
+    })
     @SysLog("删除职位")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public R remove(@RequestParam("ids") String ids) {
+    public R remove(@Parameter(description = "职位ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {
         // 使用验证工具类解析和验证参数
         List<String> postIdList = BatchOperationValidator.validateAndParseIds(ids);
         postService.deleteByIds(StringUtils.join(postIdList, ","));

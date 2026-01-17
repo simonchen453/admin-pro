@@ -18,7 +18,32 @@ import java.math.BigInteger;
 import java.util.*;
 
 /**
- * 配置的帮助类
+ * 配置辅助工具类
+ * <p>
+ * 本类提供系统配置的统一访问接口，支持多层级配置源读取：
+ * <ul>
+ * <li>环境变量（优先级最高）</li>
+ * <li>数据库配置表（动态配置）</li>
+ * <li>Spring环境配置（application.properties/yml）</li>
+ * <li>属性文件（project.properties、config.properties等）</li>
+ * </ul>
+ * <p>
+ * 主要功能：
+ * <ul>
+ * <li>支持多种数据类型的配置读取（String、Integer、Long、Double等）</li>
+ * <li>自动从多个配置源查找配置项</li>
+ * <li>支持默认值设置</li>
+ * <li>支持数组、Map等复杂类型</li>
+ * </ul>
+ * <p>
+ * 使用场景：
+ * <ul>
+ * <li>读取系统配置参数</li>
+ * <li>读取业务配置项</li>
+ * <li>读取第三方服务配置</li>
+ * </ul>
+ * <p>
+ * 注意：配置优先级为 环境变量 > 数据库配置 > Spring配置 > 属性文件
  *
  * @author simon
  */

@@ -62,8 +62,7 @@ public class UserCreateValidator extends BaseValidator<UserCreateVo> {
          * UserEntity userEntity =
          * userService.findByDomainAndMobileNo(model.getUserDomain(),
          * model.getMobileNo());
-         * if (userEntity != null && !userEntity.getUserIden().equals(new
-         * UserIden(model.getUserDomain(), model.getUserId()))) {
+         * 
          * msgBundle.addErrorMessage("mobileNo", "手机号码不能重复");
          * }
          * }

@@ -13,10 +13,28 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 角色表 sys_role_tbl
+ * 角色实体类
+ * <p>
+ * 该实体对应系统角色表(SYS_ROLE_TBL)，用于存储RBAC（基于角色的访问控制）系统中的角色信息。
+ * 角色是权限管理的重要概念，用于将权限分配给用户，实现用户与权限的解耦。
+ * </p>
+ * <p>
+ * 主要功能包括：
+ * <ul>
+ * <li>角色基本信息：角色名称、显示名称等</li>
+ * <li>角色状态管理：启用/禁用状态</li>
+ * <li>系统角色标识：区分系统内置角色和自定义角色</li>
+ * <li>菜单权限关联：通过menuIds字段关联该角色拥有的菜单权限</li>
+ * </ul>
+ * </p>
+ * <p>
+ * 继承自BaseAuditEntity，自动包含创建时间、创建人、更新时间、更新人等审计字段。
+ * 使用Lombok的@Data注解自动生成getter/setter、toString、equals、hashCode等方法。
+ * </p>
  *
  * @author simon
  * @date 2018-09-06
+ * @see com.adminpro.framework.base.entity.BaseAuditEntity
  */
 @Data
 @Table(name = RoleEntity.TABLE_NAME)
@@ -84,5 +102,12 @@ public class RoleEntity extends BaseAuditEntity {
     @Column(name = COL_IS_SYSTEM, type = Column.Type.BOOLEAN)
     private boolean system;
 
+    /**
+     * 该角色关联的菜单ID列表
+     * <p>
+     * 用于构建角色与菜单的多对多关联关系，表示该角色拥有的菜单权限。
+     * 在角色权限分配时，通过此字段设置角色可访问的菜单资源。
+     * </p>
+     */
     private List<String> menuIds;
 }

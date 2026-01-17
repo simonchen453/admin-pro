@@ -12,7 +12,7 @@ import type {
 
 // 查询定时任务列表
 export const getJobListApi = async (searchForm: JobSearchForm): Promise<JobListResponse> => {
-  const response = await request.post<ApiResponse<JobListResponse>>('/api/v1/tools/jobs', searchForm);
+  const response = await request.post<ApiResponse<JobListResponse>>('/api/v1/tools/jobs/search', searchForm);
   return response.data as unknown as JobListResponse;
 };
 
@@ -68,7 +68,7 @@ export const getNextTimeApi = async (cronExpression: string): Promise<JobNextTim
 
 // 查询定时任务日志列表
 export const getJobLogListApi = async (searchForm: JobLogSearchForm): Promise<JobLogListResponse> => {
-  const response = await request.post<ApiResponse<JobLogListResponse>>('/api/v1/tools/jobs/logs', searchForm);
+  const response = await request.post<ApiResponse<JobLogListResponse>>('/api/v1/tools/jobs/logs/search', searchForm);
   return response.data as unknown as JobLogListResponse;
 };
 

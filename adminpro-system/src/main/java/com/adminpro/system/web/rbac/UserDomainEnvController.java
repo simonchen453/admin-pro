@@ -68,7 +68,7 @@ public class UserDomainEnvController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @PostMapping(value = "/list")
+    @PostMapping(value = "/search")
     public R<QueryResultSet<UserDomainEnvEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);

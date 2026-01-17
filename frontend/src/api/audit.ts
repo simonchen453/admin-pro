@@ -5,6 +5,6 @@ import type {
 } from '../types';
 
 export const getAuditLogListApi = (searchForm: AuditLogSearchForm): Promise<AuditLogListResponse> => {
-  return request.post('/api/v1/tools/audit-logs', searchForm);
+  return request.post('/api/v1/tools/audit-logs/search', searchForm);
 };
 

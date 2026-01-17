@@ -8,7 +8,7 @@ import type {
 } from '../types';
 
 export const getDomainListApi = (params: DomainSearchForm): Promise<DomainListResponse> => {
-  return request.post('/api/v1/domains/list', params);
+  return request.post('/api/v1/domains/search', params);
 };
 
 export const getDomainDetailApi = (id: string): Promise<DomainDetailResponse> => {

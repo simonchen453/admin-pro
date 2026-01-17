@@ -9,7 +9,7 @@ import type {
 } from '../types';
 
 export const getConfigListApi = (params: ConfigSearchForm): Promise<ConfigListResponse> => {
-  return request.post('/api/v1/tools/config', params);
+  return request.post('/api/v1/tools/config/search', params);
 };
 
 export const getConfigDetailApi = (id: string): Promise<ConfigDetailResponse> => {
@@ -21,7 +21,7 @@ export const updateConfigApi = (params: ConfigEntity): Promise<ConfigCreateRespo
 };
 
 export const createConfigApi = (params: ConfigEntity): Promise<ConfigCreateResponse> => {
-  return request.post('/api/v1/tools/config/create', params);
+  return request.post('/api/v1/tools/config', params);
 };
 
 export const deleteConfigApi = (ids: string): Promise<ApiResponse> => {

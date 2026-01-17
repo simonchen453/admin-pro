@@ -9,7 +9,7 @@ import type {
 } from '../types';
 
 export const getDictListApi = (params: DictSearchForm): Promise<DictListResponse> => {
-  return request.post('/api/v1/tools/dict', params);
+  return request.post('/api/v1/tools/dict/search', params);
 };
 
 export const getDictDetailApi = (id: string): Promise<DictDetailResponse> => {
@@ -21,18 +21,22 @@ export const updateDictApi = (params: DictEntity): Promise<DictCreateResponse> =
 };
 
 export const createDictApi = (params: DictEntity): Promise<DictCreateResponse> => {
-  return request.post('/api/v1/tools/dict/create', params);
+  return request.post('/api/v1/tools/dict', params);
 };
 
-export const deleteDictApi = (ids: string): Promise<ApiResponse> => {
+export const deleteDictApi = (id: string): Promise<ApiResponse> => {
+  return request.delete(`/api/v1/tools/dict/${id}`);
+};
+
+export const batchDeleteDictApi = (ids: string): Promise<ApiResponse> => {
   return request.delete(`/api/v1/tools/dict?ids=${ids}`);
 };
 
 export const activeDictApi = (id: string): Promise<ApiResponse> => {
-  return request.patch(`/api/v1/tools/dict/active/${id}`);
+  return request.patch(`/api/v1/tools/dict/${id}/active`);
 };
 
 export const inactiveDictApi = (id: string): Promise<ApiResponse> => {
-  return request.patch(`/api/v1/tools/dict/inactive/${id}`);
+  return request.patch(`/api/v1/tools/dict/${id}/inactive`);
 };
 

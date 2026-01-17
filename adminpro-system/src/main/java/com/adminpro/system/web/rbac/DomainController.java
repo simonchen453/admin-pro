@@ -65,7 +65,8 @@ public class DomainController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @PostMapping(value = "/list")
+    @SysLog("查询用户域列表")
+    @PostMapping(value = "/search")
     public R<QueryResultSet<DomainEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);

@@ -25,7 +25,7 @@ import java.util.List;
 @RequestMapping("/api/v1/sys-logs")
 public class SysLogController extends BaseController {
     protected static final String PREFIX = "admin/syslog";
-    protected static final String PREFIX_URL = "/api/v1/sys-logs";
+    protected static final String PREFIX_URL = "/api/v1/tools/sys-logs";
     protected static final String SEARCH_FORM_KEY = SysLogController.class.getSimpleName();
     @Autowired
     private SysLogService sysLogService;
@@ -33,7 +33,7 @@ public class SysLogController extends BaseController {
     /**
      * 查询系统日志列表
      */
-    @PostMapping
+    @PostMapping("/search")
     public R<QueryResultSet<SysLogDTO>> list(@RequestBody SearchForm searchForm) {
         String condition = searchForm.getCondition();
         String startTimeStr = searchForm.getStartTime();

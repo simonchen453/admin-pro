@@ -6,7 +6,7 @@ import type {
 } from '../types';
 
 export const getSessionListApi = (searchForm: SessionSearchForm): Promise<SessionListResponse> => {
-  return request.post('/api/v1/tools/sessions', searchForm);
+  return request.post('/api/v1/tools/sessions/search', searchForm);
 };
 
 export const suspendSessionApi = (id: string): Promise<ApiResponse> => {

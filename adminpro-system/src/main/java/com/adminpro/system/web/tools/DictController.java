@@ -216,6 +216,24 @@ public class DictController extends BaseController {
         }
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "删除成功"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "字典不存在")
+    })
+    @SysLog("删除字典")
+    @DeleteMapping(value = "/{id}")
+    public R delete(@Parameter(description = "字典ID", required = true) @PathVariable String id) {
+        DictEntity entity = dictService.findById(id);
+        if (entity != null) {
+            dictService.deleteByIds(id);
+            return R.ok();
+        } else {
+            return R.error("字典不存在");
+        }
+    }
+
     /**
      * 删除字典类型
      * <p>
@@ -233,7 +251,7 @@ public class DictController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @SysLog("删除字典")
+    @SysLog("批量删除字典")
     @DeleteMapping
     public R remove(@RequestParam("ids") String ids) {
         // 使用验证工具类解析和验证参数

@@ -261,10 +261,8 @@ public class UserController extends BaseController {
         sysUserResponseVo.setAvatarUrl(userEntity.getAvatarUrl());
         sysUserResponseVo.setRealName(userEntity.getRealName());
         sysUserResponseVo.setMobileNo(userEntity.getMobileNo());
-        if (userEntity != null) {
-            sysUserResponseVo.setUserDomain(userEntity.getUserDomain());
-            sysUserResponseVo.setUserId(userEntity.getId());
-        }
+        sysUserResponseVo.setUserDomain(userEntity.getUserDomain());
+        sysUserResponseVo.setId(userEntity.getId());
         sysUserResponseVo.setDescription(userEntity.getDescription());
         sysUserResponseVo.setLatestLoginTime(userEntity.getLatestLoginTime());
         sysUserResponseVo.setStatus(userEntity.getStatus());

@@ -55,11 +55,11 @@ public class SecurityProperties {
      */
     public SecurityProperties() {
         // 默认公开接口
-        this.publicUrls.add("/auth/login");
-        this.publicUrls.add("/auth/logout");
-        this.publicUrls.add("/auth/captcha/**");
-        this.publicUrls.add("/common/**");
-        this.publicUrls.add("/public/**");
+        this.publicUrls.add("/api/v1/auth/login");
+        this.publicUrls.add("/api/v1/auth/logout");
+        this.publicUrls.add("/api/v1/auth/captcha/**");
+        this.publicUrls.add("/api/v1/common/**");
+        this.publicUrls.add("/api/v1/public/**");
         this.publicUrls.add("/error");
         this.publicUrls.add("/favicon.ico");
 

@@ -150,11 +150,11 @@ app:
         # 公开接口列表（无需认证即可访问）
         # 支持 Ant 风格路径匹配：** 匹配多级路径，* 匹配单级路径
         public-urls:
-            - /auth/login
-            - /auth/logout
-            - /auth/captcha/**
-            - /common/**
-            - /public/**
+            - /api/v1/auth/login
+            - /api/v1/auth/logout
+            - /api/v1/auth/captcha/**
+            - /api/v1/common/**
+            - /api/v1/public/**
             - /error
             - /favicon.ico
             - /v3/api-docs/**

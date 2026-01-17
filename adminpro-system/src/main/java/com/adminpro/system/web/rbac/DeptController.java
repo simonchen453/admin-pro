@@ -81,7 +81,7 @@ public class DeptController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @PostMapping
     public R<List<DeptEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -175,7 +175,7 @@ public class DeptController extends BaseController {
             @ApiResponse(responseCode = "404", description = "部门不存在")
     })
     @SysLog("更新部门")
-    @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
+    @PutMapping(value = "/{id}")
     public R editSave(@Parameter(description = "部门实体信息", required = true) @RequestBody DeptEntity dept) {
         MessageBundle messageBundle = getMessageBundle();
         BeanUtil.beanAttributeValueTrim(dept);
@@ -233,7 +233,7 @@ public class DeptController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("删除部门")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping
     public R remove(
             @Parameter(description = "部门ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {
         // 使用验证工具类解析和验证参数
@@ -301,7 +301,7 @@ public class DeptController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "部门不存在")
     })
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}")
     public R<DeptEntity> detail(@Parameter(description = "部门ID", required = true) @PathVariable String id) {
         DeptEntity entity = deptService.findById(id);
         if (entity != null) {

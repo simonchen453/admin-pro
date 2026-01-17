@@ -9,11 +9,11 @@ import type {
 } from '../types';
 
 export const getDeptListApi = (params: DeptSearchForm): Promise<DeptListResponse> => {
-  return request.post('/api/v1/depts/list', params);
+  return request.post('/api/v1/depts', params);
 };
 
 export const getDeptDetailApi = (id: string): Promise<DeptDetailResponse> => {
-  return request.get(`/api/v1/depts/detail/${id}`);
+  return request.get(`/api/v1/depts/${id}`);
 };
 
 export const createDeptApi = (params: DeptEntity): Promise<DeptCreateResponse> => {
@@ -21,11 +21,11 @@ export const createDeptApi = (params: DeptEntity): Promise<DeptCreateResponse> =
 };
 
 export const updateDeptApi = (params: DeptEntity): Promise<DeptCreateResponse> => {
-  return request.patch('/api/v1/depts/edit', params);
+  return request.put(`/api/v1/depts/${params.id}`, params);
 };
 
 export const deleteDeptApi = (ids: string): Promise<any> => {
-  return request.delete(`/api/v1/depts/delete?ids=${ids}`);
+  return request.delete(`/api/v1/depts?ids=${ids}`);
 };
 
 export const getDeptTreeSelectApi = (): Promise<DeptTreeSelectResponse> => {

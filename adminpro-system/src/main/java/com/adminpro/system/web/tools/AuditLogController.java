@@ -66,7 +66,7 @@ public class AuditLogController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @PostMapping
     public R<QueryResultSet<AuditLogDTO>> search(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         SearchParam param = startPaging(searchForm);

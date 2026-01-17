@@ -10,12 +10,12 @@ import type {
 
 // 查询岗位列表
 export const getPostListApi = (params: PostSearchForm): Promise<PostListResponse> => {
-  return request.post('/api/v1/posts/list', params);
+  return request.post('/api/v1/posts', params);
 };
 
 // 获取岗位详情
 export const getPostDetailApi = (id: string): Promise<PostDetailResponse> => {
-  return request.get(`/api/v1/posts/detail/${id}`);
+  return request.get(`/api/v1/posts/${id}`);
 };
 
 // 创建岗位
@@ -25,11 +25,11 @@ export const createPostApi = (params: PostEntity): Promise<PostCreateResponse> =
 
 // 更新岗位
 export const updatePostApi = (params: PostEntity): Promise<PostCreateResponse> => {
-  return request.patch('/api/v1/posts/edit', params);
+  return request.put(`/api/v1/posts/${params.id}`, params);
 };
 
 // 删除岗位
 export const deletePostApi = (ids: string): Promise<ApiResponse> => {
-  return request.delete(`/api/v1/posts/delete?ids=${ids}`);
+  return request.delete(`/api/v1/posts?ids=${ids}`);
 };
 

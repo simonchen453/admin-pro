@@ -33,7 +33,7 @@ public class SysLogController extends BaseController {
     /**
      * 查询系统日志列表
      */
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @PostMapping
     public R<QueryResultSet<SysLogDTO>> list(@RequestBody SearchForm searchForm) {
         String condition = searchForm.getCondition();
         String startTimeStr = searchForm.getStartTime();
@@ -65,7 +65,7 @@ public class SysLogController extends BaseController {
         return R.ok(resultSet);
     }
 
-    @RequestMapping(value = "/deletemany", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteManyLogs(@RequestParam String ids) {
         try {
             List<String> idList = BatchOperationValidator.validateAndParseIds(ids);

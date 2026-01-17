@@ -76,7 +76,7 @@ public class DictController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @PostMapping
     public R<QueryResultSet<DictEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -159,7 +159,7 @@ public class DictController extends BaseController {
             @ApiResponse(responseCode = "404", description = "字典不存在")
     })
     @SysLog("更新字典")
-    @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
+    @PutMapping(value = "/{id}")
     public R editSave(@RequestBody DictEntity dict) {
         BeanUtil.beanAttributeValueTrim(dict);
         MessageBundle messageBundle = getMessageBundle();
@@ -203,7 +203,7 @@ public class DictController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "字典不存在")
     })
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}")
     public R<DictEntity> detail(@PathVariable String id) {
         DictEntity entity = dictService.findById(id);
         if (entity != null) {
@@ -232,7 +232,7 @@ public class DictController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("删除字典")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping
     public R remove(@RequestParam("ids") String ids) {
         // 使用验证工具类解析和验证参数
         List<String> dictIdList = BatchOperationValidator.validateAndParseIds(ids);

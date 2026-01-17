@@ -9,15 +9,15 @@ import type {
 } from '../types';
 
 export const getConfigListApi = (params: ConfigSearchForm): Promise<ConfigListResponse> => {
-  return request.post('/api/v1/configs/list', params);
+  return request.post('/api/v1/configs', params);
 };
 
 export const getConfigDetailApi = (id: string): Promise<ConfigDetailResponse> => {
-  return request.get(`/api/v1/configs/detail/${id}`);
+  return request.get(`/api/v1/configs/${id}`);
 };
 
 export const updateConfigApi = (params: ConfigEntity): Promise<ConfigCreateResponse> => {
-  return request.patch('/api/v1/configs/edit', params);
+  return request.put(`/api/v1/configs/${params.id}`, params);
 };
 
 export const createConfigApi = (params: ConfigEntity): Promise<ConfigCreateResponse> => {
@@ -25,6 +25,6 @@ export const createConfigApi = (params: ConfigEntity): Promise<ConfigCreateRespo
 };
 
 export const deleteConfigApi = (ids: string): Promise<ApiResponse> => {
-  return request.delete(`/api/v1/configs/delete?ids=${ids}`);
+  return request.delete(`/api/v1/configs?ids=${ids}`);
 };
 

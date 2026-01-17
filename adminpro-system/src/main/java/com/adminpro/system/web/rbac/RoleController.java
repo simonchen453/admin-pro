@@ -48,7 +48,7 @@ public class RoleController extends BaseController {
     /**
      * 查询角色列表
      */
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @PostMapping
     public R<QueryResultSet<ListRoleVo>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -106,7 +106,7 @@ public class RoleController extends BaseController {
      * 修改保存角色
      */
     @SysLog("更新角色")
-    @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
+    @PutMapping(value = "/{id}")
     public R editSave(@RequestBody RoleEntity role) {
         BeanUtil.beanAttributeValueTrim(role);
         MessageBundle messageBundle = getMessageBundle();
@@ -137,7 +137,7 @@ public class RoleController extends BaseController {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}")
     public R<RoleEntity> detail(@PathVariable String id) {
         RoleEntity entity = roleService.findById(id);
         if (entity != null) {
@@ -152,7 +152,7 @@ public class RoleController extends BaseController {
      * 删除角色
      */
     @SysLog("删除角色")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping
     public R remove(@RequestParam("ids") String ids) {
         // 使用验证工具类解析和验证参数
         List<String> roleIdList = BatchOperationValidator.validateAndParseIds(ids);

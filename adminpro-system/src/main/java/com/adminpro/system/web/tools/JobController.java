@@ -90,7 +90,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<JobVo>> paging(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String condition = searchForm.getCondition();
@@ -155,7 +155,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "任务不存在")
     })
-    @RequestMapping(method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R update(@RequestBody JobVo jobVo) {
         BeanUtil.beanAttributeValueTrim(jobVo);
         MessageBundle bundle = getMessageBundle();
@@ -191,7 +191,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteMany(@RequestParam String ids) {
         try {
             // 使用验证工具类解析和验证参数
@@ -220,7 +220,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "任务不存在")
     })
-    @RequestMapping(value = "/detail/{id}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public R detail(@PathVariable String id) {
         ScheduleJobEntity entity = scheduleJobService.findById(id);
         JobVo convert = jobVoConverter.convert(entity);
@@ -333,7 +333,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/log/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/logs", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<JobLogVo>> logs(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String condition = searchForm.getCondition();
@@ -363,7 +363,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/log/delete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/logs", produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteManyLogs(@RequestParam String ids) {
         try {
             // 使用验证工具类解析和验证参数
@@ -389,7 +389,7 @@ public class JobController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/log/delete/all", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/logs/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteAllLogs() {
         try {
             scheduleJobLogService.deleteByBeanName("");

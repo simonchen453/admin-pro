@@ -77,7 +77,7 @@ public class ConfigController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @PostMapping
     public R<QueryResultSet<ConfigEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
@@ -162,7 +162,7 @@ public class ConfigController extends BaseController {
             @ApiResponse(responseCode = "404", description = "配置不存在")
     })
     @SysLog("更新配置")
-    @RequestMapping(value = "/edit", method = RequestMethod.PATCH)
+    @PutMapping(value = "/{id}")
     public R editSave(@RequestBody ConfigEntity config) {
         BeanUtil.beanAttributeValueTrim(config);
         MessageBundle messageBundle = getMessageBundle();
@@ -207,7 +207,7 @@ public class ConfigController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "配置不存在")
     })
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}")
     public R<ConfigEntity> detail(@PathVariable String id) {
         ConfigEntity entity = configService.findById(id);
         if (entity != null) {
@@ -236,7 +236,7 @@ public class ConfigController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @SysLog("删除配置")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @DeleteMapping
     public R remove(@RequestParam("ids") String ids) {
         // 使用验证工具类解析和验证参数
         List<String> configIdList = BatchOperationValidator.validateAndParseIds(ids);

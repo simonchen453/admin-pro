@@ -7,7 +7,7 @@ import type {
 } from '../types';
 
 export const getSysLogListApi = (searchForm: SysLogSearchForm): Promise<SysLogListResponse> => {
-  return request.post('/api/v1/sys-logs/list', searchForm);
+  return request.post('/api/v1/sys-logs', searchForm);
 };
 
 export const getSysLogDetailApi = (id: string): Promise<SysLogDetailResponse> => {
@@ -15,10 +15,10 @@ export const getSysLogDetailApi = (id: string): Promise<SysLogDetailResponse> =>
 };
 
 export const deleteSysLogApi = (ids: string): Promise<ApiResponse> => {
-  return request.delete(`/api/v1/sys-logs/delete?ids=${ids}`);
+  return request.delete(`/api/v1/sys-logs?ids=${ids}`);
 };
 
 export const deleteManySysLogApi = (ids: string): Promise<ApiResponse> => {
-  return request.delete(`/api/v1/sys-logs/deletemany`, { params: { ids } });
+  return request.delete(`/api/v1/sys-logs`, { params: { ids } });
 };
 

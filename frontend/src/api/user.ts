@@ -16,7 +16,7 @@ import type {
 
 // 用户列表查询
 export const getUserListApi = async (searchForm: UserSearchForm): Promise<UserListResponse> => {
-  const response = await request.post<ApiResponse<UserListResponse>>('/api/v1/users/list', searchForm);
+  const response = await request.post<ApiResponse<UserListResponse>>('/api/v1/users', searchForm);
   return response.data;
 };
 
@@ -28,7 +28,7 @@ export const createUserApi = async (userData: UserCreateRequest): Promise<ApiRes
 
 // 更新用户
 export const updateUserApi = async (userData: UserUpdateRequest): Promise<ApiResponse> => {
-  const response = await request.patch<ApiResponse>('/api/v1/users', userData);
+  const response = await request.put<ApiResponse>(`/api/v1/users/${userData.userId}`, userData);
   return response;
 };
 
@@ -58,13 +58,13 @@ export const resetPasswordApi = async (resetData: UserResetPasswordRequest): Pro
 
 // 获取用户详情
 export const getUserDetailApi = async (userId: string): Promise<UserDetailResponse> => {
-  const response = await request.get<ApiResponse<UserDetailResponse>>(`/api/v1/users/detail/${userId}`);
+  const response = await request.get<ApiResponse<UserDetailResponse>>(`/api/v1/users/${userId}`);
   return response.data;
 };
 
 // 获取部门列表（用于下拉选择）
 export const getDeptListApi = async (): Promise<DeptEntity[]> => {
-  const response = await request.get<ApiResponse<DeptEntity[]>>('/api/v1/depts/list');
+  const response = await request.get<ApiResponse<DeptEntity[]>>('/api/v1/depts');
   return response.data;
 };
 
@@ -76,13 +76,13 @@ export const getDeptTreeSelectApi = async (): Promise<any[]> => {
 
 // 获取角色列表（用于下拉选择）
 export const getRoleListApi = async (): Promise<RoleEntity[]> => {
-  const response = await request.get<ApiResponse<RoleEntity[]>>('/api/v1/roles/list');
+  const response = await request.get<ApiResponse<RoleEntity[]>>('/api/v1/roles');
   return response.data;
 };
 
 // 获取岗位列表（用于下拉选择）
 export const getPostListApi = async (): Promise<PostEntity[]> => {
-  const response = await request.get<ApiResponse<PostEntity[]>>('/api/v1/posts/list');
+  const response = await request.get<ApiResponse<PostEntity[]>>('/api/v1/posts');
   return response.data;
 };
 
@@ -102,7 +102,7 @@ export const getUserPrepareDataApi = async (): Promise<{
 
 // 删除用户（支持批量删除）
 export const deleteUserApi = async (userIds: string): Promise<ApiResponse> => {
-  const response = await request.delete<ApiResponse>(`/api/v1/users/delete?users=${userIds}`);
+  const response = await request.delete<ApiResponse>(`/api/v1/users?users=${userIds}`);
   return response;
 };
 

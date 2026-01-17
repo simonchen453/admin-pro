@@ -107,7 +107,7 @@ public class UserController extends BaseController {
      * @param searchForm 查询条件表单
      * @return 分页查询结果
      */
-    @RequestMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<UserListResponseVo>> search(@RequestBody SearchForm searchForm) {
         logger.debug("查询用户列表: searchForm={}", searchForm);
         SearchParam param = buildSearchParam(searchForm);
@@ -249,7 +249,7 @@ public class UserController extends BaseController {
      * @param userId 用户ID
      * @return 用户详细信息
      */
-    @RequestMapping(value = "/detail/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<UserDetailVO> view(@PathVariable String userId) {
         logger.debug("查询用户详情: userId={}", userId);
         UserEntity userEntity = userService.findById(userId);
@@ -320,7 +320,7 @@ public class UserController extends BaseController {
      * @return 操作结果
      */
     @SysLog("删除用户")
-    @RequestMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
+    @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R<Void> deleteMany(@RequestParam String users) {
         logger.info("批量删除用户: users={}", users);
         try {
@@ -427,7 +427,7 @@ public class UserController extends BaseController {
      * @return 操作结果
      */
     @SysLog("更新用户")
-    @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
+    @PutMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public R update(@Valid @RequestBody UserCreateVo userRequestVo) {
         logger.info("更新用户: userDomain={}, userId={}", userRequestVo.getUserDomain(), userRequestVo.getUserId());

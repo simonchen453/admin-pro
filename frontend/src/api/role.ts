@@ -80,12 +80,12 @@ export interface RoleMenuTreeResponse {
 
 // 查询角色列表
 export const getRoleListApi = (params: RoleSearchForm): Promise<RoleListResponse> => {
-  return request.post('/api/v1/roles/list', params);
+  return request.post('/api/v1/roles', params);
 };
 
 // 获取角色详情
 export const getRoleDetailApi = (id: string): Promise<RoleDetailResponse> => {
-  return request.get(`/api/v1/roles/detail/${id}`);
+  return request.get(`/api/v1/roles/${id}`);
 };
 
 // 创建角色
@@ -95,12 +95,12 @@ export const createRoleApi = (params: RoleEntity): Promise<RoleCreateResponse> =
 
 // 更新角色
 export const updateRoleApi = (params: RoleEntity): Promise<RoleCreateResponse> => {
-  return request.patch('/api/v1/roles/edit', params);
+  return request.put(`/api/v1/roles/${params.id}`, params);
 };
 
 // 删除角色
 export const deleteRoleApi = (ids: string): Promise<ApiResponse<{ success: boolean }>> => {
-  return request.delete(`/api/v1/roles/delete?ids=${ids}`);
+  return request.delete(`/api/v1/roles?ids=${ids}`);
 };
 
 // 获取菜单树结构

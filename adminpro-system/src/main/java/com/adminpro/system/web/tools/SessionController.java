@@ -67,7 +67,7 @@ public class SessionController extends BaseController {
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    @PostMapping
     public R<QueryResultSet<SessionEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String sessionId = searchForm.getSessionId();
@@ -113,7 +113,7 @@ public class SessionController extends BaseController {
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "会话不存在")
     })
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}")
     public R<SessionEntity> detail(@PathVariable String id) {
         SessionEntity entity = sessionService.findById(id);
         if (entity != null) {
@@ -143,7 +143,7 @@ public class SessionController extends BaseController {
             @ApiResponse(responseCode = "404", description = "会话不存在")
     })
     @SysLog("暂停会话")
-    @RequestMapping(value = "/suspend/{id}", method = RequestMethod.PATCH)
+    @PatchMapping(value = "/{id}/suspend")
     public R<SessionEntity> suspend(@PathVariable String id) {
         SessionEntity entity = sessionService.findById(id);
         if (StringHelper.equals(WebHelper.getSessionId(), entity.getSessionId())) {
@@ -177,7 +177,7 @@ public class SessionController extends BaseController {
             @ApiResponse(responseCode = "404", description = "会话不存在")
     })
     @SysLog("恢复会话")
-    @RequestMapping(value = "/unsuspend/{id}", method = RequestMethod.PATCH)
+    @PatchMapping(value = "/{id}/unsuspend")
     public R<SessionEntity> unsuspend(@PathVariable String id) {
         SessionEntity entity = sessionService.findById(id);
         if (StringHelper.equals(WebHelper.getSessionId(), entity.getSessionId())) {
@@ -211,7 +211,7 @@ public class SessionController extends BaseController {
             @ApiResponse(responseCode = "404", description = "会话不存在")
     })
     @SysLog("终止会话")
-    @RequestMapping(value = "/kill/{id}", method = RequestMethod.PATCH)
+    @PatchMapping(value = "/{id}/kill")
     public R<SessionEntity> kill(@PathVariable String id) {
         SessionEntity entity = sessionService.findById(id);
         if (StringHelper.equals(WebHelper.getSessionId(), entity.getSessionId())) {

@@ -23,12 +23,12 @@ export const getMenuList = async (): Promise<BackendMenuItem[]> => {
 
 // 获取菜单管理列表（树形结构）
 export const getMenuTreeListApi = (params?: MenuSearchForm): Promise<MenuListResponse> => {
-  return request.post('/api/v1/menus/list', params || {});
+  return request.post('/api/v1/menus', params || {});
 };
 
 // 获取菜单详情
 export const getMenuDetailApi = (id: string): Promise<MenuDetailResponse> => {
-  return request.get(`/api/v1/menus/detail/${id}`);
+  return request.get(`/api/v1/menus/${id}`);
 };
 
 // 创建菜单
@@ -38,15 +38,15 @@ export const createMenuApi = (params: MenuEntity): Promise<MenuCreateResponse> =
 
 // 更新菜单
 export const updateMenuApi = (params: MenuEntity): Promise<MenuCreateResponse> => {
-  return request.patch('/api/v1/menus/edit', params);
+  return request.put(`/api/v1/menus/${params.id}`, params);
 };
 
 // 删除菜单
 export const deleteMenuApi = (id: string): Promise<ApiResponse<{ success: boolean }>> => {
-  return request.delete(`/api/v1/menus/delete/${id}`);
+  return request.delete(`/api/v1/menus/${id}`);
 };
 
 // 获取菜单树选择器数据
 export const getMenuTreeSelectApi = (): Promise<MenuListResponse> => {
-  return request.post('/api/v1/menus/list', {});
+  return request.post('/api/v1/menus', {});
 };

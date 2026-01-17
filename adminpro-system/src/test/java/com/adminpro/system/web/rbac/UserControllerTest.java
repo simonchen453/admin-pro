@@ -89,7 +89,7 @@ public class UserControllerTest {
         when(userService.findById("test-user-id-001")).thenReturn(testUser);
 
         // Act & Assert
-        mockMvc.perform(get("/admin/user/detail/test-user-id-001")
+        mockMvc.perform(get("/api/v1/users/test-user-id-001")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -103,7 +103,7 @@ public class UserControllerTest {
         when(userService.findById("non-existent-id")).thenReturn(null);
 
         // Act & Assert
-        mockMvc.perform(get("/admin/user/detail/non-existent-id")
+        mockMvc.perform(get("/api/v1/users/non-existent-id")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()); // 返回200但带错误信息
 
@@ -117,7 +117,7 @@ public class UserControllerTest {
         doNothing().when(userService).deleteMany(anyString());
 
         // Act & Assert
-        mockMvc.perform(post("/admin/user/batch-delete")
+        mockMvc.perform(post("/api/v1/users/batch-delete")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("[\"domain_id1\", \"domain_id2\"]"))
                 .andExpect(status().isOk());
@@ -129,7 +129,7 @@ public class UserControllerTest {
     @DisplayName("批量删除用户 - 空列表")
     void batchDelete_WithEmptyList_ReturnsError() throws Exception {
         // Act & Assert
-        mockMvc.perform(post("/admin/user/batch-delete")
+        mockMvc.perform(post("/api/v1/users/batch-delete")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("[]"))
                 .andExpect(status().isOk()); // 返回200但带错误信息

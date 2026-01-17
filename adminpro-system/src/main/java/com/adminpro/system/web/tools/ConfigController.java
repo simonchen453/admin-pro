@@ -74,8 +74,8 @@ public class ConfigController extends BaseController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "搜索条件", required = true, content = @Content(schema = @Schema(implementation = SearchForm.class)))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @PostMapping("/search")
     public R<QueryResultSet<ConfigEntity>> list(@RequestBody SearchForm searchForm) {
@@ -112,9 +112,9 @@ public class ConfigController extends BaseController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "配置实体对象", required = true, content = @Content(schema = @Schema(implementation = ConfigEntity.class)))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("创建配置")
     @PostMapping
@@ -156,10 +156,10 @@ public class ConfigController extends BaseController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "配置实体对象，必须包含ID字段", required = true, content = @Content(schema = @Schema(implementation = ConfigEntity.class)))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "配置不存在")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "配置不存在（restCode=404）")
     })
     @SysLog("更新配置")
     @PutMapping(value = "/{id}")
@@ -203,9 +203,9 @@ public class ConfigController extends BaseController {
     @Parameter(name = "id", description = "配置ID", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = ConfigEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "配置不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "配置不存在（restCode=404）")
     })
     @GetMapping(value = "/{id}")
     public R<ConfigEntity> detail(@PathVariable String id) {
@@ -231,9 +231,9 @@ public class ConfigController extends BaseController {
     @Parameter(name = "ids", description = "配置ID列表，多个ID用逗号分隔", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("删除配置")
     @DeleteMapping

@@ -27,6 +27,12 @@ import com.adminpro.system.rbac.domains.vo.user.PasswordRuleVo;
 import com.adminpro.system.rbac.domains.vo.user.UpdateProfileVo;
 import com.adminpro.system.rbac.domains.vo.user.UserInfoResponseVo;
 import com.google.code.kaptcha.Producer;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
@@ -60,6 +66,7 @@ import java.util.Date;
  * @author system
  * @since 1.0.0
  */
+@Tag(name = "认证管理", description = "用户登录、登出、获取用户信息、验证码等认证相关接口")
 @RestController
 @RequestMapping("/api/v1/auth")
 /**
@@ -88,6 +95,14 @@ public class AuthController extends BaseController {
      * @return 登录结果，包含token、用户基本信息、权限信息等
      */
     @SysLog("用户登录")
+    @Operation(summary = "用户登录", description = "处理用户登录请求，支持用户名/邮箱/手机号登录，验证码验证。返回token、用户基本信息、权限信息等")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "登录成功（restCode=200）或业务失败（restCode=601表示参数错误，restCode=401表示认证失败）",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))
+            )
+    })
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R<LoginResponse> login(HttpServletRequest request, @RequestBody LoginUserVo loginUserVo) {
         BeanUtil.beanAttributeValueTrim(loginUserVo);
@@ -196,6 +211,14 @@ public class AuthController extends BaseController {
      * @return 用户详细信息
      */
     @PreAuthorize("@ss.hasPermission('system:common')")
+    @Operation(summary = "获取当前登录用户信息", description = "根据当前登录token获取用户的详细信息，包括基本资料、部门信息等")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "查询成功（restCode=200）或用户未登录（restCode=401）",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserInfoResponseVo.class))
+            )
+    })
     @RequestMapping(value = "/userinfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<UserInfoResponseVo> getUserInfo() {
         try {
@@ -249,6 +272,14 @@ public class AuthController extends BaseController {
      * @return 密码规则配置信息
      */
     @PreAuthorize("@ss.hasPermission('system:common')")
+    @Operation(summary = "获取密码规则", description = "获取系统当前配置的密码强度规则，包括长度、复杂度等要求")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "查询成功（restCode=200）或未授权（restCode=401）",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PasswordRuleVo.class))
+            )
+    })
     @RequestMapping(value = "/password-rule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<PasswordRuleVo> getPasswordRule() {
         try {
@@ -271,6 +302,14 @@ public class AuthController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermission('system:common')")
     @SysLog("更新个人资料")
+    @Operation(summary = "更新个人资料", description = "允许当前登录用户更新自己的基本资料信息，包括真实姓名、手机号、邮箱、头像等")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "更新成功（restCode=200）或参数错误/用户不存在（restCode=601）",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
     @RequestMapping(value = "/profile", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R updateProfile(@RequestBody UpdateProfileVo updateProfileVo) {
         try {
@@ -323,6 +362,7 @@ public class AuthController extends BaseController {
      * @throws ServletException Servlet异常
      * @throws IOException      IO异常
      */
+    @Operation(summary = "生成验证码图片", description = "生成数学运算类型的验证码图片，用于登录安全验证")
     @RequestMapping(value = "/captcha.jpg", method = RequestMethod.GET)
     public void captcha(HttpServletResponse response) throws ServletException, IOException {
         response.setHeader("Cache-Control", "no-store, no-cache");
@@ -363,6 +403,14 @@ public class AuthController extends BaseController {
      * @return 登出结果
      */
     @SysLog("用户登出")
+    @Operation(summary = "用户登出", description = "处理用户登出请求，清除session和token")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "登出成功（restCode=200）或登出失败（restCode=500）",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
     @RequestMapping(value = "/logout", method = { RequestMethod.POST,
             RequestMethod.GET }, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<String> logout() {

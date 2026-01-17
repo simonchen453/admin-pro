@@ -30,6 +30,12 @@ import com.adminpro.system.rbac.domains.entity.userrole.UserRoleAssignService;
 import com.adminpro.system.rbac.domains.vo.user.*;
 import com.adminpro.system.rbac.enums.UserStatus;
 import com.adminpro.system.tools.domains.entity.oss.OSSEntity;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -60,6 +66,7 @@ import java.util.stream.Collectors;
  * @author system
  * @since 1.0.0
  */
+@Tag(name = "用户管理", description = "用户的增删改查、导入导出、状态管理等接口")
 @RestController
 @RequestMapping(UserController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:user')")
@@ -94,6 +101,14 @@ public class UserController extends BaseController {
      * @param searchForm 查询条件表单
      * @return 分页查询结果
      */
+    @Operation(summary = "查询用户列表", description = "根据查询条件分页查询用户列表，支持按用户域、登录名、真实姓名、状态、部门等条件筛选")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "查询成功（restCode=200）或未授权/无权限（restCode=401/403）",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = QueryResultSet.class))
+            )
+    })
     @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<UserListResponseVo>> search(@RequestBody SearchForm searchForm) {
         logger.debug("查询用户列表: searchForm={}", searchForm);

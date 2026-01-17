@@ -66,8 +66,8 @@ public class UserDomainEnvController extends BaseController {
     @Operation(summary = "查询用户域环境配置列表", description = "根据查询条件获取用户域环境配置列表，支持按用户域进行过滤和分页查询")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDomainEnvEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @PostMapping(value = "/search")
     public R<QueryResultSet<UserDomainEnvEntity>> list(
@@ -96,9 +96,9 @@ public class UserDomainEnvController extends BaseController {
     @Operation(summary = "创建用户域环境配置", description = "新增一个用户域环境配置，包含登录URL、首页URL、错误页URL、布局等配置信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @PostMapping(value = "/create")
     public R create(
@@ -147,10 +147,10 @@ public class UserDomainEnvController extends BaseController {
     @Operation(summary = "更新用户域环境配置", description = "更新已有用户域环境配置的信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "用户域环境配置不存在")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "用户域环境配置不存在（restCode=404）")
     })
     @PutMapping(value = "/{id}")
     public R editSave(@PathVariable String id,
@@ -202,9 +202,9 @@ public class UserDomainEnvController extends BaseController {
     @Operation(summary = "查询用户域环境配置详情", description = "根据用户域环境配置ID获取配置的详细信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDomainEnvEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "用户域环境配置不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "用户域环境配置不存在（restCode=404）")
     })
     @GetMapping(value = "/{id}")
     public R<UserDomainEnvEntity> detail(
@@ -229,9 +229,9 @@ public class UserDomainEnvController extends BaseController {
     @Operation(summary = "批量删除用户域环境配置", description = "根据多个配置ID批量删除用户域环境配置，ID之间用逗号分隔")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @DeleteMapping
     public R remove(

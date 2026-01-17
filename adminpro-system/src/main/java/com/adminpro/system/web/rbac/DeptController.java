@@ -73,8 +73,8 @@ public class DeptController extends BaseController {
     @Operation(summary = "查询部门列表", description = "根据查询条件获取部门列表，支持按名称、状态等条件进行过滤和分页查询")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeptEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @PostMapping(value = "/search")
     public R<List<DeptEntity>> list(
@@ -106,7 +106,7 @@ public class DeptController extends BaseController {
     @Operation(summary = "获取部门树", description = "获取所有部门的树形结构数据")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "401", description = "未授权")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）")
     })
     @GetMapping(value = "/tree")
     @PreAuthorize("isAuthenticated()")
@@ -128,9 +128,9 @@ public class DeptController extends BaseController {
     @Operation(summary = "创建部门", description = "新增一个部门，包含部门编号、名称、上级部门、联系人等信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("创建部门")
     @PostMapping
@@ -185,10 +185,10 @@ public class DeptController extends BaseController {
     @Operation(summary = "更新部门", description = "更新已有部门的信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "部门不存在")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "部门不存在（restCode=404）")
     })
     @SysLog("更新部门")
     @PutMapping(value = "/{id}")
@@ -244,9 +244,9 @@ public class DeptController extends BaseController {
     @Operation(summary = "批量删除部门", description = "根据多个部门ID批量删除部门，ID之间用逗号分隔")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("删除部门")
     @DeleteMapping
@@ -271,9 +271,9 @@ public class DeptController extends BaseController {
     @Operation(summary = "上传部门Logo", description = "上传部门Logo图片文件，支持常见图片格式，自动压缩至900x900以内")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "上传成功", content = @Content(schema = @Schema(type = "string"))),
-            @ApiResponse(responseCode = "400", description = "文件为空或格式错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "文件为空或格式错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("部门Logo上传")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -313,9 +313,9 @@ public class DeptController extends BaseController {
     @Operation(summary = "查询部门详情", description = "根据部门ID获取部门的详细信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeptEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "部门不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "部门不存在（restCode=404）")
     })
     @GetMapping(value = "/{id}")
     public R<DeptEntity> detail(@Parameter(description = "部门ID", required = true) @PathVariable String id) {

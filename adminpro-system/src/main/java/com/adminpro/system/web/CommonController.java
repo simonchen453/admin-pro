@@ -38,6 +38,12 @@ import com.adminpro.system.tools.domains.entity.syslog.SysLogService;
 import com.adminpro.system.tools.domains.enums.SessionStatus;
 import com.adminpro.system.web.vo.RecentActivityVO;
 import com.adminpro.system.web.vo.ReleaseInfo;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
@@ -52,6 +58,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.*;
 
+@Tag(name = "通用接口", description = "通用功能接口，包括首页统计、文件上传、部门/菜单树等")
 @RestController
 @RequestMapping(value = "/api/v1/common")
 /**
@@ -77,6 +84,14 @@ public class CommonController extends BaseController {
      * @return
      */
     @PreAuthorize("@ss.hasPermission('common:home-data')")
+    @Operation(summary = "获取首页统计数据", description = "获取系统首页的统计数据，包括用户数、角色数、部门数、会话数等")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "查询成功（restCode=200）或未授权/无权限（restCode=401/403）",
+                    content = @Content(mediaType = "application/json")
+            )
+    })
     @RequestMapping(value = "/statistics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<Map<String, Long>> statistics() {
         Map<String, Long> stats = new HashMap<>();

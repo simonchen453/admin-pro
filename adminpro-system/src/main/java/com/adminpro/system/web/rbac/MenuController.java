@@ -69,8 +69,8 @@ public class MenuController extends BaseController {
     @Operation(summary = "查询菜单权限列表", description = "根据查询条件获取菜单权限列表，支持按名称、状态、可见性等条件进行过滤和分页查询")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MenuEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @PostMapping(value = "/search")
     public R<List<MenuEntity>> list(
@@ -105,7 +105,7 @@ public class MenuController extends BaseController {
     @Operation(summary = "获取当前用户菜单", description = "根据当前登录用户获取其可访问的菜单树形结构")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "401", description = "未授权")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）")
     })
     @GetMapping(value = "/current-user")
     @PreAuthorize("isAuthenticated()")
@@ -137,7 +137,7 @@ public class MenuController extends BaseController {
     @Operation(summary = "获取菜单树", description = "获取所有菜单的树形结构数据，用于角色管理分配菜单权限")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "401", description = "未授权")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）")
     })
     @GetMapping(value = "/tree")
     @PreAuthorize("isAuthenticated()")
@@ -162,7 +162,7 @@ public class MenuController extends BaseController {
     @Operation(summary = "根据角色获取菜单树", description = "获取菜单树形结构及角色已选中的菜单ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "401", description = "未授权")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）")
     })
     @GetMapping(value = "/tree/role/{roleId}")
     @PreAuthorize("isAuthenticated()")
@@ -198,9 +198,9 @@ public class MenuController extends BaseController {
     @Operation(summary = "查询菜单详情", description = "根据菜单ID获取菜单的详细信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MenuEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "菜单不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "菜单不存在（restCode=404）")
     })
     @GetMapping(value = "/{id}")
     public R<MenuEntity> detail(@Parameter(description = "菜单ID", required = true) @PathVariable String id) {
@@ -225,8 +225,8 @@ public class MenuController extends BaseController {
     @Operation(summary = "删除单个菜单", description = "根据菜单ID删除指定的菜单权限")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("删除菜单")
     @DeleteMapping(value = "/{id}")
@@ -251,9 +251,9 @@ public class MenuController extends BaseController {
     @Operation(summary = "创建菜单权限", description = "新增一个菜单权限，支持目录、菜单、按钮等多种类型的菜单")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("创建菜单")
     @PostMapping
@@ -313,10 +313,10 @@ public class MenuController extends BaseController {
     @Operation(summary = "更新菜单权限", description = "更新已有菜单权限的信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "菜单不存在")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "菜单不存在（restCode=404）")
     })
     @SysLog("更新菜单")
     @PutMapping(value = "/{id}")
@@ -377,9 +377,9 @@ public class MenuController extends BaseController {
     @Operation(summary = "批量删除菜单权限", description = "根据多个菜单ID批量删除菜单权限，ID之间用逗号分隔")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("批量删除菜单")
     @DeleteMapping

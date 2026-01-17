@@ -63,8 +63,8 @@ public class DomainController extends BaseController {
     @Operation(summary = "查询用户域列表", description = "根据查询条件获取用户域列表，支持按域名称、显示名称等条件进行过滤和分页查询")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DomainEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("查询用户域列表")
     @PostMapping(value = "/search")
@@ -96,7 +96,7 @@ public class DomainController extends BaseController {
     @Operation(summary = "获取所有用户域", description = "获取所有用户域的简化列表")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "401", description = "未授权")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）")
     })
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -118,9 +118,9 @@ public class DomainController extends BaseController {
     @Operation(summary = "创建用户域", description = "新增一个用户域，包含域名称、显示名称、是否系统域等信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("创建用户域")
     @PostMapping(value = "/create")
@@ -157,10 +157,10 @@ public class DomainController extends BaseController {
     @Operation(summary = "更新用户域", description = "更新已有用户域的信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "用户域不存在")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "用户域不存在（restCode=404）")
     })
     @SysLog("更新用户域")
     @PutMapping(value = "/{id}")
@@ -201,9 +201,9 @@ public class DomainController extends BaseController {
     @Operation(summary = "查询用户域详情", description = "根据用户域ID获取用户域的详细信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DomainEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "用户域不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "用户域不存在（restCode=404）")
     })
     @GetMapping(value = "/{id}")
     public R<DomainEntity> detail(@Parameter(description = "用户域ID", required = true) @PathVariable String id) {
@@ -228,9 +228,9 @@ public class DomainController extends BaseController {
     @Operation(summary = "删除用户域", description = "根据用户域ID删除用户域")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "用户域不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "用户域不存在（restCode=404）")
     })
     @SysLog("删除用户域")
     @DeleteMapping(value = "/{id}")

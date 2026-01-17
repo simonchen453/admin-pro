@@ -76,8 +76,8 @@ public class DictController extends BaseController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "搜索条件", required = true, content = @Content(schema = @Schema(implementation = SearchForm.class)))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @PostMapping("/search")
     public R<QueryResultSet<DictEntity>> list(@RequestBody SearchForm searchForm) {
@@ -113,9 +113,9 @@ public class DictController extends BaseController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "字典实体对象", required = true, content = @Content(schema = @Schema(implementation = DictEntity.class)))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("创建字典")
     @PostMapping
@@ -156,10 +156,10 @@ public class DictController extends BaseController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "字典实体对象，必须包含ID字段", required = true, content = @Content(schema = @Schema(implementation = DictEntity.class)))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "字典不存在")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "字典不存在（restCode=404）")
     })
     @SysLog("更新字典")
     @PutMapping(value = "/{id}")
@@ -202,9 +202,9 @@ public class DictController extends BaseController {
     @Parameter(name = "id", description = "字典ID", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = DictEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "字典不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "字典不存在（restCode=404）")
     })
     @GetMapping(value = "/{id}")
     public R<DictEntity> detail(@PathVariable String id) {
@@ -219,9 +219,9 @@ public class DictController extends BaseController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "字典不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "字典不存在（restCode=404）")
     })
     @SysLog("删除字典")
     @DeleteMapping(value = "/{id}")
@@ -248,9 +248,9 @@ public class DictController extends BaseController {
     @Parameter(name = "ids", description = "字典ID列表，多个ID用逗号分隔", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("批量删除字典")
     @DeleteMapping
@@ -274,9 +274,9 @@ public class DictController extends BaseController {
     @Parameter(name = "id", description = "字典ID", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "激活成功", content = @Content(schema = @Schema(implementation = DictEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "字典不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "字典不存在（restCode=404）")
     })
     @SysLog("激活字典")
     @PatchMapping("/{id}/active")
@@ -304,9 +304,9 @@ public class DictController extends BaseController {
     @Parameter(name = "id", description = "字典ID", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "停用成功", content = @Content(schema = @Schema(implementation = DictEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "字典不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "字典不存在（restCode=404）")
     })
     @SysLog("停用字典")
     @PatchMapping("/{id}/inactive")

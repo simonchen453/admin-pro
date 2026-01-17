@@ -66,8 +66,8 @@ public class PostController extends BaseController {
     @Operation(summary = "查询职位列表", description = "根据查询条件获取职位列表，支持按职位编码、名称、状态等条件进行过滤和分页查询")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @PostMapping(value = "/search")
     public R<QueryResultSet<PostEntity>> list(
@@ -103,9 +103,9 @@ public class PostController extends BaseController {
     @Operation(summary = "查询职位详情", description = "根据职位ID获取职位的详细信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostEntity.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "职位不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "职位不存在（restCode=404）")
     })
     @GetMapping(value = "/{id}")
     public R<PostEntity> detail(@Parameter(description = "职位ID", required = true) @PathVariable String id) {
@@ -130,9 +130,9 @@ public class PostController extends BaseController {
     @Operation(summary = "创建职位", description = "新增一个职位，包含职位编码、名称、排序、状态等信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("创建职位")
     @PostMapping
@@ -173,10 +173,10 @@ public class PostController extends BaseController {
     @Operation(summary = "更新职位", description = "更新已有职位的信息")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "职位不存在")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "职位不存在（restCode=404）")
     })
     @SysLog("更新职位")
     @PutMapping(value = "/{id}")
@@ -218,9 +218,9 @@ public class PostController extends BaseController {
      */
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "职位不存在")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "职位不存在（restCode=404）")
     })
     @SysLog("删除职位")
     @DeleteMapping(value = "/{id}")
@@ -246,9 +246,9 @@ public class PostController extends BaseController {
     @Operation(summary = "批量删除职位", description = "根据多个职位ID批量删除职位，ID之间用逗号分隔")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @SysLog("批量删除职位")
     @DeleteMapping

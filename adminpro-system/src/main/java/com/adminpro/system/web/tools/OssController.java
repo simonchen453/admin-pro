@@ -73,8 +73,8 @@ public class OssController extends BaseController {
     @Operation(summary = "分页查询文件列表", description = "查询对象存储服务中的文件列表，支持分页")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<ListOssVo>> paging(HttpServletRequest request) {
@@ -101,9 +101,9 @@ public class OssController extends BaseController {
     @Parameter(name = "ext", description = "扩展信息", required = false, schema = @Schema(type = "string"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "上传成功", content = @Content(schema = @Schema(implementation = OSSEntity.class))),
-            @ApiResponse(responseCode = "400", description = "上传失败，文件为空或格式错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "上传失败，文件为空或格式错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
@@ -145,10 +145,10 @@ public class OssController extends BaseController {
     @Parameter(name = "id", description = "文件ID", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问"),
-            @ApiResponse(responseCode = "404", description = "文件不存在")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
+            @ApiResponse(responseCode = "200", description = "文件不存在（restCode=404）")
     })
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public R delete(@PathVariable String id) {
@@ -173,9 +173,9 @@ public class OssController extends BaseController {
     @Parameter(name = "ids", description = "文件ID列表，多个ID用逗号分隔", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "400", description = "请求参数错误"),
-            @ApiResponse(responseCode = "401", description = "未授权"),
-            @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
+            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
+            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
     })
     @Transactional
     @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)

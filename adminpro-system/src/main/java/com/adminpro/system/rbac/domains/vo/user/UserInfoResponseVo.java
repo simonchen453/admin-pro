@@ -9,7 +9,9 @@ import java.util.Date;
 /**
  * 用户信息响应VO
  *
- * <p>用于返回用户详细信息，包含用户的基本信息、联系方式、部门信息及登录记录等</p>
+ * <p>
+ * 用于返回用户详细信息，包含用户的基本信息、联系方式、部门信息及登录记录等
+ * </p>
  *
  * @author adminpro
  * @since 1.0.0
@@ -19,7 +21,7 @@ import java.util.Date;
 public class UserInfoResponseVo extends BaseVO {
 
     @Schema(description = "用户ID", example = "10001")
-    private String userId;
+    private String id;
 
     @Schema(description = "用户域", example = "default")
     private String userDomain;
@@ -57,4 +59,3 @@ public class UserInfoResponseVo extends BaseVO {
     @Schema(description = "最后登录时间", example = "2024-01-17T10:30:00")
     private Date latestLoginTime;
 }
-

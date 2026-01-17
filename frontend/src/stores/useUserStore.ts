@@ -17,7 +17,7 @@ interface UserState {
     loading: boolean;
     error: string | null;
     addUser: (user: User) => void;
-    removeUser: (id: number) => void;
+    removeUser: (id: string) => void;
     setUsers: (users: User[]) => void;
     setLoading: (loading: boolean) => void;
     setError: (error: string | null) => void;
@@ -38,10 +38,8 @@ export const useAuthStore = create<AuthState>()(
                         name: response.realName || response.userId,
                         avatarUrl: response.avatarUrl,
                         mobileNo: response.mobileNo,
-                        userIden: {
-                            userDomain: response.domain,
-                            userId: response.id
-                        },
+                        userDomain: response.domain,
+                        id: response.id,
                         status: 'active'
                     };
 

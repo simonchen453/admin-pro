@@ -116,7 +116,7 @@ public class UserController extends BaseController {
             for (UserEntity entity : search.getRecords()) {
                 UserListResponseVo vo = new UserListResponseVo();
                 BeanUtils.copyProperties(entity, vo);
-                vo.setUserId(entity.getId());
+                vo.setId(entity.getId());
                 list.add(vo);
             }
         }
@@ -193,9 +193,9 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/resetpwd", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R resetPwd(@Valid @RequestBody UserResetPwdRequestVo userResetPwdRequestVo) {
         logger.info("重置用户密码: userDomain={}, userId={}", userResetPwdRequestVo.getUserDomain(),
-                userResetPwdRequestVo.getUserId());
+                userResetPwdRequestVo.getId());
         BeanUtil.beanAttributeValueTrim(userResetPwdRequestVo);
-        String userId = userResetPwdRequestVo.getUserId();
+        String userId = userResetPwdRequestVo.getId();
         String userDomain = userResetPwdRequestVo.getUserDomain();
         String newPassword = userResetPwdRequestVo.getNewPassword();
         String confirmPassword = userResetPwdRequestVo.getConfirmPassword();
@@ -428,16 +428,16 @@ public class UserController extends BaseController {
     @PutMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public R update(@Valid @RequestBody UserCreateVo userRequestVo) {
-        logger.info("更新用户: userDomain={}, userId={}", userRequestVo.getUserDomain(), userRequestVo.getUserId());
+        logger.info("更新用户: userDomain={}, userId={}", userRequestVo.getUserDomain(), userRequestVo.getId());
         BeanUtil.beanAttributeValueTrim(userRequestVo);
         MessageBundle messageBundle = getMessageBundle();
         userUpdateValidator.validate(userRequestVo, messageBundle);
         if (!messageBundle.hasErrorMessage()) {
             // userId 是主键ID，直接使用 findById
-            UserEntity userEntity = userService.findById(userRequestVo.getUserId());
+            UserEntity userEntity = userService.findById(userRequestVo.getId());
             if (userEntity == null) {
                 logger.warn("更新用户失败，用户不存在: userDomain={}, userId={}", userRequestVo.getUserDomain(),
-                        userRequestVo.getUserId());
+                        userRequestVo.getId());
                 return R.error(RbacConstants.MSG_USER_NOT_FOUND);
             }
 
@@ -450,11 +450,11 @@ public class UserController extends BaseController {
             userPostAssignService.deleteByUserId(userEntity.getId());
             assignPostsToUser(userEntity, userRequestVo.getPostIds());
 
-            logger.info("更新用户成功: userDomain={}, userId={}", userRequestVo.getUserDomain(), userRequestVo.getUserId());
+            logger.info("更新用户成功: userDomain={}, userId={}", userRequestVo.getUserDomain(), userRequestVo.getId());
             return R.ok();
         } else {
             logger.warn("更新用户验证失败: userDomain={}, userId={}, errors={}",
-                    userRequestVo.getUserDomain(), userRequestVo.getUserId(), messageBundle.getErrorMessages());
+                    userRequestVo.getUserDomain(), userRequestVo.getId(), messageBundle.getErrorMessages());
             return R.error(messageBundle);
         }
     }
@@ -585,7 +585,7 @@ public class UserController extends BaseController {
         UserEntity user = new UserEntity();
         user.setLoginName(userRequestVo.getLoginName());
         user.setUserDomain(userRequestVo.getUserDomain());
-        user.setId(StringUtils.isNotEmpty(userRequestVo.getUserId()) ? userRequestVo.getUserId()
+        user.setId(StringUtils.isNotEmpty(userRequestVo.getId()) ? userRequestVo.getId()
                 : IdGenerator.getInstance().nextStringId());
         user.setStatus(userRequestVo.getStatus());
         user.setRealName(userRequestVo.getRealName());

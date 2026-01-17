@@ -48,11 +48,8 @@ const UserEdit: React.FC = () => {
       // 转换为UserEntity格式
       const userEntity: UserEntity = {
         userDomain: detail.userDomain,
-        userId: detail.userId,
-        userIden: {
-          userDomain: detail.userDomain,
-          userId: detail.userId
-        },
+        id: detail.id,
+
         loginName: detail.loginName,
         realName: detail.realName,
         mobileNo: detail.mobileNo,

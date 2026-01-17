@@ -7,7 +7,7 @@ import java.util.List;
 
 public class UserDetailVO extends BaseVO {
 
-    private String userId;
+    private String id;
 
     private String userDomain;
 
@@ -25,12 +25,12 @@ public class UserDetailVO extends BaseVO {
     private List<String> postIds;
     private Date latestLoginTime;
 
-    public String getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUserDomain() {

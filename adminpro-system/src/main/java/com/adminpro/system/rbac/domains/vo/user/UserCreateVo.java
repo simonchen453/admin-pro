@@ -8,7 +8,9 @@ import java.util.List;
 /**
  * 用户创建请求VO
  *
- * <p>用于创建新用户的请求参数，包含用户的基本信息、登录信息、角色分配等</p>
+ * <p>
+ * 用于创建新用户的请求参数，包含用户的基本信息、登录信息、角色分配等
+ * </p>
  *
  * @author adminpro
  * @since 1.0.0
@@ -17,9 +19,10 @@ import java.util.List;
 public class UserCreateVo extends BaseVO {
 
     @Schema(description = "用户ID", example = "10001")
-    private String userId;
+    private String id;
 
-    @Schema(description = "用户域", example = "default")
+    @Schema(description = "用户域", example = "default", requiredMode = Schema.RequiredMode.REQUIRED)
+    @jakarta.validation.constraints.NotBlank(message = "用户域不能为空")
     private String userDomain;
 
     @Schema(description = "真实姓名", example = "张三", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -69,17 +72,17 @@ public class UserCreateVo extends BaseVO {
      *
      * @return 用户ID
      */
-    public String getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 
     /**
      * 设置用户ID
      *
-     * @param userId 用户ID
+     * @param id 用户ID
      */
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

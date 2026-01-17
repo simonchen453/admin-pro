@@ -10,7 +10,9 @@ import java.util.Map;
 /**
  * 用户列表响应VO
  *
- * <p>用于返回用户列表查询结果，包含用户的基本信息、状态、登录时间及角色分配情况</p>
+ * <p>
+ * 用于返回用户列表查询结果，包含用户的基本信息、状态、登录时间及角色分配情况
+ * </p>
  *
  * @author adminpro
  * @since 1.0.0
@@ -19,7 +21,7 @@ import java.util.Map;
 public class UserListResponseVo extends BaseVO {
 
     @Schema(description = "用户ID", example = "10001")
-    private String userId;
+    private String id;
 
     @Schema(description = "用户域", example = "default")
     private String userDomain;
@@ -53,17 +55,17 @@ public class UserListResponseVo extends BaseVO {
      *
      * @return 用户ID
      */
-    public String getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 
     /**
      * 设置用户ID
      *
-     * @param userId 用户ID
+     * @param id 用户ID
      */
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

@@ -5,18 +5,21 @@ import io.swagger.v3.oas.annotations.media.Schema;
 /**
  * 用户重置密码请求VO
  *
- * <p>用于管理员重置用户密码的请求参数</p>
+ * <p>
+ * 用于管理员重置用户密码的请求参数
+ * </p>
  *
  * @author adminpro
  * @since 1.0.0
  */
 @Schema(description = "用户重置密码请求VO")
-public class UserResetPwdRequestVo {
+public class UserResetPwdRequestVo extends com.adminpro.framework.base.entity.BaseVO {
 
-    @Schema(description = "用户ID", example = "10001", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String userId;
+    @Schema(description = "用户ID", example = "10001")
+    private String id;
 
-    @Schema(description = "用户域", example = "default")
+    @Schema(description = "用户域", example = "default", requiredMode = Schema.RequiredMode.REQUIRED)
+    @jakarta.validation.constraints.NotBlank(message = "用户域不能为空")
     private String userDomain;
 
     @Schema(description = "新密码", example = "123456", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -30,17 +33,17 @@ public class UserResetPwdRequestVo {
      *
      * @return 用户ID
      */
-    public String getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 
     /**
      * 设置用户ID
      *
-     * @param userId 用户ID
+     * @param id 用户ID
      */
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**

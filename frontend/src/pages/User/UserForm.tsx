@@ -83,10 +83,10 @@ const UserForm: React.FC<UserFormProps> = ({
 
   // 获取用户详情（编辑时）
   useEffect(() => {
-    if (isEdit && user && (user.userIden || user.userId)) {
+    if (isEdit && user && user.id) {
       const fetchUserDetail = async () => {
         try {
-          const userId = user.userIden?.userId || user.userId;
+          const userId = user.id;
           if (!userId) {
             return;
           }
@@ -130,8 +130,8 @@ const UserForm: React.FC<UserFormProps> = ({
     setLoading(true);
     try {
       if (isEdit) {
-        const userId = user?.userIden?.userId || user?.userId;
-        const userDomain = user?.userIden?.userDomain || user?.userDomain;
+        const userId = user?.id;
+        const userDomain = user?.userDomain;
         if (!userId || !userDomain) {
           message.error('缺少用户标识，无法更新');
           return;
@@ -139,7 +139,7 @@ const UserForm: React.FC<UserFormProps> = ({
         // 更新用户
         const updateData: UserUpdateRequest = {
           userDomain,
-          userId,
+          id: userId,
           loginName: values.loginName,
           realName: values.realName,
           mobileNo: values.mobileNo,

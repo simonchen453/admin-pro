@@ -86,10 +86,10 @@ function Profile() {
                 {userInfo.realName || '-'}
               </Descriptions.Item>
               <Descriptions.Item label="用户域">
-                {userInfo.userIden?.userDomain || '-'}
+                {userInfo.userDomain || '-'}
               </Descriptions.Item>
               <Descriptions.Item label="用户ID">
-                {userInfo.userIden?.userId || '-'}
+                {userInfo.id || '-'}
               </Descriptions.Item>
               <Descriptions.Item label="手机号码">
                 {userInfo.mobileNo || '-'}

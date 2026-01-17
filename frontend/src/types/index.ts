@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 // 用户相关类型
 export interface User {
-  id?: number;
+  id?: string;
   name?: string;
   realName?: string;
   email?: string;
@@ -14,10 +14,7 @@ export interface User {
   updatedAt?: string;
   loginName?: string;
   mobileNo?: string;
-  userIden?: {
-    userDomain: string;
-    userId: string;
-  };
+  userDomain?: string;
 }
 
 // 登录请求类型
@@ -158,15 +155,8 @@ export interface UserEntity {
   /** 用户域（主字段） */
   userDomain: string;
   /** 用户ID（主字段，全局唯一） */
-  userId: string;
-  /** 
-   * @deprecated 优先使用顶层的 userId 和 userDomain
-   * 保留用于向后兼容旧接口
-   */
-  userIden?: {
-    userDomain: string;
-    userId: string;
-  };
+  id: string;
+
   /** 登录名 */
   loginName: string;
   /** 真实姓名 */
@@ -224,12 +214,12 @@ export interface UserCreateRequest {
 }
 
 export interface UserUpdateRequest extends UserCreateRequest {
-  userId: string;
+  id: string;
 }
 
 export interface UserDetailResponse {
   userDomain: string;
-  userId: string;
+  id: string;
   loginName: string;
   realName: string;
   mobileNo?: string;
@@ -247,7 +237,7 @@ export interface UserDetailResponse {
 
 export interface UserResetPasswordRequest {
   userDomain: string;
-  userId: string;
+  id: string;
   newPassword: string;
   confirmPassword: string;
 }

@@ -246,17 +246,15 @@ function MainLayout() {
 
                     // Convert UserEntity to User for store
                     const user: User = {
-                        id: Number(userEntity.userId),
+                        id: userEntity.id,
                         loginName: userEntity.loginName,
                         realName: userEntity.realName,
                         name: userEntity.realName || userEntity.loginName,
                         avatarUrl: userEntity.avatarUrl,
                         mobileNo: userEntity.mobileNo,
                         email: userEntity.email,
-                        userIden: {
-                            userDomain: userEntity.userDomain,
-                            userId: userEntity.userId
-                        },
+                        userDomain: userEntity.userDomain,
+
                         status: (userEntity.status === 'active' || userEntity.status === '1') ? 'active' : 'inactive'
                     };
 

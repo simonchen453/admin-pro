@@ -55,7 +55,7 @@ public class UserUpdateValidator extends BaseValidator<UserCreateVo> {
         }
         if (!msgBundle.hasErrorMessage("loginName")) {
             // create
-            if (StringUtils.isEmpty(model.getUserId())) {
+            if (StringUtils.isEmpty(model.getId())) {
                 if (StringUtils.isEmpty(model.getLoginName())) {
                     msgBundle.addErrorMessage("loginName", "登录账号不能为空");
                 } else {
@@ -72,7 +72,7 @@ public class UserUpdateValidator extends BaseValidator<UserCreateVo> {
                 } else {
                     UserEntity userEntity = userService.findByUserDomainAndLoginName(model.getUserDomain(),
                             model.getLoginName());
-                    if (userEntity != null && !userEntity.getId().equals(model.getUserId())) {
+                    if (userEntity != null && !userEntity.getId().equals(model.getId())) {
                         msgBundle.addErrorMessage("loginName", "登录账号已存在");
                     }
                 }

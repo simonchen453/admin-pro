@@ -207,7 +207,7 @@ const UserList: React.FC = () => {
 
   // 激活用户
   const handleActive = (user: UserEntity) => {
-    const userId = user.userId || user.userIden?.userId;
+    const userId = user.id;
     if (!userId) return;
     Modal.confirm({
       title: '确认启用',
@@ -232,7 +232,7 @@ const UserList: React.FC = () => {
 
   // 停用用户
   const handleInactive = (user: UserEntity) => {
-    const userId = user.userId || user.userIden?.userId;
+    const userId = user.id;
     if (!userId) return;
     Modal.confirm({
       title: '确认停用',
@@ -264,8 +264,8 @@ const UserList: React.FC = () => {
 
   const handleResetPwdSubmit = async () => {
     if (!resetTargetUser) return;
-    const userId = resetTargetUser.userId || resetTargetUser.userIden?.userId;
-    const userDomain = resetTargetUser.userDomain || resetTargetUser.userIden?.userDomain;
+    const userId = resetTargetUser.id;
+    const userDomain = resetTargetUser.userDomain;
 
     if (!userId || !userDomain) {
       return;
@@ -275,7 +275,7 @@ const UserList: React.FC = () => {
       setResetLoading(true);
       await resetPasswordApi({
         userDomain,
-        userId,
+        id: userId,
         newPassword: values.newPassword,
         confirmPassword: values.confirmPassword
       });
@@ -328,7 +328,7 @@ const UserList: React.FC = () => {
     }
 
     const ids = selectedUsers
-      .map(user => user.userId)
+      .map(user => user.id)
       .filter(Boolean)
       .join(',');
 
@@ -356,7 +356,7 @@ const UserList: React.FC = () => {
 
   // 单个删除
   const handleDelete = (user: UserEntity) => {
-    const userId = user.userId;
+    const userId = user.id;
 
     if (!userId) return;
 
@@ -418,7 +418,7 @@ const UserList: React.FC = () => {
     }
     try {
       const ids = selectedUsers
-        .map(user => user.userId)
+        .map(user => user.id)
         .filter(Boolean)
         .join(',');
       await exportUserApi(ids);
@@ -670,11 +670,8 @@ const UserList: React.FC = () => {
             dataSource={userList}
             loading={loading}
             rowKey={(record) => {
-              if (record.userId && record.userDomain) {
-                return `${record.userDomain}-${record.userId}`;
-              }
-              if (record?.userIden?.userDomain && record?.userIden?.userId) {
-                return `${record.userIden.userDomain}-${record.userIden.userId}`;
+              if (record.id && record.userDomain) {
+                return `${record.userDomain}-${record.id}`;
               }
               return `row-${record.index}`;
             }}
@@ -713,7 +710,7 @@ const UserList: React.FC = () => {
         width={800}
       >
         <UserForm
-          key={editingUser ? `edit-${editingUser.userDomain || editingUser.userIden?.userDomain}-${editingUser.userId || editingUser.userIden?.userId}` : `new-${formKey}`}
+          key={editingUser ? `edit-${editingUser.userDomain}-${editingUser.id}` : `new-${formKey}`}
           user={editingUser}
           deptTreeData={convertToTreeSelectData(deptTreeData)}
           roleList={roleList}

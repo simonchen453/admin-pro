@@ -208,7 +208,7 @@ public class AuthController extends BaseController {
 
             // 构建响应VO
             UserInfoResponseVo userInfoVo = new UserInfoResponseVo();
-            userInfoVo.setUserId(userEntity.getId());
+            userInfoVo.setId(userEntity.getId());
             userInfoVo.setUserDomain(userEntity.getUserDomain());
             userInfoVo.setLoginName(userEntity.getLoginName());
             userInfoVo.setRealName(userEntity.getRealName());

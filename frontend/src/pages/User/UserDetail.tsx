@@ -148,7 +148,7 @@ const UserDetail: React.FC = () => {
             <Button
               type="primary"
               icon={<EditOutlined />}
-              onClick={() => navigate(`/user/edit/${userDetail.userDomain}/${userDetail.userId}`)}
+              onClick={() => navigate(`/user/edit/${userDetail.userDomain}/${userDetail.id}`)}
             >
               编辑用户
             </Button>
@@ -169,7 +169,7 @@ const UserDetail: React.FC = () => {
                 {userDetail.userDomain}
               </Descriptions.Item>
               <Descriptions.Item label="用户ID" span={1}>
-                {userDetail.userId}
+                {userDetail.id}
               </Descriptions.Item>
               <Descriptions.Item label="登录名" span={1}>
                 {userDetail.loginName}

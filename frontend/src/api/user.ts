@@ -28,7 +28,7 @@ export const createUserApi = async (userData: UserCreateRequest): Promise<ApiRes
 
 // 更新用户
 export const updateUserApi = async (userData: UserUpdateRequest): Promise<ApiResponse> => {
-  const response = await request.put<ApiResponse>(`/api/v1/users/${userData.userId}`, userData);
+  const response = await request.put<ApiResponse>(`/api/v1/users/${userData.id}`, userData);
   return response;
 };
 

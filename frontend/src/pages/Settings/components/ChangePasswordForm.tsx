@@ -58,12 +58,12 @@ const ChangePasswordForm: React.FC = () => {
 
   // 当新密码字段值变化时，如果之前有错误且现在有值，清除错误消息（提供更好的输入体验）
   useEffect(() => {
-    console.log('newPasswordValue changed: ', newPasswordValue);
+
     if (newPasswordValue) {
       const errors = form.getFieldError('newPassword');
-      console.log('newPassword errors: ', errors);
+
       if (errors.length > 0) {
-        console.log('clean the newPassword error msg');
+
         // 延迟清除，避免与验证冲突
         const timer = setTimeout(() => {
           form.setFields([{ name: 'newPassword', errors: [] }]);
@@ -76,12 +76,12 @@ const ChangePasswordForm: React.FC = () => {
 
   // 当确认密码字段值变化时，如果之前有错误且现在有值，清除错误消息
   useEffect(() => {
-    console.log('confirmPasswordValue changed: ', confirmPasswordValue);
+
     if (confirmPasswordValue) {
       const errors = form.getFieldError('confirmPassword');
-      console.log('confirmPassword errors: ', errors);
+
       if (errors.length > 0) {
-        console.log('clean the confirmPassword error msg');
+
         // 延迟清除，避免与验证冲突
         const timer = setTimeout(() => {
           form.setFields([{ name: 'confirmPassword', errors: [] }]);

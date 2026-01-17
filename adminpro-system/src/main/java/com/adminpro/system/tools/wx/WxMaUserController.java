@@ -19,7 +19,6 @@ import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
 import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.domains.entity.usertoken.UserTokenEntity;
 import com.adminpro.system.rbac.domains.vo.login.LoginResponse;

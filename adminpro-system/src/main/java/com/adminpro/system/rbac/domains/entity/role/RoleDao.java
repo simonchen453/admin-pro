@@ -6,7 +6,6 @@ import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
 import com.adminpro.system.core.common.helper.StringHelper;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

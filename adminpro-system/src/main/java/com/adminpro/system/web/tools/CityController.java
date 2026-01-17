@@ -6,7 +6,6 @@ import com.adminpro.system.rbac.domains.entity.city.CityEntity;
 import com.adminpro.system.rbac.domains.entity.city.CityService;
 import com.adminpro.system.rbac.domains.vo.city.CityVo;
 import com.adminpro.system.rbac.domains.vo.city.CityVoConverter;
-import org.javasimon.aop.Monitored;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;

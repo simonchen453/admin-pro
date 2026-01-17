@@ -4,7 +4,6 @@ import com.adminpro.system.rbac.api.RbacHelper;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;

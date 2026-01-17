@@ -2,7 +2,6 @@ package com.adminpro.system.core.security;
 
 import com.adminpro.system.core.security.auth.AuthToken;
 import com.adminpro.system.core.security.auth.LoginUser;
-
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;

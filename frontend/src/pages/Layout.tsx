@@ -235,11 +235,11 @@ function MainLayout() {
         const loadCurrentUserInfo = async () => {
             try {
                 const response = await getCurrentUserInfoApi();
-                console.log('获取到的用户信息响应:', response);
+
                 // getCurrentUserInfoApi 返回的是 data 字段，即 UserEntity
                 // 但根据响应拦截器，实际返回的可能是整个响应对象
                 const userInfo = (response as any)?.data || response;
-                console.log('解析后的用户信息:', userInfo);
+
                 if (userInfo) {
                     const userEntity = userInfo as unknown as UserEntity;
                     setCurrentUserInfo(userEntity);
@@ -267,7 +267,7 @@ function MainLayout() {
                 console.error('获取用户信息失败:', error);
                 // 如果获取失败，尝试使用 currentUser 中的数据
                 if (currentUser) {
-                    console.log('使用 currentUser 作为备用数据:', currentUser);
+
                     setCurrentUserInfo(currentUser as unknown as UserEntity);
                 }
             }
@@ -285,8 +285,8 @@ function MainLayout() {
                 const convertedMenus = convertMenuItems(backendMenus);
                 // 开发环境下打印菜单数据
                 if (import.meta.env.DEV) {
-                    console.log('原始菜单数据:', backendMenus);
-                    console.log('转换后菜单数据:', convertedMenus);
+
+
                 }
                 setMenuItems(convertedMenus);
             } catch (error) {
@@ -334,7 +334,7 @@ function MainLayout() {
                 }
                 break;
             default:
-                console.log('点击了:', key);
+
         }
     };
 
@@ -612,9 +612,9 @@ function MainLayout() {
                         <Outlet />
                     </div>
                 </Content>
-                <Footer style={{ 
-                    textAlign: 'center', 
-                    background: 'transparent', 
+                <Footer style={{
+                    textAlign: 'center',
+                    background: 'transparent',
                     color: '#9ca3af',
                     flexShrink: 0,
                     padding: '16px 0'

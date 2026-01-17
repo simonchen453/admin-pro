@@ -5,7 +5,6 @@ import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.BeanUtil;
-import org.springframework.beans.BeanUtils;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -23,7 +22,6 @@ import com.adminpro.system.rbac.domains.entity.post.PostService;
 import com.adminpro.system.rbac.domains.entity.role.RoleEntity;
 import com.adminpro.system.rbac.domains.entity.role.RoleService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.domains.entity.userpost.UserPostAssignEntity;
 import com.adminpro.system.rbac.domains.entity.userpost.UserPostAssignService;
@@ -38,6 +36,7 @@ import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,7 +46,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.util.ArrayList;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

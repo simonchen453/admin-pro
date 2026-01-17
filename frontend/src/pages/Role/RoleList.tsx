@@ -165,7 +165,7 @@ const RoleList: React.FC = () => {
             return;
           }
 
-          console.log('开始批量删除角色:', validIds);
+
           const ids = validIds.join(',');
           const response = await deleteRoleApi(ids);
           if (response.restCode === '200') {

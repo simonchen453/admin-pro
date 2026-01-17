@@ -4,11 +4,9 @@ import com.adminpro.framework.base.entity.BaseDao;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 用户菜单分配表 数据库持久层
@@ -26,7 +24,8 @@ public class UserMenuAssignDao extends BaseDao<UserMenuAssignEntity, String> {
      * @return
      */
     public QueryResultSet<UserMenuAssignEntity> search(SearchParam param) {
-        SelectBuilder<UserMenuAssignEntity> select = new SelectBuilder<UserMenuAssignEntity>(UserMenuAssignEntity.class);
+        SelectBuilder<UserMenuAssignEntity> select = new SelectBuilder<UserMenuAssignEntity>(
+                UserMenuAssignEntity.class);
         select.setSearchParam(param);
         prepareSelectBuilder(select, param);
         return search(select);
@@ -39,7 +38,8 @@ public class UserMenuAssignDao extends BaseDao<UserMenuAssignEntity, String> {
      * @return
      */
     public List<UserMenuAssignEntity> findByParam(SearchParam param) {
-        SelectBuilder<UserMenuAssignEntity> select = new SelectBuilder<UserMenuAssignEntity>(UserMenuAssignEntity.class);
+        SelectBuilder<UserMenuAssignEntity> select = new SelectBuilder<UserMenuAssignEntity>(
+                UserMenuAssignEntity.class);
         prepareSelectBuilder(select, param);
         return execute(select);
     }
@@ -51,11 +51,7 @@ public class UserMenuAssignDao extends BaseDao<UserMenuAssignEntity, String> {
      * @return
      */
     private void prepareSelectBuilder(SelectBuilder select, SearchParam param) {
-        //TODO 页面过滤条件
-        Map<String, Object> filters = param.getFilters();
-        String condition = (String) filters.get("condition");
-        if (StringUtils.isNotEmpty(condition)) {
-            //select.addWhereAnd(UserMenuAssignEntity.COL_TITLE + " like ?", "%" + condition+"%");
-        }
+        // select.addWhereAnd(UserMenuAssignEntity.COL_TITLE + " like ?", "%" +
+        // condition+"%");
     }
 }

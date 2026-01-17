@@ -5,12 +5,9 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
-import com.adminpro.system.rbac.common.RbacConstants;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 用户角色分配表 数据库持久层
@@ -55,13 +52,8 @@ public class UserRoleAssignDao extends BaseDao<UserRoleAssignEntity, String> {
      * @return
      */
     private void prepareSelectBuilder(SelectBuilder select, SearchParam param) {
-        // TODO 页面过滤条件
-        Map<String, Object> filters = param.getFilters();
-        String condition = (String) filters.get("condition");
-        if (StringUtils.isNotEmpty(condition)) {
-            // select.addWhereAnd(UserRoleAssignEntity.COL_TITLE + " like ?", "%" +
-            // condition+"%");
-        }
+        // select.addWhereAnd(UserRoleAssignEntity.COL_TITLE + " like ?", "%" +
+        // condition+"%");
     }
 
     public List<UserRoleAssignEntity> findByUserId(String userId) {

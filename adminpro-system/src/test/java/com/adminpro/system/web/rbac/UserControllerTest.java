@@ -1,15 +1,15 @@
 package com.adminpro.system.web.rbac;
 
-import com.adminpro.system.rbac.domains.entity.user.UserEntity;
-import com.adminpro.system.rbac.domains.entity.user.UserService;
-import com.adminpro.system.rbac.domains.entity.userrole.UserRoleAssignService;
-import com.adminpro.system.rbac.domains.entity.userpost.UserPostAssignService;
+import com.adminpro.system.core.common.helper.FileHelper;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
 import com.adminpro.system.rbac.domains.entity.post.PostService;
 import com.adminpro.system.rbac.domains.entity.role.RoleService;
+import com.adminpro.system.rbac.domains.entity.user.UserEntity;
+import com.adminpro.system.rbac.domains.entity.user.UserService;
+import com.adminpro.system.rbac.domains.entity.userpost.UserPostAssignService;
+import com.adminpro.system.rbac.domains.entity.userrole.UserRoleAssignService;
 import com.adminpro.system.rbac.domains.vo.user.UserCreateValidator;
 import com.adminpro.system.rbac.domains.vo.user.UserUpdateValidator;
-import com.adminpro.system.core.common.helper.FileHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,13 +17,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.http.MediaType;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * UserController 集成测试

@@ -1,5 +1,6 @@
 package com.adminpro.system.core.security.auth;
 
+import com.adminpro.framework.client.helper.ClientHelper;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.common.helper.WebHelper;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
@@ -12,8 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import com.adminpro.framework.client.helper.ClientHelper;
 
 /**
  * 用户详情服务实现类

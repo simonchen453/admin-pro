@@ -247,23 +247,6 @@ create table sys_post_tbl (
   UNIQUE INDEX `unq_name`(`col_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COMMENT = '职位信息表';
 
-CREATE TABLE `sys_apk_tbl`  (
-  `col_id` varchar(64) NOT NULL COMMENT 'ID',
-  `col_type` varchar(64) DEFAULT NULL COMMENT 'APK类型',
-  `col_force_update` varchar(64) DEFAULT NULL COMMENT '是否强制更新',
-  `col_ver_name` varchar(64) DEFAULT NULL COMMENT 'Version名称',
-  `col_ver_code` int(10) NULL DEFAULT 0 COMMENT 'Version Code',
-  `col_os_version` varchar(64) DEFAULT NULL COMMENT '系统版本',
-  `col_download_url` varchar(255) DEFAULT NULL COMMENT '下载地址',
-  `col_message` mediumtext COMMENT '升级说明',
-
-  `col_created_by` varchar(64) DEFAULT NULL COMMENT '创建人',
-  `col_created_at` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',
-  `col_updated_by` varchar(64) DEFAULT NULL COMMENT '更新人',
-  `col_updated_at` datetime(0) NULL DEFAULT NULL COMMENT '更新日期',
-  PRIMARY KEY (`col_id`)
-) ENGINE = InnoDB DEFAULT CHARSET=utf8 COMMENT = 'APK版本管理';
-
 CREATE TABLE `sys_audit_log_tbl`  (
   `col_id` varchar(64) NOT NULL COMMENT '主键ID',
   `col_log_date` datetime(0) NOT NULL COMMENT '日志时间',

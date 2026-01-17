@@ -5,11 +5,9 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.SelectBuilder;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 字典数据表 数据库持久层
@@ -52,12 +50,7 @@ public class DictDataDao extends BaseDao<DictDataEntity, String> {
      * @return
      */
     private void prepareSelectBuilder(SelectBuilder select, SearchParam param) {
-        //TODO 页面过滤条件
-        Map<String, Object> filters = param.getFilters();
-        String condition = (String) filters.get("condition");
-        if (StringUtils.isNotEmpty(condition)) {
-            //select.addWhereAnd(DictDataEntity.COL_TITLE + " like ?", "%" + condition+"%");
-        }
+
     }
 
     /**

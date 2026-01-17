@@ -48,5 +48,5 @@ export const deleteMenuApi = (id: string): Promise<ApiResponse<{ success: boolea
 
 // 获取菜单树选择器数据
 export const getMenuTreeSelectApi = (): Promise<MenuListResponse> => {
-  return request.post('/api/v1/menus', {});
+  return request.get('/api/v1/menus/tree');
 };

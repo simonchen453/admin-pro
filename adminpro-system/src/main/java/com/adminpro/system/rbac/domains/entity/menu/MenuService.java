@@ -187,6 +187,12 @@ public class MenuService extends BaseService<MenuEntity, String> {
         if (returnList.isEmpty()) {
             returnList = menus;
         }
+        // 按orderNum排序，确保菜单按正确顺序显示
+        returnList.sort((a, b) -> {
+            Integer orderA = a.getOrderNum() != null ? a.getOrderNum() : 0;
+            Integer orderB = b.getOrderNum() != null ? b.getOrderNum() : 0;
+            return orderA.compareTo(orderB);
+        });
         return returnList;
     }
 
@@ -196,7 +202,7 @@ public class MenuService extends BaseService<MenuEntity, String> {
      * 从菜单列表中获取指定父节点的所有子节点，并递归构建子节点树
      * </p>
      *
-     * @param list 菜单列表
+     * @param list     菜单列表
      * @param parentId 父节点ID
      * @return 子菜单树列表
      */
@@ -220,7 +226,7 @@ public class MenuService extends BaseService<MenuEntity, String> {
      * </p>
      *
      * @param list 菜单列表
-     * @param t 当前菜单节点
+     * @param t    当前菜单节点
      */
     private void recursionFn(List<MenuEntity> list, MenuEntity t) {
         // 得到子节点列表
@@ -245,7 +251,7 @@ public class MenuService extends BaseService<MenuEntity, String> {
      * </p>
      *
      * @param list 菜单列表
-     * @param t 父菜单节点
+     * @param t    父菜单节点
      * @return 直接子菜单列表
      */
     private List<MenuEntity> getChildList(List<MenuEntity> list, MenuEntity t) {
@@ -267,7 +273,7 @@ public class MenuService extends BaseService<MenuEntity, String> {
      * </p>
      *
      * @param list 菜单列表
-     * @param t 菜单节点
+     * @param t    菜单节点
      * @return 存在子节点返回true，否则返回false
      */
     private boolean hasChild(List<MenuEntity> list, MenuEntity t) {
@@ -294,7 +300,7 @@ public class MenuService extends BaseService<MenuEntity, String> {
      * 包含用户个人角色的菜单和用户域公共角色的菜单。
      * </p>
      *
-     * @param userId 用户ID
+     * @param userId     用户ID
      * @param userDomain 用户域
      * @return 菜单树列表
      */
@@ -334,7 +340,7 @@ public class MenuService extends BaseService<MenuEntity, String> {
      * </p>
      *
      * @param menus 目标菜单列表（会被修改）
-     * @param list 源菜单列表
+     * @param list  源菜单列表
      */
     private void mergeMenuList(List<MenuEntity> menus, List<MenuEntity> list) {
         for (int i = 0; i < list.size(); i++) {

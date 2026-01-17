@@ -48,7 +48,7 @@ public class TreeSelect implements Serializable {
     }
 
     public TreeSelect(MenuEntity menu) {
-        this.id = menu.getName();
+        this.id = menu.getId();
         this.label = menu.getDisplay();
         List<MenuEntity> c = menu.getChildren();
         if (c != null) {

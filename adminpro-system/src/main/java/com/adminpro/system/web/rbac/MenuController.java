@@ -126,6 +126,66 @@ public class MenuController extends BaseController {
     }
 
     /**
+     * 获取菜单树形结构
+     * <p>
+     * 获取所有菜单的树形结构数据，用于角色管理分配菜单权限
+     * </p>
+     *
+     * @return 菜单树形结构列表
+     */
+    @Operation(summary = "获取菜单树", description = "获取所有菜单的树形结构数据，用于角色管理分配菜单权限")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功"),
+            @ApiResponse(responseCode = "401", description = "未授权")
+    })
+    @GetMapping(value = "/tree")
+    @PreAuthorize("isAuthenticated()")
+    public R<List<com.adminpro.system.rbac.domains.vo.tree.TreeSelect>> getMenuTree() {
+        List<MenuEntity> menus = menuService.findAll();
+        List<MenuEntity> menuTree = menuService.buildMenuTree(menus);
+        List<com.adminpro.system.rbac.domains.vo.tree.TreeSelect> treeSelect = menuTree.stream()
+                .map(com.adminpro.system.rbac.domains.vo.tree.TreeSelect::new)
+                .collect(java.util.stream.Collectors.toList());
+        return R.ok(treeSelect);
+    }
+
+    /**
+     * 根据角色ID获取菜单树形结构
+     * <p>
+     * 获取所有菜单的树形结构数据，以及指定角色已选中的菜单ID列表
+     * </p>
+     *
+     * @param roleId 角色ID
+     * @return 包含菜单树和已选中菜单ID的映射
+     */
+    @Operation(summary = "根据角色获取菜单树", description = "获取菜单树形结构及角色已选中的菜单ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "查询成功"),
+            @ApiResponse(responseCode = "401", description = "未授权")
+    })
+    @GetMapping(value = "/tree/role/{roleId}")
+    @PreAuthorize("isAuthenticated()")
+    public R<java.util.Map<String, Object>> getMenuTreeByRoleId(@PathVariable String roleId) {
+        List<MenuEntity> menus = menuService.findAll();
+        List<MenuEntity> menuTree = menuService.buildMenuTree(menus);
+        List<com.adminpro.system.rbac.domains.vo.tree.TreeSelect> treeSelect = menuTree.stream()
+                .map(com.adminpro.system.rbac.domains.vo.tree.TreeSelect::new)
+                .collect(java.util.stream.Collectors.toList());
+
+        // 获取角色已选中的菜单ID - 从角色菜单关联表中查询
+        List<com.adminpro.system.rbac.domains.entity.rolemenu.RoleMenuAssignEntity> roleMenus = com.adminpro.system.rbac.domains.entity.rolemenu.RoleMenuAssignService
+                .getInstance().findByRoleId(roleId);
+        List<String> checkedKeys = roleMenus.stream()
+                .map(com.adminpro.system.rbac.domains.entity.rolemenu.RoleMenuAssignEntity::getMenuId)
+                .collect(java.util.stream.Collectors.toList());
+
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        result.put("menus", treeSelect);
+        result.put("checkedKeys", checkedKeys);
+        return R.ok(result);
+    }
+
+    /**
      * 查询菜单详情
      * <p>
      * 根据菜单ID获取菜单的详细信息

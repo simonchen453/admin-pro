@@ -183,12 +183,20 @@ const MenuList: React.FC = () => {
     try {
       const response = await getMenuTreeSelectApi();
       if (response.restCode === '200') {
+        // /menus/tree 返回 TreeSelect 格式: { id, label, children }
+        // 需要转换为 MenuTreeSelectNode 格式: { id, display, children }
+        const convertTreeSelectToMenuTreeSelectNode = (nodes: any[]): MenuTreeSelectNode[] => {
+          return nodes.map(node => ({
+            id: node.id || '',
+            display: node.label || node.display || '',
+            children: node.children ? convertTreeSelectToMenuTreeSelectNode(node.children) : undefined
+          }));
+        };
         const menuList = response.data || [];
-        const treeData = handleTree(menuList as MenuEntity[], 'id', 0);
         const rootMenu: MenuTreeSelectNode = {
           id: '0',
           display: '主类目',
-          children: convertMenuEntityToTreeSelect(treeData)
+          children: convertTreeSelectToMenuTreeSelectNode(menuList)
         };
         setMenuOptions([rootMenu]);
       } else {

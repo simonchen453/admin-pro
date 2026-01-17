@@ -90,7 +90,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
         permission: values.permission,
         url: values.url,
         status: values.status,
-        visible: values.visible
+        visible: values.visible || MenuVisible.SHOW
       };
 
       let response: MenuCreateResponse;
@@ -132,29 +132,29 @@ const MenuForm: React.FC<MenuFormProps> = ({
         return;
       }
       console.error('保存菜单失败:', error);
-      
+
       let errorMessage = '保存菜单失败';
       let fieldErrors: Record<string, string> = {};
-      
+
       if (error && typeof error === 'object' && 'response' in error) {
-        const errorResponse = error as { 
-          response?: { 
-            data?: { 
+        const errorResponse = error as {
+          response?: {
+            data?: {
               message?: string;
               errorsMap?: Record<string, string>;
-            } 
-          } 
+            }
+          }
         };
-        
+
         if (errorResponse.response?.data?.message) {
           errorMessage = errorResponse.response.data.message;
         }
-        
+
         if (errorResponse.response?.data?.errorsMap) {
           fieldErrors = errorResponse.response.data.errorsMap;
         }
       }
-      
+
       if (Object.keys(fieldErrors).length > 0) {
         Object.keys(fieldErrors).forEach(field => {
           form.setFields([{
@@ -163,7 +163,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
           }]);
         });
       }
-      
+
       message.error(errorMessage);
     } finally {
       setLoading(false);
@@ -211,7 +211,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
             label="菜单类型"
             rules={[{ required: true, message: '请选择菜单类型' }]}
           >
-            <Radio.Group 
+            <Radio.Group
               onChange={(e) => setMenuType(e.target.value)}
             >
               <Radio value={MenuType.DIRECTORY}>目录</Radio>
@@ -277,7 +277,7 @@ const MenuForm: React.FC<MenuFormProps> = ({
             label="显示排序"
             rules={[{ required: true, message: '菜单顺序不能为空' }]}
           >
-            <InputNumber 
+            <InputNumber
               min={0}
               style={{ width: '100%' }}
             />
@@ -291,8 +291,8 @@ const MenuForm: React.FC<MenuFormProps> = ({
               label="权限标识"
               rules={[{ required: true, message: '请输入权限标识' }]}
             >
-              <Input 
-                placeholder="请输入权限标识" 
+              <Input
+                placeholder="请输入权限标识"
                 maxLength={50}
                 style={{ width: '100%' }}
                 allowClear

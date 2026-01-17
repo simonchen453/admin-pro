@@ -65,6 +65,14 @@ export default defineConfig(({ mode }) => {
             });
           },
         },
+        '/adminpro/swagger-ui': {
+          target: 'http://127.0.0.1:8080',
+          changeOrigin: true,
+        },
+        '/adminpro/v3': {
+          target: 'http://127.0.0.1:8080',
+          changeOrigin: true,
+        },
       },
     },
     optimizeDeps: {

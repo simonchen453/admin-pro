@@ -22,7 +22,7 @@ import java.util.List;
  * @date 2018-11-29
  */
 @RestController
-@RequestMapping("/api/v1/sys-logs")
+@RequestMapping("/api/v1/tools/sys-logs")
 public class SysLogController extends BaseController {
     protected static final String PREFIX = "admin/syslog";
     protected static final String PREFIX_URL = "/api/v1/tools/sys-logs";

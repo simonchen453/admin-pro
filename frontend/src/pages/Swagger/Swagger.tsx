@@ -2,11 +2,12 @@ import React from 'react';
 import { Breadcrumb, Button, Card, Space } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { config } from '../../config/env';
 
 const Swagger: React.FC = () => {
   const navigate = useNavigate();
 
-  const swaggerUrl = '/swagger-ui/index.html';
+  const swaggerUrl = `${config.BASE_PATH}/swagger-ui/index.html`;
 
   return (
     <div className="fade-in" style={{ padding: '0' }}>

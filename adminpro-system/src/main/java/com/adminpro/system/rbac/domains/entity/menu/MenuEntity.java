@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -41,6 +42,7 @@ import java.util.List;
  * @see Comparable
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Table(name = MenuEntity.TABLE_NAME)
 public class MenuEntity extends BaseAuditEntity implements Comparable<MenuEntity> {
     private static final long serialVersionUID = 1L;

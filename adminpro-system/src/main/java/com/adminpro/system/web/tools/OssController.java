@@ -51,7 +51,7 @@ import org.springframework.web.multipart.MultipartFile;
 @PreAuthorize("@ss.hasPermission('system:oss')")
 public class OssController extends BaseController {
 
-    protected static final String PREFIX_URL = "/admin/oss";
+    protected static final String PREFIX_URL = "/api/v1/oss";
 
     @Autowired
     private FileHelper fileHelper;
@@ -70,10 +70,9 @@ public class OssController extends BaseController {
      */
     @Operation(summary = "分页查询文件列表", description = "查询对象存储服务中的文件列表，支持分页")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "查询成功",
-            content = @Content(schema = @Schema(implementation = R.class))),
-        @ApiResponse(responseCode = "401", description = "未授权"),
-        @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<ListOssVo>> paging(HttpServletRequest request) {
@@ -88,7 +87,7 @@ public class OssController extends BaseController {
      * 上传文件到对象存储服务，支持批量ID管理和单文件模式
      * </p>
      *
-     * @param file 上传的文件对象
+     * @param file    上传的文件对象
      * @param request HTTP请求对象，包含batchId、single、ext等参数
      * @return 上传成功的文件实体对象
      * @throws Exception 上传失败时抛出异常
@@ -99,11 +98,10 @@ public class OssController extends BaseController {
     @Parameter(name = "single", description = "是否单文件模式，true时会删除同batchId的旧文件", required = false, schema = @Schema(type = "boolean"))
     @Parameter(name = "ext", description = "扩展信息", required = false, schema = @Schema(type = "string"))
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "上传成功",
-            content = @Content(schema = @Schema(implementation = OSSEntity.class))),
-        @ApiResponse(responseCode = "400", description = "上传失败，文件为空或格式错误"),
-        @ApiResponse(responseCode = "401", description = "未授权"),
-        @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "上传成功", content = @Content(schema = @Schema(implementation = OSSEntity.class))),
+            @ApiResponse(responseCode = "400", description = "上传失败，文件为空或格式错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
@@ -144,11 +142,11 @@ public class OssController extends BaseController {
     @Operation(summary = "删除文件", description = "根据文件ID删除指定的文件")
     @Parameter(name = "id", description = "文件ID", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "删除成功"),
-        @ApiResponse(responseCode = "400", description = "请求参数错误"),
-        @ApiResponse(responseCode = "401", description = "未授权"),
-        @ApiResponse(responseCode = "403", description = "无权限访问"),
-        @ApiResponse(responseCode = "404", description = "文件不存在")
+            @ApiResponse(responseCode = "200", description = "删除成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "文件不存在")
     })
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public R delete(@PathVariable String id) {
@@ -172,10 +170,10 @@ public class OssController extends BaseController {
     @Operation(summary = "批量删除文件", description = "支持批量删除多个文件，多个ID用逗号分隔")
     @Parameter(name = "ids", description = "文件ID列表，多个ID用逗号分隔", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "删除成功"),
-        @ApiResponse(responseCode = "400", description = "请求参数错误"),
-        @ApiResponse(responseCode = "401", description = "未授权"),
-        @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "删除成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数错误"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @Transactional
     @RequestMapping(value = "/deletemany", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)

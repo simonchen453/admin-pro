@@ -9,6 +9,7 @@ import com.adminpro.framework.jdbc.annotation.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ import java.util.List;
  * @see com.adminpro.framework.base.entity.BaseAuditEntity
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Table(name = RoleEntity.TABLE_NAME)
 public class RoleEntity extends BaseAuditEntity {
     private static final long serialVersionUID = 1L;

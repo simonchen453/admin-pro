@@ -9,23 +9,23 @@ import type {
 } from '../types';
 
 export const getDeptListApi = (params: DeptSearchForm): Promise<DeptListResponse> => {
-  return request.post('/admin/dept/list', params);
+  return request.post('/api/v1/depts/list', params);
 };
 
 export const getDeptDetailApi = (id: string): Promise<DeptDetailResponse> => {
-  return request.get(`/admin/dept/detail/${id}`);
+  return request.get(`/api/v1/depts/detail/${id}`);
 };
 
 export const createDeptApi = (params: DeptEntity): Promise<DeptCreateResponse> => {
-  return request.post('/admin/dept/create', params);
+  return request.post('/api/v1/depts/create', params);
 };
 
 export const updateDeptApi = (params: DeptEntity): Promise<DeptCreateResponse> => {
-  return request.patch('/admin/dept/edit', params);
+  return request.patch('/api/v1/depts/edit', params);
 };
 
 export const deleteDeptApi = (ids: string): Promise<any> => {
-  return request.delete(`/admin/dept/delete?ids=${ids}`);
+  return request.delete(`/api/v1/depts/delete?ids=${ids}`);
 };
 
 export const getDeptTreeSelectApi = (): Promise<DeptTreeSelectResponse> => {
@@ -35,7 +35,7 @@ export const getDeptTreeSelectApi = (): Promise<DeptTreeSelectResponse> => {
 export const uploadDeptLogoApi = (file: File): Promise<any> => {
   const formData = new FormData();
   formData.append('file', file);
-  return request.post('/admin/dept/upload', formData, {
+  return request.post('/api/v1/depts/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }

@@ -18,7 +18,7 @@ import java.io.IOException;
 public class IndexController extends BaseController {
 
     @RequestMapping(value = "/sessionExpired", method = RequestMethod.GET)
-    public R sessionExpired() throws IOException {
+    public R<Void> sessionExpired() throws IOException {
         SessionEntity sessionEntity = SessionService.getInstance().findBySessionId(WebHelper.getSessionId());
         if (sessionEntity == null) {
             return R.error("Session not found");
@@ -34,15 +34,15 @@ public class IndexController extends BaseController {
     }
 
     @RequestMapping(value = "/sessionTerminate", method = RequestMethod.GET)
-    public R sessionTerminate() throws IOException {
+    public R<Void> sessionTerminate() throws IOException {
         SessionEntity sessionEntity = SessionService.getInstance().findBySessionId(WebHelper.getSessionId());
         if (sessionEntity == null) {
             return R.error("Session not found");
         } else {
             if (StringHelper.equals(sessionEntity.getStatus(), SessionStatus.EXPIRE.getCode())) {
-                 return R.error("401", "Session expired");
+                return R.error("401", "Session expired");
             } else if (StringHelper.equals(sessionEntity.getStatus(), SessionStatus.KILLED.getCode())) {
-                 return R.error("401", "Session terminated");
+                return R.error("401", "Session terminated");
             } else {
                 return R.ok();
             }

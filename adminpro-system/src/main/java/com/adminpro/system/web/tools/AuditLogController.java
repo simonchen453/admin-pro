@@ -8,7 +8,7 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.tools.domains.entity.auditlog.AuditLogDTO;
-import com.adminpro.system.tools.domains.entity.auditlog.AuditLogEntity;
+
 import com.adminpro.system.tools.domains.entity.auditlog.AuditLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -44,7 +44,7 @@ import java.util.Date;
 @PreAuthorize("@ss.hasPermission('system:audit')")
 public class AuditLogController extends BaseController {
 
-    protected static final String PREFIX_URL = "/admin/audit";
+    protected static final String PREFIX_URL = "/api/v1/audit-logs";
     protected static final String SEARCH_FORM_KEY = "auditLogSearchForm";
 
     @Autowired
@@ -60,19 +60,14 @@ public class AuditLogController extends BaseController {
      * @return 包含审计日志列表和分页信息的查询结果集
      */
     @Operation(summary = "查询审计日志列表", description = "支持按状态、事件、模块、类别、用户、时间范围等条件进行分页查询审计日志")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-        description = "搜索条件",
-        required = true,
-        content = @Content(schema = @Schema(implementation = SearchForm.class))
-    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "搜索条件", required = true, content = @Content(schema = @Schema(implementation = SearchForm.class)))
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "查询成功",
-            content = @Content(schema = @Schema(implementation = R.class))),
-        @ApiResponse(responseCode = "401", description = "未授权"),
-        @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public R<QueryResultSet<AuditLogEntity>> search(@RequestBody SearchForm searchForm) {
+    public R<QueryResultSet<AuditLogDTO>> search(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         SearchParam param = startPaging(searchForm);
         setSearchForm(searchForm);
@@ -140,5 +135,3 @@ public class AuditLogController extends BaseController {
         request.getSession().removeAttribute(SEARCH_FORM_KEY);
     }
 }
-
-

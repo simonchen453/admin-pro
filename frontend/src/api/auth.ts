@@ -3,7 +3,7 @@ import type { LoginRequest, LoginResponse, ApiResponse } from '../types';
 
 // 登录接口
 export const loginApi = async (data: LoginRequest): Promise<LoginResponse> => {
-  const respData = await request.post<LoginResponse>('/auth/login', data);
+  const respData = await request.post<LoginResponse>('/api/v1/auth/login', data);
   return respData as unknown as LoginResponse;
 };
 
@@ -24,7 +24,7 @@ export interface UserInfo {
 
 // 获取当前登录用户详细信息
 export const getCurrentUserInfoApi = async (): Promise<any> => {
-  const respData = await request.get<ApiResponse<any>>('/auth/userinfo');
+  const respData = await request.get<ApiResponse<any>>('/api/v1/auth/userinfo');
   return respData.data;
 };
 
@@ -38,7 +38,7 @@ export interface ChangePasswordRequest {
 
 export const changePasswordApi = async (data: ChangePasswordRequest): Promise<ApiResponse<any>> => {
   try {
-    const response = await request.patch<ApiResponse<any>>('/common/changepwd', data);
+    const response = await request.patch<ApiResponse<any>>('/api/v1/common/changepwd', data);
     return response as unknown as ApiResponse<any>;
   } catch (error) {
     console.error('修改密码失败:', error);
@@ -56,7 +56,7 @@ export interface UpdateProfileRequest {
 }
 
 export const updateProfileApi = async (data: UpdateProfileRequest): Promise<ApiResponse<any>> => {
-  const response = await request.patch<ApiResponse<any>>('/auth/profile', data);
+  const response = await request.patch<ApiResponse<any>>('/api/v1/auth/profile', data);
   return response as unknown as ApiResponse<any>;
 };
 
@@ -74,6 +74,6 @@ export interface PasswordRule {
 
 // 获取密码规则接口
 export const getPasswordRuleApi = async (): Promise<PasswordRule> => {
-  const respData = await request.get<ApiResponse<PasswordRule>>('/auth/password-rule');
+  const respData = await request.get<ApiResponse<PasswordRule>>('/api/v1/auth/password-rule');
   return (respData as unknown as ApiResponse<PasswordRule>).data;
 };

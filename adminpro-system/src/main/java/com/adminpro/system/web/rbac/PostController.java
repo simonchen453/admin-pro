@@ -29,7 +29,9 @@ import java.util.List;
 
 /**
  * 职位管理控制器
- * <p>提供职位的增删改查功能，包括职位列表查询、职位详情查询、职位创建、职位更新、职位删除等操作</p>
+ * <p>
+ * 提供职位的增删改查功能，包括职位列表查询、职位详情查询、职位创建、职位更新、职位删除等操作
+ * </p>
  *
  * @author simon
  * @date 2020-05-21
@@ -39,7 +41,7 @@ import java.util.List;
 @RequestMapping(PostController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:post')")
 public class PostController extends BaseController {
-    protected static final String PREFIX_URL = "/admin/post";
+    protected static final String PREFIX_URL = "/api/v1/posts";
     protected static final String SEARCH_FORM_KEY = "postSearchForm";
 
     @Autowired
@@ -53,20 +55,22 @@ public class PostController extends BaseController {
 
     /**
      * 查询职位列表
-     * <p>根据查询条件获取职位列表，支持按职位编码、名称、状态等条件进行过滤和分页查询</p>
+     * <p>
+     * 根据查询条件获取职位列表，支持按职位编码、名称、状态等条件进行过滤和分页查询
+     * </p>
      *
      * @param searchForm 查询条件表单，包含职位编码、名称、状态等过滤条件
      * @return 职位查询结果集，包含数据和分页信息
      */
     @Operation(summary = "查询职位列表", description = "根据查询条件获取职位列表，支持按职位编码、名称、状态等条件进行过滤和分页查询")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostEntity.class))),
+            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostEntity.class))),
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public R<QueryResultSet<PostEntity>> list(@Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
+    public R<QueryResultSet<PostEntity>> list(
+            @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String code = searchForm.getCode();
         String name = searchForm.getName();
@@ -88,15 +92,16 @@ public class PostController extends BaseController {
 
     /**
      * 查询职位详情
-     * <p>根据职位ID获取职位的详细信息</p>
+     * <p>
+     * 根据职位ID获取职位的详细信息
+     * </p>
      *
      * @param id 职位ID
      * @return 职位详细信息
      */
     @Operation(summary = "查询职位详情", description = "根据职位ID获取职位的详细信息")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostEntity.class))),
+            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostEntity.class))),
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "职位不存在")
@@ -114,7 +119,9 @@ public class PostController extends BaseController {
 
     /**
      * 创建职位
-     * <p>新增一个职位，包含职位编码、名称、排序、状态等信息</p>
+     * <p>
+     * 新增一个职位，包含职位编码、名称、排序、状态等信息
+     * </p>
      *
      * @param post 职位实体信息
      * @return 操作结果
@@ -155,7 +162,9 @@ public class PostController extends BaseController {
 
     /**
      * 更新职位
-     * <p>更新已有职位的信息</p>
+     * <p>
+     * 更新已有职位的信息
+     * </p>
      *
      * @param post 职位实体信息
      * @return 操作结果
@@ -199,7 +208,9 @@ public class PostController extends BaseController {
 
     /**
      * 批量删除职位
-     * <p>根据多个职位ID批量删除职位，ID之间用逗号分隔</p>
+     * <p>
+     * 根据多个职位ID批量删除职位，ID之间用逗号分隔
+     * </p>
      *
      * @param ids 职位ID列表，多个ID用逗号分隔
      * @return 操作结果
@@ -213,7 +224,8 @@ public class PostController extends BaseController {
     })
     @SysLog("删除职位")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public R remove(@Parameter(description = "职位ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {
+    public R remove(
+            @Parameter(description = "职位ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {
         // 使用验证工具类解析和验证参数
         List<String> postIdList = BatchOperationValidator.validateAndParseIds(ids);
         postService.deleteByIds(StringUtils.join(postIdList, ","));

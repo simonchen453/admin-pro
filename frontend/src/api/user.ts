@@ -16,25 +16,25 @@ import type {
 
 // 用户列表查询
 export const getUserListApi = async (searchForm: UserSearchForm): Promise<UserListResponse> => {
-  const response = await request.post<ApiResponse<UserListResponse>>('/admin/user/list', searchForm);
+  const response = await request.post<ApiResponse<UserListResponse>>('/api/v1/users/list', searchForm);
   return response.data;
 };
 
 // 创建用户
 export const createUserApi = async (userData: UserCreateRequest): Promise<ApiResponse> => {
-  const response = await request.post<ApiResponse>('/admin/user', userData);
+  const response = await request.post<ApiResponse>('/api/v1/users', userData);
   return response;
 };
 
 // 更新用户
 export const updateUserApi = async (userData: UserUpdateRequest): Promise<ApiResponse> => {
-  const response = await request.patch<ApiResponse>('/admin/user', userData);
+  const response = await request.patch<ApiResponse>('/api/v1/users', userData);
   return response;
 };
 
 // 激活用户
 export const activeUserApi = async (userId: string): Promise<UserStatusChangeResponse> => {
-  const response = await request.patch<ApiResponse>(`/admin/user/active/${userId}`);
+  const response = await request.patch<ApiResponse>(`/api/v1/users/active/${userId}`);
   return {
     success: response.restCode === '200' || response.restCode === '0',
     message: response.message
@@ -43,7 +43,7 @@ export const activeUserApi = async (userId: string): Promise<UserStatusChangeRes
 
 // 停用用户
 export const inactiveUserApi = async (userId: string): Promise<UserStatusChangeResponse> => {
-  const response = await request.patch<ApiResponse>(`/admin/user/inactive/${userId}`);
+  const response = await request.patch<ApiResponse>(`/api/v1/users/inactive/${userId}`);
   return {
     success: response.restCode === '200' || response.restCode === '0',
     message: response.message
@@ -52,19 +52,19 @@ export const inactiveUserApi = async (userId: string): Promise<UserStatusChangeR
 
 // 重置密码
 export const resetPasswordApi = async (resetData: UserResetPasswordRequest): Promise<ApiResponse> => {
-  const response = await request.patch<ApiResponse>('/admin/user/resetpwd', resetData);
+  const response = await request.patch<ApiResponse>('/api/v1/users/resetpwd', resetData);
   return response;
 };
 
 // 获取用户详情
 export const getUserDetailApi = async (userId: string): Promise<UserDetailResponse> => {
-  const response = await request.get<ApiResponse<UserDetailResponse>>(`/admin/user/detail/${userId}`);
+  const response = await request.get<ApiResponse<UserDetailResponse>>(`/api/v1/users/detail/${userId}`);
   return response.data;
 };
 
 // 获取部门列表（用于下拉选择）
 export const getDeptListApi = async (): Promise<DeptEntity[]> => {
-  const response = await request.get<ApiResponse<DeptEntity[]>>('/admin/dept/list');
+  const response = await request.get<ApiResponse<DeptEntity[]>>('/api/v1/depts/list');
   return response.data;
 };
 
@@ -76,13 +76,13 @@ export const getDeptTreeSelectApi = async (): Promise<any[]> => {
 
 // 获取角色列表（用于下拉选择）
 export const getRoleListApi = async (): Promise<RoleEntity[]> => {
-  const response = await request.get<ApiResponse<RoleEntity[]>>('/admin/role/list');
+  const response = await request.get<ApiResponse<RoleEntity[]>>('/api/v1/roles/list');
   return response.data;
 };
 
 // 获取岗位列表（用于下拉选择）
 export const getPostListApi = async (): Promise<PostEntity[]> => {
-  const response = await request.get<ApiResponse<PostEntity[]>>('/admin/post/list');
+  const response = await request.get<ApiResponse<PostEntity[]>>('/api/v1/posts/list');
   return response.data;
 };
 
@@ -96,13 +96,13 @@ export const getUserPrepareDataApi = async (): Promise<{
     posts: PostEntity[];
     roles: RoleEntity[];
     depts: DeptEntity[];
-  }>>('/admin/user/prepare');
+  }>>('/api/v1/users/prepare');
   return response.data;
 };
 
 // 删除用户（支持批量删除）
 export const deleteUserApi = async (userIds: string): Promise<ApiResponse> => {
-  const response = await request.delete<ApiResponse>(`/admin/user/delete?users=${userIds}`);
+  const response = await request.delete<ApiResponse>(`/api/v1/users/delete?users=${userIds}`);
   return response;
 };
 
@@ -116,7 +116,7 @@ export const getDomainListApi = async (): Promise<Array<{ id: string; name: stri
 export const importUserApi = async (file: File): Promise<ApiResponse> => {
   const formData = new FormData();
   formData.append('file', file);
-  const response = await request.post<ApiResponse>('/admin/user/import', formData, {
+  const response = await request.post<ApiResponse>('/api/v1/users/import', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -128,7 +128,7 @@ export const importUserApi = async (file: File): Promise<ApiResponse> => {
 export const exportUserApi = async (userIds: string): Promise<void> => {
   const axios = (await import('axios')).default;
   try {
-    const response = await axios.get(`${appConfig.API_BASE_URL}/admin/user/export?ids=${userIds}`, {
+    const response = await axios.get(`${appConfig.API_BASE_URL}/api/v1/users/export?ids=${userIds}`, {
       responseType: 'blob',
       withCredentials: true,
     });
@@ -171,7 +171,7 @@ export const exportAllUserApi = async (searchForm: UserSearchForm): Promise<void
   if (searchForm.pageSize) params.append('pageSize', searchForm.pageSize.toString());
 
   try {
-    const response = await axios.get(`${appConfig.API_BASE_URL}/admin/user/excelAll?${params.toString()}`, {
+    const response = await axios.get(`${appConfig.API_BASE_URL}/api/v1/users/excelAll?${params.toString()}`, {
       responseType: 'blob',
       withCredentials: true,
     });

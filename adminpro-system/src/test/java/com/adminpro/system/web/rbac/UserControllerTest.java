@@ -21,9 +21,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.http.MediaType;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -116,7 +113,6 @@ public class UserControllerTest {
     @DisplayName("批量删除用户 (RESTful)")
     void batchDelete_WithValidIds_ReturnsSuccess() throws Exception {
         // Arrange
-        List<String> userIds = Arrays.asList("domain_id1", "domain_id2");
         doNothing().when(userService).deleteMany(anyString());
 
         // Act & Assert

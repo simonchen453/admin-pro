@@ -54,7 +54,7 @@ import java.io.File;
 import java.util.*;
 
 @RestController
-@RequestMapping(value = "/common")
+@RequestMapping(value = "/api/v1/common")
 public class CommonController extends BaseController {
 
     @Autowired

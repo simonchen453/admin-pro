@@ -2,7 +2,7 @@ import request from './request';
 import type { ApiResponse, SystemInfo } from '../types';
 
 export const getSystemInfoApi = (): Promise<ApiResponse<SystemInfo>> => {
-  return request.get('/common/release-info');
+  return request.get('/api/v1/common/release-info');
 };
 
 export interface StatisticsData {
@@ -13,7 +13,7 @@ export interface StatisticsData {
 }
 
 export const getStatisticsApi = (): Promise<ApiResponse<StatisticsData>> => {
-  return request.get('/common/statistics');
+  return request.get('/api/v1/common/statistics');
 };
 
 export interface RecentActivity {
@@ -26,6 +26,6 @@ export interface RecentActivity {
 }
 
 export const getRecentActivitiesApi = (limit: number = 10): Promise<ApiResponse<RecentActivity[]>> => {
-  return request.get(`/common/recent-activities?limit=${limit}`);
+  return request.get(`/api/v1/common/recent-activities?limit=${limit}`);
 };
 

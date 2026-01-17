@@ -25,7 +25,6 @@ const ServerInfo = lazy(() => import('../pages/Server/ServerInfo'));
 const SysLogList = lazy(() => import('../pages/SysLog/SysLogList'));
 const SysLogView = lazy(() => import('../pages/SysLog/SysLogView'));
 const AuditLogList = lazy(() => import('../pages/AuditLog/AuditLogList'));
-const GeneratorList = lazy(() => import('../pages/Generator'));
 const Swagger = lazy(() => import('../pages/Swagger'));
 const Settings = lazy(() => import('../pages/Settings'));
 const NoPermission = lazy(() => import('../pages/NoPermission'));
@@ -206,14 +205,7 @@ function AppRouter() {
                             </Suspense>
                         }
                     />
-                    <Route
-                        path="admin/generator"
-                        element={
-                            <Suspense fallback={<LoadingSpinner />}>
-                                <GeneratorList />
-                            </Suspense>
-                        }
-                    />
+
                     <Route
                         path="admin/swagger"
                         element={

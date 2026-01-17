@@ -1,7 +1,7 @@
 import request from './request';
-import type { 
-  ConfigSearchForm, 
-  ConfigListResponse, 
+import type {
+  ConfigSearchForm,
+  ConfigListResponse,
   ConfigDetailResponse,
   ConfigCreateResponse,
   ConfigEntity,
@@ -9,22 +9,22 @@ import type {
 } from '../types';
 
 export const getConfigListApi = (params: ConfigSearchForm): Promise<ConfigListResponse> => {
-  return request.post('/admin/config/list', params);
+  return request.post('/api/v1/configs/list', params);
 };
 
 export const getConfigDetailApi = (id: string): Promise<ConfigDetailResponse> => {
-  return request.get(`/admin/config/detail/${id}`);
+  return request.get(`/api/v1/configs/detail/${id}`);
 };
 
 export const updateConfigApi = (params: ConfigEntity): Promise<ConfigCreateResponse> => {
-  return request.patch('/admin/config/edit', params);
+  return request.patch('/api/v1/configs/edit', params);
 };
 
 export const createConfigApi = (params: ConfigEntity): Promise<ConfigCreateResponse> => {
-  return request.post('/admin/config/create', params);
+  return request.post('/api/v1/configs/create', params);
 };
 
 export const deleteConfigApi = (ids: string): Promise<ApiResponse> => {
-  return request.delete(`/admin/config/delete?ids=${ids}`);
+  return request.delete(`/api/v1/configs/delete?ids=${ids}`);
 };
 

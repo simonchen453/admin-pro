@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("@ss.hasPermission('system:server')")
 public class ServerController extends BaseController {
 
-    protected static final String PREFIX_URL = "/admin/server";
+    protected static final String PREFIX_URL = "/api/v1/server";
 
     @GetMapping("/detail")
     public R detail() throws Exception {

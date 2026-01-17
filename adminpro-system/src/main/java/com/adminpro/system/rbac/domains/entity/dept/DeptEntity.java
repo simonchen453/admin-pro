@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ import java.util.List;
  * @see com.adminpro.framework.base.entity.BaseAuditEntity
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Table(name = DeptEntity.TABLE_NAME)
 public class DeptEntity extends BaseAuditEntity {
     private static final long serialVersionUID = 1L;

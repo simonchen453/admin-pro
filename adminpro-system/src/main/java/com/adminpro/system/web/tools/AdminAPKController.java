@@ -36,7 +36,7 @@ import java.util.List;
 @PreAuthorize("@ss.hasPermission('system:apk')")
 public class AdminAPKController extends BaseController {
 
-    protected static final String PREFIX_URL = "/admin/apk";
+    protected static final String PREFIX_URL = "/api/v1/apks";
 
     @Autowired
     private APKService apkService;

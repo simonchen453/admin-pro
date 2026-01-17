@@ -45,7 +45,7 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("@ss.hasPermission('system:session')")
 public class SessionController extends BaseController {
 
-    protected static final String PREFIX_URL = "/admin/session";
+    protected static final String PREFIX_URL = "/api/v1/sessions";
     protected static final String SEARCH_FORM_KEY = "sessionSearchForm";
 
     @Autowired
@@ -61,16 +61,11 @@ public class SessionController extends BaseController {
      * @return 包含用户会话列表和分页信息的查询结果集
      */
     @Operation(summary = "查询用户会话列表", description = "支持按Session ID、状态、用户登录名、登录IP、部门编号等条件进行分页查询")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-        description = "搜索条件",
-        required = true,
-        content = @Content(schema = @Schema(implementation = SearchForm.class))
-    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "搜索条件", required = true, content = @Content(schema = @Schema(implementation = SearchForm.class)))
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "查询成功",
-            content = @Content(schema = @Schema(implementation = R.class))),
-        @ApiResponse(responseCode = "401", description = "未授权"),
-        @ApiResponse(responseCode = "403", description = "无权限访问")
+            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     public R<QueryResultSet<SessionEntity>> list(@RequestBody SearchForm searchForm) {
@@ -113,11 +108,10 @@ public class SessionController extends BaseController {
     @Operation(summary = "获取会话详细信息", description = "根据会话ID查询用户会话的详细信息")
     @Parameter(name = "id", description = "会话ID", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "查询成功",
-            content = @Content(schema = @Schema(implementation = SessionEntity.class))),
-        @ApiResponse(responseCode = "401", description = "未授权"),
-        @ApiResponse(responseCode = "403", description = "无权限访问"),
-        @ApiResponse(responseCode = "404", description = "会话不存在")
+            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = SessionEntity.class))),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "会话不存在")
     })
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
     public R<SessionEntity> detail(@PathVariable String id) {
@@ -142,12 +136,11 @@ public class SessionController extends BaseController {
     @Operation(summary = "暂停会话", description = "将指定用户会话的状态设置为暂停状态，不允许操作当前用户自己的会话")
     @Parameter(name = "id", description = "会话ID", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "暂停成功",
-            content = @Content(schema = @Schema(implementation = SessionEntity.class))),
-        @ApiResponse(responseCode = "400", description = "不能操作当前用户"),
-        @ApiResponse(responseCode = "401", description = "未授权"),
-        @ApiResponse(responseCode = "403", description = "无权限访问"),
-        @ApiResponse(responseCode = "404", description = "会话不存在")
+            @ApiResponse(responseCode = "200", description = "暂停成功", content = @Content(schema = @Schema(implementation = SessionEntity.class))),
+            @ApiResponse(responseCode = "400", description = "不能操作当前用户"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "会话不存在")
     })
     @SysLog("暂停会话")
     @RequestMapping(value = "/suspend/{id}", method = RequestMethod.PATCH)
@@ -177,12 +170,11 @@ public class SessionController extends BaseController {
     @Operation(summary = "恢复会话", description = "将已暂停的用户会话状态恢复为激活状态，不允许操作当前用户自己的会话")
     @Parameter(name = "id", description = "会话ID", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "恢复成功",
-            content = @Content(schema = @Schema(implementation = SessionEntity.class))),
-        @ApiResponse(responseCode = "400", description = "不能操作当前用户"),
-        @ApiResponse(responseCode = "401", description = "未授权"),
-        @ApiResponse(responseCode = "403", description = "无权限访问"),
-        @ApiResponse(responseCode = "404", description = "会话不存在")
+            @ApiResponse(responseCode = "200", description = "恢复成功", content = @Content(schema = @Schema(implementation = SessionEntity.class))),
+            @ApiResponse(responseCode = "400", description = "不能操作当前用户"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "会话不存在")
     })
     @SysLog("恢复会话")
     @RequestMapping(value = "/unsuspend/{id}", method = RequestMethod.PATCH)
@@ -212,12 +204,11 @@ public class SessionController extends BaseController {
     @Operation(summary = "终止会话", description = "终止指定的用户会话，不允许操作当前用户自己的会话")
     @Parameter(name = "id", description = "会话ID", required = true, schema = @Schema(type = "string"))
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "终止成功",
-            content = @Content(schema = @Schema(implementation = SessionEntity.class))),
-        @ApiResponse(responseCode = "400", description = "不能操作当前用户"),
-        @ApiResponse(responseCode = "401", description = "未授权"),
-        @ApiResponse(responseCode = "403", description = "无权限访问"),
-        @ApiResponse(responseCode = "404", description = "会话不存在")
+            @ApiResponse(responseCode = "200", description = "终止成功", content = @Content(schema = @Schema(implementation = SessionEntity.class))),
+            @ApiResponse(responseCode = "400", description = "不能操作当前用户"),
+            @ApiResponse(responseCode = "401", description = "未授权"),
+            @ApiResponse(responseCode = "403", description = "无权限访问"),
+            @ApiResponse(responseCode = "404", description = "会话不存在")
     })
     @SysLog("终止会话")
     @RequestMapping(value = "/kill/{id}", method = RequestMethod.PATCH)

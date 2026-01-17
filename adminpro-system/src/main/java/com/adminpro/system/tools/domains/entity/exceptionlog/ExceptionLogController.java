@@ -20,10 +20,10 @@ import java.util.Date;
  * @date 2018-11-29
  */
 @RestController
-@RequestMapping("/admin/exceptionlog")
+@RequestMapping("/api/v1/exception-logs")
 public class ExceptionLogController extends BaseController {
     protected static final String PREFIX = "admin/exceptionlog";
-    protected static final String PREFIX_URL = "/admin/exceptionlog";
+    protected static final String PREFIX_URL = "/api/v1/exception-logs";
     protected static final String SEARCH_FORM_KEY = ExceptionLogController.class.getSimpleName();
     @Autowired
     private ExceptionLogService exceptionLogService;

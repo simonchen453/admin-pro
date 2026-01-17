@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -38,6 +39,7 @@ import java.util.Date;
  * @see com.adminpro.framework.base.entity.BaseAuditEntity
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Table(name = UserEntity.TABLE_NAME)
 public class UserEntity extends BaseAuditEntity {
     private static final long serialVersionUID = 1L;

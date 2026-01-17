@@ -1,5 +1,5 @@
 import request from './request';
-import type { 
+import type {
   BackendMenuItem,
   MenuEntity,
   MenuSearchForm,
@@ -23,30 +23,30 @@ export const getMenuList = async (): Promise<BackendMenuItem[]> => {
 
 // 获取菜单管理列表（树形结构）
 export const getMenuTreeListApi = (params?: MenuSearchForm): Promise<MenuListResponse> => {
-  return request.post('/admin/menu/list', params || {});
+  return request.post('/api/v1/menus/list', params || {});
 };
 
 // 获取菜单详情
 export const getMenuDetailApi = (id: string): Promise<MenuDetailResponse> => {
-  return request.get(`/admin/menu/detail/${id}`);
+  return request.get(`/api/v1/menus/detail/${id}`);
 };
 
 // 创建菜单
 export const createMenuApi = (params: MenuEntity): Promise<MenuCreateResponse> => {
-  return request.post('/admin/menu/create', params);
+  return request.post('/api/v1/menus/create', params);
 };
 
 // 更新菜单
 export const updateMenuApi = (params: MenuEntity): Promise<MenuCreateResponse> => {
-  return request.patch('/admin/menu/edit', params);
+  return request.patch('/api/v1/menus/edit', params);
 };
 
 // 删除菜单
 export const deleteMenuApi = (id: string): Promise<ApiResponse<{ success: boolean }>> => {
-  return request.delete(`/admin/menu/delete/${id}`);
+  return request.delete(`/api/v1/menus/delete/${id}`);
 };
 
 // 获取菜单树选择器数据
 export const getMenuTreeSelectApi = (): Promise<MenuListResponse> => {
-  return request.post('/admin/menu/list', {});
+  return request.post('/api/v1/menus/list', {});
 };

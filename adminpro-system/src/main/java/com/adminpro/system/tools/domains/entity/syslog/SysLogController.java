@@ -22,10 +22,10 @@ import java.util.List;
  * @date 2018-11-29
  */
 @RestController
-@RequestMapping("/admin/syslog")
+@RequestMapping("/api/v1/sys-logs")
 public class SysLogController extends BaseController {
     protected static final String PREFIX = "admin/syslog";
-    protected static final String PREFIX_URL = "/admin/syslog";
+    protected static final String PREFIX_URL = "/api/v1/sys-logs";
     protected static final String SEARCH_FORM_KEY = SysLogController.class.getSimpleName();
     @Autowired
     private SysLogService sysLogService;
@@ -34,7 +34,7 @@ public class SysLogController extends BaseController {
      * 查询系统日志列表
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public R<QueryResultSet<SysLogEntity>> list(@RequestBody SearchForm searchForm) {
+    public R<QueryResultSet<SysLogDTO>> list(@RequestBody SearchForm searchForm) {
         String condition = searchForm.getCondition();
         String startTimeStr = searchForm.getStartTime();
         String endTimeStr = searchForm.getEndTime();

@@ -39,7 +39,9 @@ import java.util.List;
 
 /**
  * 部门管理控制器
- * <p>提供部门的增删改查功能，包括部门列表查询、部门详情查询、部门创建、部门更新、部门删除、Logo上传等操作</p>
+ * <p>
+ * 提供部门的增删改查功能，包括部门列表查询、部门详情查询、部门创建、部门更新、部门删除、Logo上传等操作
+ * </p>
  *
  * @author simon
  * @date 2020-05-24
@@ -49,7 +51,7 @@ import java.util.List;
 @RequestMapping(DeptController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:dept')")
 public class DeptController extends BaseController {
-    protected static final String PREFIX_URL = "/admin/dept";
+    protected static final String PREFIX_URL = "/api/v1/depts";
     protected static final String SEARCH_FORM_KEY = "deptSearchForm";
 
     @Autowired
@@ -66,20 +68,22 @@ public class DeptController extends BaseController {
 
     /**
      * 查询部门列表
-     * <p>根据查询条件获取部门列表，支持按名称、状态等条件进行过滤和分页查询</p>
+     * <p>
+     * 根据查询条件获取部门列表，支持按名称、状态等条件进行过滤和分页查询
+     * </p>
      *
      * @param searchForm 查询条件表单，包含部门名称、状态等过滤条件
      * @return 部门列表
      */
     @Operation(summary = "查询部门列表", description = "根据查询条件获取部门列表，支持按名称、状态等条件进行过滤和分页查询")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeptEntity.class))),
+            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeptEntity.class))),
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public R<List<DeptEntity>> list(@Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
+    public R<List<DeptEntity>> list(
+            @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String status = searchForm.getStatus();
         String name = searchForm.getName();
@@ -98,7 +102,9 @@ public class DeptController extends BaseController {
 
     /**
      * 创建部门
-     * <p>新增一个部门，包含部门编号、名称、上级部门、联系人等信息</p>
+     * <p>
+     * 新增一个部门，包含部门编号、名称、上级部门、联系人等信息
+     * </p>
      *
      * @param dept 部门实体信息
      * @return 操作结果
@@ -153,7 +159,9 @@ public class DeptController extends BaseController {
 
     /**
      * 更新部门
-     * <p>更新已有部门的信息</p>
+     * <p>
+     * 更新已有部门的信息
+     * </p>
      *
      * @param dept 部门实体信息
      * @return 操作结果
@@ -210,7 +218,9 @@ public class DeptController extends BaseController {
 
     /**
      * 批量删除部门
-     * <p>根据多个部门ID批量删除部门，ID之间用逗号分隔</p>
+     * <p>
+     * 根据多个部门ID批量删除部门，ID之间用逗号分隔
+     * </p>
      *
      * @param ids 部门ID列表，多个ID用逗号分隔
      * @return 操作结果
@@ -224,7 +234,8 @@ public class DeptController extends BaseController {
     })
     @SysLog("删除部门")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public R remove(@Parameter(description = "部门ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {
+    public R remove(
+            @Parameter(description = "部门ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {
         // 使用验证工具类解析和验证参数
         List<String> deptIdList = BatchOperationValidator.validateAndParseIds(ids);
         deptService.deleteByIds(StringUtils.join(deptIdList, ","));
@@ -233,7 +244,9 @@ public class DeptController extends BaseController {
 
     /**
      * 上传部门Logo
-     * <p>上传部门Logo图片文件，支持常见图片格式，自动压缩至900x900以内</p>
+     * <p>
+     * 上传部门Logo图片文件，支持常见图片格式，自动压缩至900x900以内
+     * </p>
      *
      * @param file Logo图片文件
      * @return Logo文件的访问URL
@@ -248,7 +261,8 @@ public class DeptController extends BaseController {
     })
     @SysLog("部门Logo上传")
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public R uploadFile(@Parameter(description = "Logo图片文件", required = true) @RequestParam("file") MultipartFile file) throws Exception {
+    public R uploadFile(@Parameter(description = "Logo图片文件", required = true) @RequestParam("file") MultipartFile file)
+            throws Exception {
         if (file.isEmpty()) {
             throw new BaseRuntimeException("上传文件不能为空");
         }
@@ -273,15 +287,16 @@ public class DeptController extends BaseController {
 
     /**
      * 查询部门详情
-     * <p>根据部门ID获取部门的详细信息</p>
+     * <p>
+     * 根据部门ID获取部门的详细信息
+     * </p>
      *
      * @param id 部门ID
      * @return 部门详细信息
      */
     @Operation(summary = "查询部门详情", description = "根据部门ID获取部门的详细信息")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeptEntity.class))),
+            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeptEntity.class))),
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "部门不存在")

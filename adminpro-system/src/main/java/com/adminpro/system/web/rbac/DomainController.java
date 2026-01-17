@@ -26,7 +26,9 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 用户域管理控制器
- * <p>提供用户域的增删改查功能，包括用户域列表查询、用户域详情查询、用户域创建、用户域更新等操作</p>
+ * <p>
+ * 提供用户域的增删改查功能，包括用户域列表查询、用户域详情查询、用户域创建、用户域更新等操作
+ * </p>
  *
  * @author simon
  * @date 2020-06-14
@@ -36,7 +38,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(DomainController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:domain')")
 public class DomainController extends BaseController {
-    protected static final String PREFIX_URL = "/admin/domain";
+    protected static final String PREFIX_URL = "/api/v1/domains";
     protected static final String SEARCH_FORM_KEY = "domainSearchForm";
 
     @Autowired
@@ -50,20 +52,22 @@ public class DomainController extends BaseController {
 
     /**
      * 查询用户域列表
-     * <p>根据查询条件获取用户域列表，支持按域名称、显示名称等条件进行过滤和分页查询</p>
+     * <p>
+     * 根据查询条件获取用户域列表，支持按域名称、显示名称等条件进行过滤和分页查询
+     * </p>
      *
      * @param searchForm 查询条件表单，包含域名称、显示名称等过滤条件
      * @return 用户域查询结果集，包含数据和分页信息
      */
     @Operation(summary = "查询用户域列表", description = "根据查询条件获取用户域列表，支持按域名称、显示名称等条件进行过滤和分页查询")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DomainEntity.class))),
+            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DomainEntity.class))),
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问")
     })
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public R<QueryResultSet<DomainEntity>> list(@Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
+    public R<QueryResultSet<DomainEntity>> list(
+            @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String name = searchForm.getName();
         String display = searchForm.getDisplay();
@@ -81,7 +85,9 @@ public class DomainController extends BaseController {
 
     /**
      * 创建用户域
-     * <p>新增一个用户域，包含域名称、显示名称、是否系统域等信息</p>
+     * <p>
+     * 新增一个用户域，包含域名称、显示名称、是否系统域等信息
+     * </p>
      *
      * @param userDomain 用户域实体信息
      * @return 操作结果
@@ -118,7 +124,9 @@ public class DomainController extends BaseController {
 
     /**
      * 更新用户域
-     * <p>更新已有用户域的信息</p>
+     * <p>
+     * 更新已有用户域的信息
+     * </p>
      *
      * @param userDomain 用户域实体信息
      * @return 操作结果
@@ -158,15 +166,16 @@ public class DomainController extends BaseController {
 
     /**
      * 查询用户域详情
-     * <p>根据用户域ID获取用户域的详细信息</p>
+     * <p>
+     * 根据用户域ID获取用户域的详细信息
+     * </p>
      *
      * @param id 用户域ID
      * @return 用户域详细信息
      */
     @Operation(summary = "查询用户域详情", description = "根据用户域ID获取用户域的详细信息")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = DomainEntity.class))),
+            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DomainEntity.class))),
             @ApiResponse(responseCode = "401", description = "未授权"),
             @ApiResponse(responseCode = "403", description = "无权限访问"),
             @ApiResponse(responseCode = "404", description = "用户域不存在")

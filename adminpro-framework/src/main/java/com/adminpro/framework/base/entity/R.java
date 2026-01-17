@@ -29,13 +29,13 @@ public class R<T> implements Serializable {
     private Map<String, String> errorsMap = new HashMap<>();
 
     private T data;
-    
+
     private Long timestamp;
-    
+
     private String requestId;
 
-    public static R ok() {
-        R r = new R();
+    public static <T> R<T> ok() {
+        R<T> r = new R<>();
         r.setRestCode(String.valueOf(HttpStatus.OK.value()));
         r.setSuccess(true);
         r.setTimestamp(System.currentTimeMillis());
@@ -43,18 +43,20 @@ public class R<T> implements Serializable {
         return r;
     }
 
-    public static R ok(Object result) {
-		/*if(result != null && result instanceof String){
-			R ok = ok();
-			ok.setMessage((String)result);
-			return ok;
-		}*/
+    public static <T> R<T> ok(T result) {
+        /*
+         * if(result != null && result instanceof String){
+         * R ok = ok();
+         * ok.setMessage((String)result);
+         * return ok;
+         * }
+         */
         return ok(HttpStatus.OK.value(), result);
     }
 
-    //有可能是HttpStatus.CREATED等
-    public static R ok(int code, Object result) {
-        R r = new R();
+    // 有可能是HttpStatus.CREATED等
+    public static <T> R<T> ok(int code, T result) {
+        R<T> r = new R<>();
         r.setRestCode(String.valueOf(code));
         r.setData(result);
         r.setSuccess(true);
@@ -63,17 +65,17 @@ public class R<T> implements Serializable {
         return r;
     }
 
-    public static R error(Exception e) {
+    public static <T> R<T> error(Exception e) {
         if (!(e instanceof APIException)) {
             logger.error(e.getMessage(), e);
         }
         return error(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), e.getMessage());
     }
 
-    public static R error(MessageBundle bundle) {
+    public static <T> R<T> error(MessageBundle bundle) {
         Message[] errorMessages = bundle.getErrorMessages();
 
-        R r = new R();
+        R<T> r = new R<>();
         r.setRestCode(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
         StringBuffer sb = new StringBuffer();
         if (ArrayUtils.isNotEmpty(errorMessages)) {
@@ -96,8 +98,8 @@ public class R<T> implements Serializable {
         return r;
     }
 
-    public static R error(String code, String errMsg) {
-        R r = new R();
+    public static <T> R<T> error(String code, String errMsg) {
+        R<T> r = new R<>();
         r.setRestCode(code);
         r.setMessage(errMsg);
         r.setSuccess(false);
@@ -123,15 +125,15 @@ public class R<T> implements Serializable {
         this.success = success;
     }
 
-    public static R unauthorized() {
+    public static <T> R<T> unauthorized() {
         return error(String.valueOf(HttpStatus.UNAUTHORIZED.value()), "请登录");
     }
 
-    public static R notAcceptable() {
+    public static <T> R<T> notAcceptable() {
         return error(String.valueOf(HttpStatus.NOT_ACCEPTABLE.value()), "你没有权限访问此接口");
     }
 
-    public static R error(String errMsg) {
+    public static <T> R<T> error(String errMsg) {
         return error(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), errMsg);
     }
 
@@ -142,7 +144,6 @@ public class R<T> implements Serializable {
     public void setData(T data) {
         this.data = data;
     }
-
 
     public String getMessage() {
         return message;

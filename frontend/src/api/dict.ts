@@ -9,30 +9,30 @@ import type {
 } from '../types';
 
 export const getDictListApi = (params: DictSearchForm): Promise<DictListResponse> => {
-  return request.post('/admin/dict/list', params);
+  return request.post('/api/v1/dicts/list', params);
 };
 
 export const getDictDetailApi = (id: string): Promise<DictDetailResponse> => {
-  return request.get(`/admin/dict/detail/${id}`);
+  return request.get(`/api/v1/dicts/detail/${id}`);
 };
 
 export const updateDictApi = (params: DictEntity): Promise<DictCreateResponse> => {
-  return request.patch('/admin/dict/edit', params);
+  return request.patch('/api/v1/dicts/edit', params);
 };
 
 export const createDictApi = (params: DictEntity): Promise<DictCreateResponse> => {
-  return request.post('/admin/dict/create', params);
+  return request.post('/api/v1/dicts/create', params);
 };
 
 export const deleteDictApi = (ids: string): Promise<ApiResponse> => {
-  return request.delete(`/admin/dict/delete?ids=${ids}`);
+  return request.delete(`/api/v1/dicts/delete?ids=${ids}`);
 };
 
 export const activeDictApi = (id: string): Promise<ApiResponse> => {
-  return request.patch(`/admin/dict/active/${id}`);
+  return request.patch(`/api/v1/dicts/active/${id}`);
 };
 
 export const inactiveDictApi = (id: string): Promise<ApiResponse> => {
-  return request.patch(`/admin/dict/inactive/${id}`);
+  return request.patch(`/api/v1/dicts/inactive/${id}`);
 };
 

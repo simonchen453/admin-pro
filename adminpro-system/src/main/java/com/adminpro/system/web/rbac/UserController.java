@@ -68,7 +68,7 @@ import java.util.stream.Collectors;
 public class UserController extends BaseController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    protected static final String PREFIX_URL = "/admin/user";
+    protected static final String PREFIX_URL = "/api/v1/users";
     protected static final String SEARCH_FORM_KEY = "userSearchForm";
 
     @Autowired
@@ -136,7 +136,9 @@ public class UserController extends BaseController {
 
     /**
      * 停用用户
-     * <p>将指定用户状态设置为停用，停用后用户无法登录系统</p>
+     * <p>
+     * 将指定用户状态设置为停用，停用后用户无法登录系统
+     * </p>
      *
      * @param userId 用户ID
      * @return 操作结果
@@ -158,7 +160,9 @@ public class UserController extends BaseController {
 
     /**
      * 激活用户
-     * <p>将指定用户状态设置为激活，激活后用户可以正常登录系统</p>
+     * <p>
+     * 将指定用户状态设置为激活，激活后用户可以正常登录系统
+     * </p>
      *
      * @param userId 用户ID
      * @return 操作结果
@@ -180,7 +184,9 @@ public class UserController extends BaseController {
 
     /**
      * 重置用户密码
-     * <p>管理员重置指定用户的密码，新密码需符合系统密码规则</p>
+     * <p>
+     * 管理员重置指定用户的密码，新密码需符合系统密码规则
+     * </p>
      *
      * @param userResetPwdRequestVo 密码重置请求参数，包含用户ID、新密码、确认密码
      * @return 操作结果
@@ -236,7 +242,9 @@ public class UserController extends BaseController {
 
     /**
      * 查询用户详情
-     * <p>根据用户ID查询用户的详细信息，包括基本资料、角色、岗位等</p>
+     * <p>
+     * 根据用户ID查询用户的详细信息，包括基本资料、角色、岗位等
+     * </p>
      *
      * @param userId 用户ID
      * @return 用户详细信息
@@ -304,14 +312,16 @@ public class UserController extends BaseController {
 
     /**
      * 批量删除用户
-     * <p>根据用户ID列表批量删除用户（使用逗号分隔的字符串格式）</p>
+     * <p>
+     * 根据用户ID列表批量删除用户（使用逗号分隔的字符串格式）
+     * </p>
      *
      * @param users 用户ID列表，逗号分隔，例如: "id1,id2,id3"
      * @return 操作结果
      */
     @SysLog("删除用户")
     @RequestMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.DELETE)
-    public R deleteMany(@RequestParam String users) {
+    public R<Void> deleteMany(@RequestParam String users) {
         logger.info("批量删除用户: users={}", users);
         try {
             // 使用验证工具类解析和验证参数
@@ -327,7 +337,9 @@ public class UserController extends BaseController {
 
     /**
      * 批量删除用户 (RESTful风格)
-     * <p>根据用户ID列表批量删除用户（使用JSON数组格式）</p>
+     * <p>
+     * 根据用户ID列表批量删除用户（使用JSON数组格式）
+     * </p>
      *
      * @param userIds 用户ID列表，JSON数组格式: ["id1", "id2", "id3"]
      * @return 操作结果
@@ -351,7 +363,9 @@ public class UserController extends BaseController {
 
     /**
      * 准备用户创建/编辑页面数据
-     * <p>获取创建或编辑用户时所需的基础数据，包括角色列表和岗位列表</p>
+     * <p>
+     * 获取创建或编辑用户时所需的基础数据，包括角色列表和岗位列表
+     * </p>
      *
      * @return 包含角色列表和岗位列表的映射
      */
@@ -371,7 +385,9 @@ public class UserController extends BaseController {
 
     /**
      * 创建用户
-     * <p>创建新用户，包括基本信息、角色分配、岗位分配等</p>
+     * <p>
+     * 创建新用户，包括基本信息、角色分配、岗位分配等
+     * </p>
      *
      * @param userRequestVo 用户创建请求参数
      * @return 操作结果
@@ -403,7 +419,9 @@ public class UserController extends BaseController {
 
     /**
      * 更新用户
-     * <p>更新用户基本信息、角色分配、岗位分配等</p>
+     * <p>
+     * 更新用户基本信息、角色分配、岗位分配等
+     * </p>
      *
      * @param userRequestVo 用户更新请求参数
      * @return 操作结果
@@ -445,7 +463,9 @@ public class UserController extends BaseController {
 
     /**
      * 用户头像上传
-     * <p>上传用户头像图片到OSS存储</p>
+     * <p>
+     * 上传用户头像图片到OSS存储
+     * </p>
      *
      * @param file             上传的文件
      * @param multipartRequest 多部分请求对象
@@ -465,7 +485,9 @@ public class UserController extends BaseController {
 
     /**
      * 导入用户
-     * <p>从Excel文件批量导入用户数据</p>
+     * <p>
+     * 从Excel文件批量导入用户数据
+     * </p>
      *
      * @param file Excel文件
      * @return 操作结果
@@ -490,9 +512,11 @@ public class UserController extends BaseController {
 
     /**
      * 导出用户
-     * <p>根据用户ID列表导出用户数据到Excel文件</p>
+     * <p>
+     * 根据用户ID列表导出用户数据到Excel文件
+     * </p>
      *
-     * @param ids     用户ID列表，逗号分隔（可选）
+     * @param ids      用户ID列表，逗号分隔（可选）
      * @param response HTTP响应对象
      * @throws Exception 导出异常
      */
@@ -512,7 +536,9 @@ public class UserController extends BaseController {
 
     /**
      * 导出所有用户
-     * <p>根据查询条件导出所有符合条件的用户数据到Excel文件</p>
+     * <p>
+     * 根据查询条件导出所有符合条件的用户数据到Excel文件
+     * </p>
      *
      * @param searchForm 查询条件表单
      * @param response   HTTP响应对象

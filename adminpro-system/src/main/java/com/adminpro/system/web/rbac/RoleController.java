@@ -33,7 +33,7 @@ import java.util.List;
 @RequestMapping(RoleController.PREFIX_URL)
 @PreAuthorize("@ss.hasPermission('system:role')")
 public class RoleController extends BaseController {
-    protected static final String PREFIX_URL = "/admin/role";
+    protected static final String PREFIX_URL = "/api/v1/roles";
     protected static final String SEARCH_FORM_KEY = "roleSearchForm";
 
     @Autowired

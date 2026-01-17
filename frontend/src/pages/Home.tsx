@@ -11,7 +11,6 @@ import {
   FileTextOutlined,
   ClockCircleOutlined,
   DatabaseOutlined,
-  CodeOutlined,
   SafetyOutlined,
   ThunderboltOutlined,
   BarChartOutlined,
@@ -78,7 +77,6 @@ function Home() {
     { title: '服务器监控', icon: <BarChartOutlined />, path: '/admin/server', color: '#06b6d4' },
     { title: '系统日志', icon: <FileTextOutlined />, path: '/admin/syslog', color: '#64748b' },
     { title: '审计日志', icon: <SafetyOutlined />, path: '/admin/audit', color: '#84cc16' },
-    { title: '代码生成器', icon: <CodeOutlined />, path: '/admin/generator', color: '#d946ef' },
   ];
 
   const handleQuickActionClick = useCallback((path: string) => {

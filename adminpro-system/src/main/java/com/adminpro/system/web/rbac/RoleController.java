@@ -161,6 +161,7 @@ public class RoleController extends BaseController {
     }
 
     @Data
+    @lombok.EqualsAndHashCode(callSuper = false)
     public static class SearchForm extends BaseSearchForm {
         private String name;
         private String display;

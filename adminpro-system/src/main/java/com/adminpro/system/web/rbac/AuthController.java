@@ -169,7 +169,6 @@ public class AuthController extends BaseController {
             }
             return R.ok(loginResponse);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("登陆异常：", e);
             if (e instanceof AuthenticationException) {
                 return R.error("601", "账号或密码错误");

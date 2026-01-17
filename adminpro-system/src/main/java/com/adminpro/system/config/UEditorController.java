@@ -8,11 +8,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.PrintWriter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author simon
  */
 @RestController
 public class UEditorController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UEditorController.class);
 
     @RequestMapping(value = "/config")
     public void config(HttpServletRequest request, HttpServletResponse response) {
@@ -25,7 +30,7 @@ public class UEditorController {
             writer.flush();
             writer.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("UEditor配置加载失败", e);
         }
 
     }

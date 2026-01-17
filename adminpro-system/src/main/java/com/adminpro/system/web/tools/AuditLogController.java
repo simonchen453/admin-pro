@@ -108,6 +108,7 @@ public class AuditLogController extends BaseController {
     }
 
     @Data
+    @lombok.EqualsAndHashCode(callSuper = false)
     public static class SearchForm extends BaseSearchForm {
         private String user;
         private String module;

@@ -85,7 +85,6 @@ public class WebHelper {
     private static final String ATTR_LOCALE = "$$LOCALE";
     private static final String ATTR_ENCODING = "$$ENCODING";
 
-
     private static final String CONF_LOCALE_DEFAULT = "app.locale.default";
     private static final String CONF_LOCALE_ACCEPT = "app.locale.accept";
     private static final String CONF_LOCALE_ENCODING_PREFIX = "app.locale.encoding.";
@@ -93,20 +92,21 @@ public class WebHelper {
     public static final String UNKNOWN_BROWSER = "Unknown browser";
     public static final String UNKNOWN_OS = "Unknown OS";
     // browser[search name, display name, search version]
-    public static final String[] BROWSER_IE = {"MSIE", "Internet Explorer", "MSIE"};
-    public static final String[] BROWSER_FIREFOX = {"Firefox", "Firefox", "Firefox"};
-    public static final String[] BROWSER_OPERA = {"Opera", "Opera", "Opera"};
-    public static final String[] BROWSER_CHROME = {"Chrome", "Chrome", "Chrome"};
-    public static final String[] BROWSER_SAFARI = {"Safari", "Safari", "Version"};
-    public static final String[] BROWSER_EDG = {"Edge", "Edge", "Edge"};
-    public static final String[][] BROWSERS = {BROWSER_IE, BROWSER_FIREFOX, BROWSER_OPERA, BROWSER_CHROME, BROWSER_SAFARI};
+    public static final String[] BROWSER_IE = { "MSIE", "Internet Explorer", "MSIE" };
+    public static final String[] BROWSER_FIREFOX = { "Firefox", "Firefox", "Firefox" };
+    public static final String[] BROWSER_OPERA = { "Opera", "Opera", "Opera" };
+    public static final String[] BROWSER_CHROME = { "Chrome", "Chrome", "Chrome" };
+    public static final String[] BROWSER_SAFARI = { "Safari", "Safari", "Version" };
+    public static final String[] BROWSER_EDG = { "Edge", "Edge", "Edge" };
+    public static final String[][] BROWSERS = { BROWSER_IE, BROWSER_FIREFOX, BROWSER_OPERA, BROWSER_CHROME,
+            BROWSER_SAFARI };
     // OS[search name, display name]
-    public static final String[] OS_WINDOWS = {"Windows", "Windows"};
-    public static final String[] OS_MAC = {"Mac", "Mac OS"};
-    public static final String[] OS_LINUX = {"Linux", "Linux"};
-    public static final String[] OS_ANDROID = {"Android", "Android"};
-    public static final String[] OS_IOS = {"iPhone", "iOS"};
-    public static final String[][] OSES = {OS_WINDOWS, OS_MAC, OS_LINUX, OS_ANDROID, OS_IOS};
+    public static final String[] OS_WINDOWS = { "Windows", "Windows" };
+    public static final String[] OS_MAC = { "Mac", "Mac OS" };
+    public static final String[] OS_LINUX = { "Linux", "Linux" };
+    public static final String[] OS_ANDROID = { "Android", "Android" };
+    public static final String[] OS_IOS = { "iPhone", "iOS" };
+    public static final String[][] OSES = { OS_WINDOWS, OS_MAC, OS_LINUX, OS_ANDROID, OS_IOS };
     public static final String LOGIN_CONTINUE_URL = "continueUrl";
 
     public static String getEncoding() {
@@ -342,7 +342,7 @@ public class WebHelper {
     public static String getIpAddr(HttpServletRequest request) {
         String ip = null;
 
-        if(request != null) {
+        if (request != null) {
             try {
                 ip = request.getHeader("x-forwarded-for");
                 if (StringUtils.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
@@ -364,7 +364,7 @@ public class WebHelper {
                 logger.error("IPUtils ERROR ", e);
             }
 
-           //使用代理，则获取第一个IP地址
+            // 使用代理，则获取第一个IP地址
             if (StringUtils.isEmpty(ip) && ip.length() > 15) {
                 if (ip.indexOf(",") > 0) {
                     ip = ip.substring(0, ip.indexOf(","));
@@ -508,7 +508,7 @@ public class WebHelper {
             response.setCharacterEncoding("utf-8");
             response.getWriter().print(string);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("渲染字符串到客户端失败", e);
         }
         return null;
     }

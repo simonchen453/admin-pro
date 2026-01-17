@@ -28,8 +28,7 @@ public final class OSSFactory {
         try {
             config = init();
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("初始化OSS配置：", e);
+            logger.error("初始化OSS配置失败", e);
         }
 
         if (config.getType() == RbacConstants.CloudService.QINIU.getValue()) {
@@ -45,9 +44,10 @@ public final class OSSFactory {
 
     private static CloudStorageConfig init() throws Exception {
         InputStream resourceAsStream = OSSFactory.class.getClassLoader().getResourceAsStream("oss.json");
-        JsonParser parser = new JsonParser();  //创建JSON解析器
-        BufferedReader in = new BufferedReader(new InputStreamReader(resourceAsStream, "UTF-8"), 50 * 1024 * 1024); //设置缓冲区 编码
-        JsonObject object = (JsonObject) parser.parse(in);  //创建JsonObject对象
+        JsonParser parser = new JsonParser(); // 创建JSON解析器
+        BufferedReader in = new BufferedReader(new InputStreamReader(resourceAsStream, "UTF-8"), 50 * 1024 * 1024); // 设置缓冲区
+                                                                                                                    // 编码
+        JsonObject object = (JsonObject) parser.parse(in); // 创建JsonObject对象
         String aliyunAccessKeyId = object.get("aliyunAccessKeyId").getAsString();
         String aliyunAccessKeySecret = object.get("aliyunAccessKeySecret").getAsString();
         String aliyunBucketName = object.get("aliyunBucketName").getAsString();

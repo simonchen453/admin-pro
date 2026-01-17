@@ -245,6 +245,7 @@ public class ConfigController extends BaseController {
     }
 
     @Data
+    @lombok.EqualsAndHashCode(callSuper = false)
     public static class SearchForm extends BaseSearchForm {
         private String name;
         private String key;

@@ -423,6 +423,7 @@ public class JobController extends BaseController {
     }
 
     @Data
+    @lombok.EqualsAndHashCode(callSuper = false)
     public static class SearchForm extends BaseSearchForm {
         private String condition;
 

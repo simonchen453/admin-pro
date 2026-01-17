@@ -227,6 +227,7 @@ public class SessionController extends BaseController {
     }
 
     @Data
+    @lombok.EqualsAndHashCode(callSuper = false)
     public static class SearchForm extends BaseSearchForm {
         /**
          * Session ID

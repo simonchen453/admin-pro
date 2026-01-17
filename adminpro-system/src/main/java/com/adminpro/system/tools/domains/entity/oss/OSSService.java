@@ -69,7 +69,7 @@ public class OSSService extends BaseService<OSSEntity, String> {
                 delete(ossEntities.get(i));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // 批量删除OSS文件时忽略异常，确保流程不中断
         }
     }
 

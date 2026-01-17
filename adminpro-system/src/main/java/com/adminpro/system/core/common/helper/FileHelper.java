@@ -234,10 +234,6 @@ public class FileHelper {
         return FileUtil.getFileType(fileName);
     }
 
-    public static void main(String[] args) {
-        System.out.println(new FileHelper().getSuffix("a.png"));
-    }
-
     /**
      * 上传文件
      *

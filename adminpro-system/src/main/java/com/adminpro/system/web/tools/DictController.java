@@ -301,6 +301,7 @@ public class DictController extends BaseController {
     }
 
     @Data
+    @lombok.EqualsAndHashCode(callSuper = false)
     public static class SearchForm extends BaseSearchForm {
         /**
          * 字典名称

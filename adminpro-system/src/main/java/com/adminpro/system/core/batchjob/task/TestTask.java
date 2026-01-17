@@ -19,10 +19,9 @@ public class TestTask {
         try {
             Thread.sleep(1000L);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
-
 
     public void test2() {
         logger.info("我是不带参数的test2方法，正在被执行");

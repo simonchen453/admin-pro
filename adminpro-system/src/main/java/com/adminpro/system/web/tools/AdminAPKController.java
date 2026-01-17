@@ -231,11 +231,11 @@ public class AdminAPKController extends BaseController {
                     outputStream.flush();
                     outputStream.close();
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                    logger.error("APK下载失败：文件未找到", e);
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    logger.error("APK下载失败：编码不支持", e);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("APK下载失败：IO异常", e);
                 }
             }
         }
@@ -265,8 +265,7 @@ public class AdminAPKController extends BaseController {
         try {
             FileUtils.copyInputStreamToFile(bis, fileDb);
         } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("CopyInputStreamToFile", e);
+            logger.error("APK上传失败：文件复制异常", e);
         }
         String batchId = IdGenerator.getInstance().nextStringId();
         request.getSession().setAttribute(batchId, webPath);

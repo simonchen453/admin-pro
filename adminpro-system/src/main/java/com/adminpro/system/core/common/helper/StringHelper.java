@@ -172,7 +172,7 @@ public class StringHelper extends StringUtils {
         try {
             messageDigest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException ex) {
-            ex.printStackTrace();
+            // MD5算法不可用，返回null
             return null;
         }
         byte[] resultByte = messageDigest.digest(str.getBytes());
@@ -270,7 +270,6 @@ public class StringHelper extends StringUtils {
         return value;
     }
 
-
     /**
      * 将object转为数字
      *
@@ -331,7 +330,7 @@ public class StringHelper extends StringUtils {
             value = Integer.parseInt(str);
         } catch (Exception ex) {
             value = 0;
-            ex.printStackTrace();
+            // 整数转换失败，返回默认值0
         }
         return value;
     }
@@ -412,12 +411,11 @@ public class StringHelper extends StringUtils {
         try {
             value = Double.valueOf(str);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // Double转换失败，使用默认值
             value = defaultValue;
         }
         return value;
     }
-
 
     /**
      * 将一个list转为以split分隔的string
@@ -470,8 +468,8 @@ public class StringHelper extends StringUtils {
      */
     public static String getRootPath() {
 
-        //测试模式下由request获取根目录，为了支撑单元测试
-        //此时的request是spring test 框架mock的request
+        // 测试模式下由request获取根目录，为了支撑单元测试
+        // 此时的request是spring test 框架mock的request
         if (!(WebHelper.getServletContext() == null)) {
             String path = WebHelper.getServletContext().getRealPath("");
             return path;
@@ -504,7 +502,7 @@ public class StringHelper extends StringUtils {
         } else if (filePath.startsWith("vfs:")) {
             filePath = filePath.substring(5);
         } else if (filePath.startsWith("/vfs:")) {
-            //jboss发布war的情况
+            // jboss发布war的情况
             filePath = filePath.substring(6);
         }
         if (System.getProperty("os.name").toLowerCase().indexOf("window") < 0) {
@@ -514,7 +512,7 @@ public class StringHelper extends StringUtils {
         if (filePath.endsWith("/")) {
             filePath = filePath.substring(0, filePath.length() - 1);
         }
-//		//System.out.println("getRoot path is "+filePath );
+        // //System.out.println("getRoot path is "+filePath );
         return filePath;
     }
 
@@ -524,8 +522,7 @@ public class StringHelper extends StringUtils {
 
             return WebUtils.getRealPath(request.getSession().getServletContext(), resource);
         } catch (FileNotFoundException e) {
-
-            e.printStackTrace();
+            // 文件未找到，返回空字符串
             return "";
         }
 
@@ -602,7 +599,7 @@ public class StringHelper extends StringUtils {
         try {
             return new String(str.getBytes("ISO8859-1"), "UTF-8");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // 字符编码转换失败
             return "";
         }
     }
@@ -614,7 +611,7 @@ public class StringHelper extends StringUtils {
         try {
             return new String(str.getBytes("UTF-8"), charset);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // 字符编码转换失败
             return "";
         }
     }
@@ -626,7 +623,7 @@ public class StringHelper extends StringUtils {
         try {
             return str.getBytes(BaseConstants.DEFAULT_ENCODING);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // 字节数组获取失败
             return new byte[0];
         }
     }
@@ -638,7 +635,7 @@ public class StringHelper extends StringUtils {
         try {
             return new String(bytes, BaseConstants.DEFAULT_ENCODING);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // 字节数组转字符串失败
             return "";
         }
     }
@@ -660,8 +657,8 @@ public class StringHelper extends StringUtils {
      * @return
      */
     public static String getChineseNum(int num) {
-        String[] chineseNum = new String[]{"一", "二", "三", "四", "五", "六", "七",
-                "八", "九", "十"};
+        String[] chineseNum = new String[] { "一", "二", "三", "四", "五", "六", "七",
+                "八", "九", "十" };
         return chineseNum[num];
     }
 
@@ -820,7 +817,7 @@ public class StringHelper extends StringUtils {
     }
 
     public static String getRandom() {
-        int[] array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        int[] array = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         Random rand = new Random();
         for (int i = 10; i > 1; i--) {
             int index = rand.nextInt(i);
@@ -880,7 +877,7 @@ public class StringHelper extends StringUtils {
                 buffer.append(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // 输入流读取失败，忽略
         }
         return buffer.toString();
     }
@@ -889,7 +886,7 @@ public class StringHelper extends StringUtils {
         try {
             keyword = URLDecoder.decode(keyword, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            // UTF-8解码失败，忽略
         }
 
         return keyword;
@@ -986,7 +983,6 @@ public class StringHelper extends StringUtils {
         return result;
     }
 
-
     /**
      * 得到异常的字串
      *
@@ -1008,8 +1004,8 @@ public class StringHelper extends StringUtils {
      * @return 是整数返回true, 否则返回false
      */
     public static boolean isNumber(String str) {
-        Pattern patternInteger = Pattern.compile(INT_REGEX);        //是否是整数
-        Pattern patternDouble = Pattern.compile(DOUBLE_REGEX);    //是否是小数
+        Pattern patternInteger = Pattern.compile(INT_REGEX); // 是否是整数
+        Pattern patternDouble = Pattern.compile(DOUBLE_REGEX); // 是否是小数
         return patternInteger.matcher(str).matches() || patternDouble.matcher(str).matches();
     }
 
@@ -1050,7 +1046,8 @@ public class StringHelper extends StringUtils {
     }
 
     /**
-     * 将下划线大写方式命名的字符串转换为驼峰式。如果转换前的下划线大写方式命名的字符串为空，则返回空字符串。 例如：HELLO_WORLD->HelloWorld
+     * 将下划线大写方式命名的字符串转换为驼峰式。如果转换前的下划线大写方式命名的字符串为空，则返回空字符串。
+     * 例如：HELLO_WORLD->HelloWorld
      *
      * @param name 转换前的下划线大写方式命名的字符串
      * @return 转换后的驼峰式命名的字符串

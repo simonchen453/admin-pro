@@ -18,8 +18,20 @@ const BASE_PATH = import.meta.env.BASE_URL || '/adminpro/';
 // 防止重复跳转的标志
 let isRelogging = false;
 
+// 静默请求的 URL 列表（这些请求失败时不显示错误消息，仅静默跳转）
+const SILENT_AUTH_URLS = [
+    '/api/v1/auth/userinfo',
+    '/api/v1/menus/current-user'
+];
+
+// 检查是否是静默请求
+const isSilentRequest = (url: string | undefined): boolean => {
+    if (!url) return false;
+    return SILENT_AUTH_URLS.some(silentUrl => url.includes(silentUrl));
+};
+
 // 统一处理认证失败
-const handleAuthFailure = (msg: string = '会话已过期，请重新登录') => {
+const handleAuthFailure = (msg: string = '会话已过期，请重新登录', showMessage: boolean = true) => {
     if (isRelogging) return;
     isRelogging = true;
 
@@ -32,9 +44,13 @@ const handleAuthFailure = (msg: string = '会话已过期，请重新登录') =>
     }
 
     if (typeof window !== 'undefined') {
-        message.warning(msg);
+        // 只有非静默模式才显示消息
+        if (showMessage) {
+            message.warning(msg);
+        }
 
-        // 延迟跳转，让用户看清提示
+        // 延迟跳转，让用户看清提示（静默模式下无需延迟）
+        const delay = showMessage ? 1500 : 100;
         setTimeout(() => {
             const current = window.location.pathname + window.location.search;
             const redirect = encodeURIComponent(current);
@@ -44,7 +60,7 @@ const handleAuthFailure = (msg: string = '会话已过期，请重新登录') =>
             }
             // 重置标志
             isRelogging = false;
-        }, 1500);
+        }, delay);
     }
 };
 
@@ -62,11 +78,14 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
     (response: AxiosResponse) => {
-        const { data } = response;
+        const { data, config } = response;
+        const requestUrl = config.url;
+        const isSilent = isSilentRequest(requestUrl);
 
         // 检查业务错误码，如果是401认证失败，直接跳转登录
         if (data.restCode === '401' || (data.restCode === 401) || data.message?.includes('认证失败')) {
-            handleAuthFailure(data.message || '认证失败，请重新登录');
+            // 静默请求不显示错误消息
+            handleAuthFailure(data.message || '认证失败，请重新登录', !isSilent);
             return Promise.reject({ response: { data }, isAuthError: true });
         }
 
@@ -91,9 +110,12 @@ request.interceptors.response.use(
         return data;
     },
     (error: AxiosError) => {
+        const requestUrl = error.config?.url;
+        const isSilent = isSilentRequest(requestUrl);
+
         // 处理HTTP状态码401
         if (error.response && error.response.status === 401) {
-            handleAuthFailure('会话已过期，请重新登录');
+            handleAuthFailure('会话已过期，请重新登录', !isSilent);
         }
         return Promise.reject(error);
     }

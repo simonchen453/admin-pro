@@ -152,6 +152,22 @@ public class R<T> implements Serializable {
         return error(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()), errMsg);
     }
 
+    /**
+     * 参数验证失败（400 Bad Request）
+     * 用于请求参数缺失或格式错误
+     */
+    public static <T> R<T> badRequest(String errMsg) {
+        return error(String.valueOf(HttpStatus.BAD_REQUEST.value()), errMsg);
+    }
+
+    /**
+     * 认证失败（401 Unauthorized）
+     * 用于账号密码错误、Token无效等认证相关错误
+     */
+    public static <T> R<T> authFailed(String errMsg) {
+        return error(String.valueOf(HttpStatus.UNAUTHORIZED.value()), errMsg);
+    }
+
     public T getData() {
         return data;
     }

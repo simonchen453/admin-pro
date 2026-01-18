@@ -15,17 +15,18 @@ const Captcha = forwardRef<CaptchaRef, CaptchaProps>(({ onCaptchaChange, classNa
   const [, setCaptchaKey] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string>('');
 
-  // 生成随机key
+  // 生成随机key（包含时间戳确保唯一性）
   const generateCaptchaKey = () => {
-    return Math.random().toString();
+    return `${Date.now()}_${Math.random().toString(36).substring(2)}`;
   };
 
   // 刷新验证码
   const refreshCaptcha = () => {
     const newKey = generateCaptchaKey();
     setCaptchaKey(newKey);
-    // 使用配置的API基础路径
-    setImageUrl(`/api/v1/auth/captcha.jpg?key=${newKey}`);
+    // 使用配置的API基础路径，添加时间戳防止浏览器缓存
+    const apiBase = config.API_BASE_URL || '';
+    setImageUrl(`${apiBase}/api/v1/auth/captcha.jpg?t=${newKey}`);
     onCaptchaChange?.(newKey);
   };
 

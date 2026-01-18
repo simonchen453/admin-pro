@@ -723,7 +723,7 @@ ALTER TABLE SYS_AUDIT_LOG_TBL
     DROP COLUMN COL_LOG_DATE,
     ADD COLUMN COL_EXECUTION_TIME BIGINT NULL COMMENT '执行时间（毫秒）';
 
--- changeset simon:202511301748
+-- changeset simon:202511301748 validCheckSum:9:371b4964f605db42ed8c998476d4d169
 INSERT INTO `sys_config_tbl` VALUES (
         CONCAT('PWD_RULE_', UNIX_TIMESTAMP(NOW()) * 1000),
         'app.password.rule',
@@ -738,3 +738,36 @@ INSERT INTO `sys_config_tbl` VALUES (
 
         NOW()
     );
+
+-- changeset simon:202601181513
+-- ----------------------------
+-- Table structure for user_device
+-- ----------------------------
+create table if not exists user_device (
+  id varchar(36) not null comment '主键ID' primary key,
+  user_id varchar(36) not null comment '用户ID',
+  device_id varchar(100) not null comment '设备唯一标识',
+  device_name varchar(100) comment '设备名称(如: iPhone 13, Chrome on Mac)',
+  platform varchar(20) not null comment '平台类型(web/mobile/tablet)',
+  os varchar(50) comment '操作系统',
+  browser varchar(50) comment '浏览器',
+  
+  ip varchar(64) comment '最后登录IP',
+  last_active_at datetime comment '最后活跃时间',
+  refresh_token_jti varchar(100) comment '当前有效的Refresh Token JTI',
+  
+  is_active tinyint(1) default 1 comment '是否激活',
+  created_at datetime default current_timestamp comment '创建时间',
+  updated_at datetime default current_timestamp on update current_timestamp comment '更新时间',
+  
+  unique key uk_user_device (user_id, device_id),
+  key idx_user_id (user_id),
+  key idx_rt_jti (refresh_token_jti)
+) engine=InnoDB default charset=utf8mb4 comment='用户设备/Token表';
+
+-- changeset simon:202601181630
+ALTER TABLE user_device DROP COLUMN os;
+ALTER TABLE user_device DROP COLUMN browser;
+ALTER TABLE user_device CHANGE ip last_ip VARCHAR(64) COMMENT '最后登录IP';
+ALTER TABLE user_device ADD COLUMN last_user_agent VARCHAR(500) COMMENT 'User Agent' AFTER last_ip;
+

@@ -111,6 +111,15 @@ public class LoginHelper {
     @Autowired
     private TokenHelper tokenHelper;
 
+    @Autowired
+    private com.adminpro.system.core.security.jwt.JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private com.adminpro.system.core.security.jwt.RefreshTokenService refreshTokenService;
+
+    @Autowired
+    private com.adminpro.system.config.JwtProperties jwtProperties;
+
     /**
      * 用户登录（Web端）
      * <p>
@@ -274,10 +283,12 @@ public class LoginHelper {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             return authentication;
         } catch (AuthenticationException e) {
+            logger.error("Authentication failed for user: {}, exception type: {}, message: {}",
+                    securityUsername, e.getClass().getName(), e.getMessage(), e);
             if (e instanceof BadCredentialsException) {
                 throw new APIException("用户密码不匹配");
             } else {
-                throw new APIException("登录失败");
+                throw new APIException("登录失败: " + e.getMessage());
             }
         }
     }
@@ -370,33 +381,28 @@ public class LoginHelper {
     /**
      * 获取当前登录用户信息
      * <p>
-     * 根据请求类型自动选择获取方式：
-     * <ul>
-     * <li>移动端：从SecurityContext中获取</li>
-     * <li>Web端：从Session中获取</li>
-     * </ul>
+     * 优先从 SecurityContext 获取 (JWT 认证会设置到这里)，
+     * 如果不存在则从 Session 中获取 (传统 Web 认证)。
      *
      * @return 登录用户信息，未登录时返回null
      */
     public LoginUser getLoginUser() {
-        HttpServletRequest httpRequest = WebHelper.getHttpRequest();
-        if (httpRequest == null) {
-            return null;
+        // 1. 优先从 SecurityContext 获取 (JWT 认证)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof LoginUser) {
+            return (LoginUser) authentication.getPrincipal();
         }
-        boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
-        if (isMobileRequest) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null) {
-                Object principal = authentication.getPrincipal();
-                if (principal instanceof LoginUser) {
-                    LoginUser authUser = (LoginUser) principal;
-                    return authUser;
+
+        // 2. 降级到 Session 获取 (传统 Web 认证)
+        HttpServletRequest httpRequest = WebHelper.getHttpRequest();
+        if (httpRequest != null) {
+            HttpSession session = httpRequest.getSession(false);
+            if (session != null) {
+                Object authUser = session.getAttribute(LOGIN_AUTH_USER_KEY);
+                if (authUser instanceof LoginUser) {
+                    return (LoginUser) authUser;
                 }
             }
-        } else {
-            HttpSession session = httpRequest.getSession();
-            LoginUser authUser = (LoginUser) session.getAttribute(LOGIN_AUTH_USER_KEY);
-            return authUser;
         }
         return null;
     }
@@ -543,6 +549,42 @@ public class LoginHelper {
      */
     public boolean logout() {
         HttpServletRequest httpRequest = WebHelper.getHttpRequest();
+
+        // 1. 尝试处理 JWT 登出
+        String jwt = null;
+        String bearerToken = httpRequest.getHeader("Authorization");
+        if (StringUtils.isNotBlank(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            jwt = bearerToken.substring(7);
+        } else if (httpRequest.getCookies() != null) {
+            for (Cookie cookie : httpRequest.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (StringUtils.isNotBlank(jwt)) {
+            try {
+                if (jwtTokenProvider.validateToken(jwt)) {
+                    String jti = jwtTokenProvider.getJti(jwt);
+                    // 移除 AccessToken 白名单
+                    AppCache.getInstance()
+                            .delete(com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE, jti);
+                    // 清除 SecurityContext
+                    SecurityContextHolder.clearContext();
+                    // 这里可以进一步根据 jti 查找并注销 Refresh Token (需在 UserDevice 表中查询)
+                    // UserDeviceEntity device = userDeviceDao.findByRefreshTokenJti(...); //
+                    // AT不含RT信息
+                    // 暂不强制注销 RT，只移除 AT。用户需重新登录。
+                    return true;
+                }
+            } catch (Exception e) {
+                logger.warn("JWT logout process failed", e);
+            }
+        }
+
+        // 2. 传统登出逻辑
         boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
         if (isMobileRequest) {
             String authToken = getAuthToken();
@@ -647,17 +689,42 @@ public class LoginHelper {
      */
     public boolean validCaptcha(String captcha) {
         HttpServletRequest request = WebHelper.getHttpRequest();
+
+        // 优先从 Cookie 中获取 captchaKey，使用缓存验证
+        String captchaKey = getCaptchaKeyFromCookie(request);
+        if (captchaKey != null) {
+            String storedCaptcha = AppCache.getInstance().get(RbacCacheConstants.CAPTCHA_CACHE, captchaKey,
+                    String.class);
+            logger.debug("验证码验证(缓存) - captchaKey: {}, 存储的验证码: {}, 用户输入: {}", captchaKey, storedCaptcha, captcha);
+
+            if (storedCaptcha != null) {
+                boolean isValid = StringUtils.equalsIgnoreCase(captcha, storedCaptcha);
+                if (isValid) {
+                    // 验证成功后删除缓存，防止重复使用
+                    AppCache.getInstance().delete(RbacCacheConstants.CAPTCHA_CACHE, captchaKey);
+                }
+                return isValid;
+            }
+        }
+
+        // 降级到 Session 验证（兼容旧逻辑）
         HttpSession session = request.getSession(false);
         if (session == null) {
-            logger.debug("验证码验证时 session 不存在");
+            logger.debug("验证码验证失败 - captchaKey 无效且 Session 不存在");
             return false;
         }
 
         try {
-            String c = (String) session.getAttribute(RbacCacheConstants.CAPTCHA_CACHE);
-            logger.debug("session中的Captcha：" + c);
-            logger.debug("用户输入的Captcha：" + captcha);
-            boolean isValid = StringUtils.equalsIgnoreCase(captcha, c);
+            String storedCaptcha = (String) session.getAttribute(RbacCacheConstants.CAPTCHA_CACHE);
+            logger.debug("验证码验证(Session) - Session ID: {}, 存储的验证码: {}, 用户输入: {}",
+                    session.getId(), storedCaptcha, captcha);
+
+            if (storedCaptcha == null) {
+                logger.debug("验证码验证失败 - Session 中没有存储验证码");
+                return false;
+            }
+
+            boolean isValid = StringUtils.equalsIgnoreCase(captcha, storedCaptcha);
 
             // 验证后清除验证码，防止重复使用
             if (isValid) {
@@ -666,8 +733,171 @@ public class LoginHelper {
 
             return isValid;
         } catch (IllegalStateException e) {
-            logger.debug("验证码验证时 session 已失效");
+            logger.debug("验证码验证失败 - Session 已失效: {}", e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * 从 Cookie 中获取 captchaKey
+     */
+    private String getCaptchaKeyFromCookie(HttpServletRequest request) {
+        jakarta.servlet.http.Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (jakarta.servlet.http.Cookie cookie : cookies) {
+                if ("captchaKey".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * JWT 方式登录
+     */
+    public com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse loginJwt(String userDomain, String loginName,
+            String password, Device device, boolean rememberMe) throws APIException {
+        String securityUsername = userDomain + "_" + loginName;
+        // 1. 验证账户
+        Authentication authentication = verifyAccount(userDomain, loginName, password);
+        LoginUser userDetails = (LoginUser) userDetailsService.loadUserByUsername(securityUsername);
+
+        if (authentication == null || userDetails == null) {
+            throw new APIException("账号或密码错误");
+        }
+        if (StringHelper.equals(userDetails.getStatus(), UserStatus.LOCKED.getCode())) {
+            throw new APIException("账户已锁定");
+        }
+        if (StringHelper.equals(userDetails.getStatus(), UserStatus.INACTIVE.getCode())) {
+            throw new APIException("账户已停用");
+        }
+
+        // 2. 生成 Access Token
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userDomain", userDetails.getUserDomain());
+        claims.put("loginName", userDetails.getLoginName());
+        claims.put("realName", userDetails.getRealName());
+        claims.put("deptNo", userDetails.getDeptNo());
+        String platform = (device != null && device.isMobile()) ? "mobile" : "web";
+        claims.put("aud", platform);
+        claims.put("permissions", userDetails.getPermissions());
+
+        String accessToken = jwtTokenProvider.createAccessToken(userDetails.getUserId(), claims);
+
+        // 3. 存入 Access Token 白名单
+        String jti = jwtTokenProvider.getJti(accessToken);
+        // 注意：Ehcache key 是 jti，value 是 userId
+        AppCache.getInstance().set(com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE, jti,
+                userDetails.getUserId());
+
+        // 4. 生成 Refresh Token
+        // 4. 生成 Refresh Token
+        com.adminpro.system.rbac.domains.entity.jwt.RefreshTokenData rtData = new com.adminpro.system.rbac.domains.entity.jwt.RefreshTokenData();
+        rtData.setUserId(userDetails.getUserId());
+        rtData.setUserDomain(userDetails.getUserDomain());
+        rtData.setLoginName(userDetails.getLoginName());
+        rtData.setPlatform(platform);
+
+        // 简单处理：Web端目前没有明确的DeviceId，使用SessionID或固定值，这里暂用 UUID
+        String deviceId = UUID.randomUUID().toString();
+        rtData.setDeviceId(deviceId);
+        rtData.setDeviceName(device != null ? device.toString() : "Web Client");
+
+        // 获取 IP 和 UA
+        HttpServletRequest request = WebHelper.getHttpRequest();
+        if (request != null) {
+            rtData.setIp(IpUtils.getIpAddr(request));
+            rtData.setUserAgent(request.getHeader("User-Agent"));
+        }
+        rtData.setCreatedAt(java.time.LocalDateTime.now());
+        rtData.setLastUsedAt(java.time.LocalDateTime.now());
+        rtData.setRememberMe(rememberMe);
+
+        String refreshToken = refreshTokenService.createRefreshToken(rtData);
+
+        // 5. 记录日志
+        UserEntity userEntity = userDetails.getUser();
+        userEntity.setLatestLoginTime(new Date());
+        UserService.getInstance().update(userEntity);
+        AuditLogHelper.log(AuditLogHelper.CATEGORY_ADMIN, RbacConstants.AUDIT_MODULE_USER,
+                RbacConstants.AUDIT_ACTION_LOGIN, RbacConstants.LOGIN_RESULT_SUCCESS,
+                "userDomain=" + userDomain + ", loginName=" + loginName);
+
+        // 6. 构造响应
+        return com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(jwtProperties.getAccessTokenValidity(platform))
+                .user(com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse.UserInfo.builder()
+                        .id(userDetails.getUserId())
+                        .loginName(userDetails.getLoginName())
+                        .realName(userDetails.getRealName())
+                        .avatarUrl(userDetails.getUser().getAvatarUrl())
+                        .build())
+                .build();
+    }
+
+    /**
+     * 刷新 Token
+     *
+     * @param refreshToken 刷新令牌
+     * @return 新的 Token 响应
+     */
+    public com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse refreshJwt(String refreshToken)
+            throws APIException {
+        // 1. 验证 Refresh Token (获取数据)
+        com.adminpro.system.rbac.domains.entity.jwt.RefreshTokenData data = refreshTokenService
+                .validateRefreshToken(refreshToken);
+        if (data == null) {
+            throw new APIException("无效或已过期的 Refresh Token");
+        }
+
+        // 2. 重新加载用户信息 (确保权限最新)
+        String securityUsername = data.getUserDomain() + "_" + data.getLoginName();
+        LoginUser userDetails = (LoginUser) userDetailsService.loadUserByUsername(securityUsername);
+        if (userDetails == null) {
+            throw new APIException("用户不存在");
+        }
+        if (StringHelper.equals(userDetails.getStatus(), UserStatus.LOCKED.getCode())) {
+            throw new APIException("账户已锁定");
+        }
+        if (StringHelper.equals(userDetails.getStatus(), UserStatus.INACTIVE.getCode())) {
+            throw new APIException("账户已停用");
+        }
+
+        // 3. 轮换 Refresh Token
+        String newRefreshToken = refreshTokenService.rotateRefreshToken(refreshToken);
+
+        // 4. 生成新的 Access Token
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userDomain", userDetails.getUserDomain());
+        claims.put("loginName", userDetails.getLoginName());
+        claims.put("realName", userDetails.getRealName());
+        claims.put("deptNo", userDetails.getDeptNo());
+        String platform = data.getPlatform(); // 保持原有平台
+        claims.put("aud", platform);
+        claims.put("permissions", userDetails.getPermissions());
+
+        String accessToken = jwtTokenProvider.createAccessToken(userDetails.getUserId(), claims);
+
+        // 5. 存入 Access Token 白名单
+        String jti = jwtTokenProvider.getJti(accessToken);
+        AppCache.getInstance().set(com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE, jti,
+                userDetails.getUserId());
+
+        return com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(newRefreshToken)
+                .tokenType("Bearer")
+                .expiresIn(jwtProperties.getAccessTokenValidity(platform))
+                .user(com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse.UserInfo.builder()
+                        .id(userDetails.getUserId())
+                        .loginName(userDetails.getLoginName())
+                        .realName(userDetails.getRealName())
+                        .avatarUrl(userDetails.getUser().getAvatarUrl())
+                        .build())
+                .build();
     }
 }

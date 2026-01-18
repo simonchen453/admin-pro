@@ -23,6 +23,22 @@
             <artifactId>adminpro-system</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Explicitly adding JJWT dependencies to ensure they are on classpath -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.3</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>adminpro-web</finalName>

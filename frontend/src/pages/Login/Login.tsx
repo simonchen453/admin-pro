@@ -12,7 +12,7 @@ import type { LoginRequest, SystemInfo } from '../../types/index';
 import './Login.css';
 
 const loginSchema = z.object({
-  userId: z.string().min(1, '请输入用户ID'),
+  loginName: z.string().min(1, '请输入用户名'),
   password: z.string().min(1, '请输入密码'),
   captcha: z.string().min(1, '请输入验证码'),
   remember: z.boolean().optional()
@@ -37,7 +37,7 @@ const Login: React.FC = () => {
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      userId: '',
+      loginName: '',
       password: '',
       captcha: '',
       remember: false
@@ -75,7 +75,7 @@ const Login: React.FC = () => {
     try {
       // 构建登录请求数据
       const loginData: LoginRequest = {
-        userId: data.userId,
+        loginName: data.loginName,
         password: data.password,
         domain: 'system',
         captcha: data.captcha,
@@ -159,17 +159,17 @@ const Login: React.FC = () => {
             <div className="input-wrapper">
               <UserOutlined className="input-icon" />
               <input
-                {...register('userId')}
+                {...register('loginName')}
                 type="text"
-                placeholder="请输入用户ID"
-                className={`form-input ${errors.userId ? 'error' : ''}`}
+                placeholder="请输入用户名"
+                className={`form-input ${errors.loginName ? 'error' : ''}`}
                 autoComplete="off"
                 readOnly
                 onFocus={(e) => e.target.removeAttribute('readonly')}
               />
             </div>
-            {errors.userId && (
-              <span className="error-message">{errors.userId.message}</span>
+            {errors.loginName && (
+              <span className="error-message">{errors.loginName.message}</span>
             )}
           </div>
 

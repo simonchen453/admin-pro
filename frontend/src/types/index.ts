@@ -19,7 +19,7 @@ export interface User {
 
 // 登录请求类型
 export interface LoginRequest {
-  userId: string;
+  loginName: string;
   password: string;
   domain: string;
   captcha: string;

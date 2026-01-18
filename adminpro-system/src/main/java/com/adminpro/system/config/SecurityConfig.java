@@ -2,7 +2,7 @@ package com.adminpro.system.config;
 
 import com.adminpro.system.core.security.CustomAuthenticationProvider;
 import com.adminpro.system.core.security.auth.AuthUserDetailServiceImpl;
-import com.adminpro.system.core.security.auth.AuthenticationFilter;
+import com.adminpro.system.core.security.jwt.JwtAuthenticationFilter;
 import com.adminpro.system.core.security.handle.AuthenticationEntryPointImpl;
 import com.adminpro.system.core.security.handle.LogoutHandlerImpl;
 import com.adminpro.system.core.security.handle.LogoutSuccessHandlerImpl;
@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -95,7 +96,7 @@ public class SecurityConfig {
      * 在用户名密码认证过滤器之前执行，从请求头中提取token并进行验证
      */
     @Autowired
-    private AuthenticationFilter authenticationFilter;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     /**
      * 自定义认证提供者
@@ -164,8 +165,7 @@ public class SecurityConfig {
                         .httpStrictTransportSecurity(hsts -> hsts
                                 .maxAgeInSeconds(31536000)))
 
-                // .sessionManagement(session ->
-                // session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> {
                     // 配置公开接口（从 application.yml 读取）
@@ -193,7 +193,7 @@ public class SecurityConfig {
                         .addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler(logoutSuccessHandler))
                 .authenticationProvider(customAuthenticationProvider)
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }

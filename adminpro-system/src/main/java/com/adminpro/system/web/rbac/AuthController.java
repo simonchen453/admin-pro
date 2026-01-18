@@ -2,13 +2,11 @@ package com.adminpro.system.web.rbac;
 
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.util.BeanUtil;
-import com.adminpro.framework.base.util.DateUtil;
 import com.adminpro.framework.client.helper.ClientHelper;
+
 import com.adminpro.framework.exceptions.APIException;
+import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.common.annotation.SysLog;
-import com.adminpro.system.core.common.constants.ConfigKeys;
-import com.adminpro.system.core.common.constants.WebConstants;
-import com.adminpro.system.core.common.helper.ConfigHelper;
 import com.adminpro.system.core.common.helper.WebHelper;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.core.security.auth.LoginUser;
@@ -16,19 +14,19 @@ import com.adminpro.system.rbac.api.Device;
 import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.rbac.api.PasswordValidator;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
-import com.adminpro.system.rbac.common.RbacConstants;
+
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
-import com.adminpro.system.rbac.domains.vo.login.LoginResponse;
+
 import com.adminpro.system.rbac.domains.vo.login.LoginUserVo;
 import com.adminpro.system.rbac.domains.vo.user.PasswordRuleVo;
 import com.adminpro.system.rbac.domains.vo.user.UpdateProfileVo;
 import com.adminpro.system.rbac.domains.vo.user.UserInfoResponseVo;
 import com.google.code.kaptcha.Producer;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,6 +36,7 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +53,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * 认证控制器
@@ -78,6 +76,7 @@ import java.util.Date;
 public class AuthController extends BaseController {
 
     private final UserService userService;
+    private final LoginHelper loginHelper;
     private final DeptService deptService;
 
     @Resource(name = "captchaProducerMath")
@@ -95,35 +94,32 @@ public class AuthController extends BaseController {
      */
     @SysLog("用户登录")
     @Operation(summary = "用户登录", description = "处理用户登录请求，支持用户名/邮箱/手机号登录，验证码验证。返回token、用户基本信息、权限信息等")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 登录成功，data 字段包含 LoginResponse 对象
-                - restCode=401: 认证失败
-                - restCode=601: 参数错误或业务失败
-                - restCode=500: 服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 登录成功，data 字段包含 JwtLoginResponse 对象
+            - restCode=401: 认证失败
+            - restCode=601: 参数错误或业务失败
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public R<LoginResponse> login(HttpServletRequest request, @RequestBody LoginUserVo loginUserVo) {
+    public R<com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse> login(HttpServletRequest request,
+            @RequestBody LoginUserVo loginUserVo) {
         BeanUtil.beanAttributeValueTrim(loginUserVo);
-        String loginName = loginUserVo.getUserId();
+        String loginName = loginUserVo.getLoginName();
         String password = loginUserVo.getPassword();
         String userDomain = loginUserVo.getDomain();
         String captcha = loginUserVo.getCaptcha();
-        LoginResponse loginResponse = new LoginResponse();
+
         try {
             if (StringUtils.isEmpty(loginName)) {
-                return R.error("601", "用户名不能为空");
+                return R.badRequest("用户名不能为空");
             }
 
             if (StringUtils.isEmpty(password)) {
-                return R.error("601", "密码不能为空");
+                return R.badRequest("密码不能为空");
             }
             if (StringUtils.isEmpty(userDomain)) {
-                return R.error("601", "非法User Domain");
+                return R.badRequest("用户域不能为空");
             }
 
             // spring-mobile-device 已停止维护，使用简单的设备检测
@@ -132,76 +128,68 @@ public class AuthController extends BaseController {
             boolean isMobileApp = ClientHelper.isMobileAppRequest(request);
             boolean isMiniProgram = ClientHelper.isMiniProgramRequest(request);
             if (!isMobileApp && !isMiniProgram && !WebHelper.isDevModel()
-                    && LoginHelper.getInstance().needCheckCapture(userDomain)) {
+                    && loginHelper.needCheckCapture(userDomain)) {
                 if (StringUtils.isEmpty(captcha)) {
-                    return R.error("验证码不正确");
+                    return R.badRequest("验证码不能为空");
                 }
-                boolean b = LoginHelper.getInstance().validCaptcha(captcha);
+                boolean b = loginHelper.validCaptcha(captcha);
                 if (!b) {
-                    return R.error("验证码不正确");
+                    return R.badRequest("验证码不正确");
                 }
             }
 
-            UserEntity userEntity = userService.findByUserDomainAndLoginName(userDomain, loginName);
-            if (userEntity == null) {
-                return R.error("用户名未注册");
-            }
-            String token = LoginHelper.getInstance().login(
-                    userEntity.getUserDomain(), userEntity.getLoginName(), password, currentDevice);
-            if ("pending_active".equals(token)) {
-                return R.error("601", WebConstants.USER_PENDING_ACTIVE);
-            } else if (RbacConstants.LOGIN_RESULT_USER_LOCKED.equals(token)) {
-                return R.error("601", WebConstants.USER_LOCKED);
-            } else if (RbacConstants.LOGIN_RESULT_USER_INACTIVE.equals(token)) {
-                return R.error("601", WebConstants.USER_HAS_NO_PRIVILEGE);
-            } else if (RbacConstants.LOGIN_RESULT_NO_MATCH.equals(token)) {
-                return R.error("601", WebConstants.USER_NOT_MATCHED);
-            }
+            com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse response = loginHelper.loginJwt(
+                    userDomain, loginName, password, currentDevice, loginUserVo.isRememberMe());
 
-            loginResponse.setId(userEntity.getId());
-            loginResponse.setUserId(loginName);
-            loginResponse.setToken(token);
-            loginResponse.setHasPayPwd(!StringUtils.isEmpty(userEntity.getPayPwd()));
-            loginResponse.setAuthed(userEntity.isAuthenticated());
-            loginResponse.setIdNo(userEntity.getIdNo());
-            loginResponse.setRealName(userEntity.getRealName());
-            loginResponse.setDomain(userDomain);
-            loginResponse.setDisplay(userEntity.getDisplay());
-            loginResponse.setMobileNo(userEntity.getMobileNo());
-            loginResponse.setDate(DateUtil.formatDate(new Date()));
-            if (StringUtils.isEmpty(userEntity.getAvatarUrl())) {
-                String avatarUrl = ConfigHelper.getString(ConfigKeys.User.AVATAR_URL);
-                loginResponse.setAvatarUrl(WebConstants.getServerAddress() + avatarUrl);
-            } else {
-                loginResponse.setAvatarUrl(userEntity.getAvatarUrl());
-            }
-            loginResponse.setExtUserId(userEntity.getExtUserId());
-            if (LoginHelper.getInstance().isIntranetUser(userDomain)) {
-                loginResponse.setPost(userEntity.getPost());
-                loginResponse.setPostNo(userEntity.getJobNo());
-            }
-            String deptNo = userEntity.getDeptNo();
-            if (StringUtils.isNotEmpty(deptNo)) {
-                DeptEntity deptEntity = deptService.findByNo(deptNo);
-                if (deptEntity != null) {
-                    loginResponse.setDeptName(deptEntity.getName());
-                    loginResponse.setDeptNo(deptEntity.getNo());
-                }
-            }
-            return R.ok(loginResponse);
+            return R.ok(response);
         } catch (Exception e) {
             logger.error("登陆异常：", e);
             if (e instanceof AuthenticationException) {
-                return R.error("601", "账号或密码错误");
+                return R.authFailed("账号或密码错误");
             } else if (e instanceof BadCredentialsException) {
-                return R.error("601", e.getMessage());
+                return R.authFailed(e.getMessage());
             } else if (e instanceof UsernameNotFoundException) {
-                return R.error("601", e.getMessage());
+                return R.authFailed(e.getMessage());
             } else if (e instanceof APIException) {
-                return R.error("601", e.getMessage());
+                return R.authFailed(e.getMessage());
             } else {
                 return R.error(e.getMessage());
             }
+        }
+    }
+
+    /**
+     * 刷新Token
+     * <p>
+     * 使用Refresh Token获取新的Access Token和Refresh Token
+     * </p>
+     *
+     * @param map 包含refreshToken的请求体
+     * @return 新的登录信息
+     */
+    @SysLog("刷新Token")
+    @Operation(summary = "刷新Token", description = "使用Refresh Token获取新的Access Token和Refresh Token")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 刷新成功，data 字段包含 JwtLoginResponse 对象
+            - restCode=401: Refresh Token 无效或已过期
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
+    @RequestMapping(value = "/refresh", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public R<com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse> refresh(
+            @RequestBody java.util.Map<String, String> map) {
+        String refreshToken = map.get("refreshToken");
+        if (StringUtils.isEmpty(refreshToken)) {
+            return R.error("601", "Refresh Token不能为空");
+        }
+        try {
+            com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse response = loginHelper.refreshJwt(refreshToken);
+            return R.ok(response);
+        } catch (APIException e) {
+            return R.error("401", e.getMessage());
+        } catch (Exception e) {
+            logger.error("刷新Token失败", e);
+            return R.error("刷新Token失败");
         }
     }
 
@@ -215,16 +203,12 @@ public class AuthController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermission('system:common')")
     @Operation(summary = "获取当前登录用户信息", description = "根据当前登录token获取用户的详细信息，包括基本资料、部门信息等")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 查询成功，data 字段包含 UserInfoResponseVo 对象
-                - restCode=401: 未授权，需要登录
-                - restCode=500: 服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 查询成功，data 字段包含 UserInfoResponseVo 对象
+            - restCode=401: 未授权，需要登录
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @RequestMapping(value = "/userinfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<UserInfoResponseVo> getUserInfo() {
         try {
@@ -279,16 +263,12 @@ public class AuthController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermission('system:common')")
     @Operation(summary = "获取密码规则", description = "获取系统当前配置的密码强度规则，包括长度、复杂度等要求")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 查询成功，data 字段包含 PasswordRuleVo 对象
-                - restCode=401: 未授权，需要登录
-                - restCode=500: 服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 查询成功，data 字段包含 PasswordRuleVo 对象
+            - restCode=401: 未授权，需要登录
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @RequestMapping(value = "/password-rule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<PasswordRuleVo> getPasswordRule() {
         try {
@@ -312,17 +292,13 @@ public class AuthController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:common')")
     @SysLog("更新个人资料")
     @Operation(summary = "更新个人资料", description = "允许当前登录用户更新自己的基本资料信息，包括真实姓名、手机号、邮箱、头像等")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 更新成功
-                - restCode=400: 参数错误
-                - restCode=401: 未授权，需要登录
-                - restCode=500: 服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 更新成功
+            - restCode=400: 参数错误
+            - restCode=401: 未授权，需要登录
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @RequestMapping(value = "/profile", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R updateProfile(@RequestBody UpdateProfileVo updateProfileVo) {
         try {
@@ -378,7 +354,10 @@ public class AuthController extends BaseController {
     @Operation(summary = "生成验证码图片", description = "生成数学运算类型的验证码图片，用于登录安全验证")
     @RequestMapping(value = "/captcha.jpg", method = RequestMethod.GET)
     public void captcha(HttpServletResponse response) throws ServletException, IOException {
-        response.setHeader("Cache-Control", "no-store, no-cache");
+        // 设置响应头，禁用缓存
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
         response.setContentType("image/jpeg");
 
         String capStr = null;
@@ -390,17 +369,27 @@ public class AuthController extends BaseController {
         code = capText.substring(capText.lastIndexOf("@") + 1);
         bi = captchaProducerMath.createImage(capStr);
 
-        logger.debug("生成验证码：" + code);
-
-        // 获取或创建 session，确保验证码存储在其中
+        // 获取或创建 session
+        // request.getSession() 会自动处理失效的 session，创建新的 session
         HttpSession session = request.getSession();
-        // 如果 session 不存在或无效，创建新 session
-        if (session == null) {
-            session = request.getSession(true);
-        }
-        logger.debug("session id:" + session.getId());
 
+        // 生成唯一的验证码 Key
+        String captchaKey = java.util.UUID.randomUUID().toString().replace("-", "");
+
+        // 将验证码存储到缓存，有效期 5 分钟（300秒）
+        AppCache.getInstance().set(RbacCacheConstants.CAPTCHA_CACHE, captchaKey, code, 300);
+
+        // 同时存储到 Session 作为备用
         session.setAttribute(RbacCacheConstants.CAPTCHA_CACHE, code);
+
+        logger.debug("验证码生成 - captchaKey: {}, Session ID: {}, 答案: {}", captchaKey, session.getId(), code);
+
+        // 通过 Cookie 返回 captchaKey 给前端
+        Cookie captchaCookie = new Cookie("captchaKey", captchaKey);
+        captchaCookie.setPath("/");
+        captchaCookie.setMaxAge(300); // 5分钟
+        captchaCookie.setHttpOnly(false); // 允许前端 JS 读取
+        response.addCookie(captchaCookie);
 
         ServletOutputStream out = response.getOutputStream();
         ImageIO.write(bi, "jpg", out);
@@ -417,15 +406,11 @@ public class AuthController extends BaseController {
      */
     @SysLog("用户登出")
     @Operation(summary = "用户登出", description = "处理用户登出请求，清除session和token")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 登出成功
-                - restCode=500: 登出失败或服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 登出成功
+            - restCode=500: 登出失败或服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @RequestMapping(value = "/logout", method = { RequestMethod.POST,
             RequestMethod.GET }, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<String> logout() {

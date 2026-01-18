@@ -61,13 +61,12 @@ public class AuthUserDetailServiceImpl implements UserDetailsService {
      * <li>返回用户详情</li>
      * </ol>
      * <p>
-     * 注意：如果用户不存在，返回null而不是抛出异常，
-     * 这是为配合自定义的AuthenticationProvider使用
+     * 注意：如果用户不存在，将抛出UsernameNotFoundException，
+     * 这符合Spring Security的UserDetailsService接口契约
      *
      * @param username 用户名，格式为"用户域_登录名"
-     * @return 用户详情对象，如果用户不存在则返回null
-     * @throws UsernameNotFoundException 虽然方法签名声明了此异常，
-     *                                      但当前实现不会抛出，而是返回null
+     * @return 用户详情对象
+     * @throws UsernameNotFoundException 当用户不存在时抛出
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -88,8 +87,7 @@ public class AuthUserDetailServiceImpl implements UserDetailsService {
         String[] split = username.split(RbacConstants.SPRING_SECURITY_USERIDEN_SPLIT);
         UserEntity user = userService.findByUserDomainAndLoginName(split[0], split[1]);
         if (user == null) {
-            //throw new UsernameNotFoundException("找不到此用户");
-            return null;
+            throw new UsernameNotFoundException("用户不存在: " + username);
         } else {
             LoginUser authUser = LoginUser.convertFrom(user);
             if (isMobileRequest) {

@@ -28,8 +28,9 @@ public class UserDeviceEntity extends BaseAuditEntity {
     public static final String COL_LAST_USER_AGENT = "last_user_agent";
     public static final String COL_LAST_ACTIVE_AT = "last_active_at";
     public static final String COL_IS_ACTIVE = "is_active";
-    // COL_CREATED_AT is in BaseAuditEntity
-    // COL_UPDATED_AT is in BaseAuditEntity
+    // BaseAuditEntity定义的常量值是"COL_CREATED_AT"，不是数据库列名，必须覆盖
+    public static final String COL_CREATED_AT = "created_at";
+    public static final String COL_UPDATED_AT = "updated_at";
 
     /**
      * ID (BaseAuditEntity 没有 id 属性吗? BaseEntity 有吗? 通常 BaseEntity 是泛型的或者有 ID)

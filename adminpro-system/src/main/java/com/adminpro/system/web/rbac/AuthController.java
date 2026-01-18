@@ -35,7 +35,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
@@ -103,6 +102,7 @@ public class AuthController extends BaseController {
             """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R<com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse> login(HttpServletRequest request,
+            HttpServletResponse httpResponse,
             @RequestBody LoginUserVo loginUserVo) {
         BeanUtil.beanAttributeValueTrim(loginUserVo);
         String loginName = loginUserVo.getLoginName();
@@ -141,6 +141,23 @@ public class AuthController extends BaseController {
             com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse response = loginHelper.loginJwt(
                     userDomain, loginName, password, currentDevice, loginUserVo.isRememberMe());
 
+            // 设置 Refresh Token Cookie (HttpOnly, Secure, SameSite=Strict)
+            if (response != null && response.getRefreshToken() != null) {
+                Cookie refreshTokenCookie = new Cookie("refreshToken", response.getRefreshToken());
+                refreshTokenCookie.setHttpOnly(true); // 防止 XSS 攻击
+                refreshTokenCookie.setSecure(request.isSecure()); // 仅 HTTPS 时发送（生产环境）
+                refreshTokenCookie.setPath("/"); // 全站可用
+                // Refresh Token 有效期（根据 rememberMe 设置）
+                int maxAge = loginUserVo.isRememberMe() ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60; // 30天 或 7天
+                refreshTokenCookie.setMaxAge(maxAge);
+                // SameSite 属性需要通过 Set-Cookie header 设置
+                httpResponse.addCookie(refreshTokenCookie);
+                // 添加 SameSite=Strict 属性（Cookie API 不直接支持）
+                httpResponse.setHeader("Set-Cookie",
+                        String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Strict%s",
+                                response.getRefreshToken(), maxAge, request.isSecure() ? "; Secure" : ""));
+            }
+
             return R.ok(response);
         } catch (Exception e) {
             logger.error("登陆异常：", e);
@@ -168,7 +185,7 @@ public class AuthController extends BaseController {
      * @return 新的登录信息
      */
     @SysLog("刷新Token")
-    @Operation(summary = "刷新Token", description = "使用Refresh Token获取新的Access Token和Refresh Token")
+    @Operation(summary = "刷新Token", description = "使用Refresh Token获取新的Access Token和Refresh Token。Refresh Token从HttpOnly Cookie中读取。")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = """
             统一响应格式，通过 restCode 判断业务状态：
             - restCode=200: 刷新成功，data 字段包含 JwtLoginResponse 对象
@@ -177,16 +194,36 @@ public class AuthController extends BaseController {
             """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @RequestMapping(value = "/refresh", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse> refresh(
-            @RequestBody java.util.Map<String, String> map) {
-        String refreshToken = map.get("refreshToken");
-        if (StringUtils.isEmpty(refreshToken)) {
-            return R.error("601", "Refresh Token不能为空");
+            HttpServletRequest request, HttpServletResponse httpResponse) {
+        // 从 HttpOnly Cookie 中读取 refreshToken
+        String refreshToken = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
         }
+
+        if (StringUtils.isEmpty(refreshToken)) {
+            return R.authFailed("Refresh Token不存在，请重新登录");
+        }
+
         try {
             com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse response = loginHelper.refreshJwt(refreshToken);
+
+            // 设置新的 Refresh Token Cookie (HttpOnly, Secure, SameSite=Strict)
+            if (response != null && response.getRefreshToken() != null) {
+                int maxAge = 7 * 24 * 60 * 60; // 7天
+                httpResponse.setHeader("Set-Cookie",
+                        String.format("refreshToken=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Strict%s",
+                                response.getRefreshToken(), maxAge, request.isSecure() ? "; Secure" : ""));
+            }
+
             return R.ok(response);
         } catch (APIException e) {
-            return R.error("401", e.getMessage());
+            return R.authFailed(e.getMessage());
         } catch (Exception e) {
             logger.error("刷新Token失败", e);
             return R.error("刷新Token失败");
@@ -369,20 +406,13 @@ public class AuthController extends BaseController {
         code = capText.substring(capText.lastIndexOf("@") + 1);
         bi = captchaProducerMath.createImage(capStr);
 
-        // 获取或创建 session
-        // request.getSession() 会自动处理失效的 session，创建新的 session
-        HttpSession session = request.getSession();
-
         // 生成唯一的验证码 Key
         String captchaKey = java.util.UUID.randomUUID().toString().replace("-", "");
 
-        // 将验证码存储到缓存，有效期 5 分钟（300秒）
+        // 将验证码存储到缓存，有效期 5 分钟（300秒）- 无状态方式
         AppCache.getInstance().set(RbacCacheConstants.CAPTCHA_CACHE, captchaKey, code, 300);
 
-        // 同时存储到 Session 作为备用
-        session.setAttribute(RbacCacheConstants.CAPTCHA_CACHE, code);
-
-        logger.debug("验证码生成 - captchaKey: {}, Session ID: {}, 答案: {}", captchaKey, session.getId(), code);
+        logger.debug("验证码生成 - captchaKey: {}, 答案: {}", captchaKey, code);
 
         // 通过 Cookie 返回 captchaKey 给前端
         Cookie captchaCookie = new Cookie("captchaKey", captchaKey);

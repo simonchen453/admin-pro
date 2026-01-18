@@ -1,13 +1,10 @@
 package com.adminpro.system.core.security.auth;
 
-import com.adminpro.framework.client.helper.ClientHelper;
 import com.adminpro.system.core.cache.AppCache;
-import com.adminpro.system.core.common.helper.WebHelper;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
 import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,15 +15,16 @@ import org.springframework.stereotype.Service;
  * 用户详情服务实现类
  * <p>
  * 实现Spring Security的UserDetailsService接口，负责根据用户名加载用户详情。
- * 支持移动端和Web端两种不同的缓存策略。
+ * 使用 AppCache（分布式缓存）进行缓存，支持无状态服务器架构。
  * <p>
  * 缓存策略：
  * <ul>
- * <li>移动端：使用AppCache（分布式缓存），支持多实例部署</li>
- * <li>Web端：使用HttpSession（本地缓存），性能更好</li>
+ * <li>统一使用AppCache（EhCache/Redis），支持多实例部署</li>
+ * <li>不使用HttpSession，保持服务器无状态</li>
  * </ul>
  * <p>
  * 用户名格式：
+ * 
  * <pre>
  * 用户域_登录名（例如：system_admin）
  * </pre>
@@ -53,7 +51,7 @@ public class AuthUserDetailServiceImpl implements UserDetailsService {
      * <p>
      * 处理流程：
      * <ol>
-     * <li>检查缓存中是否存在用户详情（根据请求类型选择缓存）</li>
+     * <li>检查 AppCache 中是否存在用户详情</li>
      * <li>如果缓存命中，直接返回</li>
      * <li>如果缓存未命中，从数据库查询用户</li>
      * <li>转换用户实体为LoginUser对象</li>
@@ -70,34 +68,29 @@ public class AuthUserDetailServiceImpl implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
-        if (isMobileRequest) {
-            LoginUser userDetails = AppCache.getInstance().get(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, username, LoginUser.class);
-            if (userDetails != null) {
-                return userDetails;
-            }
-        } else {
-            HttpSession session = WebHelper.getHttpRequest().getSession();
-            LoginUser userDetail = (LoginUser) session.getAttribute(RbacCacheConstants.AUTH_USER_DETAIL_CACHE + username);
-            if (userDetail != null) {
-                return userDetail;
-            }
+        // 从 AppCache 获取缓存的用户详情（无状态，不使用 Session）
+        LoginUser userDetails = AppCache.getInstance().get(
+                RbacCacheConstants.AUTH_USER_DETAIL_CACHE, username, LoginUser.class);
+        if (userDetails != null) {
+            return userDetails;
         }
 
+        // 缓存未命中，从数据库查询
         String[] split = username.split(RbacConstants.SPRING_SECURITY_USERIDEN_SPLIT);
+        if (split.length < 2) {
+            throw new UsernameNotFoundException("用户名格式错误: " + username);
+        }
+
         UserEntity user = userService.findByUserDomainAndLoginName(split[0], split[1]);
         if (user == null) {
             throw new UsernameNotFoundException("用户不存在: " + username);
-        } else {
-            LoginUser authUser = LoginUser.convertFrom(user);
-            if (isMobileRequest) {
-                AppCache.getInstance().set(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, username, authUser);
-            }else{
-                HttpSession session = WebHelper.getHttpRequest().getSession();
-                session.setAttribute(RbacCacheConstants.AUTH_USER_DETAIL_CACHE + username, authUser);
-            }
-
-            return authUser;
         }
+
+        LoginUser authUser = LoginUser.convertFrom(user);
+
+        // 存入 AppCache（分布式缓存）
+        AppCache.getInstance().set(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, username, authUser);
+
+        return authUser;
     }
 }

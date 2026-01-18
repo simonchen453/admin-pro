@@ -381,28 +381,18 @@ public class LoginHelper {
     /**
      * 获取当前登录用户信息
      * <p>
-     * 优先从 SecurityContext 获取 (JWT 认证会设置到这里)，
-     * 如果不存在则从 Session 中获取 (传统 Web 认证)。
+     * 从 SecurityContext 获取 JWT 认证的用户信息。
+     * JWT认证模式下，JwtAuthenticationFilter 会将用户信息设置到 SecurityContext。
+     * <p>
+     * 注意：不再使用 Session，服务器为无状态模式。
      *
      * @return 登录用户信息，未登录时返回null
      */
     public LoginUser getLoginUser() {
-        // 1. 优先从 SecurityContext 获取 (JWT 认证)
+        // 从 SecurityContext 获取 (JWT 认证)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof LoginUser) {
             return (LoginUser) authentication.getPrincipal();
-        }
-
-        // 2. 降级到 Session 获取 (传统 Web 认证)
-        HttpServletRequest httpRequest = WebHelper.getHttpRequest();
-        if (httpRequest != null) {
-            HttpSession session = httpRequest.getSession(false);
-            if (session != null) {
-                Object authUser = session.getAttribute(LOGIN_AUTH_USER_KEY);
-                if (authUser instanceof LoginUser) {
-                    return (LoginUser) authUser;
-                }
-            }
         }
         return null;
     }
@@ -681,61 +671,38 @@ public class LoginHelper {
     /**
      * 验证验证码
      * <p>
-     * 从Session中获取验证码并与用户输入进行比较。
-     * 验证成功后自动清除Session中的验证码，防止重复使用。
+     * 从AppCache中获取验证码并与用户输入进行比较。
+     * 验证成功后自动删除缓存中的验证码，防止重复使用。
+     * <p>
+     * 注意：不再使用 Session，服务器为无状态模式。
      *
      * @param captcha 用户输入的验证码
-     * @return true表示验证码正确，false表示错误或Session已失效
+     * @return true表示验证码正确，false表示验证码不存在或错误
      */
     public boolean validCaptcha(String captcha) {
         HttpServletRequest request = WebHelper.getHttpRequest();
 
-        // 优先从 Cookie 中获取 captchaKey，使用缓存验证
+        // 从 Cookie 中获取 captchaKey，使用缓存验证（无状态）
         String captchaKey = getCaptchaKeyFromCookie(request);
-        if (captchaKey != null) {
-            String storedCaptcha = AppCache.getInstance().get(RbacCacheConstants.CAPTCHA_CACHE, captchaKey,
-                    String.class);
-            logger.debug("验证码验证(缓存) - captchaKey: {}, 存储的验证码: {}, 用户输入: {}", captchaKey, storedCaptcha, captcha);
-
-            if (storedCaptcha != null) {
-                boolean isValid = StringUtils.equalsIgnoreCase(captcha, storedCaptcha);
-                if (isValid) {
-                    // 验证成功后删除缓存，防止重复使用
-                    AppCache.getInstance().delete(RbacCacheConstants.CAPTCHA_CACHE, captchaKey);
-                }
-                return isValid;
-            }
-        }
-
-        // 降级到 Session 验证（兼容旧逻辑）
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            logger.debug("验证码验证失败 - captchaKey 无效且 Session 不存在");
+        if (captchaKey == null) {
+            logger.debug("验证码验证失败 - captchaKey Cookie 不存在");
             return false;
         }
 
-        try {
-            String storedCaptcha = (String) session.getAttribute(RbacCacheConstants.CAPTCHA_CACHE);
-            logger.debug("验证码验证(Session) - Session ID: {}, 存储的验证码: {}, 用户输入: {}",
-                    session.getId(), storedCaptcha, captcha);
+        String storedCaptcha = AppCache.getInstance().get(RbacCacheConstants.CAPTCHA_CACHE, captchaKey, String.class);
+        logger.debug("验证码验证(缓存) - captchaKey: {}, 存储的验证码: {}, 用户输入: {}", captchaKey, storedCaptcha, captcha);
 
-            if (storedCaptcha == null) {
-                logger.debug("验证码验证失败 - Session 中没有存储验证码");
-                return false;
-            }
-
-            boolean isValid = StringUtils.equalsIgnoreCase(captcha, storedCaptcha);
-
-            // 验证后清除验证码，防止重复使用
-            if (isValid) {
-                session.removeAttribute(RbacCacheConstants.CAPTCHA_CACHE);
-            }
-
-            return isValid;
-        } catch (IllegalStateException e) {
-            logger.debug("验证码验证失败 - Session 已失效: {}", e.getMessage());
+        if (storedCaptcha == null) {
+            logger.debug("验证码验证失败 - 缓存中没有存储验证码");
             return false;
         }
+
+        boolean isValid = StringUtils.equalsIgnoreCase(captcha, storedCaptcha);
+        if (isValid) {
+            // 验证成功后删除缓存，防止重复使用
+            AppCache.getInstance().delete(RbacCacheConstants.CAPTCHA_CACHE, captchaKey);
+        }
+        return isValid;
     }
 
     /**
@@ -856,7 +823,14 @@ public class LoginHelper {
 
         // 2. 重新加载用户信息 (确保权限最新)
         String securityUsername = data.getUserDomain() + "_" + data.getLoginName();
-        LoginUser userDetails = (LoginUser) userDetailsService.loadUserByUsername(securityUsername);
+        LoginUser userDetails = null;
+        try {
+            userDetails = (LoginUser) userDetailsService.loadUserByUsername(securityUsername);
+        } catch (Exception e) {
+            logger.error("刷新Token时加载用户失败: {}", securityUsername, e);
+            throw new APIException("加载用户信息失败: " + e.getMessage());
+        }
+
         if (userDetails == null) {
             throw new APIException("用户不存在");
         }

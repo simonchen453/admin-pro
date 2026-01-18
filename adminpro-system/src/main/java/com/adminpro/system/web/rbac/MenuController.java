@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -67,11 +66,13 @@ public class MenuController extends BaseController {
      * @return 菜单权限列表
      */
     @Operation(summary = "查询菜单权限列表", description = "根据查询条件获取菜单权限列表，支持按名称、状态、可见性等条件进行过滤和分页查询")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MenuEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 查询成功，data 字段包含 List<MenuEntity> 菜单列表
+            - restCode=401: 未授权，需要登录
+            - restCode=403: 无权限访问
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @PostMapping(value = "/search")
     public R<List<MenuEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
@@ -103,10 +104,16 @@ public class MenuController extends BaseController {
      * @return 当前用户的菜单树列表
      */
     @Operation(summary = "获取当前用户菜单", description = "根据当前登录用户获取其可访问的菜单树形结构")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）")
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = """
+                    统一响应格式，通过 restCode 判断业务状态：
+                    - restCode=200: 查询成功，data 字段包含 List<MenuTreeVo> 菜单树列表
+                    - restCode=401: 未授权，需要登录
+                    - restCode=500: 服务器内部错误
+                    """,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/current-user")
     @PreAuthorize("isAuthenticated()")
     public R<List<MenuTreeVo>> getCurrentUserMenus() {
@@ -135,10 +142,16 @@ public class MenuController extends BaseController {
      * @return 菜单树形结构列表
      */
     @Operation(summary = "获取菜单树", description = "获取所有菜单的树形结构数据，用于角色管理分配菜单权限")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）")
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = """
+                    统一响应格式，通过 restCode 判断业务状态：
+                    - restCode=200: 查询成功，data 字段包含 List<TreeSelect> 菜单树列表
+                    - restCode=401: 未授权，需要登录
+                    - restCode=500: 服务器内部错误
+                    """,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/tree")
     @PreAuthorize("isAuthenticated()")
     public R<List<com.adminpro.system.rbac.domains.vo.tree.TreeSelect>> getMenuTree() {
@@ -160,10 +173,16 @@ public class MenuController extends BaseController {
      * @return 包含菜单树和已选中菜单ID的映射
      */
     @Operation(summary = "根据角色获取菜单树", description = "获取菜单树形结构及角色已选中的菜单ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）")
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = """
+                    统一响应格式，通过 restCode 判断业务状态：
+                    - restCode=200: 查询成功，data 字段包含包含菜单树和已选中菜单ID的Map
+                    - restCode=401: 未授权，需要登录
+                    - restCode=500: 服务器内部错误
+                    """,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/tree/role/{roleId}")
     @PreAuthorize("isAuthenticated()")
     public R<java.util.Map<String, Object>> getMenuTreeByRoleId(@PathVariable String roleId) {
@@ -196,12 +215,18 @@ public class MenuController extends BaseController {
      * @return 菜单详细信息
      */
     @Operation(summary = "查询菜单详情", description = "根据菜单ID获取菜单的详细信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MenuEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "菜单不存在（restCode=404）")
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = """
+                    统一响应格式，通过 restCode 判断业务状态：
+                    - restCode=200: 查询成功，data 字段包含 MenuEntity 对象
+                    - restCode=401: 未授权，需要登录
+                    - restCode=403: 无权限访问
+                    - restCode=404: 菜单不存在
+                    - restCode=500: 服务器内部错误
+                    """,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/{id}")
     public R<MenuEntity> detail(@Parameter(description = "菜单ID", required = true) @PathVariable String id) {
         MenuEntity entity = menuService.findById(id);
@@ -223,11 +248,17 @@ public class MenuController extends BaseController {
      * @return 被删除的菜单信息
      */
     @Operation(summary = "删除单个菜单", description = "根据菜单ID删除指定的菜单权限")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = """
+                    统一响应格式，通过 restCode 判断业务状态：
+                    - restCode=200: 删除成功
+                    - restCode=401: 未授权，需要登录
+                    - restCode=403: 无权限访问
+                    - restCode=500: 服务器内部错误
+                    """,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("删除菜单")
     @DeleteMapping(value = "/{id}")
     public R<MenuEntity> delete(@Parameter(description = "菜单ID", required = true) @PathVariable String id) {
@@ -249,12 +280,18 @@ public class MenuController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "创建菜单权限", description = "新增一个菜单权限，支持目录、菜单、按钮等多种类型的菜单")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = """
+                    统一响应格式，通过 restCode 判断业务状态：
+                    - restCode=200: 创建成功
+                    - restCode=400: 请求参数错误
+                    - restCode=401: 未授权，需要登录
+                    - restCode=403: 无权限访问
+                    - restCode=500: 服务器内部错误
+                    """,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("创建菜单")
     @PostMapping
     public R create(@Parameter(description = "菜单实体信息", required = true) @RequestBody MenuEntity menu) {
@@ -311,13 +348,19 @@ public class MenuController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "更新菜单权限", description = "更新已有菜单权限的信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "菜单不存在（restCode=404）")
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = """
+                    统一响应格式，通过 restCode 判断业务状态：
+                    - restCode=200: 更新成功
+                    - restCode=400: 请求参数错误
+                    - restCode=401: 未授权，需要登录
+                    - restCode=403: 无权限访问
+                    - restCode=404: 菜单不存在
+                    - restCode=500: 服务器内部错误
+                    """,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("更新菜单")
     @PutMapping(value = "/{id}")
     public R editSave(@Parameter(description = "菜单实体信息", required = true) @RequestBody MenuEntity menu) {
@@ -375,12 +418,18 @@ public class MenuController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "批量删除菜单权限", description = "根据多个菜单ID批量删除菜单权限，ID之间用逗号分隔")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = """
+                    统一响应格式，通过 restCode 判断业务状态：
+                    - restCode=200: 批量删除成功
+                    - restCode=400: 请求参数错误
+                    - restCode=401: 未授权，需要登录
+                    - restCode=403: 无权限访问
+                    - restCode=500: 服务器内部错误
+                    """,
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("批量删除菜单")
     @DeleteMapping
     public R remove(

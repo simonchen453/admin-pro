@@ -6,7 +6,6 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +20,8 @@ import java.util.List;
 @Service
 public class RoleMenuAssignService extends BaseService<RoleMenuAssignEntity, String> {
 
-    private RoleMenuAssignDao dao;
+    private final RoleMenuAssignDao dao;
 
-    @Autowired
     public RoleMenuAssignService(RoleMenuAssignDao dao) {
         super(dao);
         this.dao = dao;

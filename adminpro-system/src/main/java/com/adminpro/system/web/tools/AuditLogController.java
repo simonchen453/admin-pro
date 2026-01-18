@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -67,11 +66,17 @@ public class AuditLogController extends BaseController {
      */
     @Operation(summary = "查询审计日志列表", description = "支持按状态、事件、模块、类别、用户、时间范围等条件进行分页查询审计日志")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "搜索条件", required = true, content = @Content(schema = @Schema(implementation = SearchForm.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<AuditLogDTO> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping("/search")
     public R<QueryResultSet<AuditLogDTO>> search(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);

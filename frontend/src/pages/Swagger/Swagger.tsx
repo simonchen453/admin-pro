@@ -15,6 +15,23 @@ const Swagger: React.FC = () => {
   // OpenAPI 规范 JSON 地址
   const apiDocsUrl = `${config.BASE_PATH}/v3/api-docs`;
 
+  // 使用 useCallback 缓存回调函数，防止 SwaggerUI 因 prop 变化而重复渲染
+  const handleComplete = React.useCallback(() => {
+    // 延迟关闭 Loading，防止闪烁，确保原生组件渲染完毕
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  }, []);
+
+  const handleRequestInterceptor = React.useCallback((req: any) => {
+    // 自动从 localStorage 获取 token 并添加到请求头
+    const token = localStorage.getItem('token');
+    if (token) {
+      req.headers['x-access-token'] = token;
+    }
+    return req;
+  }, []);
+
   return (
     <div className="fade-in" style={{ padding: '0' }}>
       <Card
@@ -39,8 +56,8 @@ const Swagger: React.FC = () => {
             justifyContent: 'center',
             alignItems: 'center',
             zIndex: 10,
-            background: 'rgba(255,255,255,0.8)',
-            backdropFilter: 'blur(4px)'
+            background: 'rgba(255,255,255)',
+            // 移除磨砂效果以防止某些浏览器渲染闪烁
           }}>
             <Spin size="large" tip="加载 API 文档中..." />
           </div>
@@ -58,20 +75,8 @@ const Swagger: React.FC = () => {
             displayRequestDuration={true}
             showExtensions={true}
             showCommonExtensions={true}
-            onComplete={() => {
-              // 延迟关闭 Loading，防止闪烁，确保原生组件渲染完毕
-              setTimeout(() => {
-                setLoading(false);
-              }, 500);
-            }}
-            requestInterceptor={(req) => {
-              // 自动从 localStorage 获取 token 并添加到请求头
-              const token = localStorage.getItem('token');
-              if (token) {
-                req.headers['x-access-token'] = token;
-              }
-              return req;
-            }}
+            onComplete={handleComplete}
+            requestInterceptor={handleRequestInterceptor}
           />
         </div>
       </Card>

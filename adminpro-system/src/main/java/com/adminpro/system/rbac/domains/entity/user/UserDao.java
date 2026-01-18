@@ -259,7 +259,7 @@ public class UserDao extends BaseDao<UserEntity, String> {
                 try {
                     boolean encryptPwdEnabled = ConfigHelper
                             .getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
-                    String encryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, "szyh$123");
+                    String encryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY);
                     if (encryptPwdEnabled && StringUtils.isNotEmpty(partyPwd)) {
                         byte[] decrypt = CryptUtil.decrypt(CryptUtil.decodeBase64(partyPwd), encryptPwd);
                         entity.setThirdPartyPwd(new String(decrypt));

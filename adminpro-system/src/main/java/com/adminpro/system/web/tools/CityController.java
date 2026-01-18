@@ -6,12 +6,19 @@ import com.adminpro.system.rbac.domains.entity.city.CityEntity;
 import com.adminpro.system.rbac.domains.entity.city.CityService;
 import com.adminpro.system.rbac.domains.vo.city.CityVo;
 import com.adminpro.system.rbac.domains.vo.city.CityVoConverter;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "城市区划管理", description = "省市区街道四级区划查询接口")
 @RestController
 @RequestMapping("/city")
 /**
@@ -30,6 +37,16 @@ public class CityController extends BaseController {
      *
      * @return
      */
+    @Operation(summary = "查询省一级区划", description = "获取所有省级行政区划列表")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 List<CityVo> 列表
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/provinces", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<List<CityVo>> provinces() {
         List<CityEntity> byLevel = cityService.findByLevel(CityEntity.PROVINCE_LEVEL);
@@ -43,6 +60,16 @@ public class CityController extends BaseController {
      * @param provinceid
      * @return
      */
+    @Operation(summary = "查询省下面市一级区划", description = "根据省ID查询该省下面的所有市级行政区划")
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 List<CityVo> 列表
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/province/{provinceid}/cities", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<List<CityVo>> cities(@PathVariable String provinceid) {
         List<CityEntity> byLevel = cityService.findByLevelAndParent(CityEntity.CITY_LEVEL, provinceid);
@@ -56,6 +83,16 @@ public class CityController extends BaseController {
      * @param cityid
      * @return
      */
+    @Operation(summary = "查询市下面区一级区划", description = "根据市ID查询该市下面的所有区县级行政区划")
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 List<CityVo> 列表
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/city/{cityid}/districts", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<List<CityVo>> districts(@PathVariable String cityid) {
         List<CityEntity> byLevel = cityService.findByLevelAndParent(CityEntity.DISTRICT_LEVEL, cityid);
@@ -69,6 +106,16 @@ public class CityController extends BaseController {
      * @param districtsid
      * @return
      */
+    @Operation(summary = "查询区下面街道一级区划", description = "根据区ID查询该区下面的所有街道级行政区划")
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 List<CityVo> 列表
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/district/{districtsid}/street", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<List<CityVo>> street(@PathVariable String districtsid) {
         List<CityEntity> byLevel = cityService.findByLevelAndParent(CityEntity.STREET_LEVEL, districtsid);
@@ -82,6 +129,16 @@ public class CityController extends BaseController {
      * @param id
      * @return
      */
+    @Operation(summary = "查询具体ID区划", description = "根据区划ID查询具体的行政区划信息")
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 CityVo 对象
+                - restCode=500: ID不存在或服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<CityVo> city(@PathVariable String id) {
         CityEntity cityEntity = cityService.findCityById(id);
@@ -105,6 +162,16 @@ public class CityController extends BaseController {
      * @param certNo
      * @return
      */
+    @Operation(summary = "根据地址和证件号查询区划ID", description = "解析地址字符串并返回省市区ID数组，结合身份证号前6位进行区划匹配")
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含省市区ID和详细地址的数组
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/ids", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<String[]> city(@RequestParam String address, @RequestParam String certNo) {
         String[] rs = new String[4];// 省、市、区、地址

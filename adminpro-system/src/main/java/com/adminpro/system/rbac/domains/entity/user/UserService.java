@@ -64,9 +64,6 @@ import java.util.*;
 @Service
 public class UserService extends BaseService<UserEntity, String> {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-    
-    // FIXME: Remove default value in production. This should be configured in application.yml
-    private static final String DEFAULT_THIRD_PARTY_ENCRYPT_PWD = "szyh$123";
 
     private final UserDao dao;
 
@@ -131,7 +128,7 @@ public class UserService extends BaseService<UserEntity, String> {
         try {
             boolean thirdPartyEncryptPwdEnabled = ConfigHelper
                     .getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
-            String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, DEFAULT_THIRD_PARTY_ENCRYPT_PWD);
+            String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY);
             if (thirdPartyEncryptPwdEnabled && StringUtils.isNotEmpty(partyPwd)) {
                 byte[] encrypt = CryptUtil.encrypt(partyPwd.getBytes(), thirdPartyEncryptPwd);
                 entity.setThirdPartyPwd(CryptUtil.encodeBase64(encrypt));
@@ -157,8 +154,8 @@ public class UserService extends BaseService<UserEntity, String> {
      * 新密码会进行加密存储，并清除用户详情缓存。
      * </p>
      *
-     * @param userDomain 用户域
-     * @param loginName 登录名
+     * @param userDomain  用户域
+     * @param loginName   登录名
      * @param newPassword 新密码（明文）
      * @return 更新后的用户实体对象
      * @throws BaseRuntimeException 如果用户不存在
@@ -193,8 +190,8 @@ public class UserService extends BaseService<UserEntity, String> {
      * </p>
      *
      * @param userDomain 用户域
-     * @param loginName 登录名
-     * @param password 登录密码（明文）
+     * @param loginName  登录名
+     * @param password   登录密码（明文）
      * @return 登录成功返回Token（移动端）或"success"（PC端），失败返回null
      */
     public String authLogin(String userDomain, String loginName, String password) {
@@ -230,9 +227,9 @@ public class UserService extends BaseService<UserEntity, String> {
      * 原密码验证通过后，更新为新密码并清除用户详情缓存。
      * </p>
      *
-     * @param userDomain 用户域
-     * @param loginName 登录名
-     * @param oldPwd 原密码（明文）
+     * @param userDomain  用户域
+     * @param loginName   登录名
+     * @param oldPwd      原密码（明文）
      * @param newPassword 新密码（明文）
      * @return 更新后的用户实体对象
      * @throws BaseRuntimeException 如果用户不存在或原密码不正确
@@ -290,7 +287,7 @@ public class UserService extends BaseService<UserEntity, String> {
         try {
             boolean thirdPartyEncryptPwdEnabled = ConfigHelper
                     .getBoolean(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_ENABLE_KEY, false);
-            String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY, DEFAULT_THIRD_PARTY_ENCRYPT_PWD);
+            String thirdPartyEncryptPwd = ConfigHelper.getString(BaseConstants.THIRD_PARTY_ENCRYPT_PWD_KEY);
             if (thirdPartyEncryptPwdEnabled && StringUtils.isNotEmpty(partyPwd)) {
                 byte[] encrypt = CryptUtil.encrypt(partyPwd.getBytes(), thirdPartyEncryptPwd);
                 entity.setThirdPartyPwd(CryptUtil.encodeBase64(encrypt));
@@ -339,7 +336,7 @@ public class UserService extends BaseService<UserEntity, String> {
      * 根据用户域和登录名查询用户
      *
      * @param userDomain 用户域
-     * @param loginName 登录名
+     * @param loginName  登录名
      * @return 用户实体对象，不存在返回null
      */
     public UserEntity findByUserDomainAndLoginName(String userDomain, String loginName) {
@@ -349,7 +346,7 @@ public class UserService extends BaseService<UserEntity, String> {
     /**
      * 根据用户域和显示名查询用户
      *
-     * @param domain 用户域
+     * @param domain  用户域
      * @param display 显示名
      * @return 用户实体对象，不存在返回null
      */
@@ -371,7 +368,7 @@ public class UserService extends BaseService<UserEntity, String> {
      * 根据用户域和邮箱查询用户
      *
      * @param domain 用户域
-     * @param email 邮箱地址
+     * @param email  邮箱地址
      * @return 用户实体对象，不存在返回null
      */
     public UserEntity findByDomainAndEmail(String domain, String email) {
@@ -381,7 +378,7 @@ public class UserService extends BaseService<UserEntity, String> {
     /**
      * 根据用户域和手机号查询用户
      *
-     * @param domain 用户域
+     * @param domain   用户域
      * @param mobileNo 手机号
      * @return 用户实体对象，不存在返回null
      */
@@ -392,7 +389,7 @@ public class UserService extends BaseService<UserEntity, String> {
     /**
      * 根据用户域和登录名模糊查询用户列表
      *
-     * @param userDomain 用户域
+     * @param userDomain    用户域
      * @param loginNameLike 登录名（支持模糊匹配）
      * @return 用户实体列表
      */
@@ -403,7 +400,7 @@ public class UserService extends BaseService<UserEntity, String> {
     /**
      * 根据用户域和手机号模糊查询用户列表
      *
-     * @param domain 用户域
+     * @param domain       用户域
      * @param mobileNoLike 手机号（支持模糊匹配）
      * @return 用户实体列表
      */
@@ -437,7 +434,7 @@ public class UserService extends BaseService<UserEntity, String> {
      * 删除用户（根据用户域和登录名）
      *
      * @param userDomain 用户域
-     * @param loginName 登录名
+     * @param loginName  登录名
      */
     @Transactional
     public void delete(String userDomain, String loginName) {
@@ -452,8 +449,8 @@ public class UserService extends BaseService<UserEntity, String> {
      * </p>
      *
      * @param userDomain 用户域
-     * @param loginName 登录名
-     * @param password 待验证的密码（明文）
+     * @param loginName  登录名
+     * @param password   待验证的密码（明文）
      * @return 密码正确返回true，否则返回false
      */
     public boolean authenticate(String userDomain, String loginName, String password) {
@@ -580,7 +577,7 @@ public class UserService extends BaseService<UserEntity, String> {
      * </p>
      *
      * @param existingUser 已存在的用户实体对象
-     * @param importVo 用户导入VO对象
+     * @param importVo     用户导入VO对象
      */
     private void updateUserFromImportVo(UserEntity existingUser, UserImportVo importVo) {
         if (StringUtils.isNotEmpty(importVo.getRealName())) {
@@ -634,7 +631,7 @@ public class UserService extends BaseService<UserEntity, String> {
      * </p>
      *
      * @param response HTTP响应对象
-     * @param list 用户实体列表
+     * @param list     用户实体列表
      * @throws Exception 导出过程中的异常
      */
     public void exportExcel(HttpServletResponse response, List<UserEntity> list) throws Exception {

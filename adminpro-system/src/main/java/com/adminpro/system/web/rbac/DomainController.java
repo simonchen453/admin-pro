@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -61,11 +60,17 @@ public class DomainController extends BaseController {
      * @return 用户域查询结果集，包含数据和分页信息
      */
     @Operation(summary = "查询用户域列表", description = "根据查询条件获取用户域列表，支持按域名称、显示名称等条件进行过滤和分页查询")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DomainEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<DomainEntity> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("查询用户域列表")
     @PostMapping(value = "/search")
     public R<QueryResultSet<DomainEntity>> list(
@@ -94,10 +99,16 @@ public class DomainController extends BaseController {
      * @return 用户域列表
      */
     @Operation(summary = "获取所有用户域", description = "获取所有用户域的简化列表")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 List<DomainEntity> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public R<java.util.List<DomainEntity>> getAllDomains() {
@@ -116,12 +127,18 @@ public class DomainController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "创建用户域", description = "新增一个用户域，包含域名称、显示名称、是否系统域等信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 创建成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("创建用户域")
     @PostMapping(value = "/create")
     public R create(@Parameter(description = "用户域实体信息", required = true) @RequestBody DomainEntity userDomain) {
@@ -155,13 +172,19 @@ public class DomainController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "更新用户域", description = "更新已有用户域的信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "用户域不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 更新成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 用户域不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("更新用户域")
     @PutMapping(value = "/{id}")
     public R editSave(@PathVariable String id,
@@ -199,12 +222,18 @@ public class DomainController extends BaseController {
      * @return 用户域详细信息
      */
     @Operation(summary = "查询用户域详情", description = "根据用户域ID获取用户域的详细信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DomainEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "用户域不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 DomainEntity 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 用户域不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/{id}")
     public R<DomainEntity> detail(@Parameter(description = "用户域ID", required = true) @PathVariable String id) {
         DomainEntity entity = domainService.findById(id);
@@ -226,12 +255,18 @@ public class DomainController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "删除用户域", description = "根据用户域ID删除用户域")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "用户域不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 删除成功
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 用户域不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("删除用户域")
     @DeleteMapping(value = "/{id}")
     public R delete(@Parameter(description = "用户域ID", required = true) @PathVariable String id) {

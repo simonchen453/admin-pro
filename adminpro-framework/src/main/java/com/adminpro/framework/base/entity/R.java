@@ -4,6 +4,7 @@ import com.adminpro.framework.base.message.Message;
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.exceptions.APIException;
 import com.google.gson.Gson;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,24 +15,38 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * 返回数据
+ * 统一响应包装类
+ * <p>
+ * 所有 API 接口统一返回此格式，HTTP 状态码始终为 200，
+ * 通过 restCode 字段区分业务状态码。
+ * </p>
  */
+@Schema(description = "统一响应格式")
 public class R<T> implements Serializable {
     final static Logger logger = LoggerFactory.getLogger(R.class);
+
+    @Schema(description = "业务状态码：200=成功, 400=参数错误, 401=未授权, 403=无权限, 404=不存在, 500=服务器错误", example = "200")
     private String restCode;
 
+    @Schema(description = "响应消息", example = "操作成功")
     private String message;
 
+    @Schema(description = "是否成功", example = "true")
     private boolean success;
 
+    @Schema(description = "错误详情列表")
     private List<Message> errors = new ArrayList<>();
 
+    @Schema(description = "错误字段映射（字段名 -> 错误信息）")
     private Map<String, String> errorsMap = new HashMap<>();
 
+    @Schema(description = "响应数据（具体类型见各接口说明）")
     private T data;
 
+    @Schema(description = "响应时间戳", example = "1705546800000")
     private Long timestamp;
 
+    @Schema(description = "请求追踪ID", example = "abc-123-def")
     private String requestId;
 
     public static <T> R<T> ok() {

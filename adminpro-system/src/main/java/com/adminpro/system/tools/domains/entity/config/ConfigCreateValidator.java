@@ -3,7 +3,7 @@ package com.adminpro.system.tools.domains.entity.config;
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
 import com.adminpro.system.core.common.helper.StringHelper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
  * @date 2020-06-15
  */
 @Component
+@RequiredArgsConstructor
 public class ConfigCreateValidator extends BaseValidator<ConfigEntity> {
 
-    @Autowired
-    private ConfigService configService;
+    private final ConfigService configService;
 
     /**
      * 校验创建参数配置

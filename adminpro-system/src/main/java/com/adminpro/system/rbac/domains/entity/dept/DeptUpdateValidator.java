@@ -5,8 +5,8 @@ import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
 import com.adminpro.framework.base.validator.IValidatorGroup;
 import com.adminpro.system.core.common.helper.StringHelper;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,10 +16,10 @@ import org.springframework.stereotype.Component;
  * @date 2020-05-24
  */
 @Component
+@RequiredArgsConstructor
 public class DeptUpdateValidator extends BaseValidator<DeptEntity> {
 
-    @Autowired
-    private DeptService deptService;
+    private final DeptService deptService;
 
     /**
      * 校验更新部门

@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -64,11 +63,17 @@ public class PostController extends BaseController {
      * @return 职位查询结果集，包含数据和分页信息
      */
     @Operation(summary = "查询职位列表", description = "根据查询条件获取职位列表，支持按职位编码、名称、状态等条件进行过滤和分页查询")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<PostEntity> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping(value = "/search")
     public R<QueryResultSet<PostEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
@@ -101,12 +106,18 @@ public class PostController extends BaseController {
      * @return 职位详细信息
      */
     @Operation(summary = "查询职位详情", description = "根据职位ID获取职位的详细信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "职位不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 PostEntity 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 职位不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/{id}")
     public R<PostEntity> detail(@Parameter(description = "职位ID", required = true) @PathVariable String id) {
         PostEntity entity = postService.findById(id);
@@ -128,12 +139,18 @@ public class PostController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "创建职位", description = "新增一个职位，包含职位编码、名称、排序、状态等信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 创建成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("创建职位")
     @PostMapping
     public R create(@Parameter(description = "职位实体信息", required = true) @RequestBody PostEntity post) {
@@ -171,13 +188,19 @@ public class PostController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "更新职位", description = "更新已有职位的信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "职位不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 更新成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 职位不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("更新职位")
     @PutMapping(value = "/{id}")
     public R editSave(@Parameter(description = "职位实体信息", required = true) @RequestBody PostEntity post) {
@@ -216,12 +239,18 @@ public class PostController extends BaseController {
      * @param ids 职位ID列表，多个ID用逗号分隔
      * @return 操作结果
      */
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "职位不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 删除成功
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 职位不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("删除职位")
     @DeleteMapping(value = "/{id}")
     public R delete(@Parameter(description = "职位ID", required = true) @PathVariable String id) {
@@ -244,12 +273,18 @@ public class PostController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "批量删除职位", description = "根据多个职位ID批量删除职位，ID之间用逗号分隔")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 批量删除成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("批量删除职位")
     @DeleteMapping
     public R remove(

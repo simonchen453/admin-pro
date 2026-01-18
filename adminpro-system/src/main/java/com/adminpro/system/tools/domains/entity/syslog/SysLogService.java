@@ -5,7 +5,6 @@ import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +19,8 @@ import java.util.List;
 @Service
 public class SysLogService extends BaseService<SysLogEntity, String> {
 
-    private SysLogDao dao;
+    private final SysLogDao dao;
 
-    @Autowired
     public SysLogService(SysLogDao dao) {
         super(dao);
         this.dao = dao;

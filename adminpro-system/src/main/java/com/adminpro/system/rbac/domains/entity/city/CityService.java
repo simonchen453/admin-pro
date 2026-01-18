@@ -1,6 +1,5 @@
 package com.adminpro.system.rbac.domains.entity.city;
 
-
 import com.adminpro.framework.base.entity.BaseService;
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.jdbc.SearchParam;
@@ -8,7 +7,6 @@ import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,9 +14,8 @@ import java.util.List;
 @Service
 public class CityService extends BaseService<CityEntity, String> {
 
-    private CityDao dao;
+    private final CityDao dao;
 
-    @Autowired
     protected CityService(CityDao dao) {
         super(dao);
         this.dao = dao;
@@ -42,13 +39,15 @@ public class CityService extends BaseService<CityEntity, String> {
     }
 
     public List<CityEntity> findByLevelAndParent(Integer level, String parent) {
-        List list = AppCache.getInstance().get(RbacCacheConstants.CITY_CACHE_LEVEL_PARENT, String.valueOf(level) + "_" + String.valueOf(parent), List.class);
+        List list = AppCache.getInstance().get(RbacCacheConstants.CITY_CACHE_LEVEL_PARENT,
+                String.valueOf(level) + "_" + String.valueOf(parent), List.class);
         if (list != null) {
             return (List<CityEntity>) list;
         } else {
             List<CityEntity> byLevel = dao.findByLevelAndParent(level, parent);
             if (byLevel != null) {
-                AppCache.getInstance().set(RbacCacheConstants.CITY_CACHE_LEVEL_PARENT, String.valueOf(level) + "_" + String.valueOf(parent), byLevel);
+                AppCache.getInstance().set(RbacCacheConstants.CITY_CACHE_LEVEL_PARENT,
+                        String.valueOf(level) + "_" + String.valueOf(parent), byLevel);
             }
             return byLevel;
         }
@@ -107,7 +106,8 @@ public class CityService extends BaseService<CityEntity, String> {
         if (entities != null) {
             for (int i = 0; i < entities.size(); i++) {
                 CityEntity cityEntity = entities.get(i);
-                if (cityEntity.getLevel() == CityEntity.DISTRICT_LEVEL && StringUtils.equals(cityEntity.getParent(), parent.getId())) {
+                if (cityEntity.getLevel() == CityEntity.DISTRICT_LEVEL
+                        && StringUtils.equals(cityEntity.getParent(), parent.getId())) {
                     return cityEntity;
                 }
             }

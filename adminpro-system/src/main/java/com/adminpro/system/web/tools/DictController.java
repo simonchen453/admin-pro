@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -74,11 +73,17 @@ public class DictController extends BaseController {
      */
     @Operation(summary = "查询字典类型列表", description = "支持按字典名称、字典类型、状态等条件进行分页查询")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "搜索条件", required = true, content = @Content(schema = @Schema(implementation = SearchForm.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<DictEntity> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping("/search")
     public R<QueryResultSet<DictEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -111,12 +116,18 @@ public class DictController extends BaseController {
      */
     @Operation(summary = "新增字典类型", description = "创建新的字典类型，包含字典名称、类型键、状态、备注及字典数据")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "字典实体对象", required = true, content = @Content(schema = @Schema(implementation = DictEntity.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 创建成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("创建字典")
     @PostMapping
     public R create(@RequestBody DictEntity dict) {
@@ -154,13 +165,19 @@ public class DictController extends BaseController {
      */
     @Operation(summary = "修改字典类型", description = "根据字典ID更新字典类型信息，包含字典名称、类型键、状态、备注及字典数据")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "字典实体对象，必须包含ID字段", required = true, content = @Content(schema = @Schema(implementation = DictEntity.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "字典不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 更新成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 字典不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("更新字典")
     @PutMapping(value = "/{id}")
     public R editSave(@RequestBody DictEntity dict) {
@@ -200,12 +217,18 @@ public class DictController extends BaseController {
      */
     @Operation(summary = "获取字典详情", description = "根据字典ID查询字典类型的详细信息")
     @Parameter(name = "id", description = "字典ID", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = DictEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "字典不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 DictEntity 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 字典不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/{id}")
     public R<DictEntity> detail(@PathVariable String id) {
         DictEntity entity = dictService.findById(id);
@@ -217,12 +240,18 @@ public class DictController extends BaseController {
         }
     }
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "字典不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 删除成功
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 字典不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("删除字典")
     @DeleteMapping(value = "/{id}")
     public R delete(@Parameter(description = "字典ID", required = true) @PathVariable String id) {
@@ -246,12 +275,18 @@ public class DictController extends BaseController {
      */
     @Operation(summary = "删除字典类型", description = "支持批量删除字典类型，多个ID用逗号分隔")
     @Parameter(name = "ids", description = "字典ID列表，多个ID用逗号分隔", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 删除成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("批量删除字典")
     @DeleteMapping
     public R remove(@RequestParam("ids") String ids) {
@@ -272,12 +307,18 @@ public class DictController extends BaseController {
      */
     @Operation(summary = "激活字典类型", description = "将指定字典类型的状态设置为激活状态")
     @Parameter(name = "id", description = "字典ID", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "激活成功", content = @Content(schema = @Schema(implementation = DictEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "字典不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 激活成功，data 字段包含 DictEntity 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 字典不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("激活字典")
     @PatchMapping("/{id}/active")
     public R<DictEntity> active(@PathVariable String id) {
@@ -302,12 +343,18 @@ public class DictController extends BaseController {
      */
     @Operation(summary = "停用字典类型", description = "将指定字典类型的状态设置为停用状态")
     @Parameter(name = "id", description = "字典ID", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "停用成功", content = @Content(schema = @Schema(implementation = DictEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "字典不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 停用成功，data 字段包含 DictEntity 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 字典不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("停用字典")
     @PatchMapping("/{id}/inactive")
     public R<DictEntity> inactive(@PathVariable String id) {

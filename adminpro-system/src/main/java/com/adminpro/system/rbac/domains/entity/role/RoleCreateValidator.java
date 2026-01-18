@@ -2,7 +2,7 @@ package com.adminpro.system.rbac.domains.entity.role;
 
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
  * @date 2020-06-08
  */
 @Component
+@RequiredArgsConstructor
 public class RoleCreateValidator extends BaseValidator<RoleEntity> {
 
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
     /**
      * 校验创建角色
@@ -25,7 +25,7 @@ public class RoleCreateValidator extends BaseValidator<RoleEntity> {
         super.baseValidate(entity, msgBundle);
         if (!msgBundle.hasErrorMessage("name")) {
             RoleEntity role = roleService.findByName(entity.getName());
-            if(role != null){
+            if (role != null) {
                 msgBundle.addErrorMessage("name", "角色名称不能重复");
             }
         }

@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -57,13 +56,17 @@ public class RoleController extends BaseController {
      * 查询角色列表
      */
     @Operation(summary = "查询角色列表", description = "根据查询条件分页查询角色列表，支持按名称、显示名称、状态、系统角色等条件筛选")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "查询成功（restCode=200）或未授权/无权限（restCode=401/403）",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = QueryResultSet.class))
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<ListRoleVo> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping(value = "/search")
     public R<QueryResultSet<ListRoleVo>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -95,13 +98,18 @@ public class RoleController extends BaseController {
      */
     @SysLog("创建角色")
     @Operation(summary = "创建角色", description = "新增保存角色，包括角色名称、显示名称、状态、菜单权限等")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "创建成功（restCode=200）或参数错误/未授权/无权限（restCode=400/401/403）",
-                    content = @Content(mediaType = "application/json")
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 创建成功
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping
     public R create(@RequestBody RoleEntity role) {
         BeanUtil.beanAttributeValueTrim(role);
@@ -131,13 +139,19 @@ public class RoleController extends BaseController {
      */
     @SysLog("更新角色")
     @Operation(summary = "更新角色", description = "修改保存角色信息，包括角色名称、显示名称、状态、菜单权限等")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "更新成功（restCode=200）或参数错误/未授权/无权限/角色不存在（restCode=400/401/403/404）",
-                    content = @Content(mediaType = "application/json")
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 更新成功
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 角色不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PutMapping(value = "/{id}")
     public R editSave(@RequestBody RoleEntity role) {
         BeanUtil.beanAttributeValueTrim(role);
@@ -170,13 +184,18 @@ public class RoleController extends BaseController {
      * @return
      */
     @Operation(summary = "获取角色详情", description = "根据角色ID获取角色的详细信息")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "查询成功（restCode=200）或未授权/无权限/角色不存在（restCode=401/403/404）",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoleEntity.class))
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 RoleEntity 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 角色不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/{id}")
     public R<RoleEntity> detail(@PathVariable String id) {
         RoleEntity entity = roleService.findById(id);
@@ -193,13 +212,18 @@ public class RoleController extends BaseController {
      */
     @SysLog("删除角色")
     @Operation(summary = "删除角色", description = "批量删除角色，支持一次删除多个角色")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "删除成功（restCode=200）或参数错误/未授权/无权限（restCode=400/401/403）",
-                    content = @Content(mediaType = "application/json")
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 批量删除成功
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @DeleteMapping
     public R remove(@RequestParam("ids") String ids) {
         // 使用验证工具类解析和验证参数

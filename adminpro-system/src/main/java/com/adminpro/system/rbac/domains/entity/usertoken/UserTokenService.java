@@ -8,7 +8,6 @@ import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.security.auth.TokenHelper;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,9 +45,8 @@ import java.util.List;
 @Service
 public class UserTokenService extends BaseService<UserTokenEntity, String> {
 
-    private UserTokenDao dao;
+    private final UserTokenDao dao;
 
-    @Autowired
     protected UserTokenService(UserTokenDao dao) {
         super(dao);
         this.dao = dao;

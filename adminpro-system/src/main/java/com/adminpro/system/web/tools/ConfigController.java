@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -72,11 +71,17 @@ public class ConfigController extends BaseController {
      */
     @Operation(summary = "查询参数配置列表", description = "支持按参数名称、参数键、参数值等条件进行分页查询")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "搜索条件", required = true, content = @Content(schema = @Schema(implementation = SearchForm.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<ConfigEntity> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping("/search")
     public R<QueryResultSet<ConfigEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -110,12 +115,18 @@ public class ConfigController extends BaseController {
      */
     @Operation(summary = "新增参数配置", description = "创建新的系统参数配置，包含参数名称、参数键、参数值、系统标识及备注")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "配置实体对象", required = true, content = @Content(schema = @Schema(implementation = ConfigEntity.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 创建成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("创建配置")
     @PostMapping
     public R create(@RequestBody ConfigEntity config) {
@@ -154,13 +165,19 @@ public class ConfigController extends BaseController {
      */
     @Operation(summary = "修改参数配置", description = "根据配置ID更新参数配置信息，包含参数名称、参数键、参数值、系统标识及备注")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "配置实体对象，必须包含ID字段", required = true, content = @Content(schema = @Schema(implementation = ConfigEntity.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "配置不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 更新成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 配置不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("更新配置")
     @PutMapping(value = "/{id}")
     public R editSave(@RequestBody ConfigEntity config) {
@@ -201,12 +218,18 @@ public class ConfigController extends BaseController {
      */
     @Operation(summary = "获取配置详情", description = "根据配置ID查询参数配置的详细信息")
     @Parameter(name = "id", description = "配置ID", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = ConfigEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "配置不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 ConfigEntity 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 配置不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/{id}")
     public R<ConfigEntity> detail(@PathVariable String id) {
         ConfigEntity entity = configService.findById(id);
@@ -229,12 +252,18 @@ public class ConfigController extends BaseController {
      */
     @Operation(summary = "删除参数配置", description = "支持批量删除参数配置，多个ID用逗号分隔")
     @Parameter(name = "ids", description = "配置ID列表，多个ID用逗号分隔", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 删除成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("删除配置")
     @DeleteMapping
     public R remove(@RequestParam("ids") String ids) {

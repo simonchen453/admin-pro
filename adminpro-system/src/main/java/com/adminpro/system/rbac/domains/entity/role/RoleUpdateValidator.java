@@ -3,8 +3,8 @@ package com.adminpro.system.rbac.domains.entity.role;
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
 import com.adminpro.framework.base.validator.IValidatorGroup;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
  * @date 2020-06-08
  */
 @Component
+@RequiredArgsConstructor
 public class RoleUpdateValidator extends BaseValidator<RoleEntity> {
 
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
     /**
      * 校验更新角色
@@ -35,7 +35,7 @@ public class RoleUpdateValidator extends BaseValidator<RoleEntity> {
         }
         if (!msgBundle.hasErrorMessage("name")) {
             RoleEntity role = roleService.findByName(entity.getName());
-            if(role != null && !StringUtils.equals(role.getId(), entity.getId())){
+            if (role != null && !StringUtils.equals(role.getId(), entity.getId())) {
                 msgBundle.addErrorMessage("name", "角色名称不能重复");
             }
         }

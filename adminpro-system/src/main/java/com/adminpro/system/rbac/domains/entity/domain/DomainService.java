@@ -6,7 +6,6 @@ import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -19,9 +18,8 @@ import java.util.Map;
 @Service
 public class DomainService extends BaseService<DomainEntity, String> {
 
-    private DomainDao dao;
+    private final DomainDao dao;
 
-    @Autowired
     protected DomainService(DomainDao dao) {
         super(dao);
         this.dao = dao;

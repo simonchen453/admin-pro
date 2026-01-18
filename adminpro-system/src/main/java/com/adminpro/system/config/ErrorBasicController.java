@@ -1,10 +1,16 @@
 package com.adminpro.system.config;
 
+import com.adminpro.framework.base.entity.R;
 import com.adminpro.system.core.common.helper.ConfigHelper;
 import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.tools.domains.entity.exceptionlog.ExceptionLogEntity;
 import com.adminpro.system.tools.domains.entity.exceptionlog.ExceptionLogService;
 import com.google.gson.Gson;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,6 +36,7 @@ import java.util.Map;
  * Created by simon on 2017/6/9.
  */
 @RestController
+@Tag(name = "错误处理", description = "Spring Boot全局错误处理接口，统一处理系统异常")
 public class ErrorBasicController implements ErrorController {
     private static final Logger logger = LoggerFactory.getLogger(ErrorBasicController.class);
 
@@ -47,6 +54,19 @@ public class ErrorBasicController implements ErrorController {
     private ExceptionLogService exceptionLogService;
 
     @RequestMapping(value = ERROR_PATH)
+    @Operation(summary = "全局错误处理", description = "Spring Boot错误控制器，统一处理系统异常并返回JSON格式的错误信息，同时记录异常日志")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - HTTP状态码始终为200，业务状态码在response body中返回
+                - restCode=401: 未授权
+                - restCode=403: 禁止访问
+                - restCode=404: 资源不存在
+                - restCode=500: 服务器错误
+                """,
+        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = R.class))
+    )
     public void error(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ErrorAttributeOptions errorAttributeOptions = ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE);
         Map<String, Object> errorAttributes = getErrorAttributes(request, errorAttributeOptions);

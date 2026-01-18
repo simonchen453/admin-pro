@@ -6,7 +6,6 @@ import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ExceptionLogService extends BaseService<ExceptionLogEntity, String> {
 
-    private ExceptionLogDao dao;
+    private final ExceptionLogDao dao;
 
-    @Autowired
     public ExceptionLogService(ExceptionLogDao dao) {
         super(dao);
         this.dao = dao;

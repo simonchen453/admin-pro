@@ -3,8 +3,8 @@ package com.adminpro.system.tools.domains.entity.dict;
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
 import com.adminpro.framework.base.validator.IValidatorGroup;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,10 +14,10 @@ import org.springframework.stereotype.Component;
  * @date 2020-05-21
  */
 @Component
+@RequiredArgsConstructor
 public class DictUpdateValidator extends BaseValidator<DictEntity> {
 
-    @Autowired
-    private DictService dictService;
+    private final DictService dictService;
 
     /**
      * 校验更新字典类型

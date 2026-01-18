@@ -7,7 +7,6 @@ import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
 import com.adminpro.system.tools.domains.enums.SessionStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -24,9 +23,8 @@ import java.util.List;
 @Service
 public class SessionService extends BaseService<SessionEntity, String> {
 
-    private SessionDao dao;
+    private final SessionDao dao;
 
-    @Autowired
     public SessionService(SessionDao dao) {
         super(dao);
         this.dao = dao;

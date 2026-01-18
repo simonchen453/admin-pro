@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -67,11 +66,17 @@ public class SessionController extends BaseController {
      */
     @Operation(summary = "查询用户会话列表", description = "支持按Session ID、状态、用户登录名、登录IP、部门编号等条件进行分页查询")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "搜索条件", required = true, content = @Content(schema = @Schema(implementation = SearchForm.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<SessionEntity> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping("/search")
     public R<QueryResultSet<SessionEntity>> list(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -112,12 +117,18 @@ public class SessionController extends BaseController {
      */
     @Operation(summary = "获取会话详细信息", description = "根据会话ID查询用户会话的详细信息")
     @Parameter(name = "id", description = "会话ID", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = SessionEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "会话不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 SessionEntity 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 会话不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping("/{id}")
     public R<SessionEntity> detail(@PathVariable String id) {
         SessionEntity entity = sessionService.findById(id);
@@ -140,13 +151,19 @@ public class SessionController extends BaseController {
      */
     @Operation(summary = "暂停会话", description = "将指定用户会话的状态设置为暂停状态，不允许操作当前用户自己的会话")
     @Parameter(name = "id", description = "会话ID", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "暂停成功", content = @Content(schema = @Schema(implementation = SessionEntity.class))),
-            @ApiResponse(responseCode = "200", description = "不能操作当前用户（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "会话不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 暂停成功
+                - restCode=400: 不能操作当前用户
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 会话不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("暂停会话")
     @PatchMapping("/{id}/suspend")
     public R<SessionEntity> suspend(@PathVariable String id) {
@@ -174,13 +191,19 @@ public class SessionController extends BaseController {
      */
     @Operation(summary = "恢复会话", description = "将已暂停的用户会话状态恢复为激活状态，不允许操作当前用户自己的会话")
     @Parameter(name = "id", description = "会话ID", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "恢复成功", content = @Content(schema = @Schema(implementation = SessionEntity.class))),
-            @ApiResponse(responseCode = "200", description = "不能操作当前用户（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "会话不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 恢复成功
+                - restCode=400: 不能操作当前用户
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 会话不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("恢复会话")
     @PatchMapping("/{id}/unsuspend")
     public R<SessionEntity> unsuspend(@PathVariable String id) {
@@ -208,13 +231,19 @@ public class SessionController extends BaseController {
      */
     @Operation(summary = "终止会话", description = "终止指定的用户会话，不允许操作当前用户自己的会话")
     @Parameter(name = "id", description = "会话ID", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "终止成功", content = @Content(schema = @Schema(implementation = SessionEntity.class))),
-            @ApiResponse(responseCode = "200", description = "不能操作当前用户（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "会话不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 终止成功
+                - restCode=400: 不能操作当前用户
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 会话不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("终止会话")
     @PatchMapping("/{id}/kill")
     public R<SessionEntity> kill(@PathVariable String id) {

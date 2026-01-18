@@ -4,8 +4,8 @@ import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
 import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.rbac.enums.MenuType;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
  * @date 2020-05-21
  */
 @Component
+@RequiredArgsConstructor
 public class MenuCreateValidator extends BaseValidator<MenuEntity> {
 
-    @Autowired
-    private MenuService menuService;
+    private final MenuService menuService;
 
     /**
      * 校验创建菜单权限

@@ -4,8 +4,8 @@ import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
 import com.adminpro.framework.base.validator.IValidatorGroup;
 import com.adminpro.system.core.common.helper.StringHelper;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
  * @date 2020-06-15
  */
 @Component
+@RequiredArgsConstructor
 public class ConfigUpdateValidator extends BaseValidator<ConfigEntity> {
 
-    @Autowired
-    private ConfigService configService;
+    private final ConfigService configService;
 
     /**
      * 校验更新参数配置

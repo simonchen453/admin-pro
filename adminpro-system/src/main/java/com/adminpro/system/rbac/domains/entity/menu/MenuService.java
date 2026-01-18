@@ -54,12 +54,11 @@ import java.util.stream.Collectors;
 @Service
 public class MenuService extends BaseService<MenuEntity, String> {
 
-    private MenuDao dao;
+    private final MenuDao dao;
 
     @Autowired
     private UserDomainEnvService userDomainEnvService;
 
-    @Autowired
     public MenuService(MenuDao dao) {
         super(dao);
         this.dao = dao;

@@ -7,7 +7,6 @@ import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.common.helper.FileHelper;
 import com.adminpro.system.rbac.domains.vo.oss.ListOssDto;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +16,8 @@ import java.util.List;
 @Service
 public class OSSService extends BaseService<OSSEntity, String> {
 
-    private OSSDao dao;
+    private final OSSDao dao;
 
-    @Autowired
     protected OSSService(OSSDao dao) {
         super(dao);
         this.dao = dao;

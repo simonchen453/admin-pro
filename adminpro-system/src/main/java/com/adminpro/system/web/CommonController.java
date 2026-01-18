@@ -42,7 +42,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -85,13 +84,17 @@ public class CommonController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermission('common:home-data')")
     @Operation(summary = "获取首页统计数据", description = "获取系统首页的统计数据，包括用户数、角色数、部门数、会话数等")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "查询成功（restCode=200）或未授权/无权限（restCode=401/403）",
-                    content = @Content(mediaType = "application/json")
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含统计数据
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/statistics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<Map<String, Long>> statistics() {
         Map<String, Long> stats = new HashMap<>();

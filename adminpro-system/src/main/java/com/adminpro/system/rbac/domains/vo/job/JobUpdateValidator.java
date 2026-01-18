@@ -5,14 +5,14 @@ import com.adminpro.framework.base.validator.BaseValidator;
 import com.adminpro.system.core.batchjob.utils.CronUtils;
 import com.adminpro.system.tools.domains.entity.job.ScheduleJobEntity;
 import com.adminpro.system.tools.domains.entity.job.ScheduleJobService;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class JobUpdateValidator extends BaseValidator<JobVo> {
-    @Autowired
-    private ScheduleJobService scheduleJobService;
+    private final ScheduleJobService scheduleJobService;
 
     @Override
     public void validate(JobVo model, MessageBundle msgBundle) {
@@ -44,7 +44,7 @@ public class JobUpdateValidator extends BaseValidator<JobVo> {
 
         String params = model.getParams();
         if (StringUtils.isEmpty(params)) {
-//            msgBundle.addErrorMessage("params", "参数不能为空");
+            // msgBundle.addErrorMessage("params", "参数不能为空");
         }
     }
 }

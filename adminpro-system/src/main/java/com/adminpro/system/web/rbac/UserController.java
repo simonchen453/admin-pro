@@ -34,7 +34,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -102,13 +101,17 @@ public class UserController extends BaseController {
      * @return 分页查询结果
      */
     @Operation(summary = "查询用户列表", description = "根据查询条件分页查询用户列表，支持按用户域、登录名、真实姓名、状态、部门等条件筛选")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "查询成功（restCode=200）或未授权/无权限（restCode=401/403）",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = QueryResultSet.class))
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<UserListResponseVo> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<UserListResponseVo>> search(@RequestBody SearchForm searchForm) {
         logger.debug("查询用户列表: searchForm={}", searchForm);
@@ -146,6 +149,19 @@ public class UserController extends BaseController {
      * @return 操作结果
      */
     @SysLog("停用用户")
+    @Operation(summary = "停用用户", description = "将指定用户状态设置为停用，停用后用户无法登录系统")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 停用成功
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 用户不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/inactive/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
     public R inactive(@PathVariable String userId) {
         logger.info("停用用户: userId={}", userId);
@@ -170,6 +186,19 @@ public class UserController extends BaseController {
      * @return 操作结果
      */
     @SysLog("激活用户")
+    @Operation(summary = "激活用户", description = "将指定用户状态设置为激活，激活后用户可以正常登录系统")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 激活成功
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 用户不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/active/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.PATCH)
     public R active(@PathVariable("userId") String userId) {
         logger.info("激活用户: userId={}", userId);
@@ -194,6 +223,19 @@ public class UserController extends BaseController {
      * @return 操作结果
      */
     @SysLog("重置用户密码")
+    @Operation(summary = "重置用户密码", description = "管理员重置指定用户的密码，新密码需符合系统密码规则")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 重置成功
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/resetpwd", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R resetPwd(@Valid @RequestBody UserResetPwdRequestVo userResetPwdRequestVo) {
         logger.info("重置用户密码: userDomain={}, userId={}", userResetPwdRequestVo.getUserDomain(),
@@ -251,6 +293,19 @@ public class UserController extends BaseController {
      * @param userId 用户ID
      * @return 用户详细信息
      */
+    @Operation(summary = "查询用户详情", description = "根据用户ID查询用户的详细信息，包括基本资料、角色、岗位等")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 UserDetailVO 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 用户不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<UserDetailVO> view(@PathVariable String userId) {
         logger.debug("查询用户详情: userId={}", userId);
@@ -320,6 +375,19 @@ public class UserController extends BaseController {
      * @return 操作结果
      */
     @SysLog("删除用户")
+    @Operation(summary = "批量删除用户", description = "根据用户ID列表批量删除用户（使用逗号分隔的字符串格式）")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 批量删除成功
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R<Void> deleteMany(@RequestParam String users) {
         logger.info("批量删除用户: users={}", users);
@@ -345,6 +413,19 @@ public class UserController extends BaseController {
      * @return 操作结果
      */
     @SysLog("删除用户")
+    @Operation(summary = "批量删除用户(RESTful)", description = "根据用户ID列表批量删除用户（使用JSON数组格式）")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 批量删除成功
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/batch-delete", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public R batchDelete(@RequestBody List<String> userIds) {
         logger.info("批量删除用户(RESTful): count={}", userIds != null ? userIds.size() : 0);
@@ -369,6 +450,18 @@ public class UserController extends BaseController {
      *
      * @return 包含角色列表和岗位列表的映射
      */
+    @Operation(summary = "准备用户创建/编辑页面数据", description = "获取创建或编辑用户时所需的基础数据，包括角色列表和岗位列表")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含角色列表和岗位列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/prepare", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public R<Map<String, Object>> prepare() {
         Map<String, Object> map = new HashMap<>();
@@ -393,6 +486,19 @@ public class UserController extends BaseController {
      * @return 操作结果
      */
     @SysLog("创建用户")
+    @Operation(summary = "创建用户", description = "创建新用户，包括基本信息、角色分配、岗位分配等")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 创建成功
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     @Transactional
     public R create(@Valid @RequestBody UserCreateVo userRequestVo) {
@@ -427,6 +533,20 @@ public class UserController extends BaseController {
      * @return 操作结果
      */
     @SysLog("更新用户")
+    @Operation(summary = "更新用户", description = "更新用户基本信息、角色分配、岗位分配等")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 更新成功
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 用户不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PutMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public R update(@Valid @RequestBody UserCreateVo userRequestVo) {
@@ -472,6 +592,19 @@ public class UserController extends BaseController {
      * @return OSS文件访问URL
      */
     @SysLog("用户头像上传")
+    @Operation(summary = "用户头像上传", description = "上传用户头像图片到OSS存储")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 上传成功，data 字段包含图片URL
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 上传失败或服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R uploadFile(@RequestParam MultipartFile file, MultipartHttpServletRequest multipartRequest) {
         try {
@@ -493,6 +626,19 @@ public class UserController extends BaseController {
      * @return 操作结果
      */
     @SysLog("导入用户")
+    @Operation(summary = "导入用户", description = "从Excel文件批量导入用户数据")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 导入成功
+                - restCode=400: 参数错误或文件格式错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 导入失败或服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/import", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R importUser(@RequestParam("file") MultipartFile file) {
         logger.info("导入用户: fileName={}, fileSize={}", file.getOriginalFilename(), file.getSize());
@@ -521,6 +667,19 @@ public class UserController extends BaseController {
      * @throws Exception 导出异常
      */
     @SysLog("导出用户")
+    @Operation(summary = "导出用户", description = "根据用户ID列表导出用户数据到Excel文件")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 导出成功，返回Excel文件流
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 导出失败或服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/export", method = RequestMethod.GET)
     public void exportUser(@RequestParam(required = false) String ids, HttpServletResponse response) throws Exception {
         List<UserEntity> list = new ArrayList<>();
@@ -545,6 +704,19 @@ public class UserController extends BaseController {
      * @throws Exception 导出异常
      */
     @SysLog("导出所有用户")
+    @Operation(summary = "导出所有用户", description = "根据查询条件导出所有符合条件的用户数据到Excel文件")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 导出成功，返回Excel文件流
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 导出失败或服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/excelAll", method = RequestMethod.GET)
     public void exportAllUser(SearchForm searchForm, HttpServletResponse response) throws Exception {
         logger.info("导出所有用户: searchForm={}", searchForm);

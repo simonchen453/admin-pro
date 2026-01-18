@@ -6,7 +6,6 @@ import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ScheduleJobLogService extends BaseService<ScheduleJobLogEntity, String> {
 
-    private ScheduleJobLogDao dao;
+    private final ScheduleJobLogDao dao;
 
-    @Autowired
     protected ScheduleJobLogService(ScheduleJobLogDao dao) {
         super(dao);
         this.dao = dao;

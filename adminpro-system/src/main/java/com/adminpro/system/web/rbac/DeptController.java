@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
@@ -71,11 +70,17 @@ public class DeptController extends BaseController {
      * @return 部门列表
      */
     @Operation(summary = "查询部门列表", description = "根据查询条件获取部门列表，支持按名称、状态等条件进行过滤和分页查询")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeptEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 List<DeptEntity> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping(value = "/search")
     public R<List<DeptEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
@@ -104,10 +109,16 @@ public class DeptController extends BaseController {
      * @return 部门树形选择列表
      */
     @Operation(summary = "获取部门树", description = "获取所有部门的树形结构数据")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含部门树形结构列表
+                - restCode=401: 未授权，需要登录
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/tree")
     @PreAuthorize("isAuthenticated()")
     public R<List<com.adminpro.system.rbac.domains.vo.tree.TreeSelect>> getTreeSelect() {
@@ -126,12 +137,18 @@ public class DeptController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "创建部门", description = "新增一个部门，包含部门编号、名称、上级部门、联系人等信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 创建成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("创建部门")
     @PostMapping
     public R create(@Parameter(description = "部门实体信息", required = true) @RequestBody DeptEntity dept) {
@@ -183,13 +200,19 @@ public class DeptController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "更新部门", description = "更新已有部门的信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "部门不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 更新成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 部门不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("更新部门")
     @PutMapping(value = "/{id}")
     public R editSave(@Parameter(description = "部门实体信息", required = true) @RequestBody DeptEntity dept) {
@@ -242,12 +265,18 @@ public class DeptController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "批量删除部门", description = "根据多个部门ID批量删除部门，ID之间用逗号分隔")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 批量删除成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("删除部门")
     @DeleteMapping
     public R remove(
@@ -269,12 +298,18 @@ public class DeptController extends BaseController {
      * @throws Exception 上传过程中可能出现的异常
      */
     @Operation(summary = "上传部门Logo", description = "上传部门Logo图片文件，支持常见图片格式，自动压缩至900x900以内")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "上传成功", content = @Content(schema = @Schema(type = "string"))),
-            @ApiResponse(responseCode = "200", description = "文件为空或格式错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 上传成功，data 字段包含Logo文件访问URL
+                - restCode=400: 文件为空或格式错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @SysLog("部门Logo上传")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R uploadFile(@Parameter(description = "Logo图片文件", required = true) @RequestParam("file") MultipartFile file)
@@ -311,12 +346,18 @@ public class DeptController extends BaseController {
      * @return 部门详细信息
      */
     @Operation(summary = "查询部门详情", description = "根据部门ID获取部门的详细信息")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeptEntity.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "部门不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 DeptEntity 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 部门不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/{id}")
     public R<DeptEntity> detail(@Parameter(description = "部门ID", required = true) @PathVariable String id) {
         DeptEntity entity = deptService.findById(id);

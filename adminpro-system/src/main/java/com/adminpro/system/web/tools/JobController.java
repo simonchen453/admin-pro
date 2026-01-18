@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
@@ -81,11 +80,17 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "分页查询定时任务列表", description = "支持按条件查询定时任务列表，返回分页结果")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "搜索条件", required = true, content = @Content(schema = @Schema(implementation = SearchForm.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<JobVo> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<JobVo>> paging(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -110,12 +115,18 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "创建定时任务", description = "创建新的定时任务，包含Bean名称、方法名、Cron表达式等配置")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "定时任务视图对象", required = true, content = @Content(schema = @Schema(implementation = JobVo.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "创建成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 创建成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R create(@RequestBody JobVo jobVo) {
         BeanUtil.beanAttributeValueTrim(jobVo);
@@ -144,13 +155,19 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "更新定时任务", description = "根据任务ID更新定时任务的配置信息")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "定时任务视图对象，必须包含ID字段", required = true, content = @Content(schema = @Schema(implementation = JobVo.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "更新成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "任务不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 更新成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 任务不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R update(@RequestBody JobVo jobVo) {
         BeanUtil.beanAttributeValueTrim(jobVo);
@@ -181,12 +198,18 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "删除定时任务", description = "支持批量删除定时任务，多个ID用逗号分隔")
     @Parameter(name = "ids", description = "任务ID列表，多个ID用逗号分隔", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 删除成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteMany(@RequestParam("ids") String ids) {
         try {
@@ -210,12 +233,18 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "获取定时任务详情", description = "根据任务ID查询定时任务的详细信息")
     @Parameter(name = "id", description = "任务ID", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = JobVo.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "任务不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 JobVo 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 任务不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/{id}")
     public R detail(@PathVariable String id) {
         ScheduleJobEntity entity = scheduleJobService.findById(id);
@@ -234,12 +263,18 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "立即执行定时任务", description = "立即执行指定的定时任务，支持批量执行")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "任务ID列表，多个ID用逗号分隔", required = true, content = @Content(schema = @Schema(type = "string")))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "执行成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 执行成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PatchMapping(value = "/run", produces = MediaType.APPLICATION_JSON_VALUE)
     public R run(@RequestBody String ids) {
         try {
@@ -264,12 +299,18 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "暂停定时任务", description = "暂停指定的定时任务，支持批量暂停")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "任务ID列表，多个ID用逗号分隔", required = true, content = @Content(schema = @Schema(type = "string")))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "暂停成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 暂停成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PatchMapping(value = "/pause", produces = MediaType.APPLICATION_JSON_VALUE)
     public R pause(@RequestBody String ids) {
         try {
@@ -294,12 +335,18 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "恢复定时任务", description = "恢复已暂停的定时任务，支持批量恢复")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "任务ID列表，多个ID用逗号分隔", required = true, content = @Content(schema = @Schema(type = "string")))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "恢复成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 恢复成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PatchMapping(value = "/resume", produces = MediaType.APPLICATION_JSON_VALUE)
     public R resume(@RequestBody String ids) {
         try {
@@ -324,11 +371,17 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "分页查询定时任务日志", description = "查询定时任务的执行日志列表，支持分页和条件筛选")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "搜索条件", required = true, content = @Content(schema = @Schema(implementation = SearchForm.class)))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<JobLogVo> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping(value = "/logs/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<JobLogVo>> logs(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
@@ -353,12 +406,18 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "删除定时任务日志", description = "支持批量删除定时任务日志，多个ID用逗号分隔")
     @Parameter(name = "ids", description = "日志ID列表，多个ID用逗号分隔", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 删除成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @DeleteMapping(value = "/logs", produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteManyLogs(@RequestParam("ids") String ids) {
         try {
@@ -380,11 +439,17 @@ public class JobController extends BaseController {
      * @return 操作结果，成功返回空数据，失败返回错误信息
      */
     @Operation(summary = "删除所有定时任务日志", description = "清空所有定时任务的执行日志")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 删除成功
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @DeleteMapping(value = "/logs/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteAllLogs() {
         try {
@@ -405,12 +470,18 @@ public class JobController extends BaseController {
      */
     @Operation(summary = "获取Cron表达式下次执行时间", description = "根据Cron表达式计算下一次执行的时间")
     @Parameter(name = "cronExpression", description = "Cron表达式", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "计算成功", content = @Content(schema = @Schema(implementation = Date.class))),
-            @ApiResponse(responseCode = "200", description = "Cron表达式格式错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 计算成功，data 字段包含 Date 对象
+                - restCode=400: Cron表达式格式错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(value = "/next-time", produces = MediaType.APPLICATION_JSON_VALUE)
     public R<Date> getNextValidTime() {
         String cronExpression = request.getParameter("cronExpression");

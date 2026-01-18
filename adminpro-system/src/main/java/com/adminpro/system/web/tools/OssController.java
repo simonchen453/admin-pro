@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -71,11 +70,17 @@ public class OssController extends BaseController {
      * @return 包含文件列表和分页信息的查询结果集
      */
     @Operation(summary = "分页查询文件列表", description = "查询对象存储服务中的文件列表，支持分页")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "查询成功", content = @Content(schema = @Schema(implementation = R.class))),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 QueryResultSet<ListOssVo> 列表
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R<QueryResultSet<ListOssVo>> paging(HttpServletRequest request) {
         SearchParam param = startPaging();
@@ -99,12 +104,18 @@ public class OssController extends BaseController {
     @Parameter(name = "batchId", description = "批量ID，用于文件分组管理", required = false, schema = @Schema(type = "string"))
     @Parameter(name = "single", description = "是否单文件模式，true时会删除同batchId的旧文件", required = false, schema = @Schema(type = "boolean"))
     @Parameter(name = "ext", description = "扩展信息", required = false, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "上传成功", content = @Content(schema = @Schema(implementation = OSSEntity.class))),
-            @ApiResponse(responseCode = "200", description = "上传失败，文件为空或格式错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 上传成功，data 字段包含 OSSEntity 对象
+                - restCode=400: 上传失败，文件为空或格式错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public R uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         if (file.isEmpty()) {
@@ -143,13 +154,19 @@ public class OssController extends BaseController {
      */
     @Operation(summary = "删除文件", description = "根据文件ID删除指定的文件")
     @Parameter(name = "id", description = "文件ID", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）"),
-            @ApiResponse(responseCode = "200", description = "文件不存在（restCode=404）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 删除成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=404: 文件不存在
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public R delete(@PathVariable String id) {
         OSSEntity entity = ossService.findById(id);
@@ -171,12 +188,18 @@ public class OssController extends BaseController {
      */
     @Operation(summary = "批量删除文件", description = "支持批量删除多个文件，多个ID用逗号分隔")
     @Parameter(name = "ids", description = "文件ID列表，多个ID用逗号分隔", required = true, schema = @Schema(type = "string"))
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "删除成功"),
-            @ApiResponse(responseCode = "200", description = "请求参数错误（restCode=400）"),
-            @ApiResponse(responseCode = "200", description = "未授权（restCode=401）"),
-            @ApiResponse(responseCode = "200", description = "无权限访问（restCode=403）")
-    })
+    @ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 删除成功
+                - restCode=400: 请求参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=403: 无权限访问
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @Transactional
     @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public R deleteMany(@RequestParam String ids) {

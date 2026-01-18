@@ -140,6 +140,10 @@ app:
     quartz:
         # Quartz 启动延迟时间（秒），默认 5 秒（从原来的 30 秒优化）
         startup-delay: ${APP_QUARTZ_STARTUP_DELAY:5}
+    # 第三方系统密码加密配置（需与 BaseConstants 中的键名匹配）
+    # 注意：这里使用扁平化配置，通过 app[third.party.pwd.encrypt] 语法
+    third.party.pwd.encrypt.enable: ${APP_THIRD_PARTY_ENCRYPT_ENABLED:false}
+    third.party.pwd.encrypt: ${APP_THIRD_PARTY_ENCRYPT_PWD:defaultKey123}
     # 安全配置 - 支持配置公开接口（无需认证）
     # 二次开发时可以在此添加自定义公开接口
     security:

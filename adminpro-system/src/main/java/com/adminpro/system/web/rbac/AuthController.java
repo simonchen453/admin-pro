@@ -31,7 +31,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
@@ -96,13 +95,17 @@ public class AuthController extends BaseController {
      */
     @SysLog("用户登录")
     @Operation(summary = "用户登录", description = "处理用户登录请求，支持用户名/邮箱/手机号登录，验证码验证。返回token、用户基本信息、权限信息等")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "登录成功（restCode=200）或业务失败（restCode=601表示参数错误，restCode=401表示认证失败）",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponse.class))
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 登录成功，data 字段包含 LoginResponse 对象
+                - restCode=401: 认证失败
+                - restCode=601: 参数错误或业务失败
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R<LoginResponse> login(HttpServletRequest request, @RequestBody LoginUserVo loginUserVo) {
         BeanUtil.beanAttributeValueTrim(loginUserVo);
@@ -212,13 +215,16 @@ public class AuthController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermission('system:common')")
     @Operation(summary = "获取当前登录用户信息", description = "根据当前登录token获取用户的详细信息，包括基本资料、部门信息等")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "查询成功（restCode=200）或用户未登录（restCode=401）",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserInfoResponseVo.class))
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 UserInfoResponseVo 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/userinfo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<UserInfoResponseVo> getUserInfo() {
         try {
@@ -273,13 +279,16 @@ public class AuthController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermission('system:common')")
     @Operation(summary = "获取密码规则", description = "获取系统当前配置的密码强度规则，包括长度、复杂度等要求")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "查询成功（restCode=200）或未授权（restCode=401）",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PasswordRuleVo.class))
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 查询成功，data 字段包含 PasswordRuleVo 对象
+                - restCode=401: 未授权，需要登录
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/password-rule", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<PasswordRuleVo> getPasswordRule() {
         try {
@@ -303,13 +312,17 @@ public class AuthController extends BaseController {
     @PreAuthorize("@ss.hasPermission('system:common')")
     @SysLog("更新个人资料")
     @Operation(summary = "更新个人资料", description = "允许当前登录用户更新自己的基本资料信息，包括真实姓名、手机号、邮箱、头像等")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "更新成功（restCode=200）或参数错误/用户不存在（restCode=601）",
-                    content = @Content(mediaType = "application/json")
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 更新成功
+                - restCode=400: 参数错误
+                - restCode=401: 未授权，需要登录
+                - restCode=500: 服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/profile", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public R updateProfile(@RequestBody UpdateProfileVo updateProfileVo) {
         try {
@@ -404,13 +417,15 @@ public class AuthController extends BaseController {
      */
     @SysLog("用户登出")
     @Operation(summary = "用户登出", description = "处理用户登出请求，清除session和token")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "登出成功（restCode=200）或登出失败（restCode=500）",
-                    content = @Content(mediaType = "application/json")
-            )
-    })
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+        responseCode = "200",
+        description = """
+                统一响应格式，通过 restCode 判断业务状态：
+                - restCode=200: 登出成功
+                - restCode=500: 登出失败或服务器内部错误
+                """,
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
+    )
     @RequestMapping(value = "/logout", method = { RequestMethod.POST,
             RequestMethod.GET }, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<String> logout() {

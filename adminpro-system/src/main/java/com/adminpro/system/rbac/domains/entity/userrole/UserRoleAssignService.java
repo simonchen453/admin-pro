@@ -3,7 +3,6 @@ package com.adminpro.system.rbac.domains.entity.userrole;
 import com.adminpro.framework.base.entity.BaseService;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,9 +12,8 @@ import java.util.List;
 @Service
 public class UserRoleAssignService extends BaseService<UserRoleAssignEntity, String> {
 
-    private UserRoleAssignDao dao;
+    private final UserRoleAssignDao dao;
 
-    @Autowired
     protected UserRoleAssignService(UserRoleAssignDao dao) {
         super(dao);
         this.dao = dao;

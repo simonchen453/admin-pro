@@ -8,18 +8,18 @@ import com.adminpro.system.rbac.domains.entity.dept.DeptService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.enums.UserStatus;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class UserCreateValidator extends BaseValidator<UserCreateVo> {
 
-    @Autowired
-    UserService userService;
+    private final UserService userService;
 
     @Override
     public void validate(UserCreateVo model, MessageBundle msgBundle) {

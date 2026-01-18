@@ -2,7 +2,7 @@ package com.adminpro.system.rbac.domains.entity.post;
 
 import com.adminpro.framework.base.message.MessageBundle;
 import com.adminpro.framework.base.validator.BaseValidator;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
  * @date 2020-05-21
  */
 @Component
+@RequiredArgsConstructor
 public class PostCreateValidator extends BaseValidator<PostEntity> {
 
-    @Autowired
-    private PostService postService;
+    private final PostService postService;
 
     /**
      * 校验创建职位

@@ -4,7 +4,6 @@ import com.adminpro.framework.base.entity.BaseService;
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,9 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuditLogService extends BaseService<AuditLogEntity, String> {
 
-    private AuditLogDao dao;
+    private final AuditLogDao dao;
 
-    @Autowired
     public AuditLogService(AuditLogDao dao) {
         super(dao);
         this.dao = dao;

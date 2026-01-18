@@ -1,0 +1,329 @@
+/* 
+ * Swagger UI Custom Theme - Tech Glass
+ * 科技感玻璃态主题，匹配 Admin Pro 风格
+ */
+
+:root {
+  --tech-primary: #6366f1;
+  --tech-secondary: #8b5cf6;
+  --tech-accent: #06b6d4;
+  --tech-bg: #f8fafc;
+  --tech-surface: rgba(255, 255, 255, 0.85);
+  --tech-border: rgba(99, 102, 241, 0.2);
+  --tech-glow: 0 0 10px rgba(99, 102, 241, 0.2);
+  --tech-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --tech-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ========================================
+   全局布局与背景
+   ======================================== */
+
+.swagger-ui {
+  font-family: var(--tech-font) !important;
+  color: #1e293b !important;
+}
+
+/* 科技感网格背景 */
+.swagger-ui .wrapper {
+  padding: 0 !important;
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  border-radius: 16px;
+}
+
+/* ========================================
+   头部信息区域
+   ======================================== */
+
+.swagger-ui .info {
+  margin: 24px 0 32px !important;
+  padding: 24px !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
+  border-radius: 12px;
+  border: 1px solid var(--tech-border);
+  box-shadow: var(--tech-glow);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 装饰性左侧光条 */
+.swagger-ui .info::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, var(--tech-primary), var(--tech-secondary));
+}
+
+.swagger-ui .info .title {
+  font-family: var(--tech-font) !important;
+  font-size: 32px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  letter-spacing: -1px !important;
+  text-transform: uppercase;
+}
+
+.swagger-ui .info .title small.version-stamp {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border: 1px solid rgba(99, 102, 241, 0.3) !important;
+  color: var(--tech-primary) !important;
+  border-radius: 4px !important;
+  padding: 2px 8px !important;
+  font-family: var(--tech-mono) !important;
+  font-size: 11px !important;
+  top: -4px !important;
+  position: relative !important;
+}
+
+/* ========================================
+   Operation Tag (分组)
+   ======================================== */
+
+.swagger-ui .opblock-tag {
+  border-bottom: 1px solid var(--tech-border) !important;
+  margin: 0 !important;
+  padding: 20px 24px !important;
+  transition: all 0.3s ease;
+}
+
+.swagger-ui .opblock-tag:hover {
+  background: rgba(99, 102, 241, 0.02) !important;
+}
+
+.swagger-ui .opblock-tag-section {
+  background: transparent !important;
+}
+
+.swagger-ui .opblock-tag a {
+  font-family: var(--tech-font) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #334155 !important;
+}
+
+.swagger-ui .opblock-tag small {
+  font-family: var(--tech-mono) !important;
+  color: #94a3b8 !important;
+}
+
+/* ========================================
+   Operation Block (API 条目)
+   ======================================== */
+
+.swagger-ui .opblock {
+  margin: 0 0 12px !important;
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+  background: white !important;
+  transition: all 0.2s ease !important;
+}
+
+.swagger-ui .opblock:hover {
+  transform: translateX(4px);
+  box-shadow: 4px 4px 12px rgba(99, 102, 241, 0.1) !important;
+}
+
+.swagger-ui .opblock .opblock-summary {
+  padding: 12px 16px !important;
+  border-left: 4px solid transparent;
+}
+
+.swagger-ui .opblock .opblock-summary-method {
+  min-width: 70px !important;
+  padding: 6px 0 !important;
+  text-align: center !important;
+  border-radius: 4px !important;
+  font-family: var(--tech-mono) !important;
+  font-weight: 800 !important;
+  font-size: 12px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.swagger-ui .opblock .opblock-summary-path {
+  font-family: var(--tech-mono) !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+}
+
+/* 方法特定样式 - 科技感霓虹色 */
+
+/* GET */
+.swagger-ui .opblock.opblock-get {
+  background: rgba(239, 246, 255, 0.5) !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+}
+
+.swagger-ui .opblock.opblock-get .opblock-summary {
+  border-left-color: #3b82f6 !important;
+}
+
+.swagger-ui .opblock.opblock-get .opblock-summary-method {
+  background: #3b82f6 !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+/* POST */
+.swagger-ui .opblock.opblock-post {
+  background: rgba(245, 243, 255, 0.5) !important;
+  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+}
+
+.swagger-ui .opblock.opblock-post .opblock-summary {
+  border-left-color: #6366f1 !important;
+}
+
+.swagger-ui .opblock.opblock-post .opblock-summary-method {
+  background: #6366f1 !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+/* PUT */
+.swagger-ui .opblock.opblock-put {
+  background: rgba(255, 251, 235, 0.5) !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+}
+
+.swagger-ui .opblock.opblock-put .opblock-summary {
+  border-left-color: #f59e0b !important;
+}
+
+.swagger-ui .opblock.opblock-put .opblock-summary-method {
+  background: #f59e0b !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+/* DELETE */
+.swagger-ui .opblock.opblock-delete {
+  background: rgba(254, 242, 242, 0.5) !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+}
+
+.swagger-ui .opblock.opblock-delete .opblock-summary {
+  border-left-color: #ef4444 !important;
+}
+
+.swagger-ui .opblock.opblock-delete .opblock-summary-method {
+  background: #ef4444 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* ========================================
+   按钮与交互元素
+   ======================================== */
+
+.swagger-ui .btn {
+  font-family: var(--tech-font) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  border-radius: 6px !important;
+}
+
+.swagger-ui .btn.authorize {
+  background: white !important;
+  border: 1px solid var(--tech-primary) !important;
+  color: var(--tech-primary) !important;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.1) !important;
+}
+
+.swagger-ui .btn.authorize:hover {
+  background: var(--tech-primary) !important;
+  color: white !important;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4) !important;
+}
+
+.swagger-ui .btn.execute {
+  background: linear-gradient(135deg, var(--tech-primary) 0%, var(--tech-secondary) 100%) !important;
+  color: white !important;
+  border: none !important;
+  width: 100%;
+  padding: 10px !important;
+  font-weight: 700 !important;
+}
+
+.swagger-ui .btn.execute:hover {
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   Schema / Model
+   ======================================== */
+
+.swagger-ui section.models {
+  border: 1px solid var(--tech-border) !important;
+  border-radius: 12px !important;
+  margin-top: 32px !important;
+  box-shadow: var(--tech-glow) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.swagger-ui section.models h4 {
+  font-family: var(--tech-font) !important;
+  font-size: 18px !important;
+  color: #334155 !important;
+  border-bottom: 1px solid var(--tech-border) !important;
+  background: rgba(248, 250, 252, 0.5) !important;
+}
+
+.swagger-ui .model-box {
+  font-family: var(--tech-mono) !important;
+  font-size: 12px !important;
+}
+
+.swagger-ui .model-title {
+  color: #475569 !important;
+}
+
+.swagger-ui .prop-type {
+  color: var(--tech-secondary) !important;
+}
+
+/* ========================================
+   其他细节优化
+   ======================================== */
+
+/* 代码块 */
+.swagger-ui .highlight-code {
+  background: #0f172a !important;
+  /* Dark Slate 900 */
+  border: 1px solid #334155 !important;
+  border-radius: 8px !important;
+}
+
+.swagger-ui .highlight-code pre {
+  font-family: var(--tech-mono) !important;
+}
+
+/* 表单输入 */
+.swagger-ui input,
+.swagger-ui select,
+.swagger-ui textarea {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  transition: all 0.2s;
+}
+
+.swagger-ui input:focus,
+.swagger-ui select:focus,
+.swagger-ui textarea:focus {
+  border-color: var(--tech-primary) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+  background: white !important;
+}
+
+/* ========================================
+   Loading 状态修复 (已改用 React 自定义 Loading，隐藏原生)
+   ======================================== */
+
+.swagger-ui .loading-container {
+  display: none !important;
+}

@@ -58,11 +58,12 @@
 
 
     <!-- JWT Access Token 缓存 (白名单) - 内存+磁盘持久化 -->
+    <!-- TTL 设置为 15 分钟，与 Web 端 Access Token 最短有效期一致 -->
     <cache alias="jwt:access_token">
         <key-type>java.lang.String</key-type>
         <value-type>java.lang.String</value-type>
         <expiry>
-            <ttl unit="minutes">30</ttl>
+            <ttl unit="minutes">15</ttl>
         </expiry>
         <resources>
             <heap unit="entries">10000</heap>

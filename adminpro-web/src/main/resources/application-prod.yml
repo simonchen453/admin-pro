@@ -5,6 +5,9 @@ app:
       sql: false
   cors:
     allowed-origins: ${APP_CORS_ORIGINS:http://localhost:8080,http://localhost:3000,http://localhost:5173}
+  jwt:
+    # 生产环境标识
+    production: true
 
 logging:
   config: classpath:logback/logback-prod.xml

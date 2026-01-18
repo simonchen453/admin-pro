@@ -558,15 +558,30 @@ public class LoginHelper {
             try {
                 if (jwtTokenProvider.validateToken(jwt)) {
                     String jti = jwtTokenProvider.getJti(jwt);
-                    // 移除 AccessToken 白名单
-                    AppCache.getInstance()
-                            .delete(com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE, jti);
+
+                    // 从白名单获取 userId
+                    String userId = AppCache.getInstance().get(
+                            com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE,
+                            jti,
+                            String.class
+                    );
+
+                    // 移除 Access Token 白名单
+                    AppCache.getInstance().delete(
+                            com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE,
+                            jti
+                    );
+
+                    // 如果找到了 userId，清除该用户的所有 Refresh Token（单点登出）
+                    if (StringUtils.isNotBlank(userId)) {
+                        com.adminpro.system.core.security.jwt.RefreshTokenService rtService =
+                                SpringUtil.getBean(com.adminpro.system.core.security.jwt.RefreshTokenService.class);
+                        int revokedCount = rtService.revokeAllUserTokens(userId);
+                        logger.info("用户 {} 登出，已清除 {} 个 Refresh Token", userId, revokedCount);
+                    }
+
                     // 清除 SecurityContext
                     SecurityContextHolder.clearContext();
-                    // 这里可以进一步根据 jti 查找并注销 Refresh Token (需在 UserDevice 表中查询)
-                    // UserDeviceEntity device = userDeviceDao.findByRefreshTokenJti(...); //
-                    // AT不含RT信息
-                    // 暂不强制注销 RT，只移除 AT。用户需重新登录。
                     return true;
                 }
             } catch (Exception e) {
@@ -752,11 +767,12 @@ public class LoginHelper {
 
         String accessToken = jwtTokenProvider.createAccessToken(userDetails.getUserId(), claims);
 
-        // 3. 存入 Access Token 白名单
+        // 3. 存入 Access Token 白名单（使用与 JWT 一致的过期时间）
         String jti = jwtTokenProvider.getJti(accessToken);
-        // 注意：Ehcache key 是 jti，value 是 userId
+        int accessTokenValidity = jwtProperties.getAccessTokenValidity(platform);
+        // Ehcache key 是 jti，value 是 userId，expire 是过期时间（秒）
         AppCache.getInstance().set(com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE, jti,
-                userDetails.getUserId());
+                userDetails.getUserId(), accessTokenValidity);
 
         // 4. 生成 Refresh Token
         // 4. 生成 Refresh Token
@@ -766,17 +782,20 @@ public class LoginHelper {
         rtData.setLoginName(userDetails.getLoginName());
         rtData.setPlatform(platform);
 
-        // 简单处理：Web端目前没有明确的DeviceId，使用SessionID或固定值，这里暂用 UUID
-        String deviceId = UUID.randomUUID().toString();
-        rtData.setDeviceId(deviceId);
-        rtData.setDeviceName(device != null ? device.toString() : "Web Client");
-
-        // 获取 IP 和 UA
+        // 使用设备指纹生成稳定的 deviceId（同一设备多次登录相同）
         HttpServletRequest request = WebHelper.getHttpRequest();
-        if (request != null) {
-            rtData.setIp(IpUtils.getIpAddr(request));
-            rtData.setUserAgent(request.getHeader("User-Agent"));
-        }
+        com.adminpro.system.core.security.jwt.DeviceFingerprintService fingerprintService =
+            SpringUtil.getBean(com.adminpro.system.core.security.jwt.DeviceFingerprintService.class);
+
+        String deviceId = fingerprintService.generateFingerprint(request);
+        String deviceName = fingerprintService.generateDeviceName(request);
+        String ip = IpUtils.getIpAddr(request);
+        String userAgent = request.getHeader("User-Agent");
+
+        rtData.setDeviceId(deviceId);
+        rtData.setDeviceName(deviceName);
+        rtData.setIp(ip);
+        rtData.setUserAgent(userAgent);
         rtData.setCreatedAt(java.time.LocalDateTime.now());
         rtData.setLastUsedAt(java.time.LocalDateTime.now());
         rtData.setRememberMe(rememberMe);
@@ -856,10 +875,11 @@ public class LoginHelper {
 
         String accessToken = jwtTokenProvider.createAccessToken(userDetails.getUserId(), claims);
 
-        // 5. 存入 Access Token 白名单
+        // 5. 存入 Access Token 白名单（使用与 JWT 一致的过期时间）
         String jti = jwtTokenProvider.getJti(accessToken);
+        int accessTokenValidity = jwtProperties.getAccessTokenValidity(platform);
         AppCache.getInstance().set(com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE, jti,
-                userDetails.getUserId());
+                userDetails.getUserId(), accessTokenValidity);
 
         return com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse.builder()
                 .accessToken(accessToken)

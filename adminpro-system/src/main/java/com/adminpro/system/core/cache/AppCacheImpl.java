@@ -1,8 +1,13 @@
 package com.adminpro.system.core.cache;
 
+import lombok.extern.slf4j.Slf4j;
+import org.ehcache.core.Ehcache;
+import org.ehcache.expiry.Duration;
+import org.ehcache.expiry.Expiry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.jcache.JCacheCache;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,9 +16,10 @@ import org.springframework.stereotype.Component;
  * - simple: 简单内存缓存
  * - redis: Redis 缓存
  * - jcache: EhCache 3.x 缓存（通过 JCache 标准）
- * 
+ *
  * Spring Boot 会根据 spring.cache.type 自动创建对应的 CacheManager
  */
+@Slf4j
 @Component
 public class AppCacheImpl extends AppCache {
 
@@ -50,12 +56,14 @@ public class AppCacheImpl extends AppCache {
     @Override
     public void set(String cacheName, String key, Object value, Integer expire) {
         Cache cache = getCache(cacheName);
-        
+
         // 如果指定了过期时间
         if (expire != null && expire > 0) {
-            // RedisCache 支持在配置时设置过期时间，动态设置需要直接操作 RedisTemplate
-            // 对于 Simple 和 EhCache，过期时间由配置控制
-            // 这里统一使用 put 方法，过期时间由各自的配置决定
+            // 注意：Ehcache 通过配置文件管理 TTL，不支持运行时动态设置单个 entry 的过期时间
+            // 这里的 expire 参数仅用于文档说明和未来扩展（如 Redis 模式）
+            // 实际过期时间由 ehcache.xml 中的 TTL 配置决定
+            log.debug("设置缓存（期望 TTL: {} 秒，实际以配置为准）: cache={}, key={}",
+                expire, cacheName, key);
             cache.put(key, value);
         } else {
             // 未指定过期时间，使用默认行为

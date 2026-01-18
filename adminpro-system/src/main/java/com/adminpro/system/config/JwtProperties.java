@@ -1,6 +1,8 @@
 package com.adminpro.system.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,7 @@ import java.util.Map;
  * @author adminpro
  * @since 1.0.0
  */
+@Slf4j
 @Data
 @Component
 @ConfigurationProperties(prefix = "app.jwt")
@@ -79,6 +82,45 @@ public class JwtProperties {
      * 是否检测 Token 重放攻击
      */
     private boolean detectTokenReuse = true;
+
+    /**
+     * 生产环境标识（用于判断是否为生产环境）
+     */
+    private boolean production = false;
+
+    /**
+     * 初始化后验证密钥安全性
+     */
+    @PostConstruct
+    public void validateSecret() {
+        if (secret == null || secret.trim().isEmpty()) {
+            throw new IllegalStateException("JWT 密钥不能为空，请通过环境变量 JWT_SECRET 配置");
+        }
+
+        // 检查是否使用了默认的开发密钥
+        if (secret.contains("dev-only")) {
+            if (production) {
+                throw new IllegalStateException(
+                        "生产环境不能使用默认的开发密钥！请通过环境变量 JWT_SECRET 配置安全的密钥。\n" +
+                                "生成方式：openssl rand -base64 32"
+                );
+            } else {
+                log.warn("⚠️ 使用开发环境默认密钥，生产环境请通过环境变量 JWT_SECRET 配置安全密钥！");
+            }
+        }
+
+        // 验证密钥长度（HS256 算法要求至少 256 位 = 32 字节）
+        // 如果是 Base64 编码，解码后长度应该 >= 32
+        int keyLength = secret.length();
+        if (keyLength < 32) {
+            throw new IllegalStateException(
+                    String.format("JWT 密钥长度不足！当前: %d 字符，要求至少 32 字符（256 位）\n" +
+                                    "生成方式：openssl rand -base64 32", keyLength)
+            );
+        }
+
+        log.info("JWT 密钥验证通过，长度: {} 字符，算法: {}", keyLength, algorithm);
+    }
 
     /**
      * 获取指定平台 Access Token 有效期

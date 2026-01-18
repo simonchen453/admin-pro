@@ -6,10 +6,13 @@ import { loginApi, logoutApi } from '../api/auth';
 interface AuthState {
     isAuthenticated: boolean;
     currentUser: User | null;
+    accessToken: string | null;
+    refreshToken: string | null;
     login: (loginData: LoginRequest) => Promise<void>;
     logout: () => Promise<void>;
     clearAuth: () => void;
     updateCurrentUser: (user: User) => void;
+    getAccessToken: () => string | null;
 }
 
 interface UserState {
@@ -25,28 +28,40 @@ interface UserState {
 
 export const useAuthStore = create<AuthState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             isAuthenticated: false,
             currentUser: null,
+            accessToken: null,
+            refreshToken: null,
             login: async (loginData: LoginRequest) => {
                 try {
                     const response = await loginApi(loginData);
+                    // JWT 登录响应包含 accessToken 和 refreshToken
+                    // 检查响应结构（可能是直接返回或在 data 字段中）
+                    const tokenData = (response as any).data || response;
+
                     // Map LoginResponse to User object
+                    const userInfo = tokenData.user || tokenData;
                     const user: User = {
-                        loginName: response.userId,
-                        realName: response.realName,
-                        name: response.realName || response.userId,
-                        avatarUrl: response.avatarUrl,
-                        mobileNo: response.mobileNo,
-                        userDomain: response.domain,
-                        id: response.id,
+                        loginName: userInfo.loginName || userInfo.userId,
+                        realName: userInfo.realName,
+                        name: userInfo.realName || userInfo.loginName || userInfo.userId,
+                        avatarUrl: userInfo.avatarUrl,
+                        mobileNo: userInfo.mobileNo,
+                        userDomain: userInfo.userDomain || (response as any).domain,
+                        id: userInfo.id || (response as any).id,
                         status: 'active'
                     };
 
-                    // session认证不需要存储token，后端会设置session cookie
+                    // 存储 JWT Tokens
+                    const accessToken = tokenData.accessToken || null;
+                    const refreshToken = tokenData.refreshToken || null;
+
                     set({
                         isAuthenticated: true,
-                        currentUser: user
+                        currentUser: user,
+                        accessToken,
+                        refreshToken
                     });
                 } catch (error) {
                     console.error('登录失败:', error);
@@ -62,25 +77,34 @@ export const useAuthStore = create<AuthState>()(
                     // 无论登出API是否成功，都清除本地状态
                     set({
                         isAuthenticated: false,
-                        currentUser: null
+                        currentUser: null,
+                        accessToken: null,
+                        refreshToken: null
                     });
                 }
             },
             clearAuth: () => {
                 set({
                     isAuthenticated: false,
-                    currentUser: null
+                    currentUser: null,
+                    accessToken: null,
+                    refreshToken: null
                 });
             },
             updateCurrentUser: (user: User) => {
                 set({ currentUser: user });
+            },
+            getAccessToken: () => {
+                return get().accessToken;
             }
         }),
         {
             name: 'auth-storage',
             partialize: (state) => ({
                 currentUser: state.currentUser,
-                isAuthenticated: state.isAuthenticated
+                isAuthenticated: state.isAuthenticated,
+                accessToken: state.accessToken,
+                refreshToken: state.refreshToken
             }),
         }
     )

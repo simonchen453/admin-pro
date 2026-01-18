@@ -67,8 +67,17 @@ const handleAuthFailure = (msg: string = '会话已过期，请重新登录', sh
 // 请求拦截器
 request.interceptors.request.use(
     (config) => {
-        // 使用session认证，浏览器会自动发送cookie
-        // 设置withCredentials确保cookie被发送
+        // 使用 JWT 认证：从 store 获取 accessToken 并添加到请求头
+        try {
+            const { accessToken } = useAuthStore.getState();
+            if (accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
+            }
+        } catch {
+            // 忽略错误（store 可能未初始化）
+        }
+
+        // 保持 withCredentials 用于 cookie 传递（如有需要）
         config.withCredentials = true;
         return config;
     },

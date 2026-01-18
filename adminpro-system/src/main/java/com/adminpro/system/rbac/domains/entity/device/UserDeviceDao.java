@@ -117,6 +117,16 @@ public class UserDeviceDao extends BaseDao<UserDeviceEntity, String> {
         execute(insert);
     }
 
+    /**
+     * 统计活跃设备数
+     */
+    public long countActiveDevices() {
+        SelectBuilder<UserDeviceEntity> select = new SelectBuilder<>(getRowMapper());
+        select.setTable(UserDeviceEntity.TABLE_NAME);
+        select.addWhereAnd(UserDeviceEntity.COL_IS_ACTIVE + EQ, 1);
+        return count(select);
+    }
+
     protected RowMapper<UserDeviceEntity> getRowMapper() {
         return new RowMapper<UserDeviceEntity>() {
             @Override

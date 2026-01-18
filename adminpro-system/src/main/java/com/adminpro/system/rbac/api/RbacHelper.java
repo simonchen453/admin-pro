@@ -7,6 +7,8 @@ import com.adminpro.system.rbac.domains.entity.domain.DomainService;
 import com.adminpro.system.rbac.domains.entity.domain.UserDomainEnvEntity;
 import com.adminpro.system.rbac.domains.entity.domain.UserDomainEnvService;
 import com.adminpro.system.rbac.domains.entity.menu.MenuService;
+import com.adminpro.system.rbac.domains.entity.user.UserEntity;
+import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.domains.entity.userrole.UserRoleAssignEntity;
 import com.adminpro.system.rbac.domains.entity.userrole.UserRoleAssignService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +60,11 @@ public class RbacHelper {
     @Autowired
     private DomainService domainService;
 
+    @Autowired
+    private UserService userService;
+
     /**
-     * 获取用户在指定域下可访问的所有权限编号
+     * 获取用户可访问的所有权限编号
      * <p>
      * 该方法首先获取用户的所有角色ID（包括域通用角色和用户分配的角色），
      * 然后根据这些角色ID查询所有可访问的权限编号
@@ -71,14 +76,13 @@ public class RbacHelper {
      * <li>动态菜单生成</li>
      * </ul>
      *
-     * @param userId     用户ID，不能为空
-     * @param userDomain 用户域，不能为空
+     * @param userId 用户ID（全局唯一主键），不能为空
      * @return 用户可访问的权限编号数组，如果用户没有任何权限则返回空数组
      */
-    public String[] getAccessibleAllPermissionsByUser(String userId, String userDomain) {
+    public String[] getAccessibleAllPermissionsByUser(String userId) {
         List<String> privilegeNos = new ArrayList<>();
 
-        String[] roleIds = getAccessibleRoleIds(userId, userDomain);
+        String[] roleIds = getAccessibleRoleIds(userId);
         List<String> ps = getAccessiblePermissionsByRoles(roleIds);
         for (int i = 0; i < ps.size(); i++) {
             privilegeNos.add(ps.get(i));
@@ -87,9 +91,9 @@ public class RbacHelper {
     }
 
     /**
-     * 获取用户在指定域下可访问的角色ID数组
+     * 获取用户可访问的角色ID数组
      * <p>
-     * 该方法返回用户在指定域下的所有角色ID，包括：
+     * 该方法返回用户的所有角色ID，包括：
      * <ul>
      * <li>域的通用角色（如果配置了）：所有在该域下的用户自动拥有的角色</li>
      * <li>用户分配的角色：显式分配给该用户的角色</li>
@@ -102,22 +106,32 @@ public class RbacHelper {
      * <li>数据权限控制</li>
      * </ul>
      *
-     * @param userId     用户ID，不能为空
-     * @param userDomain 用户域，不能为空
+     * @param userId 用户ID（全局唯一主键），不能为空
      * @return 角色ID数组，包含域通用角色和用户分配的角色
      */
-    public String[] getAccessibleRoleIds(String userId, String userDomain) {
+    public String[] getAccessibleRoleIds(String userId) {
+        // 通过 userId 获取用户信息，从中获取 userDomain
+        UserEntity user = userService.findById(userId);
+        if (user == null) {
+            return new String[0];
+        }
+
         List<UserRoleAssignEntity> list = userRoleAssignService.findByUserId(userId);
         List<String> result = new ArrayList<String>();
-        UserDomainEnvEntity domainEnvEntity = UserDomainEnvService.getInstance().findByUserDomain(userDomain);
+
+        // 添加域的通用角色
+        UserDomainEnvEntity domainEnvEntity = UserDomainEnvService.getInstance()
+                .findByUserDomain(user.getUserDomain());
         if (domainEnvEntity != null && StringHelper.isNotEmpty(domainEnvEntity.getCommonRole())) {
-            com.adminpro.system.rbac.domains.entity.role.RoleEntity roleEntity = com.adminpro.system.rbac.domains.entity.role.RoleService
+            com.adminpro.system.rbac.domains.entity.role.RoleEntity roleEntity =
+                    com.adminpro.system.rbac.domains.entity.role.RoleService
                     .getInstance().findByName(domainEnvEntity.getCommonRole());
             if (roleEntity != null) {
                 result.add(roleEntity.getId());
             }
         }
 
+        // 添加用户分配的角色
         for (int i = 0; i < list.size(); i++) {
             result.add(list.get(i).getRoleId());
         }

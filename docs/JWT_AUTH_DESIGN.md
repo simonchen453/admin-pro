@@ -75,6 +75,39 @@
 | 验证码存储 | HttpSession | Ehcache |
 | 认证过滤器 | AuthenticationFilter | JwtAuthenticationFilter |
 
+
+### 2.3 刷新 Token 流程 (Token Rotation)
+
+每次刷新时，旧的 Refresh Token 会失效，系统签发新的一对 Token。
+
+```mermaid
+sequenceDiagram
+    participant C as Client (Web/App)
+    participant F as Filter
+    participant H as LoginHelper
+    participant S as RefreshTokenService
+    participant DB as DB/Cache
+
+    Note over C: Access Token Expired
+    C->>F: POST /refresh (Cookie: refreshToken=rt_old)
+    F->>H: Invoke refreshJwt(rt_old)
+    H->>S: validateRefreshToken(rt_old)
+    S->>DB: Check Cache & Device Status
+    
+    opt Invalid / Revoked
+        S-->>C: 401 Unauthorized
+    end
+
+    Note right of S: Critical: Rotate Token
+    S->>DB: Delete rt_old (Revoke)
+    S->>DB: Generate rt_new & Update Device Record
+    S-->>H: Return rt_new
+
+    H->>DB: Save new AccessToken to Whitelist (jti)
+    H-->>C: 200 OK
+    Note right of C: Body: {accessToken: ...}<br/>Cookie: refreshToken=rt_new
+```
+
 ---
 
 ## 3. Token 设计

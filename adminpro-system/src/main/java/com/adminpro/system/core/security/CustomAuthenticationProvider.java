@@ -85,7 +85,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         LoginUser authUser = (LoginUser) userDetailsService.loadUserByUsername(name);
         if (null != authUser) {
             String userDomain = authUser.getUserDomain();
-            String loginName = authUser.getUsername();
+            String loginName = authUser.getLoginName();
 
             String token = UserService.getInstance().authLogin(userDomain, loginName, password);
             if (StringUtils.isNotEmpty(token)) {

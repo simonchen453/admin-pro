@@ -517,7 +517,7 @@ INSERT INTO `sys_menu_tbl` VALUES ('1268895694639468544', 'M_DEPT', '部门管�
 INSERT INTO `sys_menu_tbl` VALUES ('1268895982188367872', 'M_POST', '岗位管理', '1268893422756958208', 7, '/admin/post', 0, 'C', 'show', 'active', 'system:post', 'IdcardOutlined', NULL, '', '2020-06-05 21:22:32', 'system', '2020-06-19 23:37:01');
 INSERT INTO `sys_menu_tbl` VALUES ('1268896596561629184', 'M_CONFIG', '参数配置', '1268893422756958208', 9, '/admin/config', 0, 'C', 'show', 'active', 'system:config', 'SlidersOutlined', NULL, '', '2020-06-05 21:24:58', 'system', '2020-06-20 13:27:13');
 INSERT INTO `sys_menu_tbl` VALUES ('1268897921470959616', 'C_SYS_MONITOR', '系统监控', '0', 3, NULL, 0, 'M', 'show', 'active', NULL, 'DesktopOutlined', NULL, '', '2020-06-05 21:30:14', 'system', '2020-06-20 13:25:02');
-INSERT INTO `sys_menu_tbl` VALUES ('1268898167819210752', 'M_USER_SESSION', '在线用户', '1268897921470959616', 1, '/admin/session', 0, 'C', 'show', 'active', 'system:session', 'WifiOutlined', NULL, '', '2020-06-05 21:31:13', 'system', '2020-06-19 23:53:56');
+
 INSERT INTO `sys_menu_tbl` VALUES ('1268898457960189952', 'M_JOB', '定时任务', '1268897921470959616', 2, '/admin/job', 0, 'C', 'show', 'active', 'system:job', 'ClockCircleOutlined', NULL, '', '2020-06-05 21:32:22', 'system', '2020-06-19 23:39:25');
 INSERT INTO `sys_menu_tbl` VALUES ('1268898639556775936', 'M_SERVER', '服务监控', '1268897921470959616', 3, '/admin/server', 0, 'C', 'show', 'active', 'system:server', 'DatabaseOutlined', NULL, '', '2020-06-05 21:33:05', 'system', '2020-06-19 23:38:40');
 INSERT INTO `sys_menu_tbl` VALUES ('1268898849364250624', 'C_TOOLS', '系统工具', '0', 4, NULL, 0, 'M', 'show', 'active', NULL, 'ToolOutlined', NULL, '', '2020-06-05 21:33:55', 'system', '2020-06-20 13:23:45');
@@ -589,7 +589,7 @@ INSERT INTO `sys_role_menu_assign_tbl` (`col_id`, `col_role_id`, `col_menu_id`, 
 INSERT INTO `sys_role_menu_assign_tbl` (`col_id`, `col_role_id`, `col_menu_id`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) VALUES ('1272546672278376448', '1271976532176543745', '1268895982188367872', '', '2020-06-15 23:09:04', '', '2020-06-15 23:09:04');
 INSERT INTO `sys_role_menu_assign_tbl` (`col_id`, `col_role_id`, `col_menu_id`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) VALUES ('1272546672278376450', '1271976532176543745', '1268896596561629184', '', '2020-06-15 23:09:04', '', '2020-06-15 23:09:04');
 INSERT INTO `sys_role_menu_assign_tbl` (`col_id`, `col_role_id`, `col_menu_id`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) VALUES ('1272546672282570752', '1271976532176543745', '1268897921470959616', '', '2020-06-15 23:09:04', '', '2020-06-15 23:09:04');
-INSERT INTO `sys_role_menu_assign_tbl` (`col_id`, `col_role_id`, `col_menu_id`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) VALUES ('1272546672282570753', '1271976532176543745', '1268898167819210752', '', '2020-06-15 23:09:04', '', '2020-06-15 23:09:04');
+
 INSERT INTO `sys_role_menu_assign_tbl` (`col_id`, `col_role_id`, `col_menu_id`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) VALUES ('1272546672282570754', '1271976532176543745', '1268898457960189952', '', '2020-06-15 23:09:04', '', '2020-06-15 23:09:04');
 INSERT INTO `sys_role_menu_assign_tbl` (`col_id`, `col_role_id`, `col_menu_id`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) VALUES ('1272546672286765056', '1271976532176543745', '1268898639556775936', '', '2020-06-15 23:09:04', '', '2020-06-15 23:09:04');
 INSERT INTO `sys_role_menu_assign_tbl` (`col_id`, `col_role_id`, `col_menu_id`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) VALUES ('1272546672286765057', '1271976532176543745', '1268898849364250624', '', '2020-06-15 23:09:04', '', '2020-06-15 23:09:04');
@@ -770,4 +770,20 @@ ALTER TABLE user_device DROP COLUMN os;
 ALTER TABLE user_device DROP COLUMN browser;
 ALTER TABLE user_device CHANGE ip last_ip VARCHAR(64) COMMENT '最后登录IP';
 ALTER TABLE user_device ADD COLUMN last_user_agent VARCHAR(500) COMMENT 'User Agent' AFTER last_ip;
+
+
+-- changeset simon:202601182245
+-- 1. 新增“设备管理”菜单 (挂载在“工作空间”下，ID: 1274338663366529024)
+-- 使用新ID: 1845327703742484490
+INSERT INTO `sys_menu_tbl` 
+(`col_id`, `col_name`, `col_display`, `col_parent_id`, `col_order_num`, `col_url`, `col_is_frame`, `col_type`, `col_visible`, `col_status`, `col_permission`, `col_icon`, `col_remark`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) 
+VALUES 
+('1845327703742484490', 'M_DEVICE_MGR', '设备管理', '1274338663366529024', 4, '/account/devices', 0, 'C', 'show', 'active', NULL, 'MobileOutlined', NULL, 'system', NOW(), 'system', NOW());
+
+-- 2. 分配权限给“系统用户公共角色” (SYS_COMMON_ROLE, ID: 1272436037200777216)
+-- 使用新ID: 1845327703742484491
+INSERT INTO `sys_role_menu_assign_tbl` 
+(`col_id`, `col_role_id`, `col_menu_id`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) 
+VALUES 
+('1845327703742484491', '1272436037200777216', '1845327703742484490', 'system', NOW(), 'system', NOW());
 

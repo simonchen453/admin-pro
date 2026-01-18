@@ -109,7 +109,13 @@ public class RestControllerLogAspect {
             if (StringUtils.isNotEmpty(userEntity.getDisplay())) {
                 loggerDebug.debug("[" + id + "] " + "user name: " + userEntity.getDisplay());
             }
-            loggerDebug.debug("[" + id + "] " + "token: " + LoginHelper.getInstance().getAuthToken());
+            // 记录 JWT Token（脱敏处理，只显示前10个字符）
+            String authHeader = request.getHeader("Authorization");
+            if (StringUtils.isNotEmpty(authHeader) && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                String maskedToken = token.length() > 10 ? token.substring(0, 10) + "..." : token;
+                loggerDebug.debug("[" + id + "] " + "jwt: " + maskedToken);
+            }
         }
         if (result != null) {
             try {

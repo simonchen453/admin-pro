@@ -28,10 +28,10 @@ public class DeviceFingerprintService {
      * 用于生成指纹的 HTTP 头（按优先级排序）
      */
     private static final List<String> FINGERPRINT_HEADERS = Arrays.asList(
-            "User-Agent",           // 浏览器/应用标识
-            "Accept-Language",      // 语言设置
-            "Accept-Encoding",      // 编码方式
-            "Accept"                // 接受的内容类型
+            "User-Agent", // 浏览器/应用标识
+            "Accept-Language", // 语言设置
+            "Accept-Encoding", // 编码方式
+            "Accept" // 接受的内容类型
     );
 
     /**
@@ -172,5 +172,15 @@ public class DeviceFingerprintService {
         }
 
         return browser + " on " + os;
+    }
+
+    /**
+     * 获取设备ID (即设备指纹)
+     *
+     * @param request HTTP 请求对象
+     * @return 设备ID
+     */
+    public String getDeviceId(HttpServletRequest request) {
+        return generateFingerprint(request);
     }
 }

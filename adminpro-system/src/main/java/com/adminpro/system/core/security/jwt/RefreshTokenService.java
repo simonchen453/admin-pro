@@ -106,7 +106,8 @@ public class RefreshTokenService {
         // 找出最久未使用的活跃设备
         allDevices.stream()
                 .filter(d -> d.getIsActive() != null && d.getIsActive() == 1)
-                .min(Comparator.comparing(UserDeviceEntity::getLastActiveAt, Comparator.nullsLast(Comparator.naturalOrder())))
+                .min(Comparator.comparing(UserDeviceEntity::getLastActiveAt,
+                        Comparator.nullsLast(Comparator.naturalOrder())))
                 .ifPresent(oldestDevice -> {
                     log.info("用户 {} 设备数超限({}>)，踢出最旧设备: {} ({})",
                             userId, activeDeviceCount, oldestDevice.getDeviceId(),
@@ -173,8 +174,7 @@ public class RefreshTokenService {
                 // 从缓存中删除 Refresh Token
                 AppCache.getInstance().delete(
                         JwtCacheConstants.REFRESH_TOKEN_CACHE,
-                        device.getRefreshTokenJti()
-                );
+                        device.getRefreshTokenJti());
 
                 // 清空设备的 Refresh Token JTI
                 device.setRefreshTokenJti(null);
@@ -187,6 +187,28 @@ public class RefreshTokenService {
 
         log.info("已撤销用户 {} 的 {} 个 Refresh Token", userId, revokedCount);
         return revokedCount;
+    }
+
+    /**
+     * 撤销指定设备的 Refresh Token (踢出设备)
+     *
+     * @param userId   用户ID
+     * @param deviceId 设备ID
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void revokeByDeviceId(String userId, String deviceId) {
+        UserDeviceEntity device = userDeviceDao.findByDeviceId(userId, deviceId);
+        if (device != null && device.getRefreshTokenJti() != null) {
+            // 1. 从缓存删除
+            AppCache.getInstance().delete(
+                    JwtCacheConstants.REFRESH_TOKEN_CACHE,
+                    device.getRefreshTokenJti());
+
+            // 2. 更新数据库状态
+            device.setRefreshTokenJti(null);
+            device.setIsActive(0);
+            userDeviceDao.update(device);
+        }
     }
 
     /**

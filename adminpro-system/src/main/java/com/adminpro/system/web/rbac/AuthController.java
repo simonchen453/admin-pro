@@ -24,6 +24,7 @@ import com.adminpro.system.rbac.domains.vo.login.LoginUserVo;
 import com.adminpro.system.rbac.domains.vo.user.PasswordRuleVo;
 import com.adminpro.system.rbac.domains.vo.user.UpdateProfileVo;
 import com.adminpro.system.rbac.domains.vo.user.UserInfoResponseVo;
+import com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse;
 import com.google.code.kaptcha.Producer;
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -101,7 +102,7 @@ public class AuthController extends BaseController {
             - restCode=500: 服务器内部错误
             """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public R<com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse> login(HttpServletRequest request,
+    public R<JwtLoginResponse> login(HttpServletRequest request,
             HttpServletResponse httpResponse,
             @RequestBody LoginUserVo loginUserVo) {
         BeanUtil.beanAttributeValueTrim(loginUserVo);
@@ -138,7 +139,7 @@ public class AuthController extends BaseController {
                 }
             }
 
-            com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse response = loginHelper.loginJwt(
+            JwtLoginResponse response = loginHelper.loginJwt(
                     userDomain, loginName, password, currentDevice, loginUserVo.isRememberMe());
 
             // 设置 Refresh Token Cookie (HttpOnly, Secure, SameSite=Strict)
@@ -193,7 +194,7 @@ public class AuthController extends BaseController {
             - restCode=500: 服务器内部错误
             """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @RequestMapping(value = "/refresh", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public R<com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse> refresh(
+    public R<JwtLoginResponse> refresh(
             HttpServletRequest request, HttpServletResponse httpResponse) {
         // 从 HttpOnly Cookie 中读取 refreshToken
         String refreshToken = null;
@@ -211,7 +212,7 @@ public class AuthController extends BaseController {
         }
 
         try {
-            com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse response = loginHelper.refreshJwt(refreshToken);
+            JwtLoginResponse response = loginHelper.refreshJwt(refreshToken);
 
             // 设置新的 Refresh Token Cookie (HttpOnly, Secure, SameSite=Strict)
             if (response != null && response.getRefreshToken() != null) {

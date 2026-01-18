@@ -15,8 +15,6 @@ import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.rbac.api.PasswordValidator;
-import com.adminpro.system.rbac.common.RbacCacheConstants;
-import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
 import com.adminpro.system.rbac.domains.entity.domain.DomainEntity;
@@ -32,18 +30,14 @@ import com.adminpro.system.rbac.domains.vo.tree.TreeSelect;
 import com.adminpro.system.rbac.domains.vo.user.ChangePwdVo;
 import com.adminpro.system.tools.domains.entity.oss.OSSEntity;
 import com.adminpro.system.tools.domains.entity.oss.OSSService;
-import com.adminpro.system.tools.domains.entity.session.SessionService;
 import com.adminpro.system.tools.domains.entity.syslog.SysLogDTO;
 import com.adminpro.system.tools.domains.entity.syslog.SysLogService;
-import com.adminpro.system.tools.domains.enums.SessionStatus;
 import com.adminpro.system.web.vo.RecentActivityVO;
 import com.adminpro.system.web.vo.ReleaseInfo;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
@@ -74,8 +68,8 @@ public class CommonController extends BaseController {
     private final OSSService ossService;
     private final UserService userService;
     private final RoleService roleService;
-    private final SessionService sessionService;
     private final SysLogService sysLogService;
+    private final com.adminpro.system.rbac.domains.entity.device.UserDeviceDao userDeviceDao;
 
     /**
      * 获取首页统计数据
@@ -83,18 +77,14 @@ public class CommonController extends BaseController {
      * @return
      */
     @PreAuthorize("@ss.hasPermission('common:home-data')")
-    @Operation(summary = "获取首页统计数据", description = "获取系统首页的统计数据，包括用户数、角色数、部门数、会话数等")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 查询成功，data 字段包含统计数据
-                - restCode=401: 未授权，需要登录
-                - restCode=403: 无权限访问
-                - restCode=500: 服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @Operation(summary = "获取首页统计数据", description = "获取系统首页的统计数据，包括用户数、角色数、部门数、在线设备数等")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 查询成功，data 字段包含统计数据
+            - restCode=401: 未授权，需要登录
+            - restCode=403: 无权限访问
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @RequestMapping(value = "/statistics", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public R<Map<String, Long>> statistics() {
         Map<String, Long> stats = new HashMap<>();
@@ -110,10 +100,9 @@ public class CommonController extends BaseController {
         List<DeptEntity> deptList = deptService.findAll();
         stats.put("deptCount", (long) deptList.size());
 
-        SearchParam sessionParam = startPaging();
-        sessionParam.addFilter("status", SessionStatus.ACTIVE.getCode());
-        long sessionCount = sessionService.search(sessionParam).getTotalCount();
-        stats.put("sessionCount", sessionCount);
+        // 使用在线设备数代替Session数
+        long deviceCount = userDeviceDao.countActiveDevices();
+        stats.put("sessionCount", deviceCount); // 保持前端 key 不变
 
         return R.ok(stats);
     }
@@ -310,21 +299,13 @@ public class CommonController extends BaseController {
     @PreAuthorize("@ss.hasPermission('common:changepwd')")
     @GetMapping("/menus")
     public R menus() {
-        HttpSession session = request.getSession();
         UserEntity userEntity = LoginHelper.getInstance().getUserEntity();
         if (userEntity != null) {
-            List<MenuTreeVo> res = (List<MenuTreeVo>) session.getAttribute(RbacCacheConstants.SESSION_MENU_CACHE);
-            List<String> parentMenuIds = (List<String>) session
-                    .getAttribute(RbacCacheConstants.SESSION_MENU_PARENT_CACHE);
+            // 无状态模式，直接查询不使用Session缓存
+            List<MenuEntity> menuEntityList = menuService.findMenuTreeByUserId(userEntity.getId(),
+                    userEntity.getUserDomain());
+            List<MenuTreeVo> res = menuService.buildMenus(menuEntityList);
 
-            if (res == null || parentMenuIds == null) {
-                List<MenuEntity> menuEntityList = menuService.findMenuTreeByUserId(userEntity.getId(),
-                        userEntity.getUserDomain());
-                res = menuService.buildMenus(menuEntityList);
-                parentMenuIds = menuService.getParentMenuIds(menuEntityList);
-                session.setAttribute(RbacCacheConstants.SESSION_MENU_CACHE, res);
-                session.setAttribute(RbacCacheConstants.SESSION_MENU_PARENT_CACHE, parentMenuIds);
-            }
             String avatarUrl = "";
             if (userEntity != null) {
                 avatarUrl = userEntity.getAvatarUrl();
@@ -334,8 +315,9 @@ public class CommonController extends BaseController {
             }
             request.setAttribute("menus", res);
             request.setAttribute("avatarUrl", avatarUrl);
-            String activeMenuId = (String) request.getSession().getAttribute(RbacConstants.MENU_SESSION_KEY);
-            request.setAttribute("default_opened", new String[] { getTopParentMenuId(activeMenuId, res) });
+
+            request.setAttribute("default_opened", new String[] {});
+
             if (userEntity != null) {
                 if (userEntity.getLatestLoginTime() != null) {
                     request.setAttribute("latest_login_time", DateUtil.formatDateTime(userEntity.getLatestLoginTime()));
@@ -351,35 +333,6 @@ public class CommonController extends BaseController {
         } else {
             return R.ok();
         }
-    }
-
-    private String getTopParentMenuId(String menuId, List<MenuTreeVo> res) {
-        for (int i = 0; i < res.size(); i++) {
-            MenuTreeVo menuTreeVo = res.get(i);
-            List<MenuTreeVo> subs = menuTreeVo.getSubs();
-            if (subs != null && subs.size() > 0) {
-                boolean included = isIncluded(menuId, subs);
-                if (included) {
-                    return menuTreeVo.getId();
-                }
-            }
-        }
-        return "";
-    }
-
-    private boolean isIncluded(String menuId, List<MenuTreeVo> res) {
-        for (int i = 0; i < res.size(); i++) {
-            MenuTreeVo menuTreeVo = res.get(i);
-            if (StringHelper.equals(menuTreeVo.getId(), menuId)) {
-                return true;
-            } else {
-                List<MenuTreeVo> subs = menuTreeVo.getSubs();
-                if (subs != null && subs.size() > 0) {
-                    return isIncluded(menuId, subs);
-                }
-            }
-        }
-        return false;
     }
 
     /**

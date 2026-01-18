@@ -1,33 +1,31 @@
 package com.adminpro.system.rbac.api;
 
 import com.adminpro.framework.base.util.SpringUtil;
-import com.adminpro.framework.client.helper.ClientHelper;
 import com.adminpro.framework.exceptions.APIException;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.common.helper.AuditLogHelper;
 import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.core.common.helper.WebHelper;
-import com.adminpro.system.core.common.helper.ip.AddressUtils;
 import com.adminpro.system.core.common.helper.ip.IpUtils;
-import com.adminpro.system.core.security.auth.AuthToken;
-import com.adminpro.system.core.security.auth.AuthUserDetailServiceImpl;
 import com.adminpro.system.core.security.auth.LoginUser;
-import com.adminpro.system.core.security.auth.TokenHelper;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import com.adminpro.system.core.security.jwt.DeviceFingerprintService;
+import com.adminpro.system.core.security.jwt.JwtCacheConstants;
+import com.adminpro.system.core.security.jwt.JwtTokenProvider;
+import com.adminpro.system.core.security.jwt.RefreshTokenService;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
 import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
+import com.adminpro.system.rbac.domains.entity.jwt.RefreshTokenData;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
-import com.adminpro.system.rbac.domains.entity.usertoken.UserTokenEntity;
+import com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse;
 import com.adminpro.system.rbac.enums.UserStatus;
-import com.adminpro.system.tools.domains.entity.session.SessionEntity;
-import com.adminpro.system.tools.domains.entity.session.SessionService;
-import com.adminpro.system.tools.domains.enums.SessionStatus;
-import eu.bitwalker.useragentutils.UserAgent;
+import com.adminpro.system.config.JwtProperties;
+import com.adminpro.system.rbac.api.Device;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.javasimon.aop.Monitored;
@@ -50,32 +48,33 @@ import java.util.*;
  * 登录助手类
  * <p>
  * 提供用户登录、登出、以及获取当前登录用户信息等核心功能。
- * 支持移动端和Web端两种不同的认证模式。
+ * 采用 JWT 无状态认证模式。
  * <p>
  * 主要功能：
  * <ul>
- * <li>用户登录：支持用户名密码登录，返回Token或Session</li>
- * <li>用户登出：清理认证信息，使Token或Session失效</li>
- * <li>获取当前用户：从Session或SecurityContext中获取登录用户信息</li>
- * <li>会话管理：Session的创建、刷新、失效等操作</li>
+ * <li>用户登录：支持用户名密码登录，返回 JWT Token（Access Token + Refresh Token）</li>
+ * <li>用户登出：清理认证信息，从白名单移除 Token，撤销 Refresh Token（单点登出）</li>
+ * <li>获取当前用户：从 SecurityContext 中获取登录用户信息</li>
+ * <li>Token 刷新：支持使用 Refresh Token 获取新的 Access Token</li>
  * </ul>
  * <p>
  * 认证模式：
  * <ul>
- * <li>移动端：基于Token的无状态认证，使用Authorization Header传递Token</li>
- * <li>Web端：基于Session的有状态认证，使用HttpSession存储用户信息</li>
+ * <li>JWT 无状态认证：使用 Authorization Header 或 Cookie 传递 Token</li>
+ * <li>Access Token：短期有效，用于 API 认证</li>
+ * <li>Refresh Token：长期有效，用于刷新 Access Token，支持设备管理</li>
  * </ul>
  * <p>
  * 安全特性：
  * <ul>
  * <li>登录失败审计：记录登录失败日志</li>
- * <li>会话固定攻击防护：登录成功后重新创建Session</li>
- * <li>用户信息收集：记录登录IP、地点、浏览器、操作系统等</li>
+ * <li>Token 白名单：Access Token 存储在缓存中，支持主动撤销</li>
+ * <li>单点登出：撤销用户所有 Refresh Token</li>
+ * <li>设备管理：限制同一用户的最大设备数</li>
  * <li>验证码支持：可选的验证码验证功能</li>
  * </ul>
  *
  * @author simon
- * @see TokenHelper
  * @see LoginUser
  */
 @Service
@@ -97,171 +96,21 @@ public class LoginHelper {
         return SpringUtil.getBean(LoginHelper.class);
     }
 
-    /**
-     * Web端Session中存储登录用户的Key
-     */
-    public static final String LOGIN_AUTH_USER_KEY = "http_login_authuser";
-
     @Autowired
     private AuthenticationManager authenticationmanager;
 
     @Autowired
-    private AuthUserDetailServiceImpl userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Autowired
-    private TokenHelper tokenHelper;
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private com.adminpro.system.core.security.jwt.JwtTokenProvider jwtTokenProvider;
+    private RefreshTokenService refreshTokenService;
 
     @Autowired
-    private com.adminpro.system.core.security.jwt.RefreshTokenService refreshTokenService;
+    private JwtProperties jwtProperties;
 
-    @Autowired
-    private com.adminpro.system.config.JwtProperties jwtProperties;
-
-    /**
-     * 用户登录（Web端）
-     * <p>
-     * 默认使用Web端登录，不指定设备类型
-     *
-     * @param userDomain 用户域
-     * @param loginName  登录名
-     * @param password   密码
-     * @return 登录结果，成功返回"success"，失败返回错误码
-     * @throws APIException 登录失败时抛出
-     */
-    public String login(String userDomain, String loginName, String password) throws APIException {
-        return login(userDomain, loginName, password, null);
-    }
-
-    /**
-     * 用户登录（支持设备类型）
-     * <p>
-     * 根据请求类型自动选择认证模式：
-     * <ul>
-     * <li>移动端请求：返回Token，支持Bearer认证</li>
-     * <li>Web端请求：使用Session认证</li>
-     * </ul>
-     * <p>
-     * 登录流程：
-     * <ol>
-     * <li>验证账户和密码</li>
-     * <li>检查用户状态（是否锁定、停用）</li>
-     * <li>根据请求类型选择认证模式</li>
-     * <li>记录登录日志和用户信息</li>
-     * <li>更新最后登录时间</li>
-     * </ol>
-     *
-     * @param userDomain 用户域
-     * @param loginName  登录名
-     * @param password   密码
-     * @param device     设备类型，为null时默认为Web端
-     * @return 登录结果，成功返回"success"或Token，失败返回错误码
-     * @throws APIException 登录失败时抛出
-     */
-    public String login(String userDomain, String loginName, String password, Device device) throws APIException {
-        String securityUsername = userDomain + "_" + loginName;
-        logger.info(MessageFormat.format("用户{0}尝试登陆{1}", securityUsername, userDomain));
-        boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
-
-        Authentication authentication = verifyAccount(userDomain, loginName, password);
-
-        final LoginUser userDetails = (LoginUser) userDetailsService.loadUserByUsername(securityUsername);
-        if (authentication == null || userDetails == null) {
-            return RbacConstants.LOGIN_RESULT_NO_MATCH;
-        }
-        if (StringHelper.equals(userDetails.getStatus(), UserStatus.LOCKED.getCode())) {
-            logger.error("用户{0}, 账户锁定", securityUsername);
-            return RbacConstants.LOGIN_RESULT_USER_LOCKED;
-        }
-        if (StringHelper.equals(userDetails.getStatus(), UserStatus.INACTIVE.getCode())) {
-            logger.error("用户{0}, 账户停用", securityUsername);
-            return RbacConstants.LOGIN_RESULT_USER_INACTIVE;
-        }
-
-        logger.info(MessageFormat.format("用户{0}登陆成功", userDomain + "/" + userDetails.getLoginName()));
-        if (isMobileRequest) {
-            return handleMobileLogin(userDomain, loginName, authentication, device);
-        } else {
-            return handleWebLogin(userDomain, loginName, authentication, userDetails);
-        }
-    }
-
-    /**
-     * 处理移动端登录
-     * <p>
-     * 移动端登录使用Token认证模式：
-     * <ol>
-     * <li>生成Token并存储到数据库</li>
-     * <li>更新用户最后登录时间</li>
-     * <li>记录登录审计日志</li>
-     * <li>返回Token给客户端</li>
-     * </ol>
-     *
-     * @param userDomain     用户域
-     * @param loginName      登录名
-     * @param authentication 认证对象
-     * @param device         设备类型
-     * @return Token字符串
-     */
-    private String handleMobileLogin(String userDomain, String loginName, Authentication authentication,
-            Device device) {
-        AuthToken principal = (AuthToken) authentication.getPrincipal();
-        String token = principal.getToken();
-        String deviceType = device != null ? tokenHelper.generateAudience(device) : TokenHelper.AUDIENCE_WEB;
-        tokenHelper.generateToken(userDomain, loginName, token, deviceType);
-        UserEntity userEntity = UserService.getInstance().findByUserDomainAndLoginName(userDomain, loginName);
-        userEntity.setLatestLoginTime(new Date());
-        UserService.getInstance().update(userEntity);
-        AuditLogHelper.log(AuditLogHelper.CATEGORY_ADMIN, RbacConstants.AUDIT_MODULE_USER,
-                RbacConstants.AUDIT_ACTION_LOGIN, RbacConstants.LOGIN_RESULT_SUCCESS,
-                "userDomain=" + userDomain + ", loginName=" + loginName);
-        return token;
-    }
-
-    /**
-     * 处理Web端登录
-     * <p>
-     * Web端登录使用Session认证模式：
-     * <ol>
-     * <li>设置用户代理信息（IP、地点、浏览器、操作系统）</li>
-     * <li>将用户信息存储到Session</li>
-     * <li>重新创建Session（防止会话固定攻击）</li>
-     * <li>创建会话记录</li>
-     * <li>更新用户最后登录时间</li>
-     * <li>记录登录审计日志</li>
-     * </ol>
-     *
-     * @param userDomain     用户域
-     * @param loginName      登录名
-     * @param authentication 认证对象
-     * @param userDetails    用户详情
-     * @return 登录结果，成功返回"success"
-     */
-    private String handleWebLogin(String userDomain, String loginName, Authentication authentication,
-            LoginUser userDetails) {
-        HttpSession session = WebHelper.getHttpRequest().getSession();
-        Object principal = authentication.getPrincipal();
-        String token = RbacConstants.LOGIN_RESULT_SUCCESS;
-        if (principal instanceof AuthToken) {
-            token = ((AuthToken) principal).getToken();
-        }
-        if (StringUtils.equals(token, RbacConstants.LOGIN_RESULT_SUCCESS)) {
-            setUserAgent(userDetails);
-            session.setAttribute(LOGIN_AUTH_USER_KEY, userDetails);
-            renewSession(session, WebHelper.getHttpRequest());
-            UserEntity userEntity = UserService.getInstance().findByUserDomainAndLoginName(userDomain, loginName);
-            userEntity.setLatestLoginTime(new Date());
-            UserService.getInstance().update(userEntity);
-            loginUserSession(userDetails);
-            AuditLogHelper.log(AuditLogHelper.CATEGORY_ADMIN, RbacConstants.AUDIT_MODULE_USER,
-                    RbacConstants.AUDIT_ACTION_LOGIN,
-                    RbacConstants.LOGIN_RESULT_SUCCESS,
-                    "userDomain=" + userDomain + ", loginName=" + loginName);
-        }
-        return token;
-    }
 
     /**
      * 验证账户和密码
@@ -291,81 +140,6 @@ public class LoginHelper {
                 throw new APIException("登录失败: " + e.getMessage());
             }
         }
-    }
-
-    /**
-     * 设置用户代理信息
-     * <p>
-     * 从HTTP请求中提取并设置以下信息：
-     * <ul>
-     * <li>IP地址：从X-Forwarded-For或RemoteAddr获取</li>
-     * <li>登录地点：根据IP地址解析地理位置</li>
-     * <li>浏览器类型：从User-Agent解析</li>
-     * <li>操作系统：从User-Agent解析</li>
-     * </ul>
-     *
-     * @param loginUser 登录用户信息
-     */
-    private void setUserAgent(LoginUser loginUser) {
-        HttpServletRequest request = WebHelper.getHttpRequest();
-        UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader("User-Agent"));
-        String ip = IpUtils.getIpAddr(request);
-        loginUser.setIpAddr(ip);
-        loginUser.setLoginLocation(AddressUtils.getRealAddressByIP(ip));
-        loginUser.setBrowser(userAgent.getBrowser().getName());
-        loginUser.setOs(userAgent.getOperatingSystem().getName());
-    }
-
-    /**
-     * 创建用户会话记录
-     * <p>
-     * 在用户登录成功后，将会话信息保存到数据库，
-     * 用于后续的会话管理和审计。
-     *
-     * @param loginUser 登录用户信息
-     */
-    private static void loginUserSession(LoginUser loginUser) {
-        UserEntity user = loginUser.getUser();
-        SessionEntity sessionEntity = new SessionEntity();
-        sessionEntity.setUserId(user.getId());
-        sessionEntity.setDeptNo(user.getDeptNo());
-        sessionEntity.setStatus(SessionStatus.ACTIVE.getCode());
-        sessionEntity.setSessionId(WebHelper.getSessionId());
-        sessionEntity.setIpAddr(loginUser.getIpAddr());
-        sessionEntity.setLoginLocation(loginUser.getLoginLocation());
-        sessionEntity.setBrowser(loginUser.getBrowser());
-        sessionEntity.setOs(loginUser.getOs());
-        SessionService.getInstance().create(sessionEntity);
-    }
-
-    /**
-     * 判断是否为互联网用户
-     *
-     * @param userDomain 用户域
-     * @return true表示是互联网用户
-     */
-    public boolean isInternetUser(String userDomain) {
-        return StringUtils.equals(userDomain, RbacConstants.INTERNET_DOMAIN);
-    }
-
-    /**
-     * 判断是否为系统用户
-     *
-     * @param userDomain 用户域
-     * @return true表示是系统用户
-     */
-    public boolean isSystemUser(String userDomain) {
-        return StringUtils.equals(userDomain, RbacConstants.SYSTEM_DOMAIN);
-    }
-
-    /**
-     * 判断是否为内网用户
-     *
-     * @param userDomain 用户域
-     * @return true表示是内网用户
-     */
-    public boolean isIntranetUser(String userDomain) {
-        return StringUtils.equals(userDomain, RbacConstants.INTRANET_DOMAIN);
     }
 
     /**
@@ -450,7 +224,7 @@ public class LoginHelper {
     public String getLoginUserId() {
         LoginUser loginUser = getLoginUser();
         if (loginUser != null) {
-            return loginUser.getUserId();
+            return loginUser.getId();
         }
         return null;
     }
@@ -529,10 +303,12 @@ public class LoginHelper {
     /**
      * 用户登出
      * <p>
-     * 根据请求类型执行不同的登出逻辑：
+     * JWT 登出流程：
      * <ul>
-     * <li>移动端：使Token失效，清除认证信息</li>
-     * <li>Web端：使Session失效，清除会话记录</li>
+     * <li>从 Authorization Header 或 Cookie 中获取 JWT</li>
+     * <li>验证 Token 并从白名单中移除</li>
+     * <li>清除该用户的所有 Refresh Token（单点登出）</li>
+     * <li>清除 SecurityContext</li>
      * </ul>
      *
      * @return 登出成功返回true
@@ -561,21 +337,21 @@ public class LoginHelper {
 
                     // 从白名单获取 userId
                     String userId = AppCache.getInstance().get(
-                            com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE,
+                            JwtCacheConstants.ACCESS_TOKEN_CACHE,
                             jti,
                             String.class
                     );
 
                     // 移除 Access Token 白名单
                     AppCache.getInstance().delete(
-                            com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE,
+                            JwtCacheConstants.ACCESS_TOKEN_CACHE,
                             jti
                     );
 
                     // 如果找到了 userId，清除该用户的所有 Refresh Token（单点登出）
                     if (StringUtils.isNotBlank(userId)) {
-                        com.adminpro.system.core.security.jwt.RefreshTokenService rtService =
-                                SpringUtil.getBean(com.adminpro.system.core.security.jwt.RefreshTokenService.class);
+                        RefreshTokenService rtService =
+                                SpringUtil.getBean(RefreshTokenService.class);
                         int revokedCount = rtService.revokeAllUserTokens(userId);
                         logger.info("用户 {} 登出，已清除 {} 个 Refresh Token", userId, revokedCount);
                     }
@@ -589,99 +365,9 @@ public class LoginHelper {
             }
         }
 
-        // 2. 传统登出逻辑
-        boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
-        if (isMobileRequest) {
-            String authToken = getAuthToken();
-            UserTokenEntity userTokenEntity = TokenHelper.getInstance().deactiveToken(authToken);
-            if (userTokenEntity != null) {
-                com.adminpro.system.rbac.domains.entity.user.UserEntity user = UserService.getInstance()
-                        .findById(userTokenEntity.getUserId());
-                if (user != null) {
-                    String securityUsername = user.getUserDomain() + "_" + user.getLoginName();
-                    AppCache.getInstance().delete(RbacCacheConstants.AUTH_USER_DETAIL_CACHE, securityUsername);
-                }
-            }
-            SecurityContextHolder.getContext().setAuthentication(null);
-            return true;
-        } else {
-            // 使用 getSession(false) 避免自动创建新 session
-            HttpSession session = httpRequest.getSession(false);
-            if (session != null) {
-                logger.debug("logout: {}", session.getId());
-                SessionService.getInstance().invalid(session.getId());
-                session.invalidate();
-            }
-            return true;
-        }
+        return false;
     }
 
-    /**
-     * 重新创建Session
-     * <p>
-     * 防止会话固定攻击的安全措施。
-     * 登录成功后，将旧Session的属性复制到新Session，并使旧Session失效。
-     *
-     * @param session 当前Session
-     * @param request HTTP请求
-     */
-    public void renewSession(HttpSession session, HttpServletRequest request) {
-        logger.debug("renewSession: {}", session.getId());
-        Map<String, Object> attrs = getSessionAttributes(session);
-        session.invalidate();
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            Cookie cookie = request.getCookies()[0];
-            cookie.setMaxAge(0);
-        }
-        session = request.getSession(true);
-        fillAttributesToSession(session, attrs);
-    }
-
-    /**
-     * 获取Session中的所有属性
-     *
-     * @param s HttpSession对象
-     * @return 属性Map
-     */
-    private Map<String, Object> getSessionAttributes(HttpSession s) {
-        Enumeration nameEnum = s.getAttributeNames();
-        Map<String, Object> map = new HashMap<String, Object>();
-        while (nameEnum.hasMoreElements()) {
-            String key = (String) nameEnum.nextElement();
-            Object value = s.getAttribute(key);
-            if (null != value) {
-                map.put(key, s.getAttribute(key));
-            }
-        }
-
-        return map;
-    }
-
-    /**
-     * 将属性填充到Session
-     *
-     * @param session HttpSession对象
-     * @param map     属性Map
-     */
-    private void fillAttributesToSession(HttpSession session, Map<String, Object> map) {
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            session.setAttribute(entry.getKey(), entry.getValue());
-        }
-    }
-
-    /**
-     * 获取请求中的认证Token
-     * <p>
-     * 从HTTP Header中提取x-access-token
-     *
-     * @return Token字符串，不存在时返回null
-     */
-    public String getAuthToken() {
-        HttpServletRequest request = WebHelper.getHttpRequest();
-        String authHeader = request.getHeader("x-access-token");
-        return authHeader;
-    }
 
     /**
      * 验证验证码
@@ -738,12 +424,12 @@ public class LoginHelper {
     /**
      * JWT 方式登录
      */
-    public com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse loginJwt(String userDomain, String loginName,
+    public JwtLoginResponse loginJwt(String userDomain, String loginName,
             String password, Device device, boolean rememberMe) throws APIException {
         String securityUsername = userDomain + "_" + loginName;
         // 1. 验证账户
         Authentication authentication = verifyAccount(userDomain, loginName, password);
-        LoginUser userDetails = (LoginUser) userDetailsService.loadUserByUsername(securityUsername);
+        LoginUser userDetails = (LoginUser) authentication.getPrincipal();
 
         if (authentication == null || userDetails == null) {
             throw new APIException("账号或密码错误");
@@ -765,27 +451,26 @@ public class LoginHelper {
         claims.put("aud", platform);
         claims.put("permissions", userDetails.getPermissions());
 
-        String accessToken = jwtTokenProvider.createAccessToken(userDetails.getUserId(), claims);
+        String accessToken = jwtTokenProvider.createAccessToken(userDetails.getId(), claims);
 
         // 3. 存入 Access Token 白名单（使用与 JWT 一致的过期时间）
         String jti = jwtTokenProvider.getJti(accessToken);
         int accessTokenValidity = jwtProperties.getAccessTokenValidity(platform);
         // Ehcache key 是 jti，value 是 userId，expire 是过期时间（秒）
-        AppCache.getInstance().set(com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE, jti,
-                userDetails.getUserId(), accessTokenValidity);
+        AppCache.getInstance().set(JwtCacheConstants.ACCESS_TOKEN_CACHE, jti,
+                userDetails.getId(), accessTokenValidity);
 
         // 4. 生成 Refresh Token
-        // 4. 生成 Refresh Token
-        com.adminpro.system.rbac.domains.entity.jwt.RefreshTokenData rtData = new com.adminpro.system.rbac.domains.entity.jwt.RefreshTokenData();
-        rtData.setUserId(userDetails.getUserId());
+        RefreshTokenData rtData = new RefreshTokenData();
+        rtData.setUserId(userDetails.getId());
         rtData.setUserDomain(userDetails.getUserDomain());
         rtData.setLoginName(userDetails.getLoginName());
         rtData.setPlatform(platform);
 
         // 使用设备指纹生成稳定的 deviceId（同一设备多次登录相同）
         HttpServletRequest request = WebHelper.getHttpRequest();
-        com.adminpro.system.core.security.jwt.DeviceFingerprintService fingerprintService =
-            SpringUtil.getBean(com.adminpro.system.core.security.jwt.DeviceFingerprintService.class);
+        DeviceFingerprintService fingerprintService =
+            SpringUtil.getBean(DeviceFingerprintService.class);
 
         String deviceId = fingerprintService.generateFingerprint(request);
         String deviceName = fingerprintService.generateDeviceName(request);
@@ -811,13 +496,13 @@ public class LoginHelper {
                 "userDomain=" + userDomain + ", loginName=" + loginName);
 
         // 6. 构造响应
-        return com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse.builder()
+        return JwtLoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(jwtProperties.getAccessTokenValidity(platform))
-                .user(com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse.UserInfo.builder()
-                        .id(userDetails.getUserId())
+                .user(JwtLoginResponse.UserInfo.builder()
+                        .id(userDetails.getId())
                         .loginName(userDetails.getLoginName())
                         .realName(userDetails.getRealName())
                         .avatarUrl(userDetails.getUser().getAvatarUrl())
@@ -831,10 +516,10 @@ public class LoginHelper {
      * @param refreshToken 刷新令牌
      * @return 新的 Token 响应
      */
-    public com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse refreshJwt(String refreshToken)
+    public JwtLoginResponse refreshJwt(String refreshToken)
             throws APIException {
         // 1. 验证 Refresh Token (获取数据)
-        com.adminpro.system.rbac.domains.entity.jwt.RefreshTokenData data = refreshTokenService
+        RefreshTokenData data = refreshTokenService
                 .validateRefreshToken(refreshToken);
         if (data == null) {
             throw new APIException("无效或已过期的 Refresh Token");
@@ -873,21 +558,21 @@ public class LoginHelper {
         claims.put("aud", platform);
         claims.put("permissions", userDetails.getPermissions());
 
-        String accessToken = jwtTokenProvider.createAccessToken(userDetails.getUserId(), claims);
+        String accessToken = jwtTokenProvider.createAccessToken(userDetails.getId(), claims);
 
         // 5. 存入 Access Token 白名单（使用与 JWT 一致的过期时间）
         String jti = jwtTokenProvider.getJti(accessToken);
         int accessTokenValidity = jwtProperties.getAccessTokenValidity(platform);
-        AppCache.getInstance().set(com.adminpro.system.core.security.jwt.JwtCacheConstants.ACCESS_TOKEN_CACHE, jti,
-                userDetails.getUserId(), accessTokenValidity);
+        AppCache.getInstance().set(JwtCacheConstants.ACCESS_TOKEN_CACHE, jti,
+                userDetails.getId(), accessTokenValidity);
 
-        return com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse.builder()
+        return JwtLoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(newRefreshToken)
                 .tokenType("Bearer")
                 .expiresIn(jwtProperties.getAccessTokenValidity(platform))
-                .user(com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse.UserInfo.builder()
-                        .id(userDetails.getUserId())
+                .user(JwtLoginResponse.UserInfo.builder()
+                        .id(userDetails.getId())
                         .loginName(userDetails.getLoginName())
                         .realName(userDetails.getRealName())
                         .avatarUrl(userDetails.getUser().getAvatarUrl())

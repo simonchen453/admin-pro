@@ -20,7 +20,7 @@ const ConfigList = lazy(() => import('../pages/Config/ConfigList'));
 const DictList = lazy(() => import('../pages/Dict/DictList'));
 const JobList = lazy(() => import('../pages/Job/JobList'));
 const JobLog = lazy(() => import('../pages/Job/JobLog'));
-const SessionList = lazy(() => import('../pages/Session/SessionList'));
+const UserDeviceList = lazy(() => import('../pages/auth/UserDeviceList'));
 const ServerInfo = lazy(() => import('../pages/Server/ServerInfo'));
 const SysLogList = lazy(() => import('../pages/SysLog/SysLogList'));
 const SysLogView = lazy(() => import('../pages/SysLog/SysLogView'));
@@ -166,10 +166,10 @@ function AppRouter() {
                         }
                     />
                     <Route
-                        path="admin/session"
+                        path="account/devices"
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
-                                <SessionList />
+                                <UserDeviceList />
                             </Suspense>
                         }
                     />

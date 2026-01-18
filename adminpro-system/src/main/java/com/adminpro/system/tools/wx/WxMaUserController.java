@@ -14,8 +14,8 @@ import com.adminpro.framework.base.util.UUIDUtil;
 import com.adminpro.framework.client.enums.ClientType;
 import com.adminpro.framework.exceptions.APIException;
 import com.adminpro.system.core.cache.AppCache;
+import com.adminpro.system.core.common.helper.WebHelper;
 import com.adminpro.system.core.security.auth.TokenHelper;
-import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
 import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
@@ -24,6 +24,7 @@ import com.adminpro.system.rbac.domains.entity.usertoken.UserTokenEntity;
 import com.adminpro.system.rbac.domains.vo.login.LoginResponse;
 import com.adminpro.system.rbac.enums.UserStatus;
 import com.google.gson.Gson;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,10 @@ import java.util.Date;
 
 /**
  * 微信小程序用户接口
+ * <p>
+ * 注意：此控制器使用独立的 Token 机制（x-access-token header），
+ * 与系统的 JWT 认证分离，专门用于微信小程序的 session 管理。
+ * </p>
  */
 @RestController
 @AllArgsConstructor
@@ -46,6 +51,21 @@ public class WxMaUserController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private WxMaService wxService;
+
+    /**
+     * 获取微信小程序的认证 Token
+     * <p>
+     * 从 x-access-token header 中获取 Token
+     *
+     * @return Token 字符串，不存在时返回 null
+     */
+    private String getAuthToken() {
+        HttpServletRequest request = WebHelper.getHttpRequest();
+        if (request == null) {
+            return null;
+        }
+        return request.getHeader("x-access-token");
+    }
 
     /**
      * 登陆接口
@@ -110,7 +130,7 @@ public class WxMaUserController {
     public R info(@RequestParam String signature, @RequestParam String rawData, @RequestParam String encryptedData,
             @RequestParam String iv) {
         // 用户信息校验
-        String authToken = LoginHelper.getInstance().getAuthToken();
+        String authToken = getAuthToken();
         if (StringUtils.isEmpty(authToken)) {
             WxMaConfigHolder.remove();// 清理ThreadLocal
             return R.error("user check failed");
@@ -177,7 +197,7 @@ public class WxMaUserController {
     @GetMapping("/phone")
     public R phone(@RequestParam String code) {
         // 用户信息校验
-        String authToken = LoginHelper.getInstance().getAuthToken();
+        String authToken = getAuthToken();
         if (StringUtils.isEmpty(authToken)) {
             WxMaConfigHolder.remove();// 清理ThreadLocal
             return R.error("user check failed");

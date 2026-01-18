@@ -23,14 +23,13 @@ import java.util.List;
  * 包含的主要信息：
  * <ul>
  * <li>用户基本信息：用户ID、用户域、登录名、真实姓名、部门等</li>
- * <li>认证信息：密码（已加密）、账户状态等</li>
  * <li>权限信息：用户拥有的所有权限列表</li>
  * <li>会话信息：登录IP、登录地点、浏览器、操作系统等</li>
  * </ul>
  * <p>
  * 安全特性：
  * <ul>
- * <li>密码字段使用@JsonIgnore注解，防止序列化到JSON响应中</li>
+ * <li>不存储密码：JWT认证模式下不需要在内存中保留密码</li>
  * <li>实现了Spring Security的UserDetails接口，可无缝集成</li>
  * <li>使用final字段确保核心信息的不可变性</li>
  * </ul>
@@ -42,7 +41,7 @@ public class LoginUser implements UserDetails {
     /**
      * 用户ID（全局唯一主键）
      */
-    private final String userId;
+    private final String id;
 
     /**
      * 用户域
@@ -68,11 +67,6 @@ public class LoginUser implements UserDetails {
      * 真实姓名
      */
     private final String realName;
-
-    /**
-     * 加密后的密码
-     */
-    private final String password;
 
     /**
      * 用户状态
@@ -114,10 +108,9 @@ public class LoginUser implements UserDetails {
      * <p>
      * 创建完整的登录用户信息对象
      *
-     * @param userId     用户ID（全局唯一主键）
+     * @param id         用户ID（全局唯一主键）
      * @param userDomain 用户域
      * @param loginName  登录名
-     * @param password   加密后的密码
      * @param status     用户状态
      * @param deptNo     部门编号
      * @param deptName   部门名称
@@ -125,12 +118,11 @@ public class LoginUser implements UserDetails {
      * @param user       用户实体对象
      * @param permissions 用户权限列表
      */
-    public LoginUser(String userId, String userDomain, String loginName, String password, String status, String deptNo,
+    public LoginUser(String id, String userDomain, String loginName, String status, String deptNo,
             String deptName, String realName, UserEntity user, List<String> permissions) {
-        this.userId = userId;
+        this.id = id;
         this.userDomain = userDomain;
         this.loginName = loginName;
-        this.password = password;
         this.status = status;
         this.permissions = permissions;
         this.deptNo = deptNo;
@@ -153,8 +145,7 @@ public class LoginUser implements UserDetails {
      * @return 登录用户信息对象
      */
     public static LoginUser convertFrom(UserEntity user) {
-        String[] permissions = RbacHelper.getInstance().getAccessibleAllPermissionsByUser(user.getId(),
-                user.getUserDomain());
+        String[] permissions = RbacHelper.getInstance().getAccessibleAllPermissionsByUser(user.getId());
         String deptNo = user.getDeptNo();
         String deptName = "";
         if (StringUtils.isNotEmpty(deptNo)) {
@@ -167,7 +158,6 @@ public class LoginUser implements UserDetails {
                 user.getId(),
                 user.getUserDomain(),
                 user.getLoginName(),
-                user.getPassword(),
                 user.getStatus(),
                 deptNo,
                 deptName,
@@ -177,26 +167,16 @@ public class LoginUser implements UserDetails {
     }
 
     /**
-     * 生成Spring Security格式的用户名
-     * <p>
-     * 格式：用户域_登录名（例如：system_admin）
-     *
-     * @return Spring Security格式的用户名
-     */
-    public String toSecurityUserName() {
-        return userDomain + "_" + loginName;
-    }
-
-    /**
      * 获取用户名（Spring Security接口方法）
      * <p>
-     * 返回登录名
+     * 返回全局唯一的用户名，格式为：用户域_登录名（例如：system_admin）
+     * 这是因为 loginName 只在同一 userDomain 下唯一，全局可能重复
      *
-     * @return 登录名
+     * @return 全局唯一的用户名
      */
     @Override
     public String getUsername() {
-        return loginName;
+        return userDomain + "_" + loginName;
     }
 
     /**
@@ -284,13 +264,14 @@ public class LoginUser implements UserDetails {
     /**
      * 获取加密后的密码（Spring Security接口方法）
      * <p>
-     * 使用@JsonIgnore注解防止序列化到JSON响应中
+     * JWT认证模式下不需要在内存中保留密码，返回null
      *
-     * @return 加密后的密码
+     * @return null
      */
     @Override
+    @JsonIgnore
     public String getPassword() {
-        return password;
+        return null;
     }
 
     /**
@@ -298,8 +279,19 @@ public class LoginUser implements UserDetails {
      *
      * @return 用户ID
      */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * 获取用户ID（全局唯一主键）
+     *
+     * @return 用户ID
+     * @deprecated 使用 {@link #getId()} 替代
+     */
+    @Deprecated
     public String getUserId() {
-        return userId;
+        return id;
     }
 
     /**

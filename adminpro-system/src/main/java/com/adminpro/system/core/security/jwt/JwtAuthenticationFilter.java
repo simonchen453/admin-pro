@@ -3,6 +3,7 @@ package com.adminpro.system.core.security.jwt;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.security.auth.LoginUser;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
+import com.adminpro.system.rbac.enums.UserStatus;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -143,13 +144,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // LoginUser(id, userDomain, loginName, status, deptNo, deptName, realName,
         // user, permissions)
+        // status 使用 "1"（活跃），因为 JWT 白名单验证已通过
         return new LoginUser(
                 userId,
                 userDomain,
                 loginName,
-                "1", // status (assumed active if token exists)
+                UserStatus.ACTIVE.getCode(), // status: 通过白名单验证
                 deptNo,
-                "", // deptName (optional/fetch if needed)
+                "", // deptName
                 realName,
                 user,
                 permissions);

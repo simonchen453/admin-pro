@@ -134,31 +134,30 @@ public class UserDeviceDao extends BaseDao<UserDeviceEntity, String> {
     /**
      * 搜索设备（Admin）
      */
-    /**
-     * 搜索设备（Admin）
-     */
-    /**
-     * 搜索设备（Admin）
-     */
+    private static final String SQL_DEVICE_LIST = "SELECT t.*, u." + UserEntity.COL_LOGIN_NAME + ", u."
+            + UserEntity.COL_REAL_NAME + ", u." + UserEntity.COL_USER_DOMAIN
+            + " FROM " + UserDeviceEntity.TABLE_NAME + " t LEFT JOIN " + UserEntity.TABLE_NAME
+            + " u ON t." + UserDeviceEntity.COL_USER_ID + " = u." + UserEntity.COL_ID;
+
     public QueryResultSet<UserDeviceVo> searchDevices(DeviceSearchForm form) {
         SelectBuilder<UserDeviceVo> select = new SelectBuilder<>(getVoRowMapper());
-        select.setTable(UserDeviceEntity.TABLE_NAME + " t LEFT JOIN " + UserEntity.TABLE_NAME + " u ON t."
-                + UserDeviceEntity.COL_USER_ID + " = u." + UserEntity.COL_ID);
+        select.setQuery(SQL_DEVICE_LIST);
 
         if (form.getLoginName() != null) {
-            select.addWhereAnd("u." + UserEntity.COL_LOGIN_NAME + " LIKE ?", "%" + form.getLoginName() + "%");
+            select.addWhereAnd("u." + UserEntity.COL_LOGIN_NAME + LIKE, PERCENT + form.getLoginName() + PERCENT);
         }
         if (form.getUserDomain() != null) {
-            select.addWhereAnd("u." + UserEntity.COL_USER_DOMAIN + " LIKE ?", "%" + form.getUserDomain() + "%");
+            select.addWhereAnd("u." + UserEntity.COL_USER_DOMAIN + LIKE, PERCENT + form.getUserDomain() + PERCENT);
         }
         if (form.getDeviceName() != null) {
-            select.addWhereAnd("t." + UserDeviceEntity.COL_DEVICE_NAME + " LIKE ?", "%" + form.getDeviceName() + "%");
+            select.addWhereAnd("t." + UserDeviceEntity.COL_DEVICE_NAME + LIKE,
+                    PERCENT + form.getDeviceName() + PERCENT);
         }
         if (form.getIsActive() != null) {
-            select.addWhereAnd("t." + UserDeviceEntity.COL_IS_ACTIVE + " EQ ?", form.getIsActive());
+            select.addWhereAnd("t." + UserDeviceEntity.COL_IS_ACTIVE + EQ, form.getIsActive());
         }
 
-        select.addOrderByDescending("t." + UserDeviceEntity.COL_LAST_ACTIVE_AT); // DESC
+        select.addOrderByDescending("t." + UserDeviceEntity.COL_LAST_ACTIVE_AT);
 
         select.setPageSize(form.getPageSize());
         select.setPageNo(form.getPageNo());

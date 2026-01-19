@@ -773,17 +773,24 @@ ALTER TABLE user_device ADD COLUMN last_user_agent VARCHAR(500) COMMENT 'User Ag
 
 
 -- changeset simon:202601182245
--- 1. 新增“设备管理”菜单 (挂载在“工作空间”下，ID: 1274338663366529024)
+-- 1. 新增“设备管理”菜单 (挂载在“工作空间”下，ID: 1274338663366529024) 用户自己的设备管理
 -- 使用新ID: 1845327703742484490
 INSERT INTO `sys_menu_tbl` 
 (`col_id`, `col_name`, `col_display`, `col_parent_id`, `col_order_num`, `col_url`, `col_is_frame`, `col_type`, `col_visible`, `col_status`, `col_permission`, `col_icon`, `col_remark`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) 
-VALUES 
-('1845327703742484490', 'M_DEVICE_MGR', '设备管理', '1274338663366529024', 4, '/account/devices', 0, 'C', 'show', 'active', NULL, 'MobileOutlined', NULL, 'system', NOW(), 'system', NOW());
+VALUES ('1845327703742484490', 'M_DEVICE_MGR', '设备管理', '1274338663366529024', 4, '/account/devices', 0, 'C', 'show', 'active', NULL, 'MobileOutlined', NULL, 'system', NOW(), 'system', NOW());
 
 -- 2. 分配权限给“系统用户公共角色” (SYS_COMMON_ROLE, ID: 1272436037200777216)
 -- 使用新ID: 1845327703742484491
 INSERT INTO `sys_role_menu_assign_tbl` 
 (`col_id`, `col_role_id`, `col_menu_id`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`) 
-VALUES 
-('1845327703742484491', '1272436037200777216', '1845327703742484490', 'system', NOW(), 'system', NOW());
+VALUES ('1845327703742484491', '1272436037200777216', '1845327703742484490', 'system', NOW(), 'system', NOW());
+
+-- 全局系统的设备管理
+INSERT INTO `sys_menu_tbl`
+(`col_id`, `col_name`, `col_display`, `col_parent_id`, `col_order_num`, `col_url`, `col_is_frame`, `col_type`, `col_visible`, `col_status`, `col_permission`, `col_icon`, `col_remark`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`)
+VALUES ('1845327703742484500', 'M_SYS_DEVICE', '在线设备', '1268893422756958208', 10, '/admin/sys/device', 0, 'C', 'show', 'active', 'system:device:list', 'DesktopOutlined', NULL, 'system', NOW(), 'system', NOW());
+
+INSERT INTO `sys_role_menu_assign_tbl`
+(`col_id`, `col_role_id`, `col_menu_id`, `col_created_by`, `col_created_at`, `col_updated_by`, `col_updated_at`)
+VALUES ('1845327703742484501', '1272436037200777216', '1845327703742484500', 'system', NOW(), 'system', NOW());
 

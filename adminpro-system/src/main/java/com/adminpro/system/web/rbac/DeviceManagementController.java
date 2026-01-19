@@ -1,6 +1,7 @@
 package com.adminpro.system.web.rbac;
 
 import com.adminpro.framework.base.entity.R;
+import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.core.security.auth.LoginUser;
@@ -10,15 +11,17 @@ import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.rbac.domains.entity.device.UserDeviceDao;
 import com.adminpro.system.rbac.domains.entity.device.UserDeviceEntity;
 import com.adminpro.system.rbac.domains.vo.device.DeviceListVo;
+import com.adminpro.system.rbac.domains.vo.device.DeviceSearchForm;
+import com.adminpro.system.rbac.domains.vo.device.UserDeviceVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,6 +80,41 @@ public class DeviceManagementController extends BaseController {
                 .collect(Collectors.toList());
 
         return R.ok(result);
+    }
+
+    /**
+     * 管理员获取所有设备列表
+     */
+    @Operation(summary = "管理员获取设备列表", description = "获取系统所有设备（支持搜索）")
+    @GetMapping("/all")
+    @PreAuthorize("hasAuthority('system:device:list')")
+    public R<QueryResultSet<UserDeviceVo>> listAll(DeviceSearchForm searchForm) {
+        // userDeviceDao.searchDevices handles paging setup from searchForm
+        QueryResultSet<UserDeviceEntity> result = userDeviceDao.searchDevices(searchForm);
+
+        List<UserDeviceVo> voList = new ArrayList<>();
+        if (result.getRecords() != null) {
+            voList = result.getRecords().stream().map(e -> {
+                UserDeviceVo vo = new UserDeviceVo();
+                vo.setUserId(e.getUserId());
+                vo.setDeviceId(e.getDeviceId());
+                vo.setDeviceName(e.getDeviceName());
+                vo.setPlatform(e.getPlatform());
+                vo.setLastIp(e.getLastIp());
+                vo.setLastActiveAt(e.getLastActiveAt());
+                vo.setIsCurrent(false); // Admin view doesn't track "current" relative to admin
+                return vo;
+            }).collect(Collectors.toList());
+        }
+
+        QueryResultSet<UserDeviceVo> response = new QueryResultSet<>();
+        response.setRecords(voList);
+        response.setTotalCount(result.getTotalCount());
+        response.setCurrentPage(result.getCurrentPage());
+        response.setPageSize(result.getPageSize());
+        response.setTotalPage(result.getTotalPage());
+
+        return R.ok(response);
     }
 
     /**

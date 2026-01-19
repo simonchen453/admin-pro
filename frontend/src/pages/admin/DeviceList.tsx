@@ -1,0 +1,223 @@
+import React, { useState, useEffect } from 'react';
+import {
+    Table,
+    Button,
+    Space,
+    Card,
+    Tag,
+    message,
+    Modal,
+    Form,
+    Input,
+    Row,
+    Col
+} from 'antd';
+import {
+    ReloadOutlined,
+    StopOutlined,
+    SearchOutlined,
+    DesktopOutlined,
+    MobileOutlined,
+    AppleOutlined,
+    AndroidOutlined,
+    GlobalOutlined,
+    UserOutlined
+} from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
+import { getAllDevicesApi, kickoutAnyDeviceApi } from '../../api/device';
+
+interface UserDeviceVo {
+    userId: string;
+    deviceId: string;
+    deviceName: string;
+    platform: string;
+    lastIp: string;
+    lastActiveAt: string;
+    isCurrent: boolean;
+}
+
+const DeviceList: React.FC = () => {
+    const [loading, setLoading] = useState(false);
+    const [list, setList] = useState<UserDeviceVo[]>([]);
+    const [total, setTotal] = useState(0);
+    const [form] = Form.useForm();
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 10
+    });
+
+    useEffect(() => {
+        fetchData();
+    }, [pagination.current, pagination.pageSize]);
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const values = await form.validateFields();
+            const params = {
+                ...values,
+                pageNo: pagination.current,
+                pageSize: pagination.pageSize
+            };
+
+            const response = await getAllDevicesApi(params);
+            if (response.restCode === '200') {
+                setList(response.data.records || []);
+                setTotal(response.data.totalCount || 0);
+            } else {
+                message.error(response.message || '加载设备列表失败');
+            }
+        } catch (error) {
+            console.error('获取设备列表失败:', error);
+            // message.error('加载设备列表失败');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = () => {
+        setPagination({ ...pagination, current: 1 });
+        fetchData();
+    };
+
+    const handleReset = () => {
+        form.resetFields();
+        handleSearch();
+    };
+
+    const handleKickout = (record: UserDeviceVo) => {
+        Modal.confirm({
+            title: '确认强制下线',
+            content: `确定要强制下线用户 ${record.userId} 的设备 "${record.deviceName}" 吗？`,
+            okText: '确认',
+            cancelText: '取消',
+            onOk: async () => {
+                try {
+                    const response = await kickoutAnyDeviceApi(record.userId, record.deviceId);
+                    if (response.restCode === '200') {
+                        message.success('设备已下线');
+                        fetchData();
+                    } else {
+                        message.error(response.message || '下线设备失败');
+                    }
+                } catch (error) {
+                    console.error('下线设备失败:', error);
+                    message.error('下线设备失败');
+                }
+            }
+        });
+    };
+
+    const getPlatformIcon = (platform: string) => {
+        const p = (platform || '').toLowerCase();
+        if (p.includes('windows') || p.includes('mac') || p.includes('linux')) {
+            if (p.includes('mac')) return <AppleOutlined />;
+            return <DesktopOutlined />;
+        }
+        if (p.includes('android')) return <AndroidOutlined />;
+        if (p.includes('iphone') || p.includes('ipad') || p.includes('ios')) return <AppleOutlined />;
+        return <MobileOutlined />;
+    };
+
+    const columns: ColumnsType<UserDeviceVo> = [
+        {
+            title: '用户ID',
+            dataIndex: 'userId',
+            key: 'userId',
+            width: 150,
+            render: (text) => <Space><UserOutlined />{text}</Space>
+        },
+        {
+            title: '设备名称',
+            dataIndex: 'deviceName',
+            key: 'deviceName',
+            render: (text: string, record: UserDeviceVo) => (
+                <Space>
+                    {getPlatformIcon(record.platform)}
+                    {text}
+                </Space>
+            )
+        },
+        {
+            title: '操作系统',
+            dataIndex: 'platform',
+            key: 'platform',
+            width: 120
+        },
+        {
+            title: 'IP地址',
+            dataIndex: 'lastIp',
+            key: 'lastIp',
+            width: 140,
+            render: (text) => <Space><GlobalOutlined />{text}</Space>
+        },
+        {
+            title: '最后活跃时间',
+            dataIndex: 'lastActiveAt',
+            key: 'lastActiveAt',
+            width: 170
+        },
+        {
+            title: '操作',
+            key: 'action',
+            width: 100,
+            render: (_, record) => (
+                <Space size="small">
+                    <Button
+                        size="small"
+                        danger
+                        icon={<StopOutlined />}
+                        onClick={() => handleKickout(record)}
+                    >
+                        强制下线
+                    </Button>
+                </Space>
+            )
+        }
+    ];
+
+    return (
+        <div className="fade-in">
+            <Card className="modern-card" title="系统设备管理">
+                <Form form={form} layout="inline" style={{ marginBottom: 16 }}>
+                    <Form.Item name="userId" label="用户ID">
+                        <Input placeholder="输入用户ID" allowClear />
+                    </Form.Item>
+                    <Form.Item name="deviceName" label="设备名称">
+                        <Input placeholder="输入设备名称" allowClear />
+                    </Form.Item>
+                    <Form.Item>
+                        <Space>
+                            <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+                                搜索
+                            </Button>
+                            <Button onClick={handleReset} icon={<ReloadOutlined />}>
+                                重置
+                            </Button>
+                        </Space>
+                    </Form.Item>
+                </Form>
+
+                <div className="modern-table">
+                    <Table
+                        columns={columns}
+                        dataSource={list}
+                        loading={loading}
+                        rowKey="deviceId"
+                        pagination={{
+                            current: pagination.current,
+                            pageSize: pagination.pageSize,
+                            total: total,
+                            showSizeChanger: true,
+                            showQuickJumper: true,
+                            onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
+                        }}
+                        size="middle"
+                    />
+                </div>
+            </Card>
+        </div>
+    );
+};
+
+export default DeviceList;

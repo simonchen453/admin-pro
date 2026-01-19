@@ -25,6 +25,7 @@ const ServerInfo = lazy(() => import('../pages/Server/ServerInfo'));
 const SysLogList = lazy(() => import('../pages/SysLog/SysLogList'));
 const SysLogView = lazy(() => import('../pages/SysLog/SysLogView'));
 const AuditLogList = lazy(() => import('../pages/AuditLog/AuditLogList'));
+const DeviceList = lazy(() => import('../pages/admin/DeviceList'));
 const Swagger = lazy(() => import('../pages/Swagger'));
 const Settings = lazy(() => import('../pages/Settings'));
 const NoPermission = lazy(() => import('../pages/NoPermission'));
@@ -202,6 +203,14 @@ function AppRouter() {
                         element={
                             <Suspense fallback={<LoadingSpinner />}>
                                 <AuditLogList />
+                            </Suspense>
+                        }
+                    />
+                    <Route
+                        path="admin/sys/device"
+                        element={
+                            <Suspense fallback={<LoadingSpinner />}>
+                                <DeviceList />
                             </Suspense>
                         }
                     />

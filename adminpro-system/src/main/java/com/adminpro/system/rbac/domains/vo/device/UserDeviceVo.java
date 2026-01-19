@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 @Schema(description = "用户设备信息")
 public class UserDeviceVo {
 
+    @Schema(description = "用户ID")
+    private String userId;
+
     @Schema(description = "设备ID (唯一标识)")
     private String deviceId;
 

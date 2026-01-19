@@ -1,5 +1,7 @@
 package com.adminpro.system.rbac.domains.entity.device;
 
+import com.adminpro.framework.jdbc.query.QueryResultSet;
+import com.adminpro.system.rbac.domains.vo.device.DeviceSearchForm;
 import com.adminpro.framework.base.entity.BaseDao;
 import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.InsertBuilder;
@@ -125,6 +127,34 @@ public class UserDeviceDao extends BaseDao<UserDeviceEntity, String> {
         select.setTable(UserDeviceEntity.TABLE_NAME);
         select.addWhereAnd(UserDeviceEntity.COL_IS_ACTIVE + EQ, 1);
         return count(select);
+    }
+
+    /**
+     * 搜索设备（Admin）
+     */
+    /**
+     * 搜索设备（Admin）
+     */
+    public QueryResultSet<UserDeviceEntity> searchDevices(DeviceSearchForm form) {
+        SelectBuilder<UserDeviceEntity> select = new SelectBuilder<>(getRowMapper());
+        select.setTable(UserDeviceEntity.TABLE_NAME);
+
+        if (form.getUserId() != null) {
+            select.addWhereAnd(UserDeviceEntity.COL_USER_ID + EQ, form.getUserId());
+        }
+        if (form.getDeviceName() != null) {
+            select.addWhereAnd(UserDeviceEntity.COL_DEVICE_NAME + LIKE, "%" + form.getDeviceName() + "%");
+        }
+        if (form.getIsActive() != null) {
+            select.addWhereAnd(UserDeviceEntity.COL_IS_ACTIVE + EQ, form.getIsActive());
+        }
+
+        select.addOrderByDescending(UserDeviceEntity.COL_LAST_ACTIVE_AT); // DESC
+
+        select.setPageSize(form.getPageSize());
+        select.setPageNo(form.getPageNo());
+
+        return search(select);
     }
 
     protected RowMapper<UserDeviceEntity> getRowMapper() {

@@ -1,7 +1,9 @@
 package com.adminpro.system.rbac.domains.entity.device;
 
 import com.adminpro.framework.jdbc.query.QueryResultSet;
+import com.adminpro.system.rbac.domains.entity.user.UserEntity;
 import com.adminpro.system.rbac.domains.vo.device.DeviceSearchForm;
+import com.adminpro.system.rbac.domains.vo.device.UserDeviceVo;
 import com.adminpro.framework.base.entity.BaseDao;
 import com.adminpro.framework.jdbc.sqlbuilder.DeleteBuilder;
 import com.adminpro.framework.jdbc.sqlbuilder.InsertBuilder;
@@ -135,26 +137,73 @@ public class UserDeviceDao extends BaseDao<UserDeviceEntity, String> {
     /**
      * 搜索设备（Admin）
      */
-    public QueryResultSet<UserDeviceEntity> searchDevices(DeviceSearchForm form) {
-        SelectBuilder<UserDeviceEntity> select = new SelectBuilder<>(getRowMapper());
-        select.setTable(UserDeviceEntity.TABLE_NAME);
+    /**
+     * 搜索设备（Admin）
+     */
+    public QueryResultSet<UserDeviceVo> searchDevices(DeviceSearchForm form) {
+        SelectBuilder<UserDeviceVo> select = new SelectBuilder<>(getVoRowMapper());
+        select.setTable(UserDeviceEntity.TABLE_NAME + " t LEFT JOIN " + UserEntity.TABLE_NAME + " u ON t."
+                + UserDeviceEntity.COL_USER_ID + " = u." + UserEntity.COL_ID);
 
-        if (form.getUserId() != null) {
-            select.addWhereAnd(UserDeviceEntity.COL_USER_ID + EQ, form.getUserId());
+        if (form.getLoginName() != null) {
+            select.addWhereAnd("u." + UserEntity.COL_LOGIN_NAME + " LIKE ?", "%" + form.getLoginName() + "%");
+        }
+        if (form.getUserDomain() != null) {
+            select.addWhereAnd("u." + UserEntity.COL_USER_DOMAIN + " LIKE ?", "%" + form.getUserDomain() + "%");
         }
         if (form.getDeviceName() != null) {
-            select.addWhereAnd(UserDeviceEntity.COL_DEVICE_NAME + LIKE, "%" + form.getDeviceName() + "%");
+            select.addWhereAnd("t." + UserDeviceEntity.COL_DEVICE_NAME + " LIKE ?", "%" + form.getDeviceName() + "%");
         }
         if (form.getIsActive() != null) {
-            select.addWhereAnd(UserDeviceEntity.COL_IS_ACTIVE + EQ, form.getIsActive());
+            select.addWhereAnd("t." + UserDeviceEntity.COL_IS_ACTIVE + " EQ ?", form.getIsActive());
         }
 
-        select.addOrderByDescending(UserDeviceEntity.COL_LAST_ACTIVE_AT); // DESC
+        select.addOrderByDescending("t." + UserDeviceEntity.COL_LAST_ACTIVE_AT); // DESC
 
         select.setPageSize(form.getPageSize());
         select.setPageNo(form.getPageNo());
 
         return search(select);
+    }
+
+    protected RowMapper<UserDeviceVo> getVoRowMapper() {
+        return new RowMapper<UserDeviceVo>() {
+            @Override
+            public UserDeviceVo mapRow(ResultSet rs, int rowNum) throws SQLException {
+                UserDeviceVo vo = new UserDeviceVo();
+                // Map Device Fields
+                vo.setId(rs.getString(UserDeviceEntity.COL_ID)); // Assuming UserDeviceVo extends or matches fields.
+                                                                 // Check VO definition.
+                // UserDeviceVo has: userId, loginName, realName, userDomain, deviceId,
+                // platform, ...
+
+                // Inspecting UserDeviceVo previously:
+                // private String userId;
+                // private String loginName; ...
+                // private String deviceId;
+
+                vo.setUserId(rs.getString(UserDeviceEntity.COL_USER_ID));
+                vo.setDeviceId(rs.getString(UserDeviceEntity.COL_DEVICE_ID));
+                vo.setPlatform(rs.getString(UserDeviceEntity.COL_PLATFORM));
+                vo.setDeviceName(rs.getString(UserDeviceEntity.COL_DEVICE_NAME));
+                vo.setRefreshTokenJti(rs.getString(UserDeviceEntity.COL_REFRESH_TOKEN_JTI));
+                vo.setLastIp(rs.getString(UserDeviceEntity.COL_LAST_IP));
+                vo.setLastUserAgent(rs.getString(UserDeviceEntity.COL_LAST_USER_AGENT));
+
+                java.sql.Timestamp lastActive = rs.getTimestamp(UserDeviceEntity.COL_LAST_ACTIVE_AT);
+                if (lastActive != null)
+                    vo.setLastActiveAt(lastActive.toLocalDateTime());
+
+                vo.setIsActive(rs.getInt(UserDeviceEntity.COL_IS_ACTIVE));
+
+                // Map User Fields
+                vo.setLoginName(rs.getString(UserEntity.COL_LOGIN_NAME));
+                vo.setRealName(rs.getString(UserEntity.COL_REAL_NAME));
+                vo.setUserDomain(rs.getString(UserEntity.COL_USER_DOMAIN));
+
+                return vo;
+            }
+        };
     }
 
     protected RowMapper<UserDeviceEntity> getRowMapper() {

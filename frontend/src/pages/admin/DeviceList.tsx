@@ -8,9 +8,7 @@ import {
     message,
     Modal,
     Form,
-    Input,
-    Row,
-    Col
+    Input
 } from 'antd';
 import {
     ReloadOutlined,
@@ -27,13 +25,18 @@ import type { ColumnsType } from 'antd/es/table';
 import { getAllDevicesApi, kickoutAnyDeviceApi } from '../../api/device';
 
 interface UserDeviceVo {
+    id: string;
     userId: string;
+    loginName: string;
+    realName: string;
+    userDomain: string;
     deviceId: string;
     deviceName: string;
     platform: string;
     lastIp: string;
     lastActiveAt: string;
     isCurrent: boolean;
+    isActive: number;
 }
 
 const DeviceList: React.FC = () => {
@@ -69,7 +72,6 @@ const DeviceList: React.FC = () => {
             }
         } catch (error) {
             console.error('获取设备列表失败:', error);
-            // message.error('加载设备列表失败');
         } finally {
             setLoading(false);
         }
@@ -88,7 +90,7 @@ const DeviceList: React.FC = () => {
     const handleKickout = (record: UserDeviceVo) => {
         Modal.confirm({
             title: '确认强制下线',
-            content: `确定要强制下线用户 ${record.userId} 的设备 "${record.deviceName}" 吗？`,
+            content: `确定要强制下线用户 ${record.loginName}(${record.realName}) 的设备 "${record.deviceName}" 吗？`,
             okText: '确认',
             cancelText: '取消',
             onOk: async () => {
@@ -121,11 +123,24 @@ const DeviceList: React.FC = () => {
 
     const columns: ColumnsType<UserDeviceVo> = [
         {
-            title: '用户ID',
-            dataIndex: 'userId',
-            key: 'userId',
-            width: 150,
+            title: '登录名',
+            dataIndex: 'loginName',
+            key: 'loginName',
+            width: 120,
             render: (text) => <Space><UserOutlined />{text}</Space>
+        },
+        {
+            title: '真实姓名',
+            dataIndex: 'realName',
+            key: 'realName',
+            width: 100
+        },
+        {
+            title: '用户域',
+            dataIndex: 'userDomain',
+            key: 'userDomain',
+            width: 100,
+            render: (text) => <Tag color="blue">{text}</Tag>
         },
         {
             title: '设备名称',
@@ -142,13 +157,13 @@ const DeviceList: React.FC = () => {
             title: '操作系统',
             dataIndex: 'platform',
             key: 'platform',
-            width: 120
+            width: 100
         },
         {
             title: 'IP地址',
             dataIndex: 'lastIp',
             key: 'lastIp',
-            width: 140,
+            width: 130,
             render: (text) => <Space><GlobalOutlined />{text}</Space>
         },
         {
@@ -168,6 +183,7 @@ const DeviceList: React.FC = () => {
                         danger
                         icon={<StopOutlined />}
                         onClick={() => handleKickout(record)}
+                        disabled={record.isActive === 0}
                     >
                         强制下线
                     </Button>
@@ -180,8 +196,11 @@ const DeviceList: React.FC = () => {
         <div className="fade-in">
             <Card className="modern-card" title="系统设备管理">
                 <Form form={form} layout="inline" style={{ marginBottom: 16 }}>
-                    <Form.Item name="userId" label="用户ID">
-                        <Input placeholder="输入用户ID" allowClear />
+                    <Form.Item name="loginName" label="登录名">
+                        <Input placeholder="输入登录名" allowClear />
+                    </Form.Item>
+                    <Form.Item name="userDomain" label="用户域">
+                        <Input placeholder="输入用户域" allowClear />
                     </Form.Item>
                     <Form.Item name="deviceName" label="设备名称">
                         <Input placeholder="输入设备名称" allowClear />
@@ -203,7 +222,7 @@ const DeviceList: React.FC = () => {
                         columns={columns}
                         dataSource={list}
                         loading={loading}
-                        rowKey="deviceId"
+                        rowKey="id"
                         pagination={{
                             current: pagination.current,
                             pageSize: pagination.pageSize,

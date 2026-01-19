@@ -8,7 +8,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class DeviceSearchForm extends BaseSearchForm<UserDeviceEntity> {
-    private String userId;
+    private String loginName;
+    private String userDomain;
     private String deviceName;
     private Integer isActive;
 }

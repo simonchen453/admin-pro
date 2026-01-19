@@ -7,14 +7,13 @@ import com.adminpro.framework.base.entity.BaseService;
 import com.adminpro.framework.base.util.CryptUtil;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.util.SpringUtil;
-import com.adminpro.framework.client.helper.ClientHelper;
+
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.common.helper.ConfigHelper;
-import com.adminpro.system.core.common.helper.WebHelper;
-import com.adminpro.system.core.security.auth.TokenGenerator;
+
 import com.adminpro.system.rbac.api.PasswordHelper;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
 import com.adminpro.system.rbac.common.RbacConstants;
@@ -194,30 +193,22 @@ public class UserService extends BaseService<UserEntity, String> {
      * @param password   登录密码（明文）
      * @return 登录成功返回Token（移动端）或"success"（PC端），失败返回null
      */
-    public String authLogin(String userDomain, String loginName, String password) {
+    public boolean authLogin(String userDomain, String loginName, String password) {
 
         UserEntity entity = findByUserDomainAndLoginName(userDomain, loginName);
         if (entity == null) {
             logger.warn("登录失败，用户不存在: userDomain={}, loginName={}", userDomain, loginName);
-            return null;
+            return false;
         }
         logger.debug("用户登录验证: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
-        String newPwd = PasswordHelper.encryptPwd(userDomain, loginName, password);
-        boolean isMobileRequest = ClientHelper.isMobileRequest(WebHelper.getHttpRequest());
-        if (isMobileRequest) {
-            if (StringUtils.equals(newPwd, entity.getPassword())) {
-                String token = TokenGenerator.generateValue();
-                logger.info("用户登录成功(REST): userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
-                return token;
-            }
-        } else {
-            if (StringUtils.equals(newPwd, entity.getPassword())) {
-                logger.info("用户登录成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
-                return "success";
-            }
+        boolean isPasswordValid = PasswordHelper.checkPwd(entity, password);
+
+        if (isPasswordValid) {
+            logger.info("用户登录成功: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
+            return true;
         }
         logger.warn("用户登录失败，密码不正确: userDomain={}, loginName={}", entity.getUserDomain(), entity.getLoginName());
-        return null;
+        return false;
     }
 
     /**

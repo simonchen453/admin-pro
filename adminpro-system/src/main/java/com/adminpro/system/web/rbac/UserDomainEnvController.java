@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -64,17 +65,13 @@ public class UserDomainEnvController extends BaseController {
      * @return 用户域环境配置查询结果集，包含数据和分页信息
      */
     @Operation(summary = "查询用户域环境配置列表", description = "根据查询条件获取用户域环境配置列表，支持按用户域进行过滤和分页查询")
-    @ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 查询成功，data 字段包含 QueryResultSet<UserDomainEnvEntity> 列表
-                - restCode=401: 未授权，需要登录
-                - restCode=403: 无权限访问
-                - restCode=500: 服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 查询成功，data 字段包含 QueryResultSet<UserDomainEnvEntity> 列表
+            - restCode=401: 未授权，需要登录
+            - restCode=403: 无权限访问
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @PostMapping(value = "/search")
     public R<QueryResultSet<UserDomainEnvEntity>> list(
             @Parameter(description = "查询条件表单", required = true) @RequestBody SearchForm searchForm) {
@@ -100,18 +97,14 @@ public class UserDomainEnvController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "创建用户域环境配置", description = "新增一个用户域环境配置，包含登录URL、首页URL、错误页URL、布局等配置信息")
-    @ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 创建成功
-                - restCode=400: 请求参数错误
-                - restCode=401: 未授权，需要登录
-                - restCode=403: 无权限访问
-                - restCode=500: 服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 创建成功
+            - restCode=400: 请求参数错误
+            - restCode=401: 未授权，需要登录
+            - restCode=403: 无权限访问
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @PostMapping(value = "/create")
     public R create(
             @Parameter(description = "用户域环境配置实体信息", required = true) @RequestBody UserDomainEnvEntity userDomainEnv) {
@@ -157,19 +150,15 @@ public class UserDomainEnvController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "更新用户域环境配置", description = "更新已有用户域环境配置的信息")
-    @ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 更新成功
-                - restCode=400: 请求参数错误
-                - restCode=401: 未授权，需要登录
-                - restCode=403: 无权限访问
-                - restCode=404: 用户域环境配置不存在
-                - restCode=500: 服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 更新成功
+            - restCode=400: 请求参数错误
+            - restCode=401: 未授权，需要登录
+            - restCode=403: 无权限访问
+            - restCode=404: 用户域环境配置不存在
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @PutMapping(value = "/{id}")
     public R editSave(@PathVariable String id,
             @Parameter(description = "用户域环境配置实体信息", required = true) @RequestBody UserDomainEnvEntity userDomainEnv) {
@@ -218,18 +207,14 @@ public class UserDomainEnvController extends BaseController {
      * @return 用户域环境配置详细信息
      */
     @Operation(summary = "查询用户域环境配置详情", description = "根据用户域环境配置ID获取配置的详细信息")
-    @ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 查询成功，data 字段包含 UserDomainEnvEntity 对象
-                - restCode=401: 未授权，需要登录
-                - restCode=403: 无权限访问
-                - restCode=404: 用户域环境配置不存在
-                - restCode=500: 服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 查询成功，data 字段包含 UserDomainEnvEntity 对象
+            - restCode=401: 未授权，需要登录
+            - restCode=403: 无权限访问
+            - restCode=404: 用户域环境配置不存在
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @GetMapping(value = "/{id}")
     public R<UserDomainEnvEntity> detail(
             @Parameter(description = "用户域环境配置ID", required = true) @PathVariable String id) {
@@ -251,18 +236,14 @@ public class UserDomainEnvController extends BaseController {
      * @return 操作结果
      */
     @Operation(summary = "批量删除用户域环境配置", description = "根据多个配置ID批量删除用户域环境配置，ID之间用逗号分隔")
-    @ApiResponse(
-        responseCode = "200",
-        description = """
-                统一响应格式，通过 restCode 判断业务状态：
-                - restCode=200: 删除成功
-                - restCode=400: 请求参数错误
-                - restCode=401: 未授权，需要登录
-                - restCode=403: 无权限访问
-                - restCode=500: 服务器内部错误
-                """,
-        content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class))
-    )
+    @ApiResponse(responseCode = "200", description = """
+            统一响应格式，通过 restCode 判断业务状态：
+            - restCode=200: 删除成功
+            - restCode=400: 请求参数错误
+            - restCode=401: 未授权，需要登录
+            - restCode=403: 无权限访问
+            - restCode=500: 服务器内部错误
+            """, content = @Content(mediaType = "application/json", schema = @Schema(implementation = R.class)))
     @DeleteMapping
     public R remove(
             @Parameter(description = "用户域环境配置ID列表，多个ID用逗号分隔", required = true, example = "1,2,3") @RequestParam("ids") String ids) {
@@ -272,6 +253,7 @@ public class UserDomainEnvController extends BaseController {
     }
 
     @Data
+    @EqualsAndHashCode(callSuper = false)
     public static class SearchForm extends BaseSearchForm {
         private String userDomain;
 

@@ -11,7 +11,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -201,17 +201,6 @@ public class WebHelper {
         return CommonUtil.getCurrentRequest();
     }
 
-    public static String getSessionId() {
-        HttpServletRequest request = CommonUtil.getCurrentRequest();
-        if (request != null) {
-            HttpSession session = request.getSession();
-            if (session != null) {
-                return session.getId();
-            }
-        }
-        return null;
-    }
-
     public static HttpServletResponse getHttpResponse() {
         ServletRequestAttributes reqAttrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         return reqAttrs.getResponse();
@@ -259,30 +248,6 @@ public class WebHelper {
      */
     public static <E> E getAttribute(HttpServletRequest request, String key, Class<E> clazz) {
         return ParamUtil.getAttribute(request, key, clazz);
-    }
-
-    /**
-     * get attribute from session
-     *
-     * @param session
-     * @param key
-     * @return
-     */
-    public static Object getAttribute(HttpSession session, String key) {
-        return getAttribute(session, key, Object.class);
-    }
-
-    /**
-     * get attribute from session
-     *
-     * @param session
-     * @param key
-     * @param clazz
-     * @param <E>
-     * @return
-     */
-    public static <E> E getAttribute(HttpSession session, String key, Class<E> clazz) {
-        return ParamUtil.getAttribute(session, key, clazz);
     }
 
     /**

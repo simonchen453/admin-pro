@@ -1,10 +1,9 @@
 package com.adminpro.system.core.security;
 
-import com.adminpro.system.core.security.auth.AuthToken;
 import com.adminpro.system.core.security.auth.LoginUser;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -72,8 +71,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
      * @param authentication 认证对象，包含用户名和密码
      * @return 认证成功后的Authentication对象，principal为AuthToken
      * @throws AuthenticationException 认证失败时抛出，包括：
-     *                                  UsernameNotFoundException（用户不存在）
-     *                                  BadCredentialsException（密码错误）
+     *                                 UsernameNotFoundException（用户不存在）
+     *                                 BadCredentialsException（密码错误）
      */
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -87,11 +86,11 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             String userDomain = authUser.getUserDomain();
             String loginName = authUser.getLoginName();
 
-            String token = UserService.getInstance().authLogin(userDomain, loginName, password);
-            if (StringUtils.isNotEmpty(token)) {
+            boolean isAuthenticated = UserService.getInstance().authLogin(userDomain, loginName, password);
+            if (isAuthenticated) {
                 // 生成令牌
                 Authentication auth = new UsernamePasswordAuthenticationToken(
-                        new AuthToken(userDomain, loginName, token), password,
+                        authUser, password,
                         authUser.getAuthorities());
                 return auth;
             } else {

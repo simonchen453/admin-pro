@@ -502,13 +502,32 @@ public class LoginHelper {
             throw new APIException("账户已停用");
         }
 
+        // 2. 调用公共登录逻辑生成 Token
+        return login(userDetails, device, rememberMe);
+    }
+
+    /**
+     * 公共登录逻辑（生成 Token）
+     * <p>
+     * 适用于已通过认证的用户（如：用户名密码登录、第三方登录等）
+     *
+     * @param userDetails 登录用户信息
+     * @param device      设备信息
+     * @param rememberMe  是否记住我
+     * @return 登录响应（包含 Token）
+     */
+    public JwtLoginResponse login(LoginUser userDetails, Device device, boolean rememberMe) {
+        // 1. 准备基础数据
+        String userDomain = userDetails.getUserDomain();
+        String loginName = userDetails.getLoginName();
+        String platform = (device != null && device.isMobile()) ? "mobile" : "web";
+
         // 2. 生成 Access Token
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userDomain", userDetails.getUserDomain());
-        claims.put("loginName", userDetails.getLoginName());
+        claims.put("userDomain", userDomain);
+        claims.put("loginName", loginName);
         claims.put("realName", userDetails.getRealName());
         claims.put("deptNo", userDetails.getDeptNo());
-        String platform = (device != null && device.isMobile()) ? "mobile" : "web";
         claims.put("aud", platform);
         claims.put("permissions", userDetails.getPermissions());
 
@@ -517,18 +536,17 @@ public class LoginHelper {
         // 3. 存入 Access Token 白名单（使用与 JWT 一致的过期时间）
         String jti = jwtTokenProvider.getJti(accessToken);
         int accessTokenValidity = jwtProperties.getAccessTokenValidity(platform);
-        // Ehcache key 是 jti，value 是 userId，expire 是过期时间（秒）
         AppCache.getInstance().set(JwtCacheConstants.ACCESS_TOKEN_CACHE, jti,
                 userDetails.getId(), accessTokenValidity);
 
         // 4. 生成 Refresh Token
         RefreshTokenData rtData = new RefreshTokenData();
         rtData.setUserId(userDetails.getId());
-        rtData.setUserDomain(userDetails.getUserDomain());
-        rtData.setLoginName(userDetails.getLoginName());
+        rtData.setUserDomain(userDomain);
+        rtData.setLoginName(loginName);
         rtData.setPlatform(platform);
 
-        // 使用设备指纹生成稳定的 deviceId（同一设备多次登录相同）
+        // 使用设备指纹生成稳定的 deviceId
         HttpServletRequest request = WebHelper.getHttpRequest();
         DeviceFingerprintService fingerprintService = SpringUtil.getBean(DeviceFingerprintService.class);
 

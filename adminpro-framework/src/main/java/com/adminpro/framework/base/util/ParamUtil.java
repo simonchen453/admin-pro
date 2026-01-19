@@ -3,7 +3,7 @@ package com.adminpro.framework.base.util;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -11,19 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Enumeration;
 
 public final class ParamUtil {
     private static final Logger logger = LoggerFactory.getLogger(ParamUtil.class);
-
-    /**
-     * session variable name pattern for multiple tabs. e.g. _tab_303a22e0-2d4b-11eb-adc1-0242ac120002_appContact
-     */
-    private static final String MULTI_TAB_SESSION_ATTR_NAME = "_tab_%s_%s";
-    /**
-     * hidden field name on the page. e.g. 303a22e0-2d4b-11eb-adc1-0242ac120002
-     */
-    private static final String MULTI_TAB_FORM_FIELD_NAME = "multiTabId";
 
     /**
      * get data from request body
@@ -225,107 +215,6 @@ public final class ParamUtil {
         return rets;
     }
 
-    public static Object getSessionAttr(HttpServletRequest request, String paramName) {
-        if (request == null) {
-            return null;
-        }
-
-        return request.getSession().getAttribute(paramName);
-    }
-
-    public static void setSessionAttr(HttpServletRequest request, String paramName, Object obj) {
-        if (request != null) {
-            request.getSession().setAttribute(paramName, obj);
-        }
-    }
-
-    /**
-     * 1. store the session variable for a specific tab, the tab id will be retrieved from form field if any.
-     * 2. a multiTabId field will be added to page.
-     *
-     * @param request
-     * @param paramName
-     * @param obj
-     * @return the tab id, which should be placed on the page.
-     */
-    public static String setMultiTabSessionAttr(HttpServletRequest request, String paramName, Object obj) {
-        String multiTabId = null;
-        if (request != null) {
-            multiTabId = request.getParameter(MULTI_TAB_FORM_FIELD_NAME);
-            if (StringUtils.isBlank(multiTabId)) {
-                multiTabId = StringUtil.genUuid();
-            }
-
-            setMultiTabSessionAttr(request, paramName, obj, multiTabId);
-        }
-        return multiTabId;
-    }
-
-    public static Object getMultiTabSessionAttr(HttpServletRequest request, String paramName) {
-        if (request == null) {
-            return null;
-        }
-
-        String multiTabId = request.getParameter(MULTI_TAB_FORM_FIELD_NAME);
-        return request.getSession().getAttribute(String.format(MULTI_TAB_SESSION_ATTR_NAME, multiTabId, paramName));
-    }
-
-    public static void clearMultiTabSessionAttr(HttpServletRequest request, String paramName) {
-        clearMultiTabSessionAttr(request, paramName, request.getParameter(MULTI_TAB_FORM_FIELD_NAME));
-    }
-
-    public static void setMultiTabSessionAttr(HttpServletRequest request, String paramName, Object obj, String multiTabId) {
-        if (request == null) {
-            return;
-        }
-
-        request.setAttribute(MULTI_TAB_FORM_FIELD_NAME, multiTabId);
-        request.getSession().setAttribute(String.format(MULTI_TAB_SESSION_ATTR_NAME, multiTabId, paramName), obj);
-    }
-
-    public static Object getMultiTabSessionAttr(HttpServletRequest request, String paramName, String multiTabId) {
-        if (request == null) {
-            return null;
-        }
-
-        return request.getSession().getAttribute(String.format(MULTI_TAB_SESSION_ATTR_NAME, multiTabId, paramName));
-    }
-
-    public static void clearMultiTabSessionAttr(HttpServletRequest request, String paramName, String multiTabId) {
-        if (request == null) {
-            return;
-        }
-
-        String sessionKey = String.format(MULTI_TAB_SESSION_ATTR_NAME, multiTabId, paramName);
-        request.getSession().setAttribute(sessionKey, null);
-        request.getSession().removeAttribute(sessionKey);
-    }
-
-    /**
-     * clear all session variables for this tab
-     *
-     * @param request
-     * @param multiTabId
-     */
-    public static void clearMultiTabSessionAttrs(HttpServletRequest request, String multiTabId) {
-        if (request == null) {
-            return;
-        }
-
-        HttpSession session = request.getSession();
-        Enumeration<?> names = session.getAttributeNames();
-        if (names != null) {
-            String key = String.format("_tab_%s_", multiTabId);
-            while (names.hasMoreElements()) {
-                String name = (String) names.nextElement();
-                if (name.startsWith(key)) {
-                    session.setAttribute(name, null);
-                    session.removeAttribute(name);
-                }
-            }
-        }
-    }
-
     public static void setRequestAttr(HttpServletRequest request, String paramName, Object obj) {
         request.setAttribute(paramName, obj);
     }
@@ -345,24 +234,6 @@ public final class ParamUtil {
      */
     public static <E> E getAttribute(HttpServletRequest request, String key, Class<E> clazz) {
         Object obj = request.getAttribute(key);
-        if (clazz.isInstance(obj)) {
-            return clazz.cast(obj);
-        }
-
-        return null;
-    }
-
-    /**
-     * get attribute from session
-     *
-     * @param session
-     * @param key
-     * @param clazz
-     * @param <E>
-     * @return
-     */
-    public static <E> E getAttribute(HttpSession session, String key, Class<E> clazz) {
-        Object obj = session.getAttribute(key);
         if (clazz.isInstance(obj)) {
             return clazz.cast(obj);
         }

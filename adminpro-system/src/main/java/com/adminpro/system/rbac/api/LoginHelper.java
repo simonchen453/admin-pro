@@ -3,6 +3,7 @@ package com.adminpro.system.rbac.api;
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.exceptions.APIException;
 import com.adminpro.system.core.cache.AppCache;
+import com.adminpro.system.core.cache.CurrentUserCache;
 import com.adminpro.system.core.common.helper.AuditLogHelper;
 import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.core.common.helper.WebHelper;
@@ -110,7 +111,6 @@ public class LoginHelper {
 
     @Autowired
     private JwtProperties jwtProperties;
-
 
     /**
      * 验证账户和密码
@@ -230,6 +230,67 @@ public class LoginHelper {
     }
 
     /**
+     * 获取当前会话的 JTI（JWT Token ID）
+     * <p>
+     * JTI 是 JWT 的唯一标识，每次登录生成不同的 JTI。
+     * 可用于构建会话级缓存 key，区分同一用户的不同登录会话。
+     * </p>
+     *
+     * @return JTI，未登录或无法获取时返回 null
+     */
+    public String getCurrentJti() {
+        HttpServletRequest request = WebHelper.getHttpRequest();
+        if (request == null) {
+            return null;
+        }
+
+        try {
+            // 从 Authorization Header 中提取 JWT
+            String bearerToken = request.getHeader("Authorization");
+            if (StringUtils.isNotBlank(bearerToken) && bearerToken.startsWith("Bearer ")) {
+                String jwt = bearerToken.substring(7);
+                return jwtTokenProvider.getJti(jwt);
+            }
+
+            // 从 Cookie 中提取
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if ("accessToken".equals(cookie.getName())) {
+                        return jwtTokenProvider.getJti(cookie.getValue());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.debug("获取 JTI 失败: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 获取当前设备ID（基于设备指纹）
+     * <p>
+     * 使用 HTTP 请求特征（User-Agent、Accept-Language 等）生成稳定的设备标识。
+     * 同一浏览器/设备的多次请求会生成相同的设备ID。
+     * </p>
+     *
+     * @return 设备ID（32位哈希值），无法获取时返回 "unknown"
+     */
+    public String getCurrentDeviceId() {
+        HttpServletRequest request = WebHelper.getHttpRequest();
+        if (request == null) {
+            return "unknown";
+        }
+
+        try {
+            DeviceFingerprintService fingerprintService = SpringUtil.getBean(DeviceFingerprintService.class);
+            return fingerprintService.generateFingerprint(request);
+        } catch (Exception e) {
+            logger.debug("获取设备指纹失败: {}", e.getMessage());
+        }
+        return "unknown";
+    }
+
+    /**
      * 获取当前登录用户的用户域
      *
      * @return 用户域，未登录时返回null
@@ -339,21 +400,22 @@ public class LoginHelper {
                     String userId = AppCache.getInstance().get(
                             JwtCacheConstants.ACCESS_TOKEN_CACHE,
                             jti,
-                            String.class
-                    );
+                            String.class);
 
                     // 移除 Access Token 白名单
                     AppCache.getInstance().delete(
                             JwtCacheConstants.ACCESS_TOKEN_CACHE,
-                            jti
-                    );
+                            jti);
 
                     // 如果找到了 userId，清除该用户的所有 Refresh Token（单点登出）
                     if (StringUtils.isNotBlank(userId)) {
-                        RefreshTokenService rtService =
-                                SpringUtil.getBean(RefreshTokenService.class);
+                        RefreshTokenService rtService = SpringUtil.getBean(RefreshTokenService.class);
                         int revokedCount = rtService.revokeAllUserTokens(userId);
                         logger.info("用户 {} 登出，已清除 {} 个 Refresh Token", userId, revokedCount);
+
+                        // 清除当前会话的业务缓存（不影响其他设备/会话）
+                        int cacheCount = CurrentUserCache.clearCurrentSession();
+                        logger.info("用户 {} 登出，已清除 {} 个业务缓存", userId, cacheCount);
                     }
 
                     // 清除 SecurityContext
@@ -367,7 +429,6 @@ public class LoginHelper {
 
         return false;
     }
-
 
     /**
      * 验证验证码
@@ -469,8 +530,7 @@ public class LoginHelper {
 
         // 使用设备指纹生成稳定的 deviceId（同一设备多次登录相同）
         HttpServletRequest request = WebHelper.getHttpRequest();
-        DeviceFingerprintService fingerprintService =
-            SpringUtil.getBean(DeviceFingerprintService.class);
+        DeviceFingerprintService fingerprintService = SpringUtil.getBean(DeviceFingerprintService.class);
 
         String deviceId = fingerprintService.generateFingerprint(request);
         String deviceName = fingerprintService.generateDeviceName(request);
@@ -548,7 +608,10 @@ public class LoginHelper {
         // 3. 轮换 Refresh Token
         String newRefreshToken = refreshTokenService.rotateRefreshToken(refreshToken);
 
-        // 4. 生成新的 Access Token
+        // 4. 获取旧 JTI（用于会话缓存迁移）
+        String oldJti = getCurrentJti();
+
+        // 5. 生成新的 Access Token
         Map<String, Object> claims = new HashMap<>();
         claims.put("userDomain", userDetails.getUserDomain());
         claims.put("loginName", userDetails.getLoginName());
@@ -560,11 +623,16 @@ public class LoginHelper {
 
         String accessToken = jwtTokenProvider.createAccessToken(userDetails.getId(), claims);
 
-        // 5. 存入 Access Token 白名单（使用与 JWT 一致的过期时间）
-        String jti = jwtTokenProvider.getJti(accessToken);
+        // 6. 存入 Access Token 白名单（使用与 JWT 一致的过期时间）
+        String newJti = jwtTokenProvider.getJti(accessToken);
         int accessTokenValidity = jwtProperties.getAccessTokenValidity(platform);
-        AppCache.getInstance().set(JwtCacheConstants.ACCESS_TOKEN_CACHE, jti,
+        AppCache.getInstance().set(JwtCacheConstants.ACCESS_TOKEN_CACHE, newJti,
                 userDetails.getId(), accessTokenValidity);
+
+        // 7. 迁移会话级缓存（从旧 JTI 到新 JTI）
+        if (StringUtils.isNotBlank(oldJti) && !oldJti.equals(newJti)) {
+            CurrentUserCache.migrateSession(userDetails.getId(), oldJti, newJti, accessTokenValidity);
+        }
 
         return JwtLoginResponse.builder()
                 .accessToken(accessToken)

@@ -97,4 +97,17 @@
         </resources>
     </cache>
 
+    <!-- 用户业务数据缓存 (CurrentUserCache 使用) -->
+    <cache alias="user:data">
+        <key-type>java.lang.String</key-type>
+        <value-type>java.lang.Object</value-type>
+        <expiry>
+            <ttl unit="hours">2</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">10000</heap>
+            <offheap unit="MB">20</offheap>
+        </resources>
+    </cache>
+
 </config>

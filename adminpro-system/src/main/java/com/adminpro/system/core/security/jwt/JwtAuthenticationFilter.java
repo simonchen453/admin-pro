@@ -44,7 +44,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String token = extractToken(request);
-            log.debug("Extracted token: {}", token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null");
+            log.debug("Extracted token: {}",
+                    token != null ? token.substring(0, Math.min(20, token.length())) + "..." : "null");
 
             if (StringUtils.hasText(token)) {
                 boolean isValid = jwtTokenProvider.validateToken(token);
@@ -70,7 +71,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         // Token 有效且在白名单中
                         Claims claims = jwtTokenProvider.parseToken(token);
                         LoginUser loginUser = buildLoginUserFromClaims(claims);
-                        log.debug("Built LoginUser: userId={}, loginName={}", loginUser.getUserId(), loginUser.getLoginName());
+                        log.debug("Built LoginUser: userId={}, loginName={}", loginUser.getUserId(),
+                                loginUser.getLoginName());
 
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                 loginUser, null, loginUser.getAuthorities());
@@ -139,13 +141,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         user.setDeptNo(deptNo);
         // user.setRoles(roles); // UserEntity 可能没有 setRoles，或者 roles 是关联表
 
-        // LoginUser(userId, userDomain, loginName, password, status, deptNo, deptName,
-        // realName, user, permissions)
+        // LoginUser(id, userDomain, loginName, status, deptNo, deptName, realName,
+        // user, permissions)
         return new LoginUser(
                 userId,
                 userDomain,
                 loginName,
-                "", // password (not needed for JWT auth)
                 "1", // status (assumed active if token exists)
                 deptNo,
                 "", // deptName (optional/fetch if needed)

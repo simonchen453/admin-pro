@@ -9,6 +9,7 @@ import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
+import com.adminpro.system.core.cache.SearchFormCache;
 import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.helper.ExcelHelper;
 import com.adminpro.system.core.common.helper.FileHelper;
@@ -732,7 +733,7 @@ public class UserController extends BaseController {
     private SearchParam buildSearchParam(SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         SearchParam param = startPaging(searchForm);
-        setSearchForm(request, searchForm);
+        SearchFormCache.set(SEARCH_FORM_KEY, searchForm);
 
         if (StringUtils.isNotEmpty(searchForm.getUserDomain())) {
             param.addFilter("userDomain", searchForm.getUserDomain());
@@ -927,20 +928,47 @@ public class UserController extends BaseController {
         }
     }
 
-    public static SearchForm getSearchForm(HttpServletRequest request) {
-        SearchForm searchForm = (SearchForm) request.getSession().getAttribute(SEARCH_FORM_KEY);
+    /**
+     * 获取搜索表单（从缓存获取，不存在则创建新的）
+     * <p>
+     * 使用无状态缓存替代 Session，按模块隔离
+     * </p>
+     *
+     * @return 搜索表单对象
+     */
+    public static SearchForm getSearchForm() {
+        SearchForm searchForm = SearchFormCache.get(SEARCH_FORM_KEY, SearchForm.class);
         if (searchForm == null) {
             searchForm = new SearchForm();
+            SearchFormCache.set(SEARCH_FORM_KEY, searchForm);
         }
-        setSearchForm(request, searchForm);
         return searchForm;
     }
 
-    public static void setSearchForm(HttpServletRequest request, SearchForm searchForm) {
-        request.getSession().setAttribute(SEARCH_FORM_KEY, searchForm);
+    /**
+     * 设置搜索表单（已废弃，直接使用 SearchFormCache.set()）
+     * <p>
+     * 使用无状态缓存替代 Session
+     * </p>
+     *
+     * @param searchForm 搜索表单对象
+     * @deprecated 使用 {@link SearchFormCache#set(String, BaseSearchForm)} 替代
+     */
+    @Deprecated
+    public static void setSearchForm(SearchForm searchForm) {
+        SearchFormCache.set(SEARCH_FORM_KEY, searchForm);
     }
 
-    public static void cleanSearchForm(HttpServletRequest request) {
-        request.getSession().removeAttribute(SEARCH_FORM_KEY);
+    /**
+     * 清除搜索表单
+     * <p>
+     * 使用无状态缓存替代 Session
+     * </p>
+     *
+     * @deprecated 使用 {@link SearchFormCache#clear(String)} 替代
+     */
+    @Deprecated
+    public static void cleanSearchForm() {
+        SearchFormCache.clear(SEARCH_FORM_KEY);
     }
 }

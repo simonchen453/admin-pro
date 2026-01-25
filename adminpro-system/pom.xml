@@ -164,6 +164,18 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.12.3</version>
         </dependency>
+        <!-- Word 文档生成 poi-tl -->
+        <dependency>
+            <groupId>com.deepoove</groupId>
+            <artifactId>poi-tl</artifactId>
+            <version>1.12.2</version>
+        </dependency>
+        <!-- ua-parser 用于解析 User-Agent -->
+        <dependency>
+            <groupId>com.github.ua-parser</groupId>
+            <artifactId>uap-java</artifactId>
+            <version>1.6.1</version>
+        </dependency>
     </dependencies>
 
     <build>

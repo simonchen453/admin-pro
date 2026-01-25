@@ -110,10 +110,11 @@
             <artifactId>commons-codec</artifactId>
             <version>${commons.codec.version}</version>
         </dependency>
+        <!-- 使用 commons-configuration2 替代已停止维护的 1.x 版本 -->
         <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>1.10</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-configuration2</artifactId>
+            <version>2.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -178,7 +179,7 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.3</version>
+            <version>1.9.4</version>
         </dependency>
 
         <dependency>
@@ -206,17 +207,21 @@
             <artifactId>flying-saucer-pdf-itext5</artifactId>
             <version>9.1.13</version>
         </dependency>
-        <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <version>1.5.1</version>
-        </dependency>
+        <!-- 已移除旧版 commons-pool 1.5.1，统一使用 commons-pool2 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-freemarker</artifactId>
         </dependency>
         <!-- Spring Boot 3.x 已包含 Jackson，无需旧版本 -->
         <!--生成PDF 结束-->
+
+        <!-- Word 文档生成 poi-tl -->
+        <dependency>
+            <groupId>com.deepoove</groupId>
+            <artifactId>poi-tl</artifactId>
+            <version>1.12.2</version>
+        </dependency>
+
         <!--解析html-->
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -237,21 +242,21 @@
         </dependency>
 
 
-        <!--Excel导入导出-->
+        <!--Excel导入导出 - 升级到 4.x 版本以获得更好的性能和安全性-->
         <dependency>
             <groupId>cn.afterturn</groupId>
             <artifactId>easypoi-base</artifactId>
-            <version>3.0.1</version>
+            <version>4.4.0</version>
         </dependency>
         <dependency>
             <groupId>cn.afterturn</groupId>
             <artifactId>easypoi-web</artifactId>
-            <version>3.0.1</version>
+            <version>4.4.0</version>
         </dependency>
         <dependency>
             <groupId>cn.afterturn</groupId>
             <artifactId>easypoi-annotation</artifactId>
-            <version>3.0.1</version>
+            <version>4.4.0</version>
         </dependency>
 
         <!--验证码 -->
@@ -271,11 +276,11 @@
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
         </dependency>
-        <!-- 解析客户端操作系统、浏览器等 -->
+        <!-- 解析客户端操作系统、浏览器等 - 使用 ua-parser 替代已停止维护的 UserAgentUtils -->
         <dependency>
-            <groupId>eu.bitwalker</groupId>
-            <artifactId>UserAgentUtils</artifactId>
-            <version>1.19</version>
+            <groupId>com.github.ua-parser</groupId>
+            <artifactId>uap-java</artifactId>
+            <version>1.6.1</version>
         </dependency>
         <!-- fastjson 已移除，使用 Gson 替代（安全漏洞修复） -->
         <dependency>

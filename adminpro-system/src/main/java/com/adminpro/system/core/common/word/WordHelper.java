@@ -1,31 +1,26 @@
 package com.adminpro.system.core.common.word;
 
+import com.deepoove.poi.XWPFTemplate;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
 /**
  * Word生成API
- * 注意：poi-tl 依赖暂未可用，如需使用请添加正确的依赖版本
+ * 基于 poi-tl 实现 Word 文档模板渲染
  *
  * @author simon
  */
 public class WordHelper {
-    public static void generate(String templatName, OutputStream outputStream, Map<String, Object> map) {
-        // TODO: poi-tl 依赖暂未可用，需要添加正确的依赖版本
-        // 当前实现已禁用，如需使用请：
-        // 1. 在 pom.xml 中添加正确的 poi-tl 依赖版本
-        // 2. 取消下面的注释
-        /*
+    public static void generate(String templateName, OutputStream outputStream, Map<String, Object> map) {
         try {
-            //核心API采用了极简设计，只需要一行代码
-            XWPFTemplate template = XWPFTemplate.compile(templatName).render(map);
+            // 核心API采用了极简设计，只需要一行代码
+            XWPFTemplate template = XWPFTemplate.compile(templateName).render(map);
             template.write(outputStream);
             template.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("生成 Word 文档失败: " + e.getMessage(), e);
         }
-        */
-        throw new UnsupportedOperationException("WordHelper.generate() 当前不可用，需要添加 poi-tl 依赖");
     }
 }

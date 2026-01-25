@@ -4,7 +4,8 @@ import com.adminpro.framework.base.util.LoggerUtil;
 import com.adminpro.system.core.common.helper.WebHelper;
 import com.adminpro.system.core.common.helper.ip.AddressUtils;
 import com.adminpro.system.core.common.helper.ip.IpUtils;
-import eu.bitwalker.useragentutils.UserAgent;
+import ua_parser.Client;
+import ua_parser.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import java.util.TimerTask;
  */
 public class AsyncFactory {
     private static final Logger sys_user_logger = LoggerFactory.getLogger("sys-user");
+    private static final Parser UA_PARSER = new Parser();
 
     /**
      * 记录登陆信息
@@ -28,7 +30,7 @@ public class AsyncFactory {
      * @return 任务task
      */
     public static TimerTask recordLoginInfo(final String username, final String status, final String message, final Object... args) {
-        final UserAgent userAgent = UserAgent.parseUserAgentString(WebHelper.getHttpRequest().getHeader("User-Agent"));
+        final String userAgentString = WebHelper.getHttpRequest().getHeader("User-Agent");
         final String ip = IpUtils.getIpAddr(WebHelper.getHttpRequest());
         return new TimerTask() {
             @Override
@@ -42,10 +44,13 @@ public class AsyncFactory {
                 s.append(LoggerUtil.getBlock(message));
                 // 打印信息到日志
                 sys_user_logger.info(s.toString(), args);
+
+                // 使用 ua-parser 解析 User-Agent
+                Client client = UA_PARSER.parse(userAgentString);
                 // 获取客户端操作系统
-                String os = userAgent.getOperatingSystem().getName();
+                String os = client.os.family;
                 // 获取客户端浏览器
-                String browser = userAgent.getBrowser().getName();
+                String browser = client.userAgent.family;
                 // 封装对象
                 /*SysLogininfor logininfor = new SysLogininfor();
                 logininfor.setUserName(username);

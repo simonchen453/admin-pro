@@ -65,12 +65,7 @@ public class JwtAuthenticationException extends RuntimeException {
      * 根据错误码确定 HTTP 状态码
      */
     private int determineHttpStatus(JwtErrorCode errorCode) {
-        int code = errorCode.getCode();
-        if (code >= 4001 && code < 5000) {
-            return 401; // 认证失败
-        } else if (code >= 5000) {
-            return 500; // 服务器错误
-        }
-        return 400; // 默认客户端错误
+        // code 现在就是标准 HTTP 状态码
+        return errorCode.getCode();
     }
 }

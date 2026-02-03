@@ -2,8 +2,8 @@ package com.adminpro.framework.base.web;
 
 import com.adminpro.framework.base.IConstants;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * 存储基本的分页查询信息：当前页，排序，页面显示记录

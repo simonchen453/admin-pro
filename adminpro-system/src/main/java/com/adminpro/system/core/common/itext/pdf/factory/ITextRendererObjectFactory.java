@@ -3,36 +3,38 @@ package com.adminpro.system.core.common.itext.pdf.factory;
 import com.adminpro.system.core.common.itext.utils.ResourceLoader;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.BaseFont;
-import org.apache.commons.pool.BasePoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.xhtmlrenderer.pdf.ITextFontResolver;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ITextRendererObjectFactory extends
-        BasePoolableObjectFactory {
-    private static GenericObjectPool itextRendererObjectPool = null;
+public class ITextRendererObjectFactory extends BasePooledObjectFactory<ITextRenderer> {
+    private static GenericObjectPool<ITextRenderer> itextRendererObjectPool = null;
 
     @Override
-    public Object makeObject() throws Exception {
-        ITextRenderer renderer = createTextRenderer();
-        return renderer;
+    public ITextRenderer create() throws Exception {
+        return createTextRenderer();
     }
 
-    public static GenericObjectPool getObjectPool() {
+    @Override
+    public PooledObject<ITextRenderer> wrap(ITextRenderer renderer) {
+        return new DefaultPooledObject<>(renderer);
+    }
+
+    public static GenericObjectPool<ITextRenderer> getObjectPool() {
         synchronized (ITextRendererObjectFactory.class) {
             if (itextRendererObjectPool == null) {
-                itextRendererObjectPool = new GenericObjectPool(
-                        new ITextRendererObjectFactory());
-                GenericObjectPool.Config config = new GenericObjectPool.Config();
-                config.lifo = false;
-                config.maxActive = 15;
-                config.maxIdle = 5;
-                config.minIdle = 1;
-                config.maxWait = 5 * 1000;
-                itextRendererObjectPool.setConfig(config);
+                itextRendererObjectPool = new GenericObjectPool<>(new ITextRendererObjectFactory());
+                itextRendererObjectPool.setLifo(false);
+                itextRendererObjectPool.setMaxTotal(15);
+                itextRendererObjectPool.setMaxIdle(5);
+                itextRendererObjectPool.setMinIdle(1);
+                itextRendererObjectPool.setMaxWaitMillis(5 * 1000);
             }
         }
 

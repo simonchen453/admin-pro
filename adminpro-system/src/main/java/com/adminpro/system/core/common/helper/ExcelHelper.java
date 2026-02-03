@@ -1,7 +1,7 @@
 package com.adminpro.system.core.common.helper;
 
+import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
-import cn.afterturn.easypoi.excel.imports.ExcelImportServer;
 import cn.afterturn.easypoi.exception.excel.ExcelImportException;
 
 import java.io.Closeable;
@@ -52,7 +52,7 @@ public class ExcelHelper {
 
         List var4;
         try {
-            var4 = (new ExcelImportServer()).importExcelByIs(is, pojoClass, params).getList();
+            var4 = ExcelImportUtil.importExcel(is, pojoClass, params);
         } catch (ExcelImportException var9) {
             throw new ExcelImportException(var9.getType(), var9);
         } catch (Exception var10) {

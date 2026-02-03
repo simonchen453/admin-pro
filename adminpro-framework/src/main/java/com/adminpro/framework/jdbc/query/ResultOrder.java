@@ -20,10 +20,10 @@ public class ResultOrder {
     }
 
     public ResultOrder(String field) {
-        field = org.apache.commons.lang.StringUtils.trim(field);
-        org.apache.commons.lang.Validate.notEmpty(field);
+        field = StringUtils.trim(field);
+        Validate.notEmpty(field);
 
-        String[] strs = org.apache.commons.lang.StringUtils.split(field, " ");
+        String[] strs = StringUtils.split(field, " ");
         setField(strs[0]);
 
         if (strs.length > 1) {

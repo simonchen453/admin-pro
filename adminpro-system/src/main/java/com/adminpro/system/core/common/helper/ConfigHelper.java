@@ -5,10 +5,12 @@ import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.exceptions.BaseRuntimeException;
 import com.adminpro.system.tools.domains.entity.config.ConfigEntity;
 import com.adminpro.system.tools.domains.entity.config.ConfigService;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
@@ -52,10 +54,24 @@ public class ConfigHelper {
 
     private static Configuration initConfiguration() {
         CompositeConfiguration cc = new CompositeConfiguration();
+        Parameters params = new Parameters();
+
         try {
-            cc.addConfiguration(new PropertiesConfiguration("project.properties"));
-            cc.addConfiguration(new PropertiesConfiguration("config.properties"));
-            cc.addConfiguration(new PropertiesConfiguration("app-system.properties"));
+            // 使用 FileBasedConfigurationBuilder 加载 properties 文件
+            FileBasedConfigurationBuilder<PropertiesConfiguration> builder1 =
+                new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
+                .configure(params.properties().setFileName("project.properties"));
+            cc.addConfiguration(builder1.getConfiguration());
+
+            FileBasedConfigurationBuilder<PropertiesConfiguration> builder2 =
+                new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
+                .configure(params.properties().setFileName("config.properties"));
+            cc.addConfiguration(builder2.getConfiguration());
+
+            FileBasedConfigurationBuilder<PropertiesConfiguration> builder3 =
+                new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
+                .configure(params.properties().setFileName("app-system.properties"));
+            cc.addConfiguration(builder3.getConfiguration());
         } catch (ConfigurationException e) {
             throw new BaseRuntimeException(e);
         }

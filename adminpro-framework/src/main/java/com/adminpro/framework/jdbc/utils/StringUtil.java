@@ -1,9 +1,9 @@
 package com.adminpro.framework.jdbc.utils;
 
 import com.adminpro.framework.jdbc.Consts;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.List;
 
@@ -70,7 +70,7 @@ public final class StringUtil {
             return in;
         }
 
-        return StringEscapeUtils.escapeHtml(in);
+        return StringEscapeUtils.escapeHtml4(in);
     }
 
     public static String escapeJavascript(String in) {
@@ -78,7 +78,7 @@ public final class StringUtil {
             return "";
         }
 
-        return StringEscapeUtils.escapeJavaScript(in);
+        return StringEscapeUtils.escapeEcmaScript(in);
     }
 
     /**
@@ -249,8 +249,8 @@ public final class StringUtil {
         if (isEmpty(val)) {
             return val;
         }
-        val = StringEscapeUtils.unescapeHtml(val);
-        val = StringEscapeUtils.unescapeJavaScript(val);
+        val = StringEscapeUtils.unescapeHtml4(val);
+        val = StringEscapeUtils.unescapeEcmaScript(val);
         return val;
     }
 }

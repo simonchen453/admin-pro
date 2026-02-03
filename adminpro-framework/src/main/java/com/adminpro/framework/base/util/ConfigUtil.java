@@ -1,10 +1,12 @@
 package com.adminpro.framework.base.util;
 
 import com.adminpro.framework.exceptions.BaseRuntimeException;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 
@@ -27,8 +29,14 @@ public class ConfigUtil {
 
     private static Configuration initConfiguration() {
         CompositeConfiguration cc = new CompositeConfiguration();
+        Parameters params = new Parameters();
+
         try {
-            cc.addConfiguration(new PropertiesConfiguration("app-system.properties"));
+            // 使用 FileBasedConfigurationBuilder 加载 properties 文件
+            FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                new FileBasedConfigurationBuilder<PropertiesConfiguration>(PropertiesConfiguration.class)
+                .configure(params.properties().setFileName("app-system.properties"));
+            cc.addConfiguration(builder.getConfiguration());
         } catch (ConfigurationException e) {
             throw new BaseRuntimeException(e);
         }

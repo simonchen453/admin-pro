@@ -161,32 +161,47 @@ public class ErrorBasicController implements ErrorController {
         String trace = (String) errorAttributes.get("trace");
         String exception = (String) errorAttributes.get("exception");
 
+        logger.info("记录异常日志 - 状态码: {}, 路径: {}, 异常类型: {}, 消息: {}, 堆栈长度: {}", 
+                status, path, exception, message, trace != null ? trace.length() : 0);
+
         ExceptionLogEntity log = new ExceptionLogEntity();
 
         // Use full stack trace for details
         StringBuilder details = new StringBuilder();
-        if (message != null) {
-            details.append("Message: ").append(message).append("\n");
-        }
-        if (trace != null) {
+        details.append("=== 异常详情 ===\n");
+        details.append("状态码: ").append(status != null ? status : "N/A").append("\n");
+        details.append("路径: ").append(path != null ? path : "N/A").append("\n");
+        details.append("异常类型: ").append(exception != null ? exception : "N/A").append("\n");
+        details.append("消息: ").append(message != null ? message : "N/A").append("\n");
+        details.append("\n=== 堆栈跟踪 ===\n");
+        if (trace != null && !trace.isEmpty()) {
             details.append(trace);
+        } else {
+            details.append("无堆栈跟踪信息");
+            logger.warn("异常日志缺少堆栈跟踪信息: path={}, exception={}, message={}", path, exception, message);
         }
-        log.setDetails(details.toString());
+        
+        String detailsStr = details.toString();
+        if (detailsStr.length() < 100) {
+            logger.warn("异常详情过短，可能丢失信息: length={}, details={}", detailsStr.length(), detailsStr);
+        }
+        log.setDetails(detailsStr);
 
         // Use exception class name as type, fallback to message or "Unknown Error"
-        if (exception != null) {
+        if (exception != null && !exception.isEmpty()) {
             log.setType(exception);
-        } else if (message != null) {
+        } else if (message != null && !message.isEmpty()) {
             log.setType(StringUtils.abbreviate(message, 255));
         } else {
             log.setType("Unknown Error");
         }
 
-        log.setPath(path);
+        log.setPath(path != null ? path : "");
         try {
             exceptionLogService.create(log);
+            logger.info("异常日志记录成功: id={}, type={}, path={}", log.getId(), log.getType(), log.getPath());
         } catch (Exception e) {
-            logger.error("记录异常日志失败: path={}, message={}", path, message, e);
+            logger.error("记录异常日志失败: path={}, message={}, exception={}", path, message, exception, e);
         }
     }
 

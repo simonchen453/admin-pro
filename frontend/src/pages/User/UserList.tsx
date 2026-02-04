@@ -486,6 +486,13 @@ const UserList: React.FC = () => {
       responsive: ['sm'],
     },
     {
+      title: '角色名称',
+      dataIndex: 'roleName',
+      key: 'roleName',
+      ellipsis: true,
+      responsive: ['sm'],
+    },
+    {
       title: '用户姓名',
       dataIndex: 'realName',
       key: 'realName',
@@ -493,9 +500,9 @@ const UserList: React.FC = () => {
       responsive: ['sm'],
     },
     {
-      title: '描述',
-      dataIndex: 'description',
-      key: 'description',
+      title: '部门',
+      dataIndex: 'deptName',
+      key: 'deptName',
       ellipsis: true,
       responsive: ['md'],
     },
@@ -610,7 +617,7 @@ const UserList: React.FC = () => {
             </Col>
             <Col xs={24} sm={12} md={6}>
               <Form.Item name="loginName" style={{ marginBottom: 0 }}>
-                <Input placeholder="登录名" allowClear prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} />
+                <Input placeholder="登录者" allowClear prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12} md={6}>

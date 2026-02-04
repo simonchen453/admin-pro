@@ -107,8 +107,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 // If super failed to get details but we successfully got the exception,
                 // populate them manually
                 if (t != null) {
-                    if (message == null) {
+                    logger.error("捕获到异常: {}", t.getClass().getName(), t);
+                    
+                    if (message == null || message.isEmpty()) {
                         message = t.getMessage();
+                        if (message == null || message.isEmpty()) {
+                            message = t.getClass().getSimpleName();
+                        }
                     }
                     if (exception == null) {
                         exception = t.getClass().getName();
@@ -119,6 +124,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                             t.printStackTrace(pw);
                             trace = sw.toString();
                         } catch (Exception ignore) {
+                            logger.error("生成堆栈跟踪失败", ignore);
                         }
                     }
                 } else {
@@ -132,6 +138,24 @@ public class WebMvcConfig implements WebMvcConfigurer {
                             WebRequest.SCOPE_REQUEST);
                     if (errorMessage != null) {
                         message = errorMessage.toString();
+                    }
+                    
+                    Object errorException = requestAttributes.getAttribute("jakarta.servlet.error.exception",
+                            WebRequest.SCOPE_REQUEST);
+                    if (errorException instanceof Throwable) {
+                        Throwable ex = (Throwable) errorException;
+                        logger.error("从servlet属性中获取到异常: {}", ex.getClass().getName(), ex);
+                        exception = ex.getClass().getName();
+                        if (message == null || message.isEmpty()) {
+                            message = ex.getMessage();
+                        }
+                        try (java.io.StringWriter sw = new java.io.StringWriter();
+                                java.io.PrintWriter pw = new java.io.PrintWriter(sw)) {
+                            ex.printStackTrace(pw);
+                            trace = sw.toString();
+                        } catch (Exception ignore) {
+                            logger.error("生成堆栈跟踪失败", ignore);
+                        }
                     }
                 }
 
@@ -151,7 +175,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 apiResponse.put("data", null);
                 logger.debug("===============errorAttributes start===========================");
                 String json = JsonUtil.toJson(errorAttributes);
-                logger.debug("error, {}", json);
+                logger.debug("原始错误属性: {}", json);
+                logger.debug("异常类型: {}, 消息: {}, 堆栈长度: {}", exception, message, trace != null ? trace.length() : 0);
                 logger.debug("===============errorAttributes end===========================");
                 return apiResponse;
             }

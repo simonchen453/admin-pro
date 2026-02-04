@@ -125,6 +125,30 @@ public class UserController extends BaseController {
                 UserListResponseVo vo = new UserListResponseVo();
                 BeanUtils.copyProperties(entity, vo);
                 vo.setId(entity.getId());
+
+                // 设置部门名称
+                if (StringUtils.isNotEmpty(entity.getDeptNo())) {
+                    DeptEntity dept = deptService.findByNo(entity.getDeptNo());
+                    if (dept != null) {
+                        vo.setDeptName(dept.getName());
+                    }
+                }
+
+                // 设置角色名称
+                List<UserRoleAssignEntity> roleAssigns = userRoleAssignService.findByUserId(entity.getId());
+                if (roleAssigns != null && !roleAssigns.isEmpty()) {
+                    List<String> roleNames = new ArrayList<>();
+                    for (UserRoleAssignEntity assign : roleAssigns) {
+                        if (StringUtils.isNotEmpty(assign.getRoleId())) {
+                            RoleEntity role = roleService.findById(assign.getRoleId());
+                            if (role != null) {
+                                roleNames.add(role.getName());
+                            }
+                        }
+                    }
+                    vo.setRoleName(String.join(",", roleNames));
+                }
+
                 list.add(vo);
             }
         }

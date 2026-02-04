@@ -122,7 +122,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public R<?> handleException(Exception e) {
-        logger.error("系统异常", e);
+        logger.error("系统异常: {} - {}", e.getClass().getName(), e.getMessage(), e);
         return R.error(RbacConstants.MSG_SYSTEM_ERROR);
     }
 }

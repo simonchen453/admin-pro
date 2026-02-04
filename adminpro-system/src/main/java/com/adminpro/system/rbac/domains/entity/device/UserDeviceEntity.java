@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 public class UserDeviceEntity extends BaseAuditEntity {
 
-    public static final String TABLE_NAME = "user_device";
+    public static final String TABLE_NAME = "sys_user_device";
 
     public static final String COL_ID = "id";
     public static final String COL_USER_ID = "user_id";

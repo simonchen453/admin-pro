@@ -722,9 +722,9 @@ INSERT INTO `sys_config_tbl` VALUES (
 
 -- changeset simon:202601181513
 -- ----------------------------
--- Table structure for user_device
+-- Table structure for sys_user_device
 -- ----------------------------
-create table if not exists user_device (
+create table if not exists sys_user_device (
   id varchar(36) not null comment '主键ID' primary key,
   user_id varchar(36) not null comment '用户ID',
   device_id varchar(100) not null comment '设备唯一标识',
@@ -747,10 +747,10 @@ create table if not exists user_device (
 ) engine=InnoDB default charset=utf8mb4 comment='用户设备/Token表';
 
 -- changeset simon:202601181630
-ALTER TABLE user_device DROP COLUMN os;
-ALTER TABLE user_device DROP COLUMN browser;
-ALTER TABLE user_device CHANGE ip last_ip VARCHAR(64) COMMENT '最后登录IP';
-ALTER TABLE user_device ADD COLUMN last_user_agent VARCHAR(500) COMMENT 'User Agent' AFTER last_ip;
+ALTER TABLE sys_user_device DROP COLUMN os;
+ALTER TABLE sys_user_device DROP COLUMN browser;
+ALTER TABLE sys_user_device CHANGE ip last_ip VARCHAR(64) COMMENT '最后登录IP';
+ALTER TABLE sys_user_device ADD COLUMN last_user_agent VARCHAR(500) COMMENT 'User Agent' AFTER last_ip;
 
 
 -- changeset simon:202601182245

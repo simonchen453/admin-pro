@@ -140,7 +140,7 @@ public class RefreshTokenService {
             return null;
         }
 
-        // 可以在这里检查是否已被撤销 (例如 check user_device status)
+        // 可以在这里检查是否已被撤销 (例如 check sys_user_device status)
         return data;
     }
 

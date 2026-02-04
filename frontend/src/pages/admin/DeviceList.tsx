@@ -8,7 +8,9 @@ import {
     message,
     Modal,
     Form,
-    Input
+    Input,
+    Row,
+    Col
 } from 'antd';
 import {
     ReloadOutlined,
@@ -123,98 +125,115 @@ const DeviceList: React.FC = () => {
 
     const columns: ColumnsType<UserDeviceVo> = [
         {
-            title: '登录名',
-            dataIndex: 'loginName',
-            key: 'loginName',
-            width: 120,
-            render: (text) => <Space><UserOutlined />{text}</Space>
-        },
-        {
-            title: '真实姓名',
-            dataIndex: 'realName',
-            key: 'realName',
-            width: 100
+            title: '用户信息',
+            key: 'userInfo',
+            render: (_, record) => (
+                <Space>
+                    <div style={{ padding: 8, background: '#f0f5ff', borderRadius: '50%' }}>
+                        <UserOutlined style={{ color: '#2f54eb' }} />
+                    </div>
+                    <div>
+                        <div style={{ fontWeight: 500 }}>{record.realName}</div>
+                        <div style={{ fontSize: 12, color: '#8c8c8c' }}>@{record.loginName}</div>
+                    </div>
+                </Space>
+            )
         },
         {
             title: '用户域',
             dataIndex: 'userDomain',
             key: 'userDomain',
-            width: 100,
-            render: (text) => <Tag color="blue">{text}</Tag>
+            render: (text) => <Tag>{text}</Tag>
         },
         {
-            title: '设备名称',
-            dataIndex: 'deviceName',
-            key: 'deviceName',
-            render: (text: string, record: UserDeviceVo) => (
+            title: '设备信息',
+            key: 'deviceInfo',
+            render: (_, record) => (
                 <Space>
-                    {getPlatformIcon(record.platform)}
-                    {text}
+                    <div style={{ fontSize: 18, color: '#595959' }}>
+                        {getPlatformIcon(record.platform)}
+                    </div>
+                    <div>
+                        <div style={{ fontWeight: 500 }}>{record.deviceName}</div>
+                        <div style={{ fontSize: 12, color: '#bfbfbf' }}>{record.platform}</div>
+                    </div>
                 </Space>
             )
-        },
-        {
-            title: '操作系统',
-            dataIndex: 'platform',
-            key: 'platform',
-            width: 100
         },
         {
             title: 'IP地址',
             dataIndex: 'lastIp',
             key: 'lastIp',
-            width: 130,
-            render: (text) => <Space><GlobalOutlined />{text}</Space>
+            width: 160,
+            render: (text) => <div style={{ fontFamily: 'monospace' }}>{text}</div>
+        },
+        {
+            title: '状态',
+            key: 'status',
+            width: 100,
+            render: (_, record) => (
+                 <Tag color={record.isActive === 1 ? 'success' : 'default'}>
+                    {record.isActive === 1 ? '在线' : '离线'}
+                 </Tag>
+            )
         },
         {
             title: '最后活跃时间',
             dataIndex: 'lastActiveAt',
             key: 'lastActiveAt',
-            width: 170
+            width: 250,
+            render: (text) => <span style={{ color: '#8c8c8c' }}>{text}</span>
         },
         {
             title: '操作',
             key: 'action',
             width: 100,
             render: (_, record) => (
-                <Space size="small">
-                    <Button
-                        size="small"
-                        danger
-                        icon={<StopOutlined />}
-                        onClick={() => handleKickout(record)}
-                        disabled={record.isActive === 0}
-                    >
-                        强制下线
-                    </Button>
-                </Space>
+                <Button
+                    type="link"
+                    danger
+                    size="small"
+                    icon={<StopOutlined />}
+                    onClick={() => handleKickout(record)}
+                    disabled={record.isActive === 0}
+                >
+                    强制下线
+                </Button>
             )
         }
     ];
 
     return (
         <div className="fade-in">
-            <Card className="modern-card" title="系统设备管理">
-                <Form form={form} layout="inline" style={{ marginBottom: 16 }}>
-                    <Form.Item name="loginName" label="登录名">
-                        <Input placeholder="输入登录名" allowClear />
-                    </Form.Item>
-                    <Form.Item name="userDomain" label="用户域">
-                        <Input placeholder="输入用户域" allowClear />
-                    </Form.Item>
-                    <Form.Item name="deviceName" label="设备名称">
-                        <Input placeholder="输入设备名称" allowClear />
-                    </Form.Item>
-                    <Form.Item>
-                        <Space>
-                            <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-                                搜索
-                            </Button>
-                            <Button onClick={handleReset} icon={<ReloadOutlined />}>
-                                重置
-                            </Button>
-                        </Space>
-                    </Form.Item>
+            <Card className="modern-card" title="系统设备管理" bordered={false}>
+                <Form form={form} layout="vertical" className="search-form">
+                    <Row gutter={24}>
+                        <Col xs={24} sm={8} md={6}>
+                            <Form.Item name="loginName" label="登录名">
+                                <Input placeholder="请输入登录名" prefix={<UserOutlined style={{ color: '#d9d9d9' }} />} allowClear />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={8} md={6}>
+                            <Form.Item name="userDomain" label="用户域">
+                                <Input placeholder="请输入用户域" prefix={<GlobalOutlined style={{ color: '#d9d9d9' }} />} allowClear />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={8} md={6}>
+                            <Form.Item name="deviceName" label="设备名称">
+                                <Input placeholder="请输入设备名称" prefix={<DesktopOutlined style={{ color: '#d9d9d9' }} />} allowClear />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
+                            <Space>
+                                <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+                                    搜索
+                                </Button>
+                                <Button onClick={handleReset} icon={<ReloadOutlined />}>
+                                    重置
+                                </Button>
+                            </Space>
+                        </Col>
+                    </Row>
                 </Form>
 
                 <div className="modern-table">
@@ -229,9 +248,9 @@ const DeviceList: React.FC = () => {
                             total: total,
                             showSizeChanger: true,
                             showQuickJumper: true,
+                            showTotal: (total) => `共 ${total} 条记录`,
                             onChange: (page, pageSize) => setPagination({ current: page, pageSize }),
                         }}
-                        size="middle"
                     />
                 </div>
             </Card>

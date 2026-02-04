@@ -89,7 +89,6 @@ public class ConfigController extends BaseController {
         String key = searchForm.getKey();
         String value = searchForm.getValue();
         SearchParam param = startPaging(searchForm);
-        setSearchForm(searchForm);
         if (StringUtils.isNotEmpty(name)) {
             param.addFilter("name", name);
         }
@@ -288,23 +287,6 @@ public class ConfigController extends BaseController {
                     ", value='" + value + '\'' +
                     '}';
         }
-    }
-
-    private SearchForm getSearchForm() {
-        SearchForm searchForm = (SearchForm) request.getSession().getAttribute(SEARCH_FORM_KEY);
-        if (searchForm == null) {
-            searchForm = new SearchForm();
-        }
-        setSearchForm(searchForm);
-        return searchForm;
-    }
-
-    private void setSearchForm(SearchForm searchForm) {
-        request.getSession().setAttribute(SEARCH_FORM_KEY, searchForm);
-    }
-
-    private void cleanSearchForm() {
-        request.getSession().removeAttribute(SEARCH_FORM_KEY);
     }
 
 }

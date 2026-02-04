@@ -247,24 +247,6 @@ create table sys_post_tbl (
   UNIQUE INDEX `unq_name`(`col_name`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COMMENT = '职位信息表';
 
-CREATE TABLE `sys_audit_log_tbl`  (
-  `col_id` varchar(64) NOT NULL COMMENT '主键ID',
-  `col_log_date` datetime(0) NOT NULL COMMENT '日志时间',
-  `col_category` varchar(64) NOT NULL COMMENT '分类',
-  `col_module` varchar(64) NOT NULL COMMENT '模块',
-  `col_ip_address` varchar(80) DEFAULT NULL COMMENT '访问IP',
-  `col_status` varchar(64) DEFAULT NULL COMMENT '状态',
-  `col_event` varchar(255) DEFAULT NULL COMMENT '事件',
-  `col_event_data` mediumtext COMMENT '事件数据',
-  `col_session_id` varchar(100) DEFAULT NULL COMMENT 'Session Id',
-
-  `col_created_by` varchar(64) DEFAULT NULL COMMENT '创建人',
-  `col_created_at` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',
-  `col_updated_by` varchar(64) DEFAULT NULL COMMENT '更新人',
-  `col_updated_at` datetime(0) NULL DEFAULT NULL COMMENT '更新日期',
-  PRIMARY KEY (`col_id`)
-) ENGINE = InnoDB DEFAULT CHARSET=utf8 COMMENT = '日志记录表';
-
 CREATE TABLE `sys_city_tbl`  (
   `col_id` varchar(20) NOT NULL COMMENT '区域唯一标识',
   `col_title` varchar(255) DEFAULT NULL COMMENT '区域名称',
@@ -684,7 +666,6 @@ alter table sys_dept_tbl add COLUMN col_custom_login int(1) DEFAULT 0 COMMENT '�
 alter table sys_config_tbl MODIFY COLUMN col_value varchar(1024) NOT NULL;
 
 -- changeset simon:202410131221
-drop table if exists sys_audit_log_tbl;
 CREATE TABLE `sys_audit_log_tbl`  (
     `col_id` varchar(64) NOT NULL COMMENT '主键ID',
     `col_log_date` datetime(0) NOT NULL COMMENT '日志时间',
@@ -695,7 +676,7 @@ CREATE TABLE `sys_audit_log_tbl`  (
     `col_event` varchar(255) DEFAULT NULL COMMENT '事件',
     `col_before_data` mediumtext COMMENT '事件前数据',
     `col_after_data` mediumtext COMMENT '事件后数据',
-    `col_session_id` varchar(100) DEFAULT NULL COMMENT 'Session Id',
+    `col_jti` varchar(100) DEFAULT NULL COMMENT 'JWT Token ID',
 
     `col_created_by` varchar(64) DEFAULT NULL COMMENT '创建人',
     `col_created_at` datetime(0) NULL DEFAULT NULL COMMENT '创建日期',

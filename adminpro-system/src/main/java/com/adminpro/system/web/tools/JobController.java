@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -92,7 +91,6 @@ public class JobController extends BaseController {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String condition = searchForm.getCondition();
         SearchParam param = startPaging(searchForm);
-        setSearchForm(request, searchForm);
         if (StringUtils.isNotEmpty(condition)) {
             param.addFilter("condition", condition);
         }
@@ -351,7 +349,6 @@ public class JobController extends BaseController {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String condition = searchForm.getCondition();
         SearchParam param = startPaging(searchForm);
-        setSearchForm(request, searchForm);
         if (StringUtils.isNotEmpty(condition)) {
             param.addFilter("condition", condition);
         }
@@ -452,22 +449,5 @@ public class JobController extends BaseController {
                     "condition='" + condition + '\'' +
                     '}';
         }
-    }
-
-    public static SearchForm getSearchForm(HttpServletRequest request) {
-        SearchForm searchForm = (SearchForm) request.getSession().getAttribute(SEARCH_FORM_KEY);
-        if (searchForm == null) {
-            searchForm = new SearchForm();
-        }
-        setSearchForm(request, searchForm);
-        return searchForm;
-    }
-
-    public static void setSearchForm(HttpServletRequest request, SearchForm searchForm) {
-        request.getSession().setAttribute(SEARCH_FORM_KEY, searchForm);
-    }
-
-    public static void cleanSearchForm(HttpServletRequest request) {
-        request.getSession().removeAttribute(SEARCH_FORM_KEY);
     }
 }

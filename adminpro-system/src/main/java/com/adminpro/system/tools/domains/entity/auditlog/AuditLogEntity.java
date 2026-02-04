@@ -36,7 +36,7 @@ public class AuditLogEntity extends BaseAuditEntity {
 
     public static final String COL_EVENT = "COL_EVENT";
 
-    public static final String COL_SESSION_ID = "COL_SESSION_ID";
+    public static final String COL_JTI = "COL_JTI";
 
     public static final String COL_EXECUTION_TIME = "COL_EXECUTION_TIME";
 
@@ -67,8 +67,15 @@ public class AuditLogEntity extends BaseAuditEntity {
     @Column(name = COL_EVENT, type = Column.Type.STRING)
     private String event;
 
-    @Column(name = COL_SESSION_ID, type = Column.Type.STRING)
-    private String sessionId;
+    /**
+     * JWT Token ID（JTI）
+     * <p>
+     * JWT Token 的唯一标识，用于关联同一会话的多个操作日志
+     * 如果无法获取 JTI（如未登录），该字段为 null
+     * </p>
+     */
+    @Column(name = COL_JTI, type = Column.Type.STRING)
+    private String jti;
 
     /**
      * 执行时长（毫秒）

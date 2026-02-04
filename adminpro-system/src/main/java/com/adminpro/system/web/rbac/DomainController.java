@@ -6,7 +6,6 @@ import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.cache.SearchFormCache;
 import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.domain.DomainCreateValidator;
@@ -80,7 +79,6 @@ public class DomainController extends BaseController {
         String name = searchForm.getName();
         String display = searchForm.getDisplay();
         SearchParam param = startPaging(searchForm);
-        setSearchForm(searchForm);
         if (StringUtils.isNotEmpty(name)) {
             param.addFilter("name", name);
         }
@@ -307,23 +305,6 @@ public class DomainController extends BaseController {
                     ", display='" + display + '\'' +
                     '}';
         }
-    }
-
-    private SearchForm getSearchForm() {
-        SearchForm searchForm = SearchFormCache.get(SEARCH_FORM_KEY, SearchForm.class);
-        if (searchForm == null) {
-            searchForm = new SearchForm();
-            setSearchForm(searchForm);
-        }
-        return searchForm;
-    }
-
-    private void setSearchForm(SearchForm searchForm) {
-        SearchFormCache.set(SEARCH_FORM_KEY, searchForm);
-    }
-
-    private void cleanSearchForm() {
-        SearchFormCache.clear(SEARCH_FORM_KEY);
     }
 
 }

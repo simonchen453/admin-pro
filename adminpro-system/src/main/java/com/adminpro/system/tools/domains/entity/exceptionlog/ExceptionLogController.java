@@ -60,7 +60,6 @@ public class ExceptionLogController extends BaseController {
         Date endTime = DateUtil.parseDateTime(endTimeStr);
 
         SearchParam param = startPaging(searchForm);
-        setSearchForm(searchForm);
 
         if (StringUtils.isNotEmpty(condition)) {
             param.addFilter("condition", condition);
@@ -93,23 +92,6 @@ public class ExceptionLogController extends BaseController {
                     ", endTime='" + endTime + '\'' +
                     '}';
         }
-    }
-
-    private SearchForm getSearchForm() {
-        SearchForm searchForm = (SearchForm) request.getSession().getAttribute(SEARCH_FORM_KEY);
-        if (searchForm == null) {
-            searchForm = new SearchForm();
-        }
-        setSearchForm(searchForm);
-        return searchForm;
-    }
-
-    private void setSearchForm(SearchForm searchForm) {
-        request.getSession().setAttribute(SEARCH_FORM_KEY, searchForm);
-    }
-
-    private void cleanSearchForm() {
-        request.getSession().removeAttribute(SEARCH_FORM_KEY);
     }
 
 }

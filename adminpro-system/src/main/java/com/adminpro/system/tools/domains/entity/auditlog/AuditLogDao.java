@@ -38,7 +38,7 @@ public class AuditLogDao extends BaseDao<AuditLogEntity, String> {
                 dto.setBeforeData(resultSet.getString(AuditLogEntity.COL_BEFORE_DATA));
                 dto.setIpAddress(resultSet.getString(AuditLogEntity.COL_IP_ADDRESS));
                 dto.setModule(resultSet.getString(AuditLogEntity.COL_MODULE));
-                dto.setSessionId(resultSet.getString(AuditLogEntity.COL_SESSION_ID));
+                dto.setJti(resultSet.getString(AuditLogEntity.COL_JTI));
                 dto.setStatus(resultSet.getString(AuditLogEntity.COL_STATUS));
                 dto.setUserName(resultSet.getString(UserEntity.COL_REAL_NAME));
                 Long executionTime = resultSet.getLong(AuditLogEntity.COL_EXECUTION_TIME);

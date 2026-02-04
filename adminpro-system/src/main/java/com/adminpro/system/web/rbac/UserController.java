@@ -9,7 +9,6 @@ import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.cache.SearchFormCache;
 import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.helper.ExcelHelper;
 import com.adminpro.system.core.common.helper.FileHelper;
@@ -39,6 +38,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -757,7 +757,6 @@ public class UserController extends BaseController {
     private SearchParam buildSearchParam(SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         SearchParam param = startPaging(searchForm);
-        SearchFormCache.set(SEARCH_FORM_KEY, searchForm);
 
         if (StringUtils.isNotEmpty(searchForm.getUserDomain())) {
             param.addFilter("userDomain", searchForm.getUserDomain());
@@ -873,6 +872,7 @@ public class UserController extends BaseController {
         }
     }
 
+    @Data
     public static class SearchForm extends BaseSearchForm {
         private String userDomain;
         private String userId;
@@ -881,62 +881,6 @@ public class UserController extends BaseController {
         private String loginName;
         private String realName;
         private String deptId;
-
-        public String getUserDomain() {
-            return userDomain;
-        }
-
-        public void setUserDomain(String userDomain) {
-            this.userDomain = userDomain;
-        }
-
-        public String getUserId() {
-            return userId;
-        }
-
-        public void setUserId(String userId) {
-            this.userId = userId;
-        }
-
-        public String getDisplay() {
-            return display;
-        }
-
-        public void setDisplay(String display) {
-            this.display = display;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-
-        public String getLoginName() {
-            return loginName;
-        }
-
-        public void setLoginName(String loginName) {
-            this.loginName = loginName;
-        }
-
-        public String getRealName() {
-            return realName;
-        }
-
-        public void setRealName(String realName) {
-            this.realName = realName;
-        }
-
-        public String getDeptId() {
-            return deptId;
-        }
-
-        public void setDeptId(String deptId) {
-            this.deptId = deptId;
-        }
 
         @Override
         public String toString() {
@@ -950,49 +894,5 @@ public class UserController extends BaseController {
                     ", deptId='" + deptId + '\'' +
                     '}';
         }
-    }
-
-    /**
-     * 获取搜索表单（从缓存获取，不存在则创建新的）
-     * <p>
-     * 使用无状态缓存替代 Session，按模块隔离
-     * </p>
-     *
-     * @return 搜索表单对象
-     */
-    public static SearchForm getSearchForm() {
-        SearchForm searchForm = SearchFormCache.get(SEARCH_FORM_KEY, SearchForm.class);
-        if (searchForm == null) {
-            searchForm = new SearchForm();
-            SearchFormCache.set(SEARCH_FORM_KEY, searchForm);
-        }
-        return searchForm;
-    }
-
-    /**
-     * 设置搜索表单（已废弃，直接使用 SearchFormCache.set()）
-     * <p>
-     * 使用无状态缓存替代 Session
-     * </p>
-     *
-     * @param searchForm 搜索表单对象
-     * @deprecated 使用 {@link SearchFormCache#set(String, BaseSearchForm)} 替代
-     */
-    @Deprecated
-    public static void setSearchForm(SearchForm searchForm) {
-        SearchFormCache.set(SEARCH_FORM_KEY, searchForm);
-    }
-
-    /**
-     * 清除搜索表单
-     * <p>
-     * 使用无状态缓存替代 Session
-     * </p>
-     *
-     * @deprecated 使用 {@link SearchFormCache#clear(String)} 替代
-     */
-    @Deprecated
-    public static void cleanSearchForm() {
-        SearchFormCache.clear(SEARCH_FORM_KEY);
     }
 }

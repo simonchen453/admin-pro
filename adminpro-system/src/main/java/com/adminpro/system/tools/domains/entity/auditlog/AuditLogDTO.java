@@ -28,7 +28,10 @@ public class AuditLogDTO extends BaseAuditDTO {
 
     private String event;
 
-    private String sessionId;
+    /**
+     * JWT Token ID（JTI）
+     */
+    private String jti;
 
     private String userName;
 

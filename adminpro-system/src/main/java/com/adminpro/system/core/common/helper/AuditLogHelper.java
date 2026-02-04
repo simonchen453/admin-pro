@@ -1,5 +1,6 @@
 package com.adminpro.system.core.common.helper;
 
+import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.tools.domains.entity.auditlog.AuditLogEntity;
 import com.adminpro.system.tools.domains.entity.auditlog.AuditLogService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,14 +16,14 @@ import java.util.Map;
  * <p>
  * 本类提供系统审计日志的记录功能，用于追踪和记录系统中的关键操作。
  * 记录的信息包括：操作类别、模块、事件名称、状态、操作前数据、操作后数据、
- * 执行时间、IP地址、会话ID等
+ * 执行时间、IP地址、JWT Token ID等
  * <p>
  * 主要功能：
  * <ul>
  * <li>记录系统操作的审计日志</li>
  * <li>支持记录操作前后的数据变化</li>
  * <li>支持记录方法执行时间</li>
- * <li>自动记录请求来源IP和会话信息</li>
+ * <li>自动记录请求来源IP和JWT Token信息</li>
  * </ul>
  * <p>
  * 使用场景：
@@ -61,10 +62,28 @@ public class AuditLogHelper {
     public static String CATEGORY_THIRDPART = "third-part";
 
     /**
+     * 获取当前会话标识（JWT JTI）
+     * <p>
+     * JWT 认证模式下，返回 JWT Token 的唯一标识（JTI）
+     * 如果无法获取（如未登录或Token解析失败），返回null
+     * </p>
+     *
+     * @return JTI，无法获取时返回null
+     */
+    private static String getCurrentJti() {
+        try {
+            return LoginHelper.getInstance().getCurrentJti();
+        } catch (Exception e) {
+            logger.debug("获取 JTI 失败: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
      * 记录审计日志（包含操作前后数据）
      * <p>
      * 记录完整的操作信息，包括操作前后的数据变化。
-     * 自动获取当前请求的IP地址和会话ID
+     * 自动获取当前请求的IP地址和JWT Token ID
      * <p>
      * 使用场景：
      * <ul>
@@ -88,7 +107,7 @@ public class AuditLogHelper {
      * 记录审计日志（包含操作前后数据和执行时间）
      * <p>
      * 记录完整的操作信息，包括操作前后的数据变化和方法执行时间。
-     * 自动获取当前请求的IP地址和会话ID
+     * 自动获取当前请求的IP地址和JWT Token ID
      * <p>
      * 使用场景：
      * <ul>
@@ -122,7 +141,10 @@ public class AuditLogHelper {
             HttpServletRequest request = WebHelper.getHttpRequest();
             if(request != null){
                 auditLogEntity.setIpAddress(WebHelper.getIpAddr(request));
-                auditLogEntity.setSessionId(request.getSession().getId());
+                String jti = getCurrentJti();
+                if (jti != null) {
+                    auditLogEntity.setJti(jti);
+                }
             }
 
             AuditLogService.getInstance().create(auditLogEntity);
@@ -135,7 +157,7 @@ public class AuditLogHelper {
      * 记录审计日志（仅包含操作后数据）
      * <p>
      * 记录操作信息，仅包含操作后的数据，不包含操作前数据。
-     * 自动获取当前请求的IP地址和会话ID
+     * 自动获取当前请求的IP地址和JWT Token ID
      * <p>
      * 使用场景：
      * <ul>
@@ -158,7 +180,7 @@ public class AuditLogHelper {
      * 记录审计日志（包含操作后数据和执行时间）
      * <p>
      * 记录操作信息，包含操作后的数据和方法执行时间。
-     * 自动获取当前请求的IP地址和会话ID
+     * 自动获取当前请求的IP地址和JWT Token ID
      * <p>
      * 使用场景：
      * <ul>
@@ -189,7 +211,10 @@ public class AuditLogHelper {
             HttpServletRequest request = WebHelper.getHttpRequest();
             if(request != null) {
                 auditLogEntity.setIpAddress(WebHelper.getIpAddr(request));
-                auditLogEntity.setSessionId(request.getSession().getId());
+                String jti = getCurrentJti();
+                if (jti != null) {
+                    auditLogEntity.setJti(jti);
+                }
             }
             AuditLogService.getInstance().create(auditLogEntity);
         } catch (Exception e) {

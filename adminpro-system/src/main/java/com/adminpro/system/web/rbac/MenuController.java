@@ -6,7 +6,6 @@ import com.adminpro.framework.base.util.BatchOperationValidator;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
-import com.adminpro.system.core.cache.SearchFormCache;
 import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.menu.MenuCreateValidator;
@@ -82,7 +81,6 @@ public class MenuController extends BaseController {
         String status = searchForm.getStatus();
         Boolean visible = searchForm.isVisible();
         SearchParam param = startPaging(searchForm);
-        setSearchForm(searchForm);
         if (StringUtils.isNotEmpty(name)) {
             param.addFilter("name", name);
         }
@@ -478,23 +476,6 @@ public class MenuController extends BaseController {
                     ", visible=" + visible +
                     '}';
         }
-    }
-
-    private SearchForm getSearchForm() {
-        SearchForm searchForm = SearchFormCache.get(SEARCH_FORM_KEY, SearchForm.class);
-        if (searchForm == null) {
-            searchForm = new SearchForm();
-            setSearchForm(searchForm);
-        }
-        return searchForm;
-    }
-
-    private void setSearchForm(SearchForm searchForm) {
-        SearchFormCache.set(SEARCH_FORM_KEY, searchForm);
-    }
-
-    private void cleanSearchForm() {
-        SearchFormCache.clear(SEARCH_FORM_KEY);
     }
 
 }

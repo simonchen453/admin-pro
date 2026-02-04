@@ -7,7 +7,6 @@ import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.cache.SearchFormCache;
 import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.role.RoleCreateValidator;
@@ -77,7 +76,6 @@ public class RoleController extends BaseController {
         Boolean system = searchForm.system;
 
         SearchParam param = startPaging(searchForm);
-        setSearchForm(searchForm);
         if (StringUtils.isNotEmpty(name)) {
             param.addFilter("name", name);
         }
@@ -240,23 +238,6 @@ public class RoleController extends BaseController {
         private String display;
         private String status;
         private Boolean system;
-    }
-
-    private SearchForm getSearchForm() {
-        SearchForm searchForm = SearchFormCache.get(SEARCH_FORM_KEY, SearchForm.class);
-        if (searchForm == null) {
-            searchForm = new SearchForm();
-            setSearchForm(searchForm);
-        }
-        return searchForm;
-    }
-
-    private void setSearchForm(SearchForm searchForm) {
-        SearchFormCache.set(SEARCH_FORM_KEY, searchForm);
-    }
-
-    private void cleanSearchForm() {
-        SearchFormCache.clear(SEARCH_FORM_KEY);
     }
 
 }

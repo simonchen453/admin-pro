@@ -7,7 +7,6 @@ import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.base.web.BaseSearchForm;
 import com.adminpro.framework.jdbc.SearchParam;
 import com.adminpro.framework.jdbc.query.QueryResultSet;
-import com.adminpro.system.core.cache.SearchFormCache;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.rbac.domains.entity.domain.UserDomainEnvCreateValidator;
 import com.adminpro.system.rbac.domains.entity.domain.UserDomainEnvEntity;
@@ -78,7 +77,6 @@ public class UserDomainEnvController extends BaseController {
         BeanUtil.beanAttributeValueTrim(searchForm);
         String userDomain = searchForm.getUserDomain();
         SearchParam param = startPaging(searchForm);
-        setSearchForm(searchForm);
         if (StringUtils.isNotEmpty(userDomain)) {
             param.addFilter("userDomain", userDomain);
         }
@@ -263,23 +261,6 @@ public class UserDomainEnvController extends BaseController {
                     "userDomain='" + userDomain + '\'' +
                     '}';
         }
-    }
-
-    private SearchForm getSearchForm() {
-        SearchForm searchForm = SearchFormCache.get(SEARCH_FORM_KEY, SearchForm.class);
-        if (searchForm == null) {
-            searchForm = new SearchForm();
-            setSearchForm(searchForm);
-        }
-        return searchForm;
-    }
-
-    private void setSearchForm(SearchForm searchForm) {
-        SearchFormCache.set(SEARCH_FORM_KEY, searchForm);
-    }
-
-    private void cleanSearchForm() {
-        SearchFormCache.clear(SEARCH_FORM_KEY);
     }
 
 }

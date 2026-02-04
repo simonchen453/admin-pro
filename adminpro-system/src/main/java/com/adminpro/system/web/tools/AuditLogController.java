@@ -81,7 +81,6 @@ public class AuditLogController extends BaseController {
     public R<QueryResultSet<AuditLogDTO>> search(@RequestBody SearchForm searchForm) {
         BeanUtil.beanAttributeValueTrim(searchForm);
         SearchParam param = startPaging(searchForm);
-        setSearchForm(searchForm);
         String status = searchForm.getStatus();
         String event = searchForm.getEvent();
         String module = searchForm.getModule();
@@ -128,22 +127,5 @@ public class AuditLogController extends BaseController {
         private String status;
         private String startDate;
         private String endDate;
-    }
-
-    public SearchForm getSearchForm() {
-        SearchForm searchForm = (SearchForm) request.getSession().getAttribute(SEARCH_FORM_KEY);
-        if (searchForm == null) {
-            searchForm = new SearchForm();
-        }
-        setSearchForm(searchForm);
-        return searchForm;
-    }
-
-    public void setSearchForm(SearchForm searchForm) {
-        request.getSession().setAttribute(SEARCH_FORM_KEY, searchForm);
-    }
-
-    public void cleanSearchForm() {
-        request.getSession().removeAttribute(SEARCH_FORM_KEY);
     }
 }

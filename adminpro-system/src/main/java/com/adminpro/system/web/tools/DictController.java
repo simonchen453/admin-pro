@@ -91,7 +91,6 @@ public class DictController extends BaseController {
         String key = searchForm.getKey();
         String status = searchForm.getStatus();
         SearchParam param = startPaging(searchForm);
-        setSearchForm(searchForm);
         if (StringUtils.isNotEmpty(name)) {
             param.addFilter("name", name);
         }
@@ -383,23 +382,6 @@ public class DictController extends BaseController {
          * 状态
          */
         private String status;
-    }
-
-    private SearchForm getSearchForm() {
-        SearchForm searchForm = (SearchForm) request.getSession().getAttribute(SEARCH_FORM_KEY);
-        if (searchForm == null) {
-            searchForm = new SearchForm();
-        }
-        setSearchForm(searchForm);
-        return searchForm;
-    }
-
-    private void setSearchForm(SearchForm searchForm) {
-        request.getSession().setAttribute(SEARCH_FORM_KEY, searchForm);
-    }
-
-    private void cleanSearchForm() {
-        request.getSession().removeAttribute(SEARCH_FORM_KEY);
     }
 
 }

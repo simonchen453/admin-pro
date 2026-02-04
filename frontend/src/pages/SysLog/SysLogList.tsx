@@ -165,13 +165,6 @@ const SysLogList: React.FC = () => {
 
   const columns: ColumnsType<SysLogEntity> = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      key: 'index',
-      width: 60,
-      render: (value: number) => (currentPage - 1) * pageSize + value + 1
-    },
-    {
       title: '用户登录名',
       dataIndex: 'loginName',
       key: 'loginName',
@@ -255,52 +248,46 @@ const SysLogList: React.FC = () => {
     <div className="fade-in" style={{ padding: '0', background: '#f5f5f5' }}>
 
 
-      <Divider />
+      <Card className="modern-card" title="系统日志" bordered={false}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSearch}
+          className="search-form"
+        >
+          <Row gutter={24}>
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="condition" label="关键字">
+                <Input placeholder="请输入关键字" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={16} md={12}>
+              <Form.Item label="时间范围">
+                <RangePicker
+                  showTime
+                  format="YYYY-MM-DD HH:mm:ss"
+                  value={dateRange}
+                  onChange={(dates) => setDateRange(dates as [Dayjs | null, Dayjs | null] | null)}
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
+              <Space>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                  搜索
+                </Button>
+                <Button onClick={handleReset} icon={<ClearOutlined />}>
+                  重置
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+        </Form>
 
-      <Card>
-        <Card size="small" style={{ marginBottom: 16 }}>
-          <Form autoComplete="off"
-            form={form}
-            layout="inline"
-            onFinish={handleSearch}
-          >
-            <Row gutter={[16, 16]}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item name="condition" label="关键字">
-                  <Input placeholder="关键字" allowClear />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12} md={12}>
-                <Form.Item label="时间范围">
-                  <RangePicker
-                    showTime
-                    format="YYYY-MM-DD HH:mm:ss"
-                    value={dateRange}
-                    onChange={(dates) => setDateRange(dates as [Dayjs | null, Dayjs | null] | null)}
-                    style={{ width: '100%' }}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={24} style={{ textAlign: 'left', marginTop: 16 }}>
-                <Space>
-                  <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                    搜索
-                  </Button>
-                  <Button onClick={handleReset} icon={<ClearOutlined />}>
-                    重置
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
-
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'white', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Space>
             <Button
-              type="primary"
               danger
               icon={<DeleteOutlined />}
               disabled={selectedLogs.length === 0}
@@ -309,38 +296,33 @@ const SysLogList: React.FC = () => {
               批量删除
             </Button>
           </Space>
-          <div>
-            已选择 {selectedLogs.length} 项
+          <div style={{ color: '#666' }}>
+            {selectedLogs.length > 0 && `已选择 ${selectedLogs.length} 项`}
           </div>
         </div>
 
-        <div style={{ background: 'white', borderRadius: '8px', overflow: 'hidden' }}>
+        <div className="modern-table">
           <Table
             columns={columns}
             dataSource={sysLogList}
             loading={loading}
             rowKey={(record) => record.id || `log-${record.loginName}-${record.createdDate}`}
             rowSelection={rowSelection}
-            pagination={false}
-            size="small"
-            scroll={{ x: 1500 }}
+            pagination={{
+              current: currentPage,
+              pageSize: pageSize,
+              total: total,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+              onChange: handlePageChange,
+              onShowSizeChange: handlePageChange,
+              pageSizeOptions: ['10', '20', '30', '50']
+            }}
+            size="middle"
             locale={{
               emptyText: sysLogList.length === 0 && !loading ? '暂无数据' : undefined
             }}
-          />
-        </div>
-
-        <div style={{ marginTop: 16, textAlign: 'right', padding: '16px', background: 'white', borderRadius: '8px' }}>
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={total}
-            showSizeChanger
-            showQuickJumper
-            showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
-            onChange={handlePageChange}
-            onShowSizeChange={handlePageChange}
-            pageSizeOptions={['10', '20', '30', '50']}
           />
         </div>
       </Card>

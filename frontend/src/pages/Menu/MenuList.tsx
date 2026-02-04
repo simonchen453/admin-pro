@@ -483,34 +483,32 @@ const MenuList: React.FC = () => {
     <div className="fade-in" style={{ padding: '0' }}>
 
 
-      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
-        <Form autoComplete="off"
+      <Card className="modern-card" title="菜单管理" bordered={false}>
+        <Form
           form={form}
-          layout="inline"
+          layout="vertical"
           onFinish={handleSearch}
-          style={{ marginBottom: 24 }}
+          className="search-form"
         >
-          <Row gutter={[16, 16]} style={{ width: '100%' }}>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="name" style={{ marginBottom: 0 }}>
+          <Row gutter={24}>
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="name" label="菜单名称">
                 <Input
-                  placeholder="菜单名称"
-                  prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />}
+                  placeholder="请输入菜单名称"
+                  prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />}
                   allowClear
-                  size="large"
-                  onPressEnter={() => form.submit()}
                 />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="status" style={{ marginBottom: 0 }}>
-                <Select placeholder="状态" allowClear style={{ width: '100%' }} size="large">
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="status" label="状态">
+                <Select placeholder="请选择状态" allowClear style={{ width: '100%' }}>
                   <Option value={MenuStatus.ACTIVE}>正常</Option>
                   <Option value={MenuStatus.INACTIVE}>停用</Option>
                 </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
               <Space>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索

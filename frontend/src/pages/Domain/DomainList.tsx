@@ -133,13 +133,6 @@ const DomainList: React.FC = () => {
 
   const columns: ColumnsType<DomainEntity> = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      key: 'index',
-      width: 60,
-      render: (value: number) => (currentPage - 1) * pageSize + value + 1
-    },
-    {
       title: '名称',
       dataIndex: 'name',
       key: 'name',
@@ -187,25 +180,25 @@ const DomainList: React.FC = () => {
     <div className="fade-in" style={{ padding: '0' }}>
 
 
-      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
-        <Form autoComplete="off"
+      <Card className="modern-card" title="用户域管理" bordered={false}>
+        <Form
           form={form}
-          layout="inline"
+          layout="vertical"
           onFinish={handleSearch}
-          style={{ marginBottom: 24 }}
+          className="search-form"
         >
-          <Row gutter={[16, 16]} style={{ width: '100%' }}>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="name" style={{ marginBottom: 0 }}>
-                <Input placeholder="名称" allowClear />
+          <Row gutter={24}>
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="name" label="名称">
+                <Input placeholder="请输入名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="display" style={{ marginBottom: 0 }}>
-                <Input placeholder="显示名称" allowClear />
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="display" label="显示名称">
+                <Input placeholder="请输入显示名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
               <Space>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索
@@ -230,22 +223,18 @@ const DomainList: React.FC = () => {
             dataSource={domainList}
             loading={loading}
             rowKey={(record) => record.id || `domain-${record.name}`}
-            pagination={false}
+            pagination={{
+              current: currentPage,
+              pageSize: pageSize,
+              total: total,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+              onChange: handlePageChange,
+              onShowSizeChange: handlePageChange,
+              pageSizeOptions: ['10', '20', '30', '50']
+            }}
             size="middle"
-          />
-        </div>
-
-        <div style={{ marginTop: 24, textAlign: 'right' }}>
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={total}
-            showSizeChanger
-            showQuickJumper
-            showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
-            onChange={handlePageChange}
-            onShowSizeChange={handlePageChange}
-            pageSizeOptions={['10', '20', '30', '50']}
           />
         </div>
       </Card>

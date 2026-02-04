@@ -21,6 +21,7 @@ import {
   EditOutlined,
   UserDeleteOutlined,
   UserAddOutlined,
+  UserOutlined,
   ReloadOutlined,
   SearchOutlined,
   ClearOutlined,
@@ -505,6 +506,7 @@ const UserList: React.FC = () => {
       key: 'deptName',
       ellipsis: true,
       responsive: ['md'],
+      render: (text) => text || '-'
     },
     {
       title: '上次登录时间',
@@ -512,7 +514,7 @@ const UserList: React.FC = () => {
       key: 'latestLoginTime',
       ellipsis: true,
       responsive: ['md'],
-      render: (time: string) => time || '-'
+      render: (time: string) => <span style={{ color: '#8c8c8c' }}>{time || '-'}</span>
     },
     {
       title: '状态',
@@ -544,25 +546,17 @@ const UserList: React.FC = () => {
           >
             重置密码
           </Button>
-          {record.status === UserStatus.LOCKED ? (
+          {record.status === UserStatus.LOCKED || record.status === UserStatus.INACTIVE ? (
             <Button
               size="small"
               type="link"
               icon={<UserAddOutlined />}
               onClick={() => handleActive(record)}
+              style={{ color: '#52c41a' }}
             >
               启用
             </Button>
-          ) : record.status === UserStatus.INACTIVE ? (
-            <Button
-              size="small"
-              type="link"
-              icon={<UserAddOutlined />}
-              onClick={() => handleActive(record)}
-            >
-              启用
-            </Button>
-          ) : record.status === UserStatus.ACTIVE ? (
+          ) : (
             <Button
               size="small"
               type="link"
@@ -572,7 +566,7 @@ const UserList: React.FC = () => {
             >
               停用
             </Button>
-          ) : null}
+          )}
           <Button
             size="small"
             type="link"
@@ -595,37 +589,37 @@ const UserList: React.FC = () => {
   return (
     <div className="fade-in" style={{ padding: '0' }}>
 
-      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
-        <Form autoComplete="off"
+      <Card className="modern-card" title="用户管理" bordered={false}>
+        <Form
           form={form}
-          layout="inline"
+          layout="vertical"
           onFinish={handleSearch}
-          style={{ marginBottom: 24 }}
+          className="search-form"
         >
-          <Row gutter={[16, 16]} style={{ width: '100%' }}>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="deptId" style={{ marginBottom: 0 }}>
+          <Row gutter={24}>
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="deptId" label="部门">
                 <TreeSelect
                   treeData={convertToTreeSelectData(deptTreeData)}
                   placeholder="选择部门"
                   allowClear
                   treeDefaultExpandAll
                   style={{ width: '100%' }}
-                  styles={{ popup: { root: { maxHeight: 400, overflow: 'auto' } } }}
+                  listHeight={400}
                 />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="loginName" style={{ marginBottom: 0 }}>
-                <Input placeholder="登录者" allowClear prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} />
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="loginName" label="登录者">
+                <Input placeholder="请输入登录名" allowClear prefix={<UserOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="realName" style={{ marginBottom: 0 }}>
-                <Input placeholder="用户姓名" allowClear prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} />
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="realName" label="用户姓名">
+                <Input placeholder="请输入用户姓名" allowClear prefix={<UserOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
               <Space>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索
@@ -679,25 +673,21 @@ const UserList: React.FC = () => {
               return `row-${record.index}`;
             }}
             rowSelection={rowSelection}
-            pagination={false}
+            pagination={{
+              current: currentPage,
+              pageSize: pageSize,
+              total: total,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+              onChange: handlePageChange,
+              onShowSizeChange: handlePageChange,
+              pageSizeOptions: ['10', '20', '30', '50']
+            }}
             size="middle"
             locale={{
               emptyText: userList.length === 0 && !loading ? '暂无数据' : undefined
             }}
-          />
-        </div>
-
-        <div style={{ marginTop: 24, textAlign: 'right' }}>
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={total}
-            showSizeChanger
-            showQuickJumper
-            showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
-            onChange={handlePageChange}
-            onShowSizeChange={handlePageChange}
-            pageSizeOptions={['10', '20', '30', '50']}
           />
         </div>
       </Card>

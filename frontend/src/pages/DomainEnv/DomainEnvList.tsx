@@ -175,13 +175,6 @@ const DomainEnvList: React.FC = () => {
 
   const columns: ColumnsType<DomainEnvEntity> = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      key: 'index',
-      width: 60,
-      render: (value: number) => (currentPage - 1) * pageSize + value + 1
-    },
-    {
       title: '用户域',
       dataIndex: 'userDomain',
       key: 'userDomain',
@@ -238,18 +231,18 @@ const DomainEnvList: React.FC = () => {
     <div className="fade-in" style={{ padding: '0' }}>
 
 
-      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
-        <Form autoComplete="off"
+      <Card className="modern-card" title="用户域配置" bordered={false}>
+        <Form
           form={form}
-          layout="inline"
+          layout="vertical"
           onFinish={handleSearch}
-          style={{ marginBottom: 24 }}
+          className="search-form"
         >
-          <Row gutter={[16, 16]} style={{ width: '100%' }}>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="userDomain" style={{ marginBottom: 0 }}>
+          <Row gutter={24}>
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="userDomain" label="用户域">
                 <Select
-                  placeholder="用户域"
+                  placeholder="请选择用户域"
                   allowClear
                   style={{ width: '100%' }}
                 >
@@ -261,7 +254,7 @@ const DomainEnvList: React.FC = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
               <Space>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索
@@ -296,26 +289,22 @@ const DomainEnvList: React.FC = () => {
             dataSource={domainEnvList}
             loading={loading}
             rowKey={(record) => record.id || `domainEnv-${record.userDomain}`}
-            pagination={false}
+            pagination={{
+              current: currentPage,
+              pageSize: pageSize,
+              total: total,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+              onChange: handlePageChange,
+              onShowSizeChange: handlePageChange,
+              pageSizeOptions: ['10', '20', '30', '50']
+            }}
             size="middle"
             rowSelection={{
               selectedRowKeys,
               onChange: (keys) => setSelectedRowKeys(keys)
             }}
-          />
-        </div>
-
-        <div style={{ marginTop: 24, textAlign: 'right' }}>
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={total}
-            showSizeChanger
-            showQuickJumper
-            showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
-            onChange={handlePageChange}
-            onShowSizeChange={handlePageChange}
-            pageSizeOptions={['10', '20', '30', '50']}
           />
         </div>
       </Card>

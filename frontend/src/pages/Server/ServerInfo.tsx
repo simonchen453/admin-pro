@@ -170,7 +170,7 @@ const ServerInfo: React.FC = () => {
         {!loading && (
           <Row gutter={[20, 20]}>
             <Col xs={24} sm={24} md={12}>
-              <Card title="CPU" size="small" className="modern-card">
+              <Card title="CPU" size="small" className="modern-card" bordered={false}>
                 <Table
                   columns={cpuColumns}
                   dataSource={cpuData}
@@ -183,7 +183,7 @@ const ServerInfo: React.FC = () => {
             </Col>
 
             <Col xs={24} sm={24} md={12}>
-              <Card title="内存" size="small" className="modern-card">
+              <Card title="内存" size="small" className="modern-card" bordered={false}>
                 <Table
                   columns={memColumns}
                   dataSource={memData}
@@ -196,7 +196,7 @@ const ServerInfo: React.FC = () => {
             </Col>
 
             <Col xs={24}>
-              <Card title="服务器信息" size="small" className="modern-card">
+              <Card title="服务器信息" size="small" className="modern-card" bordered={false}>
                 <Row gutter={[16, 16]}>
                   <Col xs={24} sm={12}>
                     <div style={{ marginBottom: 8 }}>
@@ -227,7 +227,7 @@ const ServerInfo: React.FC = () => {
             </Col>
 
             <Col xs={24}>
-              <Card title="Java虚拟机信息" size="small" className="modern-card">
+              <Card title="Java虚拟机信息" size="small" className="modern-card" bordered={false}>
                 <Row gutter={[16, 16]}>
                   <Col xs={24} sm={12}>
                     <div style={{ marginBottom: 8 }}>
@@ -270,7 +270,7 @@ const ServerInfo: React.FC = () => {
             </Col>
 
             <Col xs={24}>
-              <Card title="磁盘状态" size="small" className="modern-card">
+              <Card title="磁盘状态" size="small" className="modern-card" bordered={false}>
                 <Table
                   columns={diskColumns}
                   dataSource={serverInfo.sysFiles || []}

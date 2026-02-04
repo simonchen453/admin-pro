@@ -251,13 +251,6 @@ const RoleList: React.FC = () => {
   // 表格列定义
   const columns: ColumnsType<RoleEntity> = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      key: 'index',
-      width: 60,
-      render: (value: number) => (currentPage - 1) * pageSize + value + 1
-    },
-    {
       title: '编号',
       dataIndex: 'name',
       key: 'name',
@@ -322,34 +315,34 @@ const RoleList: React.FC = () => {
     <div className="fade-in" style={{ padding: '0' }}>
 
 
-      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
+      <Card className="modern-card" title="角色管理" bordered={false}>
         {/* 搜索表单 */}
-        <Form autoComplete="off"
+        <Form
           form={form}
-          layout="inline"
+          layout="vertical"
           onFinish={handleSearch}
-          style={{ marginBottom: 24 }}
+          className="search-form"
         >
-          <Row gutter={[16, 16]} style={{ width: '100%' }}>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="name" style={{ marginBottom: 0 }}>
-                <Input placeholder="编号" allowClear prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} />
+          <Row gutter={24}>
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="name" label="编号">
+                <Input placeholder="请输入编号" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="display" style={{ marginBottom: 0 }}>
-                <Input placeholder="显示名称" allowClear prefix={<SearchOutlined style={{ color: '#cbd5e1' }} />} />
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="display" label="显示名称">
+                <Input placeholder="请输入显示名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="status" style={{ marginBottom: 0 }}>
-                <Select placeholder="状态" allowClear style={{ width: '100%' }}>
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="status" label="状态">
+                <Select placeholder="请选择状态" allowClear style={{ width: '100%' }}>
                   <Option value={RoleStatus.ACTIVE}>正常</Option>
                   <Option value={RoleStatus.INACTIVE}>停用</Option>
                 </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
               <Space>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索
@@ -389,26 +382,21 @@ const RoleList: React.FC = () => {
             loading={loading}
             rowKey={(record) => record.id || `role-${record.name}`}
             rowSelection={rowSelection}
-            pagination={false}
+            pagination={{
+              current: currentPage,
+              pageSize: pageSize,
+              total: total,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+              onChange: handlePageChange,
+              onShowSizeChange: handlePageChange,
+              pageSizeOptions: ['10', '20', '30', '50']
+            }}
             size="middle"
             locale={{
               emptyText: roleList.length === 0 && !loading ? '暂无数据' : undefined
             }}
-          />
-        </div>
-
-        {/* 分页 */}
-        <div style={{ marginTop: 24, textAlign: 'right' }}>
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={total}
-            showSizeChanger
-            showQuickJumper
-            showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
-            onChange={handlePageChange}
-            onShowSizeChange={handlePageChange}
-            pageSizeOptions={['10', '20', '30', '50']}
           />
         </div>
       </Card>

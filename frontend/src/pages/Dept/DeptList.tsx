@@ -253,6 +253,7 @@ const DeptList: React.FC = () => {
       title: '排序',
       dataIndex: 'orderNum',
       key: 'orderNum',
+      width: 80,
     },
     {
       title: '状态',
@@ -271,8 +272,7 @@ const DeptList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      fixed: 'right',
-      width: 120,
+      width: 180,
       render: (_, record: DeptEntity) => (
         <Space size="small">
           <Button
@@ -313,28 +313,28 @@ const DeptList: React.FC = () => {
     <div className="fade-in" style={{ padding: '0' }}>
 
 
-      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
-        <Form autoComplete="off"
+      <Card className="modern-card" title="部门管理" bordered={false}>
+        <Form
           form={form}
-          layout="inline"
+          layout="vertical"
           onFinish={handleSearch}
-          style={{ marginBottom: 24 }}
+          className="search-form"
         >
-          <Row gutter={[16, 16]} style={{ width: '100%' }}>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="name" style={{ marginBottom: 0 }}>
-                <Input placeholder="部门名称" allowClear />
+          <Row gutter={24}>
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="name" label="部门名称">
+                <Input placeholder="请输入部门名称" allowClear />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Form.Item name="status" style={{ marginBottom: 0 }}>
-                <Select placeholder="状态" allowClear style={{ width: '100%' }}>
+            <Col xs={24} sm={8} md={6}>
+              <Form.Item name="status" label="状态">
+                <Select placeholder="请选择状态" allowClear style={{ width: '100%' }}>
                   <Option value={DeptStatus.ACTIVE}>正常</Option>
                   <Option value={DeptStatus.INACTIVE}>停用</Option>
                 </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6}>
+            <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
               <Space>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索

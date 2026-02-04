@@ -144,13 +144,6 @@ const AuditLogList: React.FC = () => {
 
   const columns: ColumnsType<AuditLogEntity> = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      key: 'index',
-      width: 60,
-      render: (value: number) => (currentPage - 1) * pageSize + value + 1
-    },
-    {
       title: '类别',
       dataIndex: 'category',
       key: 'category',
@@ -226,41 +219,41 @@ const AuditLogList: React.FC = () => {
     <div className="fade-in" style={{ padding: '0' }}>
 
 
-      <Card className="modern-card" styles={{ body: { padding: '24px' } }}>
-        <Form autoComplete="off"
+      <Card className="modern-card" title="审计日志" bordered={false}>
+        <Form
           form={form}
-          layout="inline"
+          layout="vertical"
           onFinish={handleSearch}
-          style={{ marginBottom: 24 }}
+          className="search-form"
         >
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} md={6} lg={4}>
-              <Form.Item name="category" style={{ marginBottom: 0 }}>
-                <Input placeholder="分类名称" allowClear />
+          <Row gutter={24}>
+            <Col xs={24} sm={8} md={6} lg={4}>
+              <Form.Item name="category" label="分类名称">
+                <Input placeholder="请输入分类名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6} lg={4}>
-              <Form.Item name="module" style={{ marginBottom: 0 }}>
-                <Input placeholder="模块名称" allowClear />
+            <Col xs={24} sm={8} md={6} lg={4}>
+              <Form.Item name="module" label="模块名称">
+                <Input placeholder="请输入模块名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6} lg={4}>
-              <Form.Item name="user" style={{ marginBottom: 0 }}>
-                <Input placeholder="操作人员" allowClear />
+            <Col xs={24} sm={8} md={6} lg={4}>
+              <Form.Item name="user" label="操作人员">
+                <Input placeholder="请输入操作人员" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6} lg={4}>
-              <Form.Item name="event" style={{ marginBottom: 0 }}>
-                <Input placeholder="操作名称" allowClear />
+            <Col xs={24} sm={8} md={6} lg={4}>
+              <Form.Item name="event" label="操作名称">
+                <Input placeholder="请输入操作名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6} lg={4}>
-              <Form.Item name="status" style={{ marginBottom: 0 }}>
-                <Input placeholder="状态" allowClear />
+            <Col xs={24} sm={8} md={6} lg={4}>
+              <Form.Item name="status" label="状态">
+                <Input placeholder="请输入状态" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={12} lg={8}>
-              <Form.Item style={{ marginBottom: 0 }}>
+            <Col xs={24} sm={16} md={12} lg={8}>
+              <Form.Item label="时间范围">
                 <RangePicker
                   showTime
                   format="YYYY-MM-DD HH:mm:ss"
@@ -270,7 +263,7 @@ const AuditLogList: React.FC = () => {
                 />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={12} md={6} lg={4}>
+            <Col xs={24} sm={24} md={6} lg={4} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
               <Space>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                   搜索
@@ -289,26 +282,21 @@ const AuditLogList: React.FC = () => {
             dataSource={auditLogList}
             loading={loading}
             rowKey={(record) => record.id || `log-${record.logDate}-${record.userName}`}
-            pagination={false}
+            pagination={{
+              current: currentPage,
+              pageSize: pageSize,
+              total: total,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
+              onChange: handlePageChange,
+              onShowSizeChange: handlePageChange,
+              pageSizeOptions: ['10', '20', '30', '50']
+            }}
             size="middle"
-            scroll={{ x: 1200 }}
             locale={{
               emptyText: auditLogList.length === 0 && !loading ? '暂无数据' : undefined
             }}
-          />
-        </div>
-
-        <div style={{ marginTop: 24, textAlign: 'right' }}>
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={total}
-            showSizeChanger
-            showQuickJumper
-            showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
-            onChange={handlePageChange}
-            onShowSizeChange={handlePageChange}
-            pageSizeOptions={['10', '20', '30', '50']}
           />
         </div>
       </Card>

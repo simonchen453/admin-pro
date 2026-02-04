@@ -85,6 +85,7 @@ const Settings: React.FC = () => {
         className="settings-sidebar modern-card"
         style={{ width: 280, flexShrink: 0 }}
         styles={{ body: { padding: '12px' } }}
+        bordered={false}
       >
         <div style={{ padding: '12px 16px 24px 16px' }}>
           <Title level={4} style={{ margin: 0 }}>设置中心</Title>
@@ -107,6 +108,7 @@ const Settings: React.FC = () => {
         className="settings-content modern-card"
         style={{ flex: 1, minHeight: 600 }}
         styles={{ body: { padding: '32px' } }}
+        bordered={false}
       >
         {renderContent()}
       </Card>

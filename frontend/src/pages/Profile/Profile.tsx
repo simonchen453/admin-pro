@@ -52,6 +52,8 @@ function Profile() {
   return (
     <div className="profile-container">
       <Card
+        className="modern-card"
+        bordered={false}
         title={
           <Space>
             <UserOutlined />

@@ -2,6 +2,7 @@ package com.adminpro.system.rbac.api;
 
 import com.adminpro.framework.base.util.SpringUtil;
 import com.adminpro.framework.exceptions.APIException;
+import com.adminpro.system.config.JwtProperties;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.cache.CurrentUserCache;
 import com.adminpro.system.core.common.helper.AuditLogHelper;
@@ -9,7 +10,6 @@ import com.adminpro.system.core.common.helper.StringHelper;
 import com.adminpro.system.core.common.helper.WebHelper;
 import com.adminpro.system.core.common.helper.ip.IpUtils;
 import com.adminpro.system.core.security.auth.LoginUser;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import com.adminpro.system.core.security.jwt.DeviceFingerprintService;
 import com.adminpro.system.core.security.jwt.JwtCacheConstants;
 import com.adminpro.system.core.security.jwt.JwtTokenProvider;
@@ -23,8 +23,6 @@ import com.adminpro.system.rbac.domains.entity.user.UserEntity;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse;
 import com.adminpro.system.rbac.enums.UserStatus;
-import com.adminpro.system.config.JwtProperties;
-import com.adminpro.system.rbac.api.Device;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
@@ -39,11 +37,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.MessageFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 登录助手类

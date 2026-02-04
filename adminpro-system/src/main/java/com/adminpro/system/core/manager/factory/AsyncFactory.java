@@ -4,10 +4,10 @@ import com.adminpro.framework.base.util.LoggerUtil;
 import com.adminpro.system.core.common.helper.WebHelper;
 import com.adminpro.system.core.common.helper.ip.AddressUtils;
 import com.adminpro.system.core.common.helper.ip.IpUtils;
-import ua_parser.Client;
-import ua_parser.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ua_parser.Client;
+import ua_parser.Parser;
 
 import java.util.TimerTask;
 

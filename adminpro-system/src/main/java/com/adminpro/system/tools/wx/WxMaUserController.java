@@ -1,7 +1,6 @@
 package com.adminpro.system.tools.wx;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
-
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.binarywang.wx.miniapp.util.WxMaConfigHolder;
 import com.adminpro.framework.base.entity.R;
@@ -20,7 +19,6 @@ import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse;
 import com.adminpro.system.rbac.domains.vo.login.LoginResponse;
 import com.adminpro.system.rbac.enums.UserStatus;
-
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.apache.commons.lang3.StringUtils;

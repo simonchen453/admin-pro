@@ -16,10 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * 设备管理控制器
  * <p>
@@ -43,9 +39,9 @@ public class DeviceManagementController extends BaseController {
      * 管理员获取所有设备列表
      */
     @Operation(summary = "管理员获取设备列表", description = "获取系统所有设备（支持搜索）")
-    @GetMapping("/all")
+    @PostMapping("/search")
     @PreAuthorize("hasAuthority('system:device:list')")
-    public R<QueryResultSet<UserDeviceVo>> listAll(DeviceSearchForm searchForm) {
+    public R<QueryResultSet<UserDeviceVo>> listAll(@RequestBody DeviceSearchForm searchForm) {
         QueryResultSet<UserDeviceVo> result = userDeviceDao.searchDevices(searchForm);
         return R.ok(result);
     }

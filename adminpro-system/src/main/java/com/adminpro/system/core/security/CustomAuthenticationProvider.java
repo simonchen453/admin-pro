@@ -3,7 +3,6 @@ package com.adminpro.system.core.security;
 import com.adminpro.system.core.security.auth.LoginUser;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import jakarta.annotation.Resource;
-
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

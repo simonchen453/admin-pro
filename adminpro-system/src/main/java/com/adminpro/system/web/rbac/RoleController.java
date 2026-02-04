@@ -16,7 +16,6 @@ import com.adminpro.system.rbac.domains.entity.role.RoleUpdateValidator;
 import com.adminpro.system.rbac.domains.vo.role.ListRoleVo;
 import com.adminpro.system.rbac.domains.vo.role.ListRoleVoConverter;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;

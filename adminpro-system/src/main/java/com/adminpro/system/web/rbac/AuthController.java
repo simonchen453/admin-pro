@@ -3,7 +3,6 @@ package com.adminpro.system.web.rbac;
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.util.BeanUtil;
 import com.adminpro.framework.client.helper.ClientHelper;
-
 import com.adminpro.framework.exceptions.APIException;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.common.annotation.SysLog;
@@ -14,29 +13,26 @@ import com.adminpro.system.rbac.api.Device;
 import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.rbac.api.PasswordValidator;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
-
 import com.adminpro.system.rbac.domains.entity.dept.DeptEntity;
 import com.adminpro.system.rbac.domains.entity.dept.DeptService;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
-
+import com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse;
 import com.adminpro.system.rbac.domains.vo.login.LoginUserVo;
 import com.adminpro.system.rbac.domains.vo.user.PasswordRuleVo;
 import com.adminpro.system.rbac.domains.vo.user.UpdateProfileVo;
 import com.adminpro.system.rbac.domains.vo.user.UserInfoResponseVo;
-import com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse;
 import com.google.code.kaptcha.Producer;
 import io.swagger.v3.oas.annotations.Operation;
-
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;

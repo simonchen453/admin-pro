@@ -1,6 +1,7 @@
 package com.adminpro.system.web.rbac;
 
 import com.adminpro.framework.base.entity.R;
+import com.adminpro.system.core.common.annotation.SysLog;
 import com.adminpro.system.core.common.web.BaseController;
 import com.adminpro.system.core.security.auth.LoginUser;
 import com.adminpro.system.core.security.jwt.DeviceFingerprintService;
@@ -9,7 +10,6 @@ import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.rbac.domains.entity.device.UserDeviceDao;
 import com.adminpro.system.rbac.domains.entity.device.UserDeviceEntity;
 import com.adminpro.system.rbac.domains.vo.device.UserDeviceVo;
-import com.adminpro.system.core.common.annotation.SysLog;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;

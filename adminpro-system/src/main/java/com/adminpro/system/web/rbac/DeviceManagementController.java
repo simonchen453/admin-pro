@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/devices")
 @RequiredArgsConstructor
+@PreAuthorize("@ss.hasPermission('system:device:list')")
 public class DeviceManagementController extends BaseController {
 
     private final UserDeviceDao userDeviceDao;
@@ -40,7 +41,6 @@ public class DeviceManagementController extends BaseController {
      */
     @Operation(summary = "管理员获取设备列表", description = "获取系统所有设备（支持搜索）")
     @PostMapping("/search")
-    @PreAuthorize("hasAuthority('system:device:list')")
     public R<QueryResultSet<UserDeviceVo>> listAll(@RequestBody DeviceSearchForm searchForm) {
         QueryResultSet<UserDeviceVo> result = userDeviceDao.searchDevices(searchForm);
         return R.ok(result);
@@ -52,7 +52,6 @@ public class DeviceManagementController extends BaseController {
     @SysLog("管理员踢出设备")
     @Operation(summary = "管理员踢出设备", description = "管理员强制踢出用户的设备")
     @DeleteMapping("/{userId}/{deviceId}")
-    @PreAuthorize("hasAuthority('system:device:kickout')")
     public R<String> kickoutDevice(@PathVariable String userId, @PathVariable String deviceId) {
         UserDeviceEntity device = userDeviceDao.findByDeviceId(userId, deviceId);
         if (device == null) {

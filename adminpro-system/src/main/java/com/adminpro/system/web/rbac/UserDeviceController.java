@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/auth/devices")
 @RequiredArgsConstructor
+@PreAuthorize("@ss.hasPermission('user:device:list')")
 public class UserDeviceController extends BaseController {
 
     private final UserDeviceDao userDeviceDao;

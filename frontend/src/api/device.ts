@@ -14,7 +14,7 @@ export const kickoutDeviceApi = (deviceId: string) => {
 
 // 获取所有设备列表 (Admin)
 export const getAllDevicesApi = (params: any) => {
-  return request.get('/api/v1/devices/all', { params });
+  return request.post('/api/v1/devices/search', { params });
 };
 
 // 踢出指定用户的设备 (Admin)

@@ -45,7 +45,7 @@ echo "Runtime injection complete. API_BASE_URL=${API_BASE_URL}"
 
 # 5. 导出环境变量供 Nginx 使用
 # docker-entrypoint.sh 会使用 envsubst 处理 nginx.conf.template
-export API_BASE_URL
+export API_BASE_URL APP_BASE_PATH BACKEND_HOST BACKEND_API_PORT BACKEND_CONTEXT_PATH
 
 # 6. 启动 Nginx (使用原来的 entrypoint 逻辑来处理 nginx.conf.template)
 # 注意：docker-entrypoint.sh 是 Nginx 官方镜像的入口脚本，负责 envsubst

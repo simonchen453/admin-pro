@@ -131,7 +131,15 @@ public class AuthController extends BaseController {
             loginResponse.setDate(DateUtil.formatDate(new Date()));
             if (StringUtils.isEmpty(userEntity.getAvatarUrl())) {
                 String avatarUrl = ConfigHelper.getString(ConfigKeys.User.AVATAR_URL);
-                loginResponse.setAvatarUrl(WebConstants.getServerAddress() + avatarUrl);
+                if (StringUtils.isNotEmpty(avatarUrl)) {
+                    if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
+                        loginResponse.setAvatarUrl(avatarUrl);
+                    } else {
+                        loginResponse.setAvatarUrl(WebConstants.getServerAddress() + avatarUrl);
+                    }
+                } else {
+                    loginResponse.setAvatarUrl(WebConstants.getServerAddress() + request.getContextPath() + "/img/avatar.png");
+                }
             } else {
                 loginResponse.setAvatarUrl(userEntity.getAvatarUrl());
             }

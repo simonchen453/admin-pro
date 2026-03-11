@@ -172,6 +172,11 @@ BACKEND_CONTEXT_PATH=/
 - 前端: `http://your-domain/`
 - API: `http://your-domain/api/*` → 后端: `http://backend:8080/*`
 
+
+## OpenClaw 自动化流程
+
+项目当前的 QA → GitHub Issue → Codex 修复协作流程见 [OPENCLAW_QA_ISSUE_WORKFLOW.md](OPENCLAW_QA_ISSUE_WORKFLOW.md)。
+
 ## 许可证
 
 [LICENSE](LICENSE)

@@ -121,6 +121,40 @@ public class UserDao extends BaseDao<UserEntity, String> {
         return executeSingle(select);
     }
 
+    /**
+     * 根据用户域和微信 UnionID 查找 UserEntity 对象。
+     * <p>
+     * UnionID 只在同一开放平台账号下唯一，因此必须与用户域一起限定，
+     * 与 {@code unq_union_id} 唯一索引保持一致。
+     * </p>
+     *
+     * @param domain  用户域
+     * @param unionId 微信开放平台 UnionID
+     * @return 匹配的用户，不存在时返回 null
+     */
+    public UserEntity findByDomainAndUnionId(String domain, String unionId) {
+        SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
+        select.setTable(UserEntity.TABLE_NAME);
+        select.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, domain);
+        select.addWhereAnd(UserEntity.COL_UNION_ID + EQ, unionId);
+        return executeSingle(select);
+    }
+
+    /**
+     * 根据用户域和 extUserId（微信 openid）查找 UserEntity 对象。
+     *
+     * @param domain     用户域
+     * @param extUserId  外部用户 ID
+     * @return 匹配的用户，不存在时返回 null
+     */
+    public UserEntity findByDomainAndExtUserId(String domain, String extUserId) {
+        SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
+        select.setTable(UserEntity.TABLE_NAME);
+        select.addWhereAnd(UserEntity.COL_USER_DOMAIN + EQ, domain);
+        select.addWhereAnd(UserEntity.COL_EXT_USER_ID + EQ, extUserId);
+        return executeSingle(select);
+    }
+
     public UserEntity findByDomainAndEmail(String domain, String email) {
         SelectBuilder<UserEntity> select = new SelectBuilder<UserEntity>(getUserRowMapper());
         select.setTable(UserEntity.TABLE_NAME);
@@ -241,6 +275,7 @@ public class UserDao extends BaseDao<UserEntity, String> {
                 entity.setPost(resultSet.getString(UserEntity.COL_POST));
                 entity.setJobNo(resultSet.getString(UserEntity.COL_JOB_NO));
                 entity.setExtUserId(resultSet.getString(UserEntity.COL_EXT_USER_ID));
+                entity.setUnionId(resultSet.getString(UserEntity.COL_UNION_ID));
                 entity.setAuthenticateDate(resultSet.getTimestamp(UserEntity.COL_AUTHENTICATE_DATE));
                 entity.setLatestLoginTime(resultSet.getTimestamp(UserEntity.COL_LATEST_LOGIN_TIME));
                 entity.setLatestChangePwdTime(resultSet.getTimestamp(UserEntity.COL_LATEST_CHANGE_PWD_TIME));

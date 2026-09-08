@@ -2,29 +2,30 @@ package com.adminpro.system.tools.wx;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
+import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
 import cn.binarywang.wx.miniapp.util.WxMaConfigHolder;
 import com.adminpro.framework.base.entity.R;
 import com.adminpro.framework.base.util.DateUtil;
 import com.adminpro.framework.base.util.IdGenerator;
 import com.adminpro.framework.base.util.UUIDUtil;
-import com.adminpro.framework.exceptions.APIException;
 import com.adminpro.system.core.cache.AppCache;
 import com.adminpro.system.core.security.auth.LoginUser;
 import com.adminpro.system.rbac.api.Device;
 import com.adminpro.system.rbac.api.LoginHelper;
 import com.adminpro.system.rbac.common.RbacCacheConstants;
-import com.adminpro.system.rbac.common.RbacConstants;
 import com.adminpro.system.rbac.domains.entity.user.UserEntity;
 import com.adminpro.system.rbac.domains.entity.user.UserService;
 import com.adminpro.system.rbac.domains.vo.jwt.JwtLoginResponse;
 import com.adminpro.system.rbac.domains.vo.login.LoginResponse;
 import com.adminpro.system.rbac.enums.UserStatus;
+import com.adminpro.system.tools.wx.config.WxMaProperties;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,190 +33,276 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 
 /**
- * 微信小程序用户接口
+ * 微信小程序用户接口。
  * <p>
- * 提供小程序登录、用户信息获取等功能。
- * 使用 JWT 进行认证。
+ * 提供小程序登录、资料维护和手机号绑定，使用 JWT 进行认证。
+ * </p>
+ *
+ * <h3>身份标识</h3>
+ * <ul>
+ * <li>openid：按小程序隔离，存入 {@link UserEntity#getExtUserId()}。</li>
+ * <li>unionid：同一开放平台账号下跨应用唯一，存入 {@link UserEntity#getUnionId()}，
+ * 是后续打通公众号与 App 的唯一依据。</li>
+ * </ul>
+ *
+ * <h3>日志约定</h3>
+ * <p>
+ * session_key 可解密微信返回的加密数据，openid 与 unionid 属于用户标识，
+ * 三者一律不得写入日志。排查问题请使用内部用户 ID。
  * </p>
  */
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/wechat/user")
 public class WxMaUserController {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private static final Logger logger = LoggerFactory.getLogger(WxMaUserController.class);
+
+    /** 小程序按移动端设备签发令牌。 */
+    private static final Device MINI_PROGRAM_DEVICE = new Device() {
+        @Override
+        public boolean isNormal() {
+            return false;
+        }
+
+        @Override
+        public boolean isMobile() {
+            return true;
+        }
+
+        @Override
+        public boolean isTablet() {
+            return false;
+        }
+    };
 
     private final WxMaService wxService;
 
+    private final WxMaProperties wxMaProperties;
+
     /**
-     * 登陆接口
+     * 小程序登录：用 wx.login 返回的 code 换取会话并签发 JWT。
+     *
+     * @param code  wx.login 返回的一次性 jsCode
+     * @param appid 多小程序接入时指定使用哪个配置，单小程序可不传
      */
     @GetMapping("/login")
-    public R login(@RequestParam("code") String code) throws APIException {
+    public R login(@RequestParam("code") String code,
+            @RequestParam(value = "appid", required = false) String appid) {
         if (StringUtils.isBlank(code)) {
             return R.error("empty jscode");
         }
-
+        if (StringUtils.isNotBlank(appid) && !wxService.switchover(appid)) {
+            return R.error("未配置的小程序 appid");
+        }
         try {
             WxMaJscode2SessionResult session = wxService.getUserService().getSessionInfo(code);
-            logger.info("session key: " + session.getSessionKey());
-            logger.info("Open Id: " + session.getOpenid());
-            logger.info("Union Id: " + session.getUnionid());
-            UserEntity user = UserService.getInstance().findByExtUserId(session.getOpenid());
-
-            if (user == null) {
-                user = new UserEntity();
-                user.setLoginName(session.getOpenid());
-                user.setExtUserId(session.getOpenid());
-                user.setUserDomain(RbacConstants.INTERNET_DOMAIN);
-                user.setId(IdGenerator.getInstance().nextStringId());
-                user.setStatus(UserStatus.ACTIVE.getCode());
-                user.setPassword(UUIDUtil.getUUID()); // 随机密码，小程序端不使用密码登录
-                UserService.getInstance().create(user);
+            String openid = session.getOpenid();
+            String unionId = StringUtils.trimToNull(session.getUnionid());
+            if (StringUtils.isBlank(openid)) {
+                logger.warn("微信 jscode2session 未返回 openid");
+                return R.error("微信登录失败");
             }
 
-            // 构造登录用户对象
+            String userDomain = wxMaProperties.resolveUserDomain(appid);
+            UserEntity user = findBoundUser(userDomain, openid, unionId);
+            if (user == null) {
+                UserEntity conflict = UserService.getInstance().findByExtUserId(openid);
+                if (conflict != null) {
+                    // sys_user_tbl 的 unq_ext_userid 是全局唯一索引，直接建号会撞唯一约束，
+                    // 这里给出明确结论而不是抛 500。
+                    logger.warn("微信 openid 已注册在其它用户域: expected={}, actual={}, userId={}",
+                            userDomain, conflict.getUserDomain(), conflict.getId());
+                    return R.error("该微信账号已在其它用户域注册");
+                }
+                user = createUser(userDomain, openid, unionId);
+            } else {
+                syncWechatBinding(user, openid, unionId);
+            }
+
             LoginUser loginUser = LoginUser.convertFrom(user);
+            JwtLoginResponse jwtResponse = LoginHelper.getInstance()
+                    .login(loginUser, MINI_PROGRAM_DEVICE, true);
 
-            // 模拟移动端设备
-            Device device = new Device() {
-                @Override
-                public boolean isNormal() {
-                    return false;
-                }
+            // 缓存 session_key，供后续解密微信加密数据使用；仅存缓存，不落库、不打日志。
+            AppCache.getInstance().set(RbacCacheConstants.WX_SESSION_KEY_CACHE,
+                    jwtResponse.getAccessToken(), session, (int) jwtResponse.getExpiresIn());
 
-                @Override
-                public boolean isMobile() {
-                    return true;
-                }
-
-                @Override
-                public boolean isTablet() {
-                    return false;
-                }
-            };
-
-            // 执行 JWT 登录
-            JwtLoginResponse jwtResponse = LoginHelper.getInstance().login(loginUser, device, true);
-
-            // 为了保持 API 兼容性，我们将 JWT 响应转换为旧的 LoginResponse 格式（部分字段）
-            // 或者直接返回 JWT 响应。取决于前端是否已经准备好接收标准 JWT。
-            // 假设前端需要 accessToken 作为 token。
-            LoginResponse response = new LoginResponse();
-            response.setId(user.getId());
-            response.setUserId(user.getLoginName());
-            response.setToken(jwtResponse.getAccessToken()); // 使用 Access Token
-            response.setAuthed(user.isAuthenticated());
-            response.setIdNo(user.getIdNo());
-            response.setRealName(user.getRealName());
-            response.setDomain(user.getUserDomain());
-            response.setDisplay(user.getDisplay());
-            response.setMobileNo(user.getMobileNo());
-            response.setDate(DateUtil.formatDate(new Date()));
-            response.setAvatarUrl(user.getAvatarUrl());
-            response.setExtUserId(user.getExtUserId());
-
-            // 缓存 SessionKey (业务需要解密数据时使用)
-            // 使用 JTI 或者 AccessToken 作为 Key 都可以，这里使用 AccessToken
-            AppCache.getInstance().set(RbacCacheConstants.WX_SESSION_KEY_CACHE, jwtResponse.getAccessToken(), session,
-                    (int) jwtResponse.getExpiresIn());
-
-            return R.ok(response);
+            return R.ok(toLoginResponse(user, jwtResponse.getAccessToken()));
         } catch (WxErrorException e) {
-            this.logger.error(e.getMessage(), e);
-            WxMaConfigHolder.remove();// 清理ThreadLocal
-            return R.error(e.toString());
+            logger.error("微信小程序登录失败", e);
+            return R.error("微信登录失败");
+        } finally {
+            WxMaConfigHolder.remove();
         }
     }
 
     /**
-     * <pre>
-     * 获取用户信息接口
-     * </pre>
+     * 返回当前登录用户资料。
+     * <p>
+     * 微信自 2021-04-13 起对 wx.getUserInfo / getUserProfile 的加密资料只返回匿名昵称
+     * 和灰色默认头像，signature、rawData、encryptedData、iv 已无解密价值，仅为兼容旧
+     * 调用方保留且不再使用。需要真实昵称头像请改用 {@link #profile(String, String)}。
+     * </p>
      */
     @GetMapping("/info")
-    public R info(@RequestParam String signature, @RequestParam String rawData, @RequestParam String encryptedData,
-            @RequestParam String iv) {
-        // 用户信息校验 (由 JwtAuthenticationFilter 保证已认证)
+    public R info(@RequestParam(required = false) String signature,
+            @RequestParam(required = false) String rawData,
+            @RequestParam(required = false) String encryptedData,
+            @RequestParam(required = false) String iv) {
         LoginUser loginUser = LoginHelper.getInstance().getLoginUser();
-        if (loginUser == null) {
-            return R.error("Unauthorized");
+        if (loginUser == null || loginUser.getUser() == null) {
+            return R.authFailed("Unauthorized");
         }
-
-        // 获取当前 Token (用于获取 SessionKey)
-        // 注意：SecurityContext 中没有直接存 Token 字符串，我们需要从请求中再次提取，或者
-        // 在 JwtAuthenticationFilter 中将 Token 也放入 Details。
-        // 或者，我们可以简单地不验证 SessionKey 签名，只更新用户信息。
-        // 但为了安全性，最好还是验证。
-        // 我们可以使用 LoginHelper.getCurrentJti() 或者直接从请求头取
-        // 为了方便，这里假设我们可以从 Request Header 取 Token
-
-        // 暂时无法获取 Raw Token 来从 Cache 取 SessionKey，
-        // 除非我们修改 Authentication 流程把 Token 存进去。
-        // 或者前端传过来？前端传了 Authorization Header。
-        // 让我们尝试从 Authorization Header 获取。
-
-        // 这里只是为了获取 SessionKey 缓存 Key
-        // 由于我们在 login 时用 accessToken 作为 key 存了 sessionKey
-        // 所以我们需要 accessToken
-
-        // 这里简化处理：如果没有 SessionKey 缓存，可能无法解密，但这步主要是更新用户信息。
-        // 如果无法解密，则跳过解密步骤，只返回数据库信息。
-
-        // 尝试获取 accessToken
-        // ... (省略复杂的 Token 提取，假设 SessionKey 缓存机制可能需要调整以适配 JTI)
-        // 实际上，最好用 JTI 做缓存 Key，但 login 接口返回的是 accessToken。
-
-        // 鉴于时间，我们保留 SessionKey 逻辑，尝试从 Header 取 Token。
-        // (在实际项目中，应该重构 SessionKey 的管理方式)
-
-        return R.ok(loginUser); // 临时只返回用户信息
+        // 不能直接返回 LoginUser：其 getUser() 携带 UserEntity 的密码散列、
+        // 支付密码和身份证号，会被整体序列化给客户端。
+        return R.ok(toLoginResponse(loginUser.getUser(), null));
     }
 
     /**
-     * <pre>
-     * 获取用户绑定手机号信息
-     * </pre>
+     * 保存小程序端采集的昵称与头像。
+     * <p>
+     * 对应 open-type="chooseAvatar" 按钮与昵称输入框的新版取值方式，
+     * 替代已失效的加密资料解密链路。
+     * </p>
+     *
+     * @param nickName  用户填写的昵称，为空表示不修改
+     * @param avatarUrl 头像地址，为空表示不修改
      */
-    @GetMapping("/phone")
-    public R phone(@RequestParam String code) {
+    @PostMapping("/profile")
+    public R profile(@RequestParam(required = false) String nickName,
+            @RequestParam(required = false) String avatarUrl) {
         LoginUser loginUser = LoginHelper.getInstance().getLoginUser();
-        if (loginUser == null) {
-            return R.error("Unauthorized");
+        if (loginUser == null || loginUser.getUser() == null) {
+            return R.authFailed("Unauthorized");
         }
-
         UserEntity user = loginUser.getUser();
 
-        // 解密手机号需要 SessionKey，同上，需要 Token。
-        // 下面的代码暂时注释，等待 SessionKey 管理机制统一。
-        /*
-         * // 解密
-         * WxMaPhoneNumberInfo phoneNoInfo = null;
-         * try {
-         * phoneNoInfo = this.wxService.getUserService().getPhoneNoInfo(code);
-         * } catch (WxErrorException e) {
-         * logger.error("", e);
-         * }
-         * 
-         * if (phoneNoInfo != null) {
-         * String phoneNumber = phoneNoInfo.getPurePhoneNumber();
-         * user.setMobileNo(phoneNumber);
-         * UserService.getInstance().update(user);
-         * }
-         */
+        boolean changed = false;
+        if (StringUtils.isNotBlank(nickName)) {
+            user.setDisplay(StringUtils.abbreviate(nickName.trim(), 255));
+            changed = true;
+        }
+        if (StringUtils.isNotBlank(avatarUrl)) {
+            user.setAvatarUrl(StringUtils.abbreviate(avatarUrl.trim(), 255));
+            changed = true;
+        }
+        if (changed) {
+            UserService.getInstance().update(user);
+        }
+        return R.ok(toLoginResponse(user, null));
+    }
 
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setId(user.getId());
-        loginResponse.setUserId(user.getLoginName());
-        // loginResponse.setToken(authToken); // 不再返回 Token
-        loginResponse.setAuthed(true);
-        loginResponse.setIdNo(user.getIdNo());
-        loginResponse.setRealName(user.getRealName());
-        loginResponse.setDomain(user.getUserDomain());
-        loginResponse.setDisplay(user.getDisplay());
-        loginResponse.setMobileNo(user.getMobileNo());
-        loginResponse.setDate(DateUtil.formatDate(new Date()));
-        loginResponse.setAvatarUrl(user.getAvatarUrl());
-        loginResponse.setExtUserId(user.getExtUserId());
-        return R.ok(loginResponse);
+    /**
+     * 绑定微信手机号。
+     * <p>
+     * 使用 open-type="getPhoneNumber" 回调返回的 code 直接换取手机号
+     * （wxa/business/getuserphonenumber），不依赖 session_key，
+     * 也不需要客户端传加密数据。
+     * </p>
+     *
+     * @param code  getPhoneNumber 回调返回的动态令牌，五分钟内有效且只能消费一次
+     * @param appid 多小程序接入时指定使用哪个配置，单小程序可不传
+     */
+    @GetMapping("/phone")
+    public R phone(@RequestParam String code,
+            @RequestParam(value = "appid", required = false) String appid) {
+        LoginUser loginUser = LoginHelper.getInstance().getLoginUser();
+        if (loginUser == null || loginUser.getUser() == null) {
+            return R.authFailed("Unauthorized");
+        }
+        UserEntity user = loginUser.getUser();
+        if (StringUtils.isBlank(code)) {
+            return R.error("empty phone code");
+        }
+        if (StringUtils.isNotBlank(appid) && !wxService.switchover(appid)) {
+            return R.error("未配置的小程序 appid");
+        }
+
+        try {
+            WxMaPhoneNumberInfo phoneNoInfo = wxService.getUserService().getNewPhoneNoInfo(code);
+            String phoneNumber = phoneNoInfo == null ? null : phoneNoInfo.getPurePhoneNumber();
+            if (StringUtils.isBlank(phoneNumber)) {
+                logger.warn("微信未返回手机号: userId={}", user.getId());
+                return R.error("获取手机号失败");
+            }
+            user.setMobileNo(phoneNumber);
+            UserService.getInstance().update(user);
+            return R.ok(toLoginResponse(user, null));
+        } catch (WxErrorException e) {
+            logger.error("获取微信手机号失败: userId={}", user.getId(), e);
+            return R.error("获取手机号失败");
+        } finally {
+            WxMaConfigHolder.remove();
+        }
+    }
+
+    /**
+     * 按 openid 定位账号；openid 未命中且携带 unionid 时用 unionid 兜底，
+     * 覆盖同一自然人换小程序或重新授权后 openid 变化的情况。
+     */
+    private UserEntity findBoundUser(String userDomain, String openid, String unionId) {
+        UserEntity user = UserService.getInstance().findByDomainAndExtUserId(userDomain, openid);
+        if (user != null) {
+            return user;
+        }
+        if (StringUtils.isNotBlank(unionId)) {
+            return UserService.getInstance().findByDomainAndUnionId(userDomain, unionId);
+        }
+        return null;
+    }
+
+    private UserEntity createUser(String userDomain, String openid, String unionId) {
+        UserEntity user = new UserEntity();
+        user.setId(IdGenerator.getInstance().nextStringId());
+        user.setUserDomain(userDomain);
+        user.setLoginName(openid);
+        user.setExtUserId(openid);
+        user.setUnionId(unionId);
+        user.setStatus(UserStatus.ACTIVE.getCode());
+        user.setPassword(UUIDUtil.getUUID()); // 随机密码，小程序端不使用密码登录
+        UserService.getInstance().create(user);
+        logger.info("微信小程序创建账号: userDomain={}, userId={}", userDomain, user.getId());
+        return user;
+    }
+
+    /** 补齐历史账号缺失的 openid / unionid 绑定；已有绑定不覆盖。 */
+    private void syncWechatBinding(UserEntity user, String openid, String unionId) {
+        boolean changed = false;
+        if (StringUtils.isBlank(user.getExtUserId())) {
+            user.setExtUserId(openid);
+            changed = true;
+        }
+        if (StringUtils.isNotBlank(unionId)) {
+            if (StringUtils.isBlank(user.getUnionId())) {
+                user.setUnionId(unionId);
+                changed = true;
+            } else if (!StringUtils.equals(unionId, user.getUnionId())) {
+                logger.warn("微信 UnionID 与既有绑定不一致，保留原绑定: userId={}", user.getId());
+            }
+        }
+        if (changed) {
+            UserService.getInstance().update(user);
+        }
+    }
+
+    /** 统一对外响应，避免直接序列化 UserEntity 泄露密码散列与身份证号。 */
+    private LoginResponse toLoginResponse(UserEntity user, String accessToken) {
+        LoginResponse response = new LoginResponse();
+        response.setId(user.getId());
+        response.setUserId(user.getLoginName());
+        if (StringUtils.isNotBlank(accessToken)) {
+            response.setToken(accessToken);
+        }
+        response.setAuthed(user.isAuthenticated());
+        response.setIdNo(user.getIdNo());
+        response.setRealName(user.getRealName());
+        response.setDomain(user.getUserDomain());
+        response.setDisplay(user.getDisplay());
+        response.setMobileNo(user.getMobileNo());
+        response.setDate(DateUtil.formatDate(new Date()));
+        response.setAvatarUrl(user.getAvatarUrl());
+        response.setExtUserId(user.getExtUserId());
+        return response;
     }
 }

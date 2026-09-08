@@ -161,6 +161,10 @@ public class UserEntity extends BaseAuditEntity {
      */
     public static final String COL_EXT_USER_ID = "COL_EXT_USER_ID";
     /**
+     * 微信开放平台UnionID
+     */
+    public static final String COL_UNION_ID = "COL_UNION_ID";
+    /**
      * 实名认证时间
      */
     public static final String COL_AUTHENTICATE_DATE = "COL_AUTHENTICATE_DATE";
@@ -366,6 +370,16 @@ public class UserEntity extends BaseAuditEntity {
     @Column(name = COL_EXT_USER_ID, type = Column.Type.STRING)
     private String extUserId;
     /**
+     * 微信开放平台UnionID。
+     * <p>
+     * {@link #extUserId} 存放按应用隔离的 openid；unionId 在同一开放平台账号下
+     * 跨小程序、公众号和 App 唯一，是打通同一自然人的依据。未接入微信的账号为空。
+     * </p>
+     */
+    @Size(max = 255)
+    @Column(name = COL_UNION_ID, type = Column.Type.STRING)
+    private String unionId;
+    /**
      * 实名认证时间
      */
     @Column(name = COL_AUTHENTICATE_DATE, type = Column.Type.DATETIME)
@@ -478,6 +492,7 @@ public class UserEntity extends BaseAuditEntity {
                 .append("thirdPartyPwd", getThirdPartyPwd())
                 .append("jobNo", getJobNo())
                 .append("extUserId", getExtUserId())
+                .append("unionId", getUnionId())
                 .append("authenticateDate", getAuthenticateDate())
                 .append("latestLoginTime", getLatestLoginTime())
                 .append("latestChangePwdTime", getLatestChangePwdTime())

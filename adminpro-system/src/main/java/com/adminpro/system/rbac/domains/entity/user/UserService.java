@@ -354,6 +354,28 @@ public class UserService extends BaseService<UserEntity, String> {
     }
 
     /**
+     * 根据用户域和外部系统用户ID（微信 openid）查询用户
+     *
+     * @param domain    用户域
+     * @param extUserId 外部系统用户ID
+     * @return 用户实体对象，不存在返回null
+     */
+    public UserEntity findByDomainAndExtUserId(String domain, String extUserId) {
+        return dao.findByDomainAndExtUserId(domain, extUserId);
+    }
+
+    /**
+     * 根据用户域和微信开放平台 UnionID 查询用户
+     *
+     * @param domain  用户域
+     * @param unionId 微信开放平台 UnionID
+     * @return 用户实体对象，不存在返回null
+     */
+    public UserEntity findByDomainAndUnionId(String domain, String unionId) {
+        return dao.findByDomainAndUnionId(domain, unionId);
+    }
+
+    /**
      * 根据用户域和邮箱查询用户
      *
      * @param domain 用户域

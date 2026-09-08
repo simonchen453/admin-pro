@@ -9,4 +9,5 @@
     <include file="classpath:changelog/sql/quartz.sql" relativeToChangelogFile="false"/>
     <include file="classpath:changelog/sql/city.sql" relativeToChangelogFile="false"/>
     <include file="classpath:changelog/sql/changelog-function.xml" relativeToChangelogFile="false"/>
+    <include file="classpath:changelog/sql/changelog-user-union-id.xml" relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <!--
+      微信开放平台 UnionID。openid 按应用隔离，存在 col_ext_user_id；
+      unionid 在同一开放平台账号下跨应用唯一，是小程序、公众号和 App
+      打通同一个自然人的唯一依据，必须独立成列。
+      不改写 schema.sql：该文件的种子 INSERT 未写列名，追加列会错位。
+    -->
+    <changeSet author="adminpro" id="1000005-add-user-union-id">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="sys_user_tbl" columnName="col_union_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="sys_user_tbl">
+            <column name="col_union_id" type="varchar(255)" remarks="微信开放平台UnionID"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="sys_user_tbl" columnName="col_union_id"/>
+        </rollback>
+    </changeSet>
+
+    <!--
+      与 unq_login_name、unq_mobileno 一致，按用户域限定唯一。
+      MySQL 的唯一索引允许多行 NULL，未绑定微信的账号不受影响。
+    -->
+    <changeSet author="adminpro" id="1000005-add-user-union-id-index">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="sys_user_tbl" indexName="unq_union_id"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="sys_user_tbl" indexName="unq_union_id" unique="true">
+            <column name="col_user_domain"/>
+            <column name="col_union_id"/>
+        </createIndex>
+        <rollback>
+            <dropIndex tableName="sys_user_tbl" indexName="unq_union_id"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

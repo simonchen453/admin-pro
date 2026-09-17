@@ -1,24 +1,97 @@
 /* ==========================================================================
    登录
    ------------------------------------------------------------------
-   上一版 641 行：深紫渐变背景、无限滚动的科技网格、20 个 CSS 动画粒子、
-   一张带模糊和投影的玻璃卡。那些东西解决不了登录时唯一会出错的两件事 ——
-   管理员分不清自己连的是哪套环境，以及密码错了之后不知道该怎么办。
+   上一版把 420px 的一列表单摆在整页正中 —— 四周全是空白，页面像
+   没做完。这一版给登录页一个真正的构图：左右分栏。
 
-   这一版只做这两件事：白底上一列 420px 宽的内容，没有外层卡片，
-   分隔全部交给发丝线。表单件复用 styles/ui.css 的 .ap-field / .ap-input。
+   左侧是墨黑品牌面板（ logo + 一句主张 + 版本号），右侧是纯白表单区。
+   黑白对半，这是这套语言里最重也最便宜的一个"设计动作"。
+   窄屏（<920px）收起品牌面板，表单回到居中单列。
+
+   表单件复用 styles/ui.css 的 .ap-field / .ap-input；
+   分隔仍然全部交给发丝线，没有卡片、没有投影、没有渐变。
    ========================================================================== */
 
 .lg-page {
   min-height: 100vh;
   display: grid;
+  grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+  background: var(--ap-card);
+}
+
+/* --- 左：墨黑品牌面板 -------------------------------------------------- */
+.lg-side {
+  background: var(--ap-accent);
+  color: var(--ap-text-inv);
+  display: flex;
+  flex-direction: column;
+  padding: clamp(28px, 4vw, 56px);
+  position: relative;
+  overflow: hidden;
+}
+.lg-side-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--ap-sp-3);
+  font-family: var(--ap-font-d);
+  font-size: var(--ap-fs-lead);
+  font-weight: 600;
+  letter-spacing: var(--ap-tr-title);
+}
+.lg-side-brand .ap-logo {
+  width: 28px; height: 28px;
+  background: var(--ap-text-inv);
+  color: var(--ap-accent);
+}
+.lg-side-brand .ap-logo svg { width: 16px; height: 16px; }
+
+.lg-side-hero {
+  margin: auto 0;
+  padding: var(--ap-sp-8) 0;
+  max-width: 460px;
+}
+.lg-side-kicker {
+  font-size: var(--ap-fs-meta);
+  font-weight: 500;
+  color: rgba(255, 255, 255, .52);
+  letter-spacing: .14em;
+}
+.lg-side-title {
+  font-family: var(--ap-font-d);
+  font-size: clamp(30px, 3.2vw, 44px);
+  font-weight: 600;
+  letter-spacing: var(--ap-tr-page);
+  line-height: 1.12;
+  margin: var(--ap-sp-3) 0 var(--ap-sp-5);
+}
+.lg-side-sub {
+  font-size: var(--ap-fs-body);
+  line-height: 1.8;
+  color: rgba(255, 255, 255, .58);
+  margin: 0;
+  max-width: 34em;
+}
+.lg-side-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--ap-sp-3);
+  font-family: var(--ap-mono);
+  font-size: var(--ap-fs-micro);
+  color: rgba(255, 255, 255, .38);
+  flex-wrap: wrap;
+}
+.lg-side-meta i { font-style: normal; opacity: .5; }
+
+/* --- 右：表单区 --------------------------------------------------------- */
+.lg-main {
+  display: grid;
   place-items: center;
   padding: var(--ap-sp-8) var(--ap-sp-6);
-  background: var(--ap-bg);
+  background: var(--ap-card);
 }
-.lg { width: 100%; max-width: 420px; }
+.lg { width: 100%; max-width: 400px; }
 
-/* 顶上一行小灰字 + 一个很大的紧字距标题 */
+/* 顶上一行小灰字 —— 右侧只留一句话，品牌声明交给左面板 */
 .lg-eyebrow {
   display: flex;
   align-items: center;
@@ -26,20 +99,20 @@
   font-size: var(--ap-fs-meta);
   color: var(--ap-text-3);
 }
-.lg-eyebrow .ap-logo { width: 22px; height: 22px; border-radius: 6px; }
 .lg-eyebrow b { color: var(--ap-text); font-weight: 500; }
 
 .lg-title {
   font-family: var(--ap-font-d);
-  font-size: var(--ap-fs-page);
+  font-size: 26px;
   font-weight: 600;
-  letter-spacing: var(--ap-tr-page);
-  line-height: 1.15;
+  letter-spacing: var(--ap-tr-title);
+  line-height: 1.2;
   color: var(--ap-text);
-  margin: var(--ap-sp-4) 0 var(--ap-sp-6);
+  margin: var(--ap-sp-3) 0 var(--ap-sp-5);
 }
 
-/* 站点条：一条上下发丝线 + 一个中性点，不用红底块 */
+/* 站点条已按需求移除（原「当前站点 localhost:3000」一行）；
+   如需恢复，样式保留在这里。 */
 .lg-env {
   display: flex;
   align-items: center;
@@ -127,7 +200,13 @@
   line-height: 1.9;
 }
 
-@media (max-width: 480px) {
-  .lg-page { padding: var(--ap-sp-6) var(--ap-sp-5); }
+/* --- 窄屏：收起品牌面板 ------------------------------------------------- */
+@media (max-width: 920px) {
+  .lg-page { grid-template-columns: 1fr; }
+  .lg-side { display: none; }
+  .lg-main { background: var(--ap-bg); }
   .lg-title { font-size: 24px; }
+}
+@media (max-width: 480px) {
+  .lg-main { padding: var(--ap-sp-6) var(--ap-sp-5); }
 }

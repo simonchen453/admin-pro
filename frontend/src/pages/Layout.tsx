@@ -41,7 +41,6 @@ const { Header, Sider, Content, Footer } = AntLayout;
 function MainLayout() {
     const [collapsed, setCollapsed] = useState(false);
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-    const [openKeys, setOpenKeys] = useState<string[]>([]);
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
     const [, setLoading] = useState(true);
     const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
@@ -136,22 +135,6 @@ function MainLayout() {
             if (item.children) {
                 const found = findMenuItemByPath(item.children, path);
                 if (found) return found;
-            }
-        }
-        return null;
-    };
-
-    // 获取菜单项的所有父级key
-    const getParentKeys = (items: MenuItem[], targetKey: string, parentKeys: string[] = []): string[] | null => {
-        for (const item of items) {
-            if (item.key === targetKey) {
-                return parentKeys;
-            }
-            if (item.children) {
-                const found = getParentKeys(item.children, targetKey, [...parentKeys, item.key]);
-                if (found !== null) {
-                    return found;
-                }
             }
         }
         return null;
@@ -295,8 +278,36 @@ function MainLayout() {
         loadMenus();
     }, []);
 
+    // 菜单项转 AntD items：静态分组导航（参照 x.ai 控制台侧栏）
+    // 顶层有子项的节点渲染为不可折叠的分组标题（type:'group'），
+    // 组内成员平铺；更深层级拍平进最近的分组，不再出现第二级缩进树。
+    const flattenLeaves = (item: MenuItem): MenuItem[] => {
+        if (!item.children || item.children.length === 0) return [item];
+        return item.children.flatMap(flattenLeaves);
+    };
+
+    const groupedMenuItems = menuItems.map(item => {
+        const leaves = flattenLeaves(item);
+        // 顶层叶子（如「首页」）直接作为独立项，不进任何分组
+        if (!item.children || item.children.length === 0) {
+            return { key: item.key, icon: item.icon, label: item.label };
+        }
+        return {
+            key: `grp-${item.key}`,
+            type: 'group' as const,
+            label: item.label,
+            children: leaves.map(leaf => ({
+                key: leaf.key,
+                icon: leaf.icon,
+                label: leaf.label,
+            })),
+        };
+    });
+
     // 处理菜单点击
     const handleMenuClick = async ({ key }: { key: string }) => {
+        // 分组标题不可点，也没有对应路由
+        if (key.startsWith('grp-')) return;
         const findMenuItem = (items: MenuItem[], targetKey: string): MenuItem | null => {
             for (const item of items) {
                 if (item.key === targetKey) {
@@ -328,12 +339,7 @@ function MainLayout() {
         }
     };
 
-    // 处理菜单展开/收起
-    const handleOpenChange = (keys: string[]) => {
-        setOpenKeys(keys);
-    };
-
-    // 根据当前路由自动展开菜单并高亮
+    // 根据当前路由自动高亮菜单项（静态分组没有展开/收起状态可同步）
     useEffect(() => {
         if (menuItems.length === 0) return;
 
@@ -342,33 +348,10 @@ function MainLayout() {
 
         if (matchedMenuItem) {
             setSelectedKeys([matchedMenuItem.key]);
-            const parentKeys = getParentKeys(menuItems, matchedMenuItem.key);
-            if (parentKeys && parentKeys.length > 0 && !collapsed) {
-                setOpenKeys(parentKeys);
-            }
         } else {
             setSelectedKeys([]);
         }
-    }, [location.pathname, menuItems, collapsed]);
-
-    // 当侧边栏折叠时，清空展开的菜单
-    useEffect(() => {
-        if (collapsed) {
-            setOpenKeys([]);
-        } else {
-            // 侧边栏展开时，根据当前路由重新展开菜单
-            if (menuItems.length > 0) {
-                const currentPath = location.pathname;
-                const matchedMenuItem = findMenuItemByPath(menuItems, currentPath);
-                if (matchedMenuItem) {
-                    const parentKeys = getParentKeys(menuItems, matchedMenuItem.key);
-                    if (parentKeys && parentKeys.length > 0) {
-                        setOpenKeys(parentKeys);
-                    }
-                }
-            }
-        }
-    }, [collapsed, menuItems, location.pathname]);
+    }, [location.pathname, menuItems]);
 
     const displayName =
         currentUserInfo?.realName ||
@@ -435,24 +418,8 @@ function MainLayout() {
                     <Menu
                         mode="inline"
                         selectedKeys={selectedKeys}
-                        openKeys={openKeys}
                         onClick={handleMenuClick}
-                        onOpenChange={handleOpenChange}
-                        items={menuItems.map(item => ({
-                            key: item.key,
-                            icon: item.icon,
-                            label: item.label,
-                            children: item.children?.map(child => ({
-                                key: child.key,
-                                icon: child.icon,
-                                label: child.label,
-                                children: child.children?.map(subChild => ({
-                                    key: subChild.key,
-                                    icon: subChild.icon,
-                                    label: subChild.label,
-                                })),
-                            })),
-                        }))}
+                        items={groupedMenuItems}
                         style={{ background: 'transparent', borderRight: 0 }}
                     />
                 </div>

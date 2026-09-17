@@ -27,15 +27,15 @@ export const antdTheme: ThemeConfig = {
     colorPrimaryHover:  '#2E2E2E',   // 黑按钮悬停往上提亮，不是压暗
     colorPrimaryActive: '#0A0A0A',
 
-    colorBgLayout:    '#FFFFFF',     // 工作区、侧栏、卡片全部纯白
+    colorBgLayout:    '#F7F7F5',     // 工作区画布：极浅暖灰，白卡片浮在其上；侧栏与卡片纯白
     colorBgContainer: '#FFFFFF',
     colorBgElevated:  '#FFFFFF',
-    colorFillQuaternary: '#F5F5F5',  // 悬停、选中、键帽这类极浅填充
-    colorFillTertiary:   '#F5F5F5',
-    colorFillSecondary:  '#EBEBEB',
+    colorFillQuaternary: '#F1F1EF',  // 悬停、选中、键帽这类极浅填充
+    colorFillTertiary:   '#F1F1EF',
+    colorFillSecondary:  '#E7E7E5',
 
-    colorBorder:          '#D2D2D2', // 控件描边
-    colorBorderSecondary: '#E3E3E3', // 区块边界、分隔线
+    colorBorder:          '#D2D2D0', // 控件描边
+    colorBorderSecondary: '#E1E1DE', // 区块边界、分隔线
 
     colorText:           '#0A0A0A',
     colorTextSecondary:  '#5C5C5C',
@@ -78,23 +78,23 @@ export const antdTheme: ThemeConfig = {
 
   components: {
     Layout: {
-      bodyBg:   '#FFFFFF',
+      bodyBg:   '#F7F7F5',
       headerBg: '#FFFFFF',
-      siderBg:  '#FFFFFF',   // 侧栏不再比工作区深，靠右侧一条发丝线分开
+      siderBg:  '#FFFFFF',   // 侧栏纯白，右侧一条发丝线，衬在暖灰画布上
       headerHeight: 60,
       headerPadding: '0 32px',
     },
 
-    /* 侧栏菜单：当前项是浅灰底 + 墨黑字。
-       没有投影、没有位移动画、没有右侧竖条。 */
+    /* 侧栏菜单：选中项用中灰底（#F0F0EE）—— 参照稿里的选中态是淡灰，
+       不是纯黑；纯黑适合按钮，不适合导航。悬停同样浅灰。 */
     Menu: {
       itemBg:             'transparent',
       subMenuItemBg:      'transparent',
       itemColor:          '#5C5C5C',
       itemHoverColor:     '#0A0A0A',
-      itemHoverBg:        '#F5F5F5',
+      itemHoverBg:        '#F1F1EF',
       itemSelectedColor:  '#0A0A0A',
-      itemSelectedBg:     '#F5F5F5',
+      itemSelectedBg:     '#F0F0EE',
       itemBorderRadius:   10,
       itemHeight:         36,
       itemMarginInline:   0,
@@ -116,8 +116,8 @@ export const antdTheme: ThemeConfig = {
       primaryShadow: 'none',
       defaultShadow: 'none',
       dangerShadow:  'none',
-      defaultBorderColor: '#D2D2D2',
-      textHoverBg: '#F5F5F5',
+      defaultBorderColor: '#D2D2D0',
+      textHoverBg: '#F1F1EF',
     },
 
     /* 表头没有底色，只有一条线；行高 60，留白是这套语言的主料。 */
@@ -125,10 +125,10 @@ export const antdTheme: ThemeConfig = {
       headerBg:           '#FFFFFF',
       headerColor:        '#757575',
       headerSplitColor:   'transparent',
-      borderColor:        '#EDEDED',
-      rowHoverBg:         '#FAFAFA',
-      rowSelectedBg:      '#F5F5F5',
-      rowSelectedHoverBg: '#EBEBEB',
+      borderColor:        '#E9E9E6',
+      rowHoverBg:         '#FAFAF8',
+      rowSelectedBg:      '#F1F1EF',
+      rowSelectedHoverBg: '#E7E7E5',
       headerBorderRadius: 0,
       /* 行高不在这里给：AntD 的 cellPaddingBlock 会同时作用于表头和内容，
          而设计要的是表头 44、内容 60 两个不同的值 —— 放在 styles/antd.css 里分开写。 */
@@ -144,10 +144,10 @@ export const antdTheme: ThemeConfig = {
 
     /* 输入类控件保持圆角矩形 —— 和胶囊按钮形状不同，
        让"可输入"和"可点击"一眼分得开。 */
-    Input:       { borderRadius: 10, borderRadiusLG: 10, paddingBlock: 6, activeShadow: '0 0 0 3px #EBEBEB' },
-    InputNumber: { borderRadius: 10, borderRadiusLG: 10, activeShadow: '0 0 0 3px #EBEBEB' },
-    Select:      { borderRadius: 10, borderRadiusLG: 10, optionSelectedBg: '#F5F5F5', optionSelectedColor: '#0A0A0A' },
-    DatePicker:  { borderRadius: 10, borderRadiusLG: 10, activeShadow: '0 0 0 3px #EBEBEB' },
+    Input:       { borderRadius: 10, borderRadiusLG: 10, paddingBlock: 6, activeShadow: '0 0 0 3px #E7E7E5' },
+    InputNumber: { borderRadius: 10, borderRadiusLG: 10, activeShadow: '0 0 0 3px #E7E7E5' },
+    Select:      { borderRadius: 10, borderRadiusLG: 10, optionSelectedBg: '#F1F1EF', optionSelectedColor: '#0A0A0A' },
+    DatePicker:  { borderRadius: 10, borderRadiusLG: 10, activeShadow: '0 0 0 3px #E7E7E5' },
 
     Tag: {
       defaultBg:      '#FFFFFF',
@@ -158,7 +158,7 @@ export const antdTheme: ThemeConfig = {
     Modal:   { headerBg: '#FFFFFF', contentBg: '#FFFFFF', footerBg: '#FFFFFF', borderRadiusLG: 14 },
     Drawer:  { footerPaddingBlock: 20 },
     Tooltip: { colorBgSpotlight: '#0A0A0A', borderRadius: 10 },
-    Segmented: { itemSelectedBg: '#FFFFFF', trackBg: '#F5F5F5', borderRadius: 999, itemSelectedColor: '#0A0A0A' },
+    Segmented: { itemSelectedBg: '#FFFFFF', trackBg: '#F1F1EF', borderRadius: 999, itemSelectedColor: '#0A0A0A' },
     Tabs:    { itemSelectedColor: '#0A0A0A', inkBarColor: '#0A0A0A' },
     Pagination: { itemActiveBg: '#0A0A0A', itemBg: '#FFFFFF', borderRadius: 999 },
   },

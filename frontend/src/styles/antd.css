@@ -14,10 +14,16 @@
    ========================================================================== */
 .ant-layout,
 .ant-layout-content,
+.ant-layout-footer {
+  background: var(--ap-bg);
+}
+/* 顶栏和侧栏是"面板"，必须是纯白；画布色只属于工作区。
+   （之前三层同为纯白，这条覆盖关系从未暴露过） */
 .ant-layout-header,
-.ant-layout-footer,
-.ant-layout-sider,
-.ant-layout-sider-children { background: var(--ap-bg); }
+.ant-layout-header.ap-topbar {
+  background: var(--ap-card);
+}
+.ant-layout-sider { background: var(--ap-rail); }
 
 .ant-layout-sider { border-right: 1px solid var(--ap-card-line); }
 
@@ -62,12 +68,20 @@
 .ant-menu-item-selected .ant-menu-item-icon,
 .ant-menu-submenu-title:hover .ant-menu-item-icon { opacity: 1; }
 
+/* 静态分组标题（x.ai 控制台式）：小号灰字，不可点、不折叠。
+   与上一个分组之间留足间距，让"组"的边界靠留白而不是箭头。 */
 .ant-menu-item-group-title {
   font-size: var(--ap-fs-micro);
+  font-weight: 500;
   color: var(--ap-text-3);
   letter-spacing: .04em;
-  padding-block: var(--ap-sp-5) var(--ap-sp-2);
+  padding: var(--ap-sp-5) 10px var(--ap-sp-2) !important;
+  line-height: 1.4;
+  height: auto;
 }
+.ant-menu-item-group:first-child .ant-menu-item-group-title { padding-top: var(--ap-sp-1) !important; }
+/* 分组标题不响应悬停：它不是按钮 */
+.ant-menu-item-group-title:hover { background: transparent !important; color: var(--ap-text-3) !important; }
 
 
 /* ==========================================================================
@@ -104,11 +118,11 @@
 .ant-table { background: transparent; font-size: var(--ap-fs-body); }
 
 .ant-table-thead > tr > th {
-  background: var(--ap-card) !important;
-  color: var(--ap-text-3) !important;
+  background: var(--ap-fill) !important;   /* 极浅灰底，让表头和内容行有明确区分 */
+  color: var(--ap-text-2) !important;
   font-size: var(--ap-fs-meta);
-  font-weight: 400 !important;
-  padding-block: 11px !important;
+  font-weight: 500 !important;
+  padding-block: 10px !important;
   border-bottom: 1px solid var(--ap-card-line) !important;
   /* 中文没有大小写，uppercase 无效；字距拉伸只会把「用户姓名」拆成四个孤字 */
   text-transform: none !important;
@@ -118,13 +132,17 @@
 .ant-table-thead > tr > th::before { display: none !important; }
 
 .ant-table-tbody > tr > td {
-  padding-block: 18px !important;
+  padding-block: 14px !important;
   border-bottom: 1px solid var(--ap-line) !important;
   color: var(--ap-text);
 }
 .ant-table-tbody > tr:last-child > td { border-bottom: 0 !important; }
 .ant-table-tbody > tr.ant-table-row:hover > td { background: var(--ap-hover) !important; }
 .ant-table-tbody > tr.ant-table-row-selected > td { background: var(--ap-fill) !important; }
+
+/* 行内操作列永不换行：窄窗口里「修改 / 删除」折成两行是最常见的破相。
+   本系统的表格最后一列几乎都是操作列，按最后一列处理即可。 */
+.ant-table-tbody > tr > td:last-child { white-space: nowrap; }
 
 .ant-table-container,
 .ant-table-container table > thead > tr:first-child > *:first-child,
@@ -446,16 +464,73 @@ a.ant-typography, .ant-typography a { color: var(--ap-text); text-decoration-col
 }
 
 /* .modern-table 是包在 Table 外面的一层 div，真正的样式在上面 D 段。
-   这里只负责让它在卡片里贴边 —— 表格自带边线，不需要卡片再留一圈内边距。 */
-.modern-table { margin: 0 calc(var(--ap-sp-6) * -1) calc(var(--ap-sp-6) * -1); }
+   搜索区和表格之间加一条发丝分隔，让"工具"和"数据"分界清晰。 */
+.modern-table {
+  margin: 0 calc(var(--ap-sp-6) * -1) calc(var(--ap-sp-6) * -1);
+  border-top: 1px solid var(--ap-line);
+  padding-top: var(--ap-sp-4);
+}
 .modern-table .ant-table { background: transparent !important; }
 .modern-table .ant-pagination { padding-inline: var(--ap-sp-6); }
 
-/* 搜索区：和表格之间用一条发丝线断开，而不是靠间距硬隔 */
+/* 搜索区：压成一行工具条，而不是一叠竖排表单。
+   原来的 layout="vertical" 让每页在见到第一条数据前先吞掉 130px 高的
+   标签+输入框堆叠 —— 数据少的页面整个屏幕都是搜索框。
+   页面 TSX 都是 vertical 布局，这里在 CSS 层把标签移到控件左侧：
+   20 多个页面一行不改。
+   注意：AntD 的 .ant-form-vertical .ant-form-item-row { flex-direction: column }
+   与本规则同级但注入更晚，必须用 .search-form.ant-form-vertical 提级 +
+   关键属性 !important 才压得住。 */
 .search-form {
-  padding-bottom: var(--ap-sp-2);
-  margin-bottom: var(--ap-sp-5);
+  padding-bottom: var(--ap-sp-4);
+  margin-bottom: var(--ap-sp-4);
   border-bottom: 1px solid var(--ap-line);
+}
+.search-form .ant-form-item {
+  margin-bottom: var(--ap-sp-3);
+}
+/* 标签变成控件左侧的内联小灰字，间距收紧 */
+.search-form.ant-form-vertical .ant-form-item-row {
+  flex-direction: row !important;
+  align-items: center;
+  gap: var(--ap-sp-2);
+}
+.search-form .ant-col.ant-form-item-label {
+  flex: none !important;
+  padding: 0;
+}
+.search-form .ant-col.ant-form-item-label > label {
+  color: var(--ap-text-3);
+  height: auto;
+  min-height: 0;
+  font-size: var(--ap-fs-meta);
+  white-space: nowrap;
+}
+.search-form .ant-col.ant-form-item-control {
+  flex: 1 !important;
+  min-width: 0;
+}
+.search-form .ant-form-item-control-input-content {
+  display: flex;
+  align-items: center;
+}
+/* 搜索工具条：每个搜索字段强制 200px 宽，打破 AntD 栅格的宽度限制。
+   !important 必不可少：AntD Col 用 inline-style 写死宽度，CSS 优先级必须赢。 */
+.search-form .ant-col { width: 200px !important; flex: 0 0 200px !important; max-width: 200px !important; }
+.search-form .ant-col[style*="padding-bottom"] {
+  width: auto !important;
+  flex: 1 1 auto !important;
+  max-width: none !important;
+  padding-bottom: 0 !important;
+  align-items: flex-start !important;
+  display: flex !important;
+}
+.search-form .ant-form-item-control-input { min-width: 200px !important; }
+.search-form .ant-form-item-control-input .ant-input,
+.search-form .ant-form-item-control-input .ant-input-affix-wrapper,
+.search-form .ant-form-item-control-input .ant-select-selector {
+  width: 100%;
+  min-width: 0;
 }
 
 /* 玻璃拟态取消：这套语言里"抬起"靠线和留白，不靠半透明模糊 */

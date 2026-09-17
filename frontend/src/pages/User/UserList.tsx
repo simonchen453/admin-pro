@@ -14,7 +14,8 @@ import {
   Col,
   Pagination,
   TreeSelect,
-  Typography
+  Typography,
+  Dropdown,
 } from 'antd';
 import {
   PlusOutlined,
@@ -167,7 +168,7 @@ const UserList: React.FC = () => {
       const list = response.records || [];
       const total = response.totalCount || 0;
 
-      setUserList(list.map((item, index) => ({ ...item, index })));
+      setUserList(list);
       setTotal(total);
     } catch (error) {
       console.error('获取用户列表失败:', error);
@@ -462,13 +463,6 @@ const UserList: React.FC = () => {
 
   const columns: ColumnsType<UserEntity> = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      key: 'index',
-      width: 60,
-      render: (value: number) => (currentPage - 1) * pageSize + value + 1
-    },
-    {
       title: '用户域',
       dataIndex: 'userDomain',
       key: 'userDomain',
@@ -527,54 +521,25 @@ const UserList: React.FC = () => {
       title: '操作',
       key: 'action',
       fixed: 'right',
-      width: 330,
+      width: 100,
       render: (_, record: UserEntity) => (
-        <Space size="small">
-          <Button
-            size="small"
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
+        <Space size={4}>
+          <Button size="small" type="link" icon={<EditOutlined />} onClick={() => handleEdit(record)}>修改</Button>
+          <Dropdown
+            menu={{
+              items: [
+                { key: 'pwd', icon: <ReloadOutlined />, label: '重置密码', onClick: () => handleResetPassword(record) },
+                record.status === UserStatus.LOCKED || record.status === UserStatus.INACTIVE
+                  ? { key: 'active', icon: <UserAddOutlined />, label: '启用', onClick: () => handleActive(record) }
+                  : { key: 'inactive', icon: <UserDeleteOutlined />, label: '停用', danger: true, onClick: () => handleInactive(record) },
+                { type: 'divider' },
+                { key: 'delete', icon: <DeleteOutlined />, label: '删除', danger: true, onClick: () => handleDelete(record) },
+              ]
+            }}
+            trigger={['click']}
           >
-            修改
-          </Button>
-          <Button
-            size="small"
-            type="link"
-            icon={<ReloadOutlined />}
-            onClick={() => handleResetPassword(record)}
-          >
-            重置密码
-          </Button>
-          {record.status === UserStatus.LOCKED || record.status === UserStatus.INACTIVE ? (
-            <Button
-              size="small"
-              type="link"
-              icon={<UserAddOutlined />}
-              onClick={() => handleActive(record)}
-            >
-              启用
-            </Button>
-          ) : (
-            <Button
-              size="small"
-              type="link"
-              danger
-              icon={<UserDeleteOutlined />}
-              onClick={() => handleInactive(record)}
-            >
-              停用
-            </Button>
-          )}
-          <Button
-            size="small"
-            type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record)}
-          >
-            删除
-          </Button>
+            <Button size="small" type="link" danger icon={<DeleteOutlined />} />
+          </Dropdown>
         </Space>
       )
     }

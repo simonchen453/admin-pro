@@ -124,23 +124,41 @@ const Login: React.FC = () => {
   return (
     <div className="lg-page">
       {contextHolder}
+
+      {/* 左侧品牌面板：墨黑半屏，把登录页从"一列孤零零的表单"变成一个真正的构图。
+          窄屏整块收起，表单回到居中单列。 */}
+      <aside className="lg-side">
+        <div className="lg-side-brand">
+          <span className="ap-logo"><LogoMark size={16} /></span>
+          {systemInfo?.platformShortName || 'AdminPro'}
+        </div>
+
+        <div className="lg-side-hero">
+          <div className="lg-side-kicker">{systemInfo?.platformName || 'ADMIN PRO PLATFORM'}</div>
+          <h2 className="lg-side-title">
+            一套后台，<br />管好每一份权限。
+          </h2>
+          <p className="lg-side-sub">
+            用户、角色、菜单、部门与数据域的完整 RBAC 能力，
+            配套操作审计与系统监控 —— 开箱即用。
+          </p>
+        </div>
+
+        <div className="lg-side-meta">
+          {systemInfo?.releaseVersion && <span>{systemInfo.releaseVersion}</span>}
+          {systemInfo?.releaseVersion && systemInfo?.buildVersion && <i>·</i>}
+          {systemInfo?.buildVersion && <span>{systemInfo.buildVersion}</span>}
+        </div>
+      </aside>
+
+      <main className="lg-main">
       <div className="lg">
 
         <div className="lg-eyebrow">
-          <span className="ap-logo"><LogoMark size={13} /></span>
-          <b>{systemInfo?.platformShortName || 'AdminPro'}</b>
-          {systemInfo?.platformName ? ` ${systemInfo.platformName}` : ' 企业级权限管理'}
+          <b>登录管理控制台</b>
         </div>
 
-        <h1 className="lg-title">登录管理控制台</h1>
-
-        {/* 登错环境在企业后台是真实且昂贵的事故，值得占一行显眼的位置。
-            这里只写浏览器确实连着的主机名 —— 是「生产」还是「测试」前端无从得知，
-            就不替它下判断，点也保持中性灰。 */}
-        <div className="lg-env">
-          <strong>当前站点</strong>
-          <span>{window.location.host}</span>
-        </div>
+        <h1 className="lg-title">{systemInfo?.platformShortName || 'AdminPro'} · 管理员入口</h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="lg-form" autoComplete="off">
           {/* 隐藏输入框：绕开浏览器的自动填充 */}
@@ -218,18 +236,11 @@ const Login: React.FC = () => {
         </form>
 
         <div className="lg-foot">
-          {(systemInfo?.releaseVersion || systemInfo?.buildVersion) && (
-            <>
-              {systemInfo.releaseVersion && <span>{systemInfo.releaseVersion}</span>}
-              {systemInfo.releaseVersion && systemInfo.buildVersion && <span> · </span>}
-              {systemInfo.buildVersion && <span>{systemInfo.buildVersion}</span>}
-              <br />
-            </>
-          )}
           {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} AdminPro`}
         </div>
 
       </div>
+      </main>
     </div>
   );
 };

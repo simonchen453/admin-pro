@@ -147,26 +147,11 @@ const DomainList: React.FC = () => {
     {
       title: '操作',
       key: 'action',
-      width: 180,
+      width: 110,
       render: (_, record: DomainEntity) => (
-        <Space size="small">
-          <Button
-            size="small"
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            修改
-          </Button>
-          <Button
-            size="small"
-            type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record)}
-          >
-            删除
-          </Button>
+        <Space size={4}>
+          <Button size="small" type="link" onClick={() => handleEdit(record)}>修改</Button>
+          <Button size="small" type="link" danger onClick={() => handleDelete(record)}>删除</Button>
         </Space>
       )
     }

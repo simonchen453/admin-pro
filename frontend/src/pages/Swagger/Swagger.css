@@ -1,329 +1,217 @@
-/* 
- * Swagger UI Custom Theme - Tech Glass
- * 科技感玻璃态主题，匹配 Admin Pro 风格
- */
+/* ==========================================================================
+   Swagger UI 主题
+   ------------------------------------------------------------------
+   上一版叫 "Tech Glass"：靛紫主色、20px 的网格底纹、发光边框、
+   hover 时 translateX(4px) 的位移、execute 按钮上的渐变。
+   接口文档是拿来查的，不是拿来看特效的 —— 全部换成这套的白与墨黑。
 
-:root {
-  --tech-primary: #6366f1;
-  --tech-secondary: #8b5cf6;
-  --tech-accent: #06b6d4;
-  --tech-bg: #f8fafc;
-  --tech-surface: rgba(255, 255, 255, 0.85);
-  --tech-border: rgba(99, 102, 241, 0.2);
-  --tech-glow: 0 0 10px rgba(99, 102, 241, 0.2);
-  --tech-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --tech-mono: 'JetBrains Mono', 'Fira Code', monospace;
-}
-
-/* ========================================
-   全局布局与背景
-   ======================================== */
+   方法色只保留一处：DELETE 是破坏性动作，给它语义红。
+   GET / POST / PUT 靠 mono 字体的方法名本身区分，不需要再各配一个色相。
+   ========================================================================== */
 
 .swagger-ui {
-  font-family: var(--tech-font) !important;
-  color: #1e293b !important;
+  font-family: var(--ap-font) !important;
+  color: var(--ap-text) !important;
 }
 
-/* 科技感网格背景 */
-.swagger-ui .wrapper {
-  padding: 0 !important;
-  background-image:
-    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
-  border-radius: 16px;
-}
+.swagger-ui .wrapper { padding: 0 !important; }
 
-/* ========================================
-   头部信息区域
-   ======================================== */
-
+/* --- 文档头 --- */
 .swagger-ui .info {
-  margin: 24px 0 32px !important;
-  padding: 24px !important;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.9));
-  border-radius: 12px;
-  border: 1px solid var(--tech-border);
-  box-shadow: var(--tech-glow);
-  position: relative;
-  overflow: hidden;
+  margin: 0 0 var(--ap-sp-7) !important;
+  padding: 0 0 var(--ap-sp-6) !important;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--ap-card-line);
+  border-radius: 0;
+  box-shadow: none;
 }
-
-/* 装饰性左侧光条 */
-.swagger-ui .info::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: linear-gradient(to bottom, var(--tech-primary), var(--tech-secondary));
-}
-
 .swagger-ui .info .title {
-  font-family: var(--tech-font) !important;
-  font-size: 32px !important;
-  font-weight: 800 !important;
-  color: #0f172a !important;
-  letter-spacing: -1px !important;
-  text-transform: uppercase;
-}
-
-.swagger-ui .info .title small.version-stamp {
-  background: rgba(99, 102, 241, 0.1) !important;
-  border: 1px solid rgba(99, 102, 241, 0.3) !important;
-  color: var(--tech-primary) !important;
-  border-radius: 4px !important;
-  padding: 2px 8px !important;
-  font-family: var(--tech-mono) !important;
-  font-size: 11px !important;
-  top: -4px !important;
-  position: relative !important;
-}
-
-/* ========================================
-   Operation Tag (分组)
-   ======================================== */
-
-.swagger-ui .opblock-tag {
-  border-bottom: 1px solid var(--tech-border) !important;
-  margin: 0 !important;
-  padding: 20px 24px !important;
-  transition: all 0.3s ease;
-}
-
-.swagger-ui .opblock-tag:hover {
-  background: rgba(99, 102, 241, 0.02) !important;
-}
-
-.swagger-ui .opblock-tag-section {
-  background: transparent !important;
-}
-
-.swagger-ui .opblock-tag a {
-  font-family: var(--tech-font) !important;
-  font-size: 16px !important;
-  font-weight: 700 !important;
-  color: #334155 !important;
-}
-
-.swagger-ui .opblock-tag small {
-  font-family: var(--tech-mono) !important;
-  color: #94a3b8 !important;
-}
-
-/* ========================================
-   Operation Block (API 条目)
-   ======================================== */
-
-.swagger-ui .opblock {
-  margin: 0 0 12px !important;
-  border-radius: 8px !important;
-  border: 1px solid transparent !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
-  background: white !important;
-  transition: all 0.2s ease !important;
-}
-
-.swagger-ui .opblock:hover {
-  transform: translateX(4px);
-  box-shadow: 4px 4px 12px rgba(99, 102, 241, 0.1) !important;
-}
-
-.swagger-ui .opblock .opblock-summary {
-  padding: 12px 16px !important;
-  border-left: 4px solid transparent;
-}
-
-.swagger-ui .opblock .opblock-summary-method {
-  min-width: 70px !important;
-  padding: 6px 0 !important;
-  text-align: center !important;
-  border-radius: 4px !important;
-  font-family: var(--tech-mono) !important;
-  font-weight: 800 !important;
-  font-size: 12px !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.swagger-ui .opblock .opblock-summary-path {
-  font-family: var(--tech-mono) !important;
+  font-family: var(--ap-font-d) !important;
+  font-size: var(--ap-fs-page) !important;
   font-weight: 600 !important;
-  color: #475569 !important;
+  color: var(--ap-text) !important;
+  letter-spacing: var(--ap-tr-page) !important;
+  text-transform: none;
+}
+.swagger-ui .info .title small.version-stamp {
+  position: relative !important;
+  top: -6px !important;
+  padding: 2px 9px !important;
+  background: var(--ap-card) !important;
+  border: 1px solid var(--ap-card-line) !important;
+  border-radius: 999px !important;
+  color: var(--ap-text-2) !important;
+  font-family: var(--ap-mono) !important;
+  font-size: 11px !important;
+}
+.swagger-ui .info .base-url,
+.swagger-ui .info li,
+.swagger-ui .info p,
+.swagger-ui .info table { color: var(--ap-text-2) !important; }
+
+/* --- 分组 --- */
+.swagger-ui .opblock-tag {
+  margin: 0 !important;
+  padding: var(--ap-sp-5) 0 !important;
+  border-bottom: 1px solid var(--ap-card-line) !important;
+}
+.swagger-ui .opblock-tag:hover { background: none !important; }
+.swagger-ui .opblock-tag-section { background: transparent !important; }
+.swagger-ui .opblock-tag a {
+  font-family: var(--ap-font-d) !important;
+  font-size: var(--ap-fs-lead) !important;
+  font-weight: 600 !important;
+  letter-spacing: var(--ap-tr-title) !important;
+  color: var(--ap-text) !important;
+}
+.swagger-ui .opblock-tag small {
+  font-family: var(--ap-font) !important;
+  font-size: var(--ap-fs-meta) !important;
+  color: var(--ap-text-3) !important;
 }
 
-/* 方法特定样式 - 科技感霓虹色 */
+/* --- 接口条目 --- */
+/* 条目之间靠一条发丝线分开，不是一堆互相错开的浅色卡片 */
+.swagger-ui .opblock {
+  margin: 0 !important;
+  background: var(--ap-card) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--ap-line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+.swagger-ui .opblock:hover { transform: none !important; box-shadow: none !important; }
+.swagger-ui .opblock .opblock-summary {
+  padding: var(--ap-sp-3) 0 !important;
+  border-left: 0;
+  border-bottom: 0 !important;
+}
+.swagger-ui .opblock .opblock-summary:hover { background: var(--ap-hover) !important; }
 
-/* GET */
-.swagger-ui .opblock.opblock-get {
-  background: rgba(239, 246, 255, 0.5) !important;
-  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+/* 方法名做成描边胶囊，和全站的 tag 一个形状 */
+.swagger-ui .opblock .opblock-summary-method {
+  min-width: 74px !important;
+  padding: 5px 0 !important;
+  background: var(--ap-card) !important;
+  border: 1px solid var(--ap-field) !important;
+  border-radius: 999px !important;
+  color: var(--ap-text-2) !important;
+  font-family: var(--ap-mono) !important;
+  font-weight: 500 !important;
+  font-size: 11.5px !important;
+  text-align: center !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+.swagger-ui .opblock .opblock-summary-path,
+.swagger-ui .opblock .opblock-summary-path__deprecated {
+  font-family: var(--ap-mono) !important;
+  font-size: var(--ap-fs-meta) !important;
+  font-weight: 400 !important;
+  color: var(--ap-text) !important;
+}
+.swagger-ui .opblock .opblock-summary-description {
+  color: var(--ap-text-3) !important;
+  font-size: var(--ap-fs-meta) !important;
 }
 
-.swagger-ui .opblock.opblock-get .opblock-summary {
-  border-left-color: #3b82f6 !important;
-}
-
-.swagger-ui .opblock.opblock-get .opblock-summary-method {
-  background: #3b82f6 !important;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-}
-
-/* POST */
-.swagger-ui .opblock.opblock-post {
-  background: rgba(245, 243, 255, 0.5) !important;
-  border: 1px solid rgba(99, 102, 241, 0.2) !important;
-}
-
-.swagger-ui .opblock.opblock-post .opblock-summary {
-  border-left-color: #6366f1 !important;
-}
-
-.swagger-ui .opblock.opblock-post .opblock-summary-method {
-  background: #6366f1 !important;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
-}
-
-/* PUT */
-.swagger-ui .opblock.opblock-put {
-  background: rgba(255, 251, 235, 0.5) !important;
-  border: 1px solid rgba(245, 158, 11, 0.2) !important;
-}
-
-.swagger-ui .opblock.opblock-put .opblock-summary {
-  border-left-color: #f59e0b !important;
-}
-
-.swagger-ui .opblock.opblock-put .opblock-summary-method {
-  background: #f59e0b !important;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
-}
-
-/* DELETE */
+/* 四种方法共用一套底色：白。区分靠方法名本身。 */
+.swagger-ui .opblock.opblock-get,
+.swagger-ui .opblock.opblock-post,
+.swagger-ui .opblock.opblock-put,
+.swagger-ui .opblock.opblock-patch,
 .swagger-ui .opblock.opblock-delete {
-  background: rgba(254, 242, 242, 0.5) !important;
-  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  background: var(--ap-card) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--ap-line) !important;
 }
 
-.swagger-ui .opblock.opblock-delete .opblock-summary {
-  border-left-color: #ef4444 !important;
-}
-
+/* 唯一的例外：DELETE 会删掉东西，这是真正的语义色 */
 .swagger-ui .opblock.opblock-delete .opblock-summary-method {
-  background: #ef4444 !important;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  border-color: var(--ap-bad) !important;
+  color: var(--ap-bad) !important;
 }
 
-/* ========================================
-   按钮与交互元素
-   ======================================== */
-
+/* --- 按钮 --- */
 .swagger-ui .btn {
-  font-family: var(--tech-font) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  border-radius: 6px !important;
+  font-family: var(--ap-font) !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
 }
-
 .swagger-ui .btn.authorize {
-  background: white !important;
-  border: 1px solid var(--tech-primary) !important;
-  color: var(--tech-primary) !important;
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.1) !important;
+  background: var(--ap-card) !important;
+  border: 1px solid var(--ap-field) !important;
+  color: var(--ap-text) !important;
 }
+.swagger-ui .btn.authorize:hover { background: var(--ap-fill) !important; }
+.swagger-ui .btn.authorize svg { fill: currentColor !important; }
 
-.swagger-ui .btn.authorize:hover {
-  background: var(--tech-primary) !important;
-  color: white !important;
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4) !important;
-}
-
+/* 一屏最多一个实心黑按钮，这里是 execute */
 .swagger-ui .btn.execute {
-  background: linear-gradient(135deg, var(--tech-primary) 0%, var(--tech-secondary) 100%) !important;
-  color: white !important;
-  border: none !important;
   width: 100%;
-  padding: 10px !important;
-  font-weight: 700 !important;
+  padding: 9px !important;
+  background: var(--ap-accent) !important;
+  border: 1px solid var(--ap-accent) !important;
+  color: var(--ap-text-inv) !important;
+  font-weight: 500 !important;
 }
-
 .swagger-ui .btn.execute:hover {
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
-  transform: translateY(-1px);
+  background: var(--ap-accent-hover) !important;
+  border-color: var(--ap-accent-hover) !important;
+  transform: none;
+  box-shadow: none !important;
 }
 
-/* ========================================
-   Schema / Model
-   ======================================== */
-
+/* --- Schema / Model --- */
 .swagger-ui section.models {
-  border: 1px solid var(--tech-border) !important;
-  border-radius: 12px !important;
-  margin-top: 32px !important;
-  box-shadow: var(--tech-glow) !important;
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(8px) !important;
+  margin-top: var(--ap-sp-7) !important;
+  background: var(--ap-card) !important;
+  border: 1px solid var(--ap-card-line) !important;
+  border-radius: var(--ap-r) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
 }
-
 .swagger-ui section.models h4 {
-  font-family: var(--tech-font) !important;
-  font-size: 18px !important;
-  color: #334155 !important;
-  border-bottom: 1px solid var(--tech-border) !important;
-  background: rgba(248, 250, 252, 0.5) !important;
+  font-family: var(--ap-font-d) !important;
+  font-size: var(--ap-fs-lead) !important;
+  font-weight: 600 !important;
+  color: var(--ap-text) !important;
+  background: var(--ap-card) !important;
+  border-bottom: 1px solid var(--ap-card-line) !important;
 }
+.swagger-ui .model-box { font-family: var(--ap-mono) !important; font-size: 12px !important; }
+.swagger-ui .model-title { color: var(--ap-text) !important; }
+.swagger-ui .prop-type { color: var(--ap-text-2) !important; }
 
-.swagger-ui .model-box {
-  font-family: var(--tech-mono) !important;
-  font-size: 12px !important;
-}
-
-.swagger-ui .model-title {
-  color: #475569 !important;
-}
-
-.swagger-ui .prop-type {
-  color: var(--tech-secondary) !important;
-}
-
-/* ========================================
-   其他细节优化
-   ======================================== */
-
-/* 代码块 */
+/* --- 代码块 --- */
+/* 这块保持深底：代码本来就该和正文有明确分界，而且它不是「界面」 */
 .swagger-ui .highlight-code {
-  background: #0f172a !important;
-  /* Dark Slate 900 */
-  border: 1px solid #334155 !important;
-  border-radius: 8px !important;
+  background: var(--ap-accent) !important;
+  border: 0 !important;
+  border-radius: var(--ap-r-sm) !important;
 }
+.swagger-ui .highlight-code pre { font-family: var(--ap-mono) !important; }
 
-.swagger-ui .highlight-code pre {
-  font-family: var(--tech-mono) !important;
-}
-
-/* 表单输入 */
+/* --- 表单控件：和全站输入框对齐，10px 圆角矩形 + 黑焦点环 --- */
 .swagger-ui input,
 .swagger-ui select,
 .swagger-ui textarea {
-  background: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid #cbd5e1 !important;
-  border-radius: 6px !important;
-  transition: all 0.2s;
+  background: var(--ap-card) !important;
+  border: 1px solid var(--ap-field) !important;
+  border-radius: var(--ap-r-sm) !important;
+  color: var(--ap-text) !important;
 }
-
 .swagger-ui input:focus,
 .swagger-ui select:focus,
 .swagger-ui textarea:focus {
-  border-color: var(--tech-primary) !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
-  background: white !important;
+  border-color: var(--ap-accent) !important;
+  box-shadow: 0 0 0 3px var(--ap-fill-2) !important;
+  outline: none !important;
 }
 
-/* ========================================
-   Loading 状态修复 (已改用 React 自定义 Loading，隐藏原生)
-   ======================================== */
-
-.swagger-ui .loading-container {
-  display: none !important;
-}
+/* 原生 loading 已由 React 侧自定义组件替代 */
+.swagger-ui .loading-container { display: none !important; }

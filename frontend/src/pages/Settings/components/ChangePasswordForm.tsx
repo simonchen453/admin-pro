@@ -150,9 +150,9 @@ const ChangePasswordForm: React.FC = () => {
     const maxScore = 1 + (rule.requireLowerCase ? 1 : 0) + (rule.requireUpperCase ? 1 : 0) +
       (rule.requireDigit ? 1 : 0) + (rule.requireSpecialChar ? 1 : 0);
 
-    if (score <= maxScore * 0.4) return { score, text: '弱', color: '#ff4d4f' };
-    if (score <= maxScore * 0.7) return { score, text: '中', color: '#faad14' };
-    return { score, text: '强', color: '#52c41a' };
+    if (score <= maxScore * 0.4) return { score, text: '弱', color: 'var(--ap-bad)' };
+    if (score <= maxScore * 0.7) return { score, text: '中', color: 'var(--ap-warn)' };
+    return { score, text: '强', color: 'var(--ap-ok)' };
   };
 
   const strength = passwordStrength(newPasswordValue || '');
@@ -224,9 +224,9 @@ const ChangePasswordForm: React.FC = () => {
               justifyContent: 'center',
               width: 32,
               height: 32,
-              background: '#eff4ff',
+              background: 'var(--ap-fill)',
               borderRadius: 6,
-              color: '#5b73e8'
+              color: 'var(--ap-text-2)'
             }}>
               <LockOutlined />
             </span>
@@ -237,7 +237,7 @@ const ChangePasswordForm: React.FC = () => {
           header: { borderBottom: 'none', paddingTop: 20, paddingLeft: 24, paddingRight: 24 },
           body: { paddingTop: 0, paddingLeft: 24, paddingRight: 24, paddingBottom: 24 }
         }}
-        style={{ background: '#f8f9fa', border: '1px solid #f0f0f0' }}
+        style={{ background: 'var(--ap-card)', border: '1px solid var(--ap-card-line)' }}
         bordered={false}
       >
         <Form autoComplete="off"
@@ -260,7 +260,7 @@ const ChangePasswordForm: React.FC = () => {
                   placeholder="请输入当前密码"
                   size="large"
                   allowClear
-                  style={{ background: '#fff' }}
+                  style={{ background: 'var(--ap-card)' }}
                 />
               </Form.Item>
             </Col>
@@ -275,7 +275,7 @@ const ChangePasswordForm: React.FC = () => {
                   placeholder="请输入新密码"
                   size="large"
                   allowClear
-                  style={{ background: '#fff' }}
+                  style={{ background: 'var(--ap-card)' }}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (value) {
@@ -293,7 +293,7 @@ const ChangePasswordForm: React.FC = () => {
                 <div style={{ marginTop: -8, marginBottom: 16 }}>
                   <div style={{
                     height: 4,
-                    backgroundColor: '#e6e6e6',
+                    backgroundColor: 'var(--ap-fill-2)',
                     borderRadius: 2,
                     overflow: 'hidden'
                   }}>
@@ -342,7 +342,7 @@ const ChangePasswordForm: React.FC = () => {
                   placeholder="请再次输入新密码"
                   size="large"
                   allowClear
-                  style={{ background: '#fff' }}
+                  style={{ background: 'var(--ap-card)' }}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (value) {

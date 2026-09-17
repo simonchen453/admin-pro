@@ -1,10 +1,14 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@ant-design/v5-patch-for-react-19'
-import './index.css'
-import App from './App.tsx'
+
+// 样式顺序有意义：先 reset，再我们自己的三层。
+// 反过来的话 antd 的 reset 会盖掉设计令牌 —— 旧版那一堆 !important 就是这么逼出来的。
 import 'normalize.css';
 import 'antd/dist/reset.css'; /* Ant Design v5 推荐使用 reset */
+import './index.css'
+
+import App from './App.tsx'
 
 // 全局兜底策略：监听所有输入框聚焦事件，强制关闭自动填充
 // 注意：虽然这里做了全局处理，但在 Form 标签上显式添加 autoComplete="off" 仍然是更推荐的做法（兼容性更好）

@@ -229,27 +229,27 @@ const AuditLogList: React.FC = () => {
           <Row gutter={24}>
             <Col xs={24} sm={8} md={6} lg={4}>
               <Form.Item name="category" label="分类名称">
-                <Input placeholder="请输入分类名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入分类名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6} lg={4}>
               <Form.Item name="module" label="模块名称">
-                <Input placeholder="请输入模块名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入模块名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6} lg={4}>
               <Form.Item name="user" label="操作人员">
-                <Input placeholder="请输入操作人员" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入操作人员" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6} lg={4}>
               <Form.Item name="event" label="操作名称">
-                <Input placeholder="请输入操作名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入操作名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6} lg={4}>
               <Form.Item name="status" label="状态">
-                <Input placeholder="请输入状态" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入状态" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={16} md={12} lg={8}>
@@ -337,7 +337,7 @@ const AuditLogList: React.FC = () => {
                 <pre style={{
                   marginTop: 8,
                   padding: '8px',
-                  background: '#f5f5f5',
+                  background: 'var(--ap-fill)',
                   borderRadius: '4px',
                   maxHeight: '200px',
                   overflow: 'auto',
@@ -354,7 +354,7 @@ const AuditLogList: React.FC = () => {
                 <pre style={{
                   marginTop: 8,
                   padding: '8px',
-                  background: '#f5f5f5',
+                  background: 'var(--ap-fill)',
                   borderRadius: '4px',
                   maxHeight: '200px',
                   overflow: 'auto',

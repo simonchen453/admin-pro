@@ -9,9 +9,9 @@ const SystemPreferences: React.FC = () => {
     const [language, setLanguage] = useState('zh-CN');
 
     const themes = [
-        { key: 'light', name: '浅色模式', color: '#ffffff', borderColor: '#d9d9d9' },
+        { key: 'light', name: '浅色模式', color: '#ffffff', borderColor: 'var(--ap-field)' },
         { key: 'dark', name: '深色模式', color: '#1f1f1f', borderColor: '#434343' },
-        { key: 'system', name: '跟随系统', color: 'linear-gradient(135deg, #ffffff 50%, #1f1f1f 50%)', borderColor: '#d9d9d9' },
+        { key: 'system', name: '跟随系统', color: 'linear-gradient(135deg, #ffffff 50%, #0A0A0A 50%)', borderColor: 'var(--ap-field)' },
     ];
 
     return (
@@ -29,7 +29,7 @@ const SystemPreferences: React.FC = () => {
                             style={{
                                 cursor: 'pointer',
                                 borderRadius: 8,
-                                border: `2px solid ${theme === item.key ? '#5b73e8' : 'transparent'}`,
+                                border: `2px solid ${theme === item.key ? 'var(--ap-accent)' : 'transparent'}`,
                                 padding: 4,
                                 position: 'relative'
                             }}
@@ -43,14 +43,13 @@ const SystemPreferences: React.FC = () => {
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
                                     position: 'relative',
                                     overflow: 'hidden'
                                 }}
                             >
                                 {/* Simple Preview UI */}
                                 {item.key === 'light' && (
-                                    <div style={{ width: '80%', height: '60%', background: '#f5f5f5', borderRadius: 4, display: 'flex' }}>
+                                    <div style={{ width: '80%', height: '60%', background: 'var(--ap-fill)', borderRadius: 4, display: 'flex' }}>
                                         <div style={{ width: '30%', height: '100%', background: '#fff', borderRight: '1px solid #eee' }}></div>
                                         <div style={{ width: '70%', height: '100%', padding: 4 }}>
                                             <div style={{ width: '100%', height: 8, background: '#fff', marginBottom: 4 }}></div>
@@ -68,15 +67,15 @@ const SystemPreferences: React.FC = () => {
                                     </div>
                                 )}
                                 {item.key === 'system' && (
-                                    <DesktopOutlined style={{ fontSize: 32, color: '#8c8c8c' }} />
+                                    <DesktopOutlined style={{ fontSize: 32, color: 'var(--ap-text-3)' }} />
                                 )}
 
                                 {theme === item.key && (
-                                    <CheckCircleFilled style={{ position: 'absolute', top: 8, right: 8, color: '#5b73e8', fontSize: 20 }} />
+                                    <CheckCircleFilled style={{ position: 'absolute', top: 8, right: 8, color: 'var(--ap-accent)', fontSize: 20 }} />
                                 )}
                             </div>
                             <div style={{ textAlign: 'center', marginTop: 8 }}>
-                                <Text style={{ color: theme === item.key ? '#5b73e8' : undefined }}>{item.name}</Text>
+                                <Text style={{ color: theme === item.key ? 'var(--ap-text)' : undefined }}>{item.name}</Text>
                             </div>
                         </div>
                     </Col>

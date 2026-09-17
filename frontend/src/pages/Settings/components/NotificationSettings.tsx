@@ -17,13 +17,13 @@ const NotificationSettings: React.FC = () => {
             <div style={{
                 width: 80,
                 height: 80,
-                background: '#eff4ff',
+                background: 'var(--ap-fill)',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 24,
-                color: '#5b73e8'
+                color: 'var(--ap-text-2)'
             }}>
                 <BellOutlined style={{ fontSize: 40 }} />
             </div>

@@ -50,8 +50,6 @@ const Captcha = forwardRef<CaptchaRef, CaptchaProps>(({ onCaptchaChange, classNa
         <img
           src={imageUrl}
           alt="验证码"
-          width="103"
-          height="40"
           style={{ cursor: 'pointer' }}
           title="看不清可单击图片刷新"
           onClick={handleImageClick}

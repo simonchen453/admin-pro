@@ -77,7 +77,7 @@ const SysLogView: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: '24px', background: '#f5f5f5' }}>
+    <div className="fade-in">
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
         <Breadcrumb
           items={[
@@ -140,7 +140,7 @@ const SysLogView: React.FC = () => {
             <pre style={{ 
               margin: 0, 
               padding: '8px', 
-              background: '#f5f5f5', 
+              background: 'var(--ap-fill)', 
               borderRadius: '4px',
               maxHeight: '300px',
               overflow: 'auto',
@@ -154,7 +154,7 @@ const SysLogView: React.FC = () => {
             <pre style={{ 
               margin: 0, 
               padding: '8px', 
-              background: '#f5f5f5', 
+              background: 'var(--ap-fill)', 
               borderRadius: '4px',
               maxHeight: '300px',
               overflow: 'auto',

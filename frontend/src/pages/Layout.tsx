@@ -1,9 +1,8 @@
-import { Layout as AntLayout, Menu, theme, Button, Avatar, Dropdown, Space, Typography, Tooltip, ConfigProvider, message } from 'antd';
+import { Layout as AntLayout, Menu, Button, Dropdown, Tooltip, message } from 'antd';
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
     UserOutlined,
-    DashboardOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     LogoutOutlined,
@@ -34,10 +33,10 @@ import { getMenuList } from '../api/menu';
 import { getSystemInfoApi } from '../api/common';
 import { getCurrentUserInfoApi } from '../api/auth';
 import type { MenuItem, BackendMenuItem, SystemInfo, UserEntity, User } from '../types/index';
+import { LogoMark, ChevronRight } from '../components/Logo';
 import './Layout.css';
 
 const { Header, Sider, Content, Footer } = AntLayout;
-const { Text } = Typography;
 
 function MainLayout() {
     const [collapsed, setCollapsed] = useState(false);
@@ -49,9 +48,6 @@ function MainLayout() {
     const [currentUserInfo, setCurrentUserInfo] = useState<UserEntity | null>(null);
     const navigate = useNavigate();
     const { logout, currentUser, updateCurrentUser } = useAuthStore();
-    const {
-        token: { colorBgContainer, borderRadiusLG },
-    } = theme.useToken();
 
     const location = useLocation();
 
@@ -299,43 +295,6 @@ function MainLayout() {
         loadMenus();
     }, []);
 
-    const userMenuItems = [
-        {
-            key: 'profile',
-            icon: <UserOutlined />,
-            label: '个人资料',
-        },
-        {
-            type: 'divider' as const,
-        },
-        {
-            key: 'logout',
-            icon: <LogoutOutlined />,
-            label: '退出登录',
-        },
-    ];
-
-    const handleUserMenuClick = async ({ key }: { key: string }) => {
-        switch (key) {
-            case 'profile':
-                navigate('/settings');
-                break;
-            case 'logout':
-                try {
-                    await logout();
-                    setMenuItems([]);
-                    navigate('/login', { replace: true });
-                } catch (error) {
-                    console.error('登出失败:', error);
-                    setMenuItems([]);
-                    navigate('/login', { replace: true });
-                }
-                break;
-            default:
-
-        }
-    };
-
     // 处理菜单点击
     const handleMenuClick = async ({ key }: { key: string }) => {
         const findMenuItem = (items: MenuItem[], targetKey: string): MenuItem | null => {
@@ -411,215 +370,162 @@ function MainLayout() {
         }
     }, [collapsed, menuItems, location.pathname]);
 
+    const displayName =
+        currentUserInfo?.realName ||
+        currentUser?.realName ||
+        currentUser?.name ||
+        currentUserInfo?.loginName ||
+        '管理员';
+    const roleName = currentUserInfo?.roleName || '系统管理员';
+    const avatarUrl = currentUserInfo?.avatarUrl || currentUser?.avatarUrl || currentUser?.avatar;
+
+    // 账号菜单从顶栏挪到了侧栏底部：这类操作一天用不了两次，
+    // 不该常年占着顶栏右上角最显眼的位置。
+    const accountMenu = {
+        items: [
+            {
+                key: 'settings',
+                label: '个人设置',
+                icon: <SettingOutlined />,
+                onClick: () => navigate('/settings')
+            },
+            {
+                key: 'logout',
+                label: '退出登录',
+                icon: <LogoutOutlined />,
+                danger: true,
+                onClick: async () => {
+                    try {
+                        await logout();
+                    } catch (error) {
+                        console.error('登出失败:', error);
+                    } finally {
+                        setMenuItems([]);
+                        navigate('/login', { replace: true });
+                    }
+                }
+            }
+        ]
+    };
+
     return (
         <AntLayout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'row' }}>
-            <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
-                <Sider
-                    collapsible
-                    collapsed={collapsed}
-                    onCollapse={(value) => setCollapsed(value)}
-                    trigger={null}
-                    breakpoint="lg"
-                    collapsedWidth="0"
-                    width={260}
-                    className="glass-effect-dark"
-                    style={{
-                        position: 'fixed',
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        zIndex: 1001,
-                        boxShadow: '4px 0 16px rgba(0,0,0,0.1)',
-                    }}
-                >
-                    <div className="logo">
-                        <div className="layout-logo-background">
-                            <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Admin Pro" className="layout-logo-image" />
-                        </div>
-                        {!collapsed && (
-                            <div className="logo-text fade-in">
-                                <div className="logo-title">{systemInfo?.platformShortName || 'Admin Pro'}</div>
-                                <div className="logo-subtitle">企业级管理系统</div>
-                            </div>
-                        )}
-                    </div>
-                    <div style={{ height: 'calc(100vh - 64px)', overflowY: 'auto', overflowX: 'hidden' }} className="custom-scrollbar">
-                        <Menu
-                            theme="dark"
-                            mode="inline"
-                            selectedKeys={selectedKeys}
-                            openKeys={openKeys}
-                            onClick={handleMenuClick}
-                            onOpenChange={handleOpenChange}
-                            items={menuItems.map(item => ({
-                                key: item.key,
-                                icon: item.icon,
-                                label: item.label,
-                                children: item.children?.map(child => ({
-                                    key: child.key,
-                                    icon: child.icon,
-                                    label: child.label,
-                                    children: child.children?.map(subChild => ({
-                                        key: subChild.key,
-                                        icon: subChild.icon,
-                                        label: subChild.label,
-                                        children: child.children?.map(subChild => ({
-                                            key: subChild.key,
-                                            icon: subChild.icon,
-                                            label: subChild.label,
-                                        }))
-                                    })),
+            {/* 侧栏和工作区一样是纯白，只靠右侧一条发丝线分开 —— 没有深色玻璃、没有投影 */}
+            <Sider
+                collapsible
+                collapsed={collapsed}
+                onCollapse={(value) => setCollapsed(value)}
+                trigger={null}
+                breakpoint="lg"
+                collapsedWidth="0"
+                width={248}
+                className="ap-rail-sider"
+                style={{ position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 1001 }}
+            >
+                <div className="ap-brand">
+                    <span className="ap-logo"><LogoMark /></span>
+                    {!collapsed && (
+                        <span className="ap-brand-t">
+                            {systemInfo?.platformShortName || 'AdminPro'}
+                        </span>
+                    )}
+                </div>
+
+                <div className="ap-rail-nav custom-scrollbar">
+                    <Menu
+                        mode="inline"
+                        selectedKeys={selectedKeys}
+                        openKeys={openKeys}
+                        onClick={handleMenuClick}
+                        onOpenChange={handleOpenChange}
+                        items={menuItems.map(item => ({
+                            key: item.key,
+                            icon: item.icon,
+                            label: item.label,
+                            children: item.children?.map(child => ({
+                                key: child.key,
+                                icon: child.icon,
+                                label: child.label,
+                                children: child.children?.map(subChild => ({
+                                    key: subChild.key,
+                                    icon: subChild.icon,
+                                    label: subChild.label,
                                 })),
-                            }))}
-                            style={{ background: 'transparent', borderRight: 0 }}
-                        />
+                            })),
+                        }))}
+                        style={{ background: 'transparent', borderRight: 0 }}
+                    />
+                </div>
+
+                <Dropdown menu={accountMenu} placement="topRight" trigger={['click']}>
+                    <div className="ap-rail-user">
+                        {avatarUrl
+                            ? <img className="ap-ru-av" src={avatarUrl} alt="" />
+                            : <span className="ap-ru-av">{displayName.slice(0, 1)}</span>}
+                        <span style={{ minWidth: 0 }}>
+                            <span className="ap-ru-n">{displayName}</span><br />
+                            <span className="ap-ru-r">{roleName}</span>
+                        </span>
+                        <span className="ap-ru-x"><ChevronRight /></span>
                     </div>
-                </Sider>
-            </ConfigProvider>
+                </Dropdown>
+            </Sider>
+
             <AntLayout style={{
-                marginLeft: collapsed ? 0 : 260,
+                marginLeft: collapsed ? 0 : 248,
                 transition: 'margin-left 0.2s',
-                background: '#f3f4f6',
                 display: 'flex',
                 flexDirection: 'column',
                 minHeight: '100vh',
                 flex: 1
             }}>
-                <Header style={{
-                    padding: '0 24px',
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 1000,
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
-                    height: 64,
-                    borderBottom: '1px solid rgba(0,0,0,0.03)'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <Button
-                            type="text"
-                            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                            onClick={() => setCollapsed(!collapsed)}
-                            style={{ fontSize: '18px', width: 48, height: 48, marginRight: 16 }}
-                        />
-                        <Breadcrumb items={getBreadcrumbItems()} />
-                    </div>
+                <Header className="ap-topbar" style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
+                    <Button
+                        type="text"
+                        shape="circle"
+                        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                        onClick={() => setCollapsed(!collapsed)}
+                        aria-label={collapsed ? '展开侧栏' : '收起侧栏'}
+                        style={{ marginLeft: -8, marginRight: 4 }}
+                    />
+                    <Breadcrumb items={getBreadcrumbItems()} />
 
-                    <Space size={12}>
-                        {/* Language Switch */}
+                    <div className="ap-topbar-r">
                         <Dropdown
                             menu={{
                                 items: [
-                                    {
-                                        key: 'zh-CN',
-                                        label: '简体中文',
-                                        onClick: () => message.success('已切换至简体中文')
-                                    },
-                                    {
-                                        key: 'en-US',
-                                        label: 'English',
-                                        onClick: () => message.success('Switched to English')
-                                    }
+                                    { key: 'zh-CN', label: '简体中文', onClick: () => message.success('已切换至简体中文') },
+                                    { key: 'en-US', label: 'English', onClick: () => message.success('Switched to English') }
                                 ]
                             }}
                             placement="bottomRight"
                         >
+                            <Button type="text" shape="circle" icon={<TranslationOutlined />} aria-label="切换语言" />
+                        </Dropdown>
+                        <Tooltip title="消息通知">
                             <Button
                                 type="text"
                                 shape="circle"
-                                icon={<TranslationOutlined />}
+                                aria-label="消息通知"
+                                icon={
+                                    <Badge dot offset={[-2, 2]}>
+                                        <BellOutlined />
+                                    </Badge>
+                                }
                             />
-                        </Dropdown>
-                        <Tooltip title="消息通知">
-                            <Button type="text" shape="circle" icon={
-                                <Badge dot offset={[-2, 2]}>
-                                    <BellOutlined style={{ fontSize: 18 }} />
-                                </Badge>
-                            } />
                         </Tooltip>
-
-                        {/* User Info Dropdown */}
-                        <Dropdown
-                            menu={{
-                                items: [
-                                    {
-                                        key: 'settings',
-                                        label: '个人设置',
-                                        icon: <SettingOutlined />,
-                                        onClick: () => navigate('/settings')
-                                    },
-                                    {
-                                        key: 'logout',
-                                        label: '退出登录',
-                                        icon: <LogoutOutlined />,
-                                        danger: true,
-                                        onClick: async () => {
-                                            try {
-                                                await logout();
-                                                setMenuItems([]);
-                                                navigate('/login', { replace: true });
-                                            } catch (error) {
-                                                console.error('登出失败:', error);
-                                                setMenuItems([]);
-                                                navigate('/login', { replace: true });
-                                            }
-                                        }
-                                    }
-                                ]
-                            }}
-                            placement="bottomRight"
-                        >
-                            <Space className="user-info" style={{ cursor: 'pointer' }}>
-                                <Avatar
-                                    src={currentUserInfo?.avatarUrl || currentUser?.avatarUrl || currentUser?.avatar}
-                                    icon={<UserOutlined />}
-                                    style={{ backgroundColor: '#6366f1' }}
-                                />
-                                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                                    <Text strong>
-                                        {(() => {
-                                            const displayName = currentUserInfo?.realName ||
-                                                currentUser?.realName ||
-                                                currentUser?.name ||
-                                                currentUserInfo?.loginName ||
-                                                '管理员';
-                                            return displayName;
-                                        })()}
-                                    </Text>
-                                    <Text type="secondary" style={{ fontSize: 12 }}>
-                                        {currentUserInfo?.roleName || '系统管理员'}
-                                    </Text>
-                                </div>
-                            </Space>
-                        </Dropdown>
-                    </Space>
+                    </div>
                 </Header>
-                <Content style={{
-                    margin: '16px',
-                    minHeight: 'calc(100vh - 80px - 80px)',
-                    flex: '1 1 auto',
-                    display: 'flex',
-                    flexDirection: 'column',
-                }}>
-                    <div className="fade-in" style={{ flex: 1 }}>
+
+                {/* 留白由 .ap-page 统一给：32 的内边距、28 的纵向间距，页面自己不再加 margin */}
+                <Content style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column' }}>
+                    <div className="ap-page fade-in">
                         <Outlet />
                     </div>
                 </Content>
-                <Footer style={{
-                    textAlign: 'center',
-                    background: 'transparent',
-                    color: '#9ca3af',
-                    flexShrink: 0,
-                    padding: '16px 0'
-                }}>
-                    <div className="copyright-text">
-                        {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} Admin Pro. All rights reserved.`}
-                    </div>
+
+                <Footer className="ap-foot">
+                    {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} AdminPro`}
                 </Footer>
             </AntLayout>
         </AntLayout>

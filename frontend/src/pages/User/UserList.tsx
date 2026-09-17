@@ -514,7 +514,7 @@ const UserList: React.FC = () => {
       key: 'latestLoginTime',
       ellipsis: true,
       responsive: ['md'],
-      render: (time: string) => <span style={{ color: '#8c8c8c' }}>{time || '-'}</span>
+      render: (time: string) => <span style={{ color: 'var(--ap-text-3)' }}>{time || '-'}</span>
     },
     {
       title: '状态',
@@ -552,7 +552,6 @@ const UserList: React.FC = () => {
               type="link"
               icon={<UserAddOutlined />}
               onClick={() => handleActive(record)}
-              style={{ color: '#52c41a' }}
             >
               启用
             </Button>
@@ -611,12 +610,12 @@ const UserList: React.FC = () => {
             </Col>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="loginName" label="登录者">
-                <Input placeholder="请输入登录名" allowClear prefix={<UserOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入登录名" allowClear prefix={<UserOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="realName" label="用户姓名">
-                <Input placeholder="请输入用户姓名" allowClear prefix={<UserOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入用户姓名" allowClear prefix={<UserOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>

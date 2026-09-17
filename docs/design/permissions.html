@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>权限矩阵 · AdminPro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body data-page="roles" data-crumb="系统管理 / 角色权限">
+
+<!-- RBAC 系统的核心问题只有一句话：谁能碰什么。
+     旧版把答案拆散在六个角色的编辑弹窗里，一次只能看一个角色的复选框树，
+     回答不了「有几个角色能删用户」这种问题。矩阵把它压成一屏，横向对比才成立。 -->
+<main class="ap-page">
+
+  <div class="ap-pagehead">
+    <div>
+      <h1 class="ap-page-title">角色权限</h1>
+      <p class="ap-page-sub">系统用户域 · 6 个角色 × 12 类资源，共 36 项细粒度权限</p>
+    </div>
+    <div class="ap-page-act">
+      <button class="ap-btn" type="button">导出授权清单</button>
+      <button class="ap-btn ap-btn-p" type="button">新建角色</button>
+    </div>
+  </div>
+
+  <section class="ap-card">
+    <div class="ap-tools">
+      <select class="ap-select" aria-label="用户域">
+        <option>系统用户域</option><option>局域网用户域</option>
+      </select>
+      <input class="ap-input" type="search" placeholder="筛选角色或资源" aria-label="筛选角色或资源">
+      <label class="ap-row" style="font-size:12.5px;color:var(--ap-text-2)">
+        <input class="ap-check" type="checkbox"> 只看有差异的资源
+      </label>
+    </div>
+    <div class="ap-mx-wrap"><table class="ap-mx" id="mx"></table></div>
+    <div class="ap-legend">
+      <span><i class="ap-k ap-k-all"></i> 全部权限</span>
+      <span><i class="ap-k ap-k-part"></i> 部分权限</span>
+      <span><i class="ap-k ap-k-no"></i> 无权限</span>
+      <span><i class="ap-k ap-k-na"></i> 该用户域不适用</span>
+      <span style="color:var(--ap-text-3)">悬停任意格，行与列同时点亮</span>
+    </div>
+  </section>
+
+  <div class="ap-cols ap-cols-2-1">
+
+    <!-- 「部分」到底是哪部分：矩阵的下钻层，也是原来那棵复选框树该待的位置 -->
+    <section class="ap-card">
+      <div class="ap-card-h">
+        <h2 class="ap-card-t">财务审核 · 权限明细</h2>
+        <span class="ap-card-n ap-mono">5 / 36</span>
+        <div class="ap-card-a">
+          <button class="ap-btn ap-btn-sm" type="button">取消</button>
+          <button class="ap-btn ap-btn-p ap-btn-sm" type="button">保存权限</button>
+        </div>
+      </div>
+      <div class="ap-tbl-wrap">
+        <table class="ap-tbl">
+          <thead><tr><th style="width:130px">资源</th><th>权限项</th><th style="width:90px">已授权</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600">用户</td>
+              <td><span class="ap-row" style="flex-wrap:wrap;gap:var(--ap-sp-4)">
+                <label class="ap-row"><input class="ap-check" type="checkbox" checked> 查看列表</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox" checked> 查看详情</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox"> 新增</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox"> 编辑</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox"> 删除</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox"> 重置密码</label>
+              </span></td>
+              <td class="ap-mono ap-tbl-sec">2 / 6</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">部门</td>
+              <td><span class="ap-row" style="flex-wrap:wrap;gap:var(--ap-sp-4)">
+                <label class="ap-row"><input class="ap-check" type="checkbox" checked> 查看</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox"> 新增</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox"> 编辑</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox"> 删除</label>
+              </span></td>
+              <td class="ap-mono ap-tbl-sec">1 / 4</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">字典</td>
+              <td><span class="ap-row" style="flex-wrap:wrap;gap:var(--ap-sp-4)">
+                <label class="ap-row"><input class="ap-check" type="checkbox" checked> 查看</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox"> 编辑</label>
+              </span></td>
+              <td class="ap-mono ap-tbl-sec">1 / 2</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">审计</td>
+              <td><span class="ap-row" style="flex-wrap:wrap;gap:var(--ap-sp-4)">
+                <label class="ap-row"><input class="ap-check" type="checkbox" checked> 查看</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox"> 导出</label>
+                <label class="ap-row"><input class="ap-check" type="checkbox"> 清理</label>
+              </span></td>
+              <td class="ap-mono ap-tbl-sec">1 / 3</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600">角色</td>
+              <td class="ap-tbl-sec">未授予任何权限项</td>
+              <td class="ap-mono ap-tbl-sec">0 / 5</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="ap-stack">
+      <!-- 保存前告诉管理员这次改动会打到谁头上。
+           权限系统里最贵的错误就是「我不知道这会影响谁」。
+           这一块用的就是参照稿那套授权行：一个线性图标 + 一句人话，
+           行与行之间一条发丝线，把「按下保存会发生什么」逐条摊开。 -->
+      <section class="ap-card">
+        <div class="ap-card-h"><h2 class="ap-card-t">保存后会发生什么</h2></div>
+        <div class="ap-card-b">
+          <ul class="ap-rows">
+            <li>
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="6.3" r="2.9"/><path d="M3.4 15.3c0-2.9 2.5-4.6 5.6-4.6s5.6 1.7 5.6 4.6" stroke-linecap="round"/></svg>
+              改变这些人的可访问范围<em>1 人</em>
+            </li>
+            <li>
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.2" y="3.2" width="13.6" height="9.4" rx="1.4"/><path d="M6.1 15.8h5.8" stroke-linecap="round"/></svg>
+              其中正在使用系统的<em>1 人在线</em>
+            </li>
+            <li>
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="6.8"/><path d="M9 5.2v4.1l2.7 1.7" stroke-linecap="round"/></svg>
+              新权限开始生效<em>保存后立即</em>
+            </li>
+            <li>
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.8 2.2h6.6l3.8 3.7v9.9H3.8z" stroke-linejoin="round"/><path d="M10.2 2.2v3.8h3.9M6.6 10.3h4.8M6.6 12.7h3" stroke-linecap="round"/></svg>
+              这次改动记入审计日志<em>superadmin</em>
+            </li>
+          </ul>
+          <p class="ap-hint" style="margin:var(--ap-sp-5) 0 0;line-height:1.7">
+            已登录的会话不会被强制下线，权限在该用户的下一次请求时刷新。
+            如需立即断开，请到「在线会话」中踢出。
+          </p>
+          <div class="ap-row" style="margin-top:var(--ap-sp-4)">
+            <span class="ap-who-av g4" style="width:28px;height:28px;font-size:12px">李</span>
+            <span style="font-size:12.5px">李燕 · 财务部 · <span style="color:var(--ap-ok)">在线</span></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="ap-card">
+        <div class="ap-card-h"><h2 class="ap-card-t">角色概览</h2></div>
+        <div class="ap-tbl-wrap">
+          <table class="ap-tbl">
+            <tbody>
+              <tr><td>超级管理员</td><td class="ap-mono" style="text-align:right">36/36</td><td class="ap-mono ap-tbl-sec" style="text-align:right;padding-right:var(--ap-sp-5)">1 人</td></tr>
+              <tr><td>系统管理员</td><td class="ap-mono" style="text-align:right">28/36</td><td class="ap-mono ap-tbl-sec" style="text-align:right;padding-right:var(--ap-sp-5)">1 人</td></tr>
+              <tr><td>运维工程师</td><td class="ap-mono" style="text-align:right">14/36</td><td class="ap-mono ap-tbl-sec" style="text-align:right;padding-right:var(--ap-sp-5)">1 人</td></tr>
+              <tr><td>开发工程师</td><td class="ap-mono" style="text-align:right">9/36</td><td class="ap-mono ap-tbl-sec" style="text-align:right;padding-right:var(--ap-sp-5)">2 人</td></tr>
+              <tr aria-selected="true"><td style="font-weight:600">财务审核</td><td class="ap-mono" style="text-align:right">5/36</td><td class="ap-mono ap-tbl-sec" style="text-align:right;padding-right:var(--ap-sp-5)">1 人</td></tr>
+              <tr><td>只读</td><td class="ap-mono" style="text-align:right">6/36</td><td class="ap-mono ap-tbl-sec" style="text-align:right;padding-right:var(--ap-sp-5)">2 人</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* 紧凑记号：F=全部 P=部分 N=无 -=不适用。
+   这个写法本身可读 —— 一眼能看出哪个角色权限过宽。 */
+(function () {
+  var RES = ['用户','角色','菜单','部门','岗位','用户域','参数','字典','会话','审计','任务','工具'];
+  var ROLES = [
+    { n: '超级管理员', g: 36, b: 'FFFFFFFFFFFF' },
+    { n: '系统管理员', g: 28, b: 'FFFFFFFFFPNN' },
+    { n: '运维工程师', g: 14, b: 'NNNNNNPNFFFP' },
+    { n: '开发工程师', g: 9,  b: 'NNNNNNNPNPNF' },
+    { n: '财务审核',   g: 5,  b: 'PNNPN-NPNPN-' },
+    { n: '只读',       g: 6,  b: 'PPPPPNPPNPNN' }
+  ];
+  var C = { F: 'ap-k-all', P: 'ap-k-part', N: 'ap-k-no', '-': 'ap-k-na' };
+  var L = { F: '全部权限', P: '部分权限', N: '无权限', '-': '不适用' };
+
+  document.getElementById('mx').innerHTML =
+    '<thead><tr><th>角色</th>' + RES.map(function (r) { return '<th>' + r + '</th>'; }).join('') + '</tr></thead>' +
+    '<tbody>' + ROLES.map(function (r) {
+      return '<tr><th>' + r.n + '<span class="ap-mx-n">' + r.g + '/36</span></th>' +
+        r.b.split('').map(function (x, i) {
+          return '<td title="' + r.n + ' · ' + RES[i] + '：' + L[x] + '"><i class="ap-k ' + C[x] + '"></i></td>';
+        }).join('') + '</tr>';
+    }).join('') + '</tbody>';
+})();
+</script>
+<script src="shell.js"></script>
+</body>
+</html>

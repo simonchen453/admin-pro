@@ -253,12 +253,12 @@ const ConfigList: React.FC = () => {
           <Row gutter={24}>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="name" label="配置名称">
-                <Input placeholder="请输入配置名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} onPressEnter={() => form.submit()} />
+                <Input placeholder="请输入配置名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} onPressEnter={() => form.submit()} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="key" label="配置Key">
-                <Input placeholder="请输入配置Key" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} onPressEnter={() => form.submit()} />
+                <Input placeholder="请输入配置Key" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} onPressEnter={() => form.submit()} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>

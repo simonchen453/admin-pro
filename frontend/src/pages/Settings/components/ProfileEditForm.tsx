@@ -135,8 +135,8 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
     <Spin spinning={loadingData}>
       {/* 标题部分 */}
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: '16px', fontWeight: 500, color: '#1f1f1f', marginBottom: 4 }}>基本信息</div>
-        <div style={{ fontSize: '14px', color: '#8c8c8c' }}>更新您的头像和个人详细信息。</div>
+        <div style={{ fontSize: '16px', fontWeight: 500, color: 'var(--ap-text)', marginBottom: 4 }}>基本信息</div>
+        <div style={{ fontSize: '14px', color: 'var(--ap-text-3)' }}>更新您的头像和个人详细信息。</div>
       </div>
 
       <Form autoComplete="off"
@@ -189,20 +189,20 @@ function ProfileEditForm({ onSuccess, onCancel }: ProfileEditFormProps) {
                       right: 0,
                       width: 32,
                       height: 32,
-                      background: '#fff',
+                      background: 'var(--ap-card)',
                       borderRadius: '50%',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      border: '1px solid var(--ap-card-line)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
-                      color: '#5b73e8'
+                      color: 'var(--ap-text-2)'
                     }}>
                       <UploadOutlined />
                     </div>
                   </Upload>
                 </div>
-                <div style={{ color: '#666', fontSize: '12px', marginTop: 8 }}>点击更换头像</div>
+                <div style={{ color: 'var(--ap-text-3)', fontSize: '12px', marginTop: 8 }}>点击更换头像</div>
               </div>
             </Form.Item>
           </Col>

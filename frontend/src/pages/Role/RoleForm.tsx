@@ -211,7 +211,7 @@ const RoleForm: React.FC<RoleFormProps> = ({ role, menuOptions, onSuccess, onCan
             border: '1px solid #f0f0f0', 
             borderRadius: '6px', 
             padding: '12px',
-            background: '#fafafa'
+            background: 'var(--ap-fill)'
           }}>
             <Tree
               checkable

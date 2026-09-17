@@ -495,7 +495,7 @@ const MenuList: React.FC = () => {
               <Form.Item name="name" label="菜单名称">
                 <Input
                   placeholder="请输入菜单名称"
-                  prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />}
+                  prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />}
                   allowClear
                 />
               </Form.Item>

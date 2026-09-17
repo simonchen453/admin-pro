@@ -190,12 +190,12 @@ const DomainList: React.FC = () => {
           <Row gutter={24}>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="name" label="名称">
-                <Input placeholder="请输入名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="display" label="显示名称">
-                <Input placeholder="请输入显示名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入显示名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>

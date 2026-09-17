@@ -14,16 +14,17 @@ function NoPermission() {
     };
 
     return (
-        <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
+        <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             minHeight: '100vh',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+            background: 'var(--ap-bg)'
         }}>
+            {/* 被拦下来这件事本身已经够醒目了，不需要再配一张紫色渐变的背景板 */}
             <Result
                 status="403"
-                icon={<LockOutlined style={{ color: '#ff4d4f' }} />}
+                icon={<LockOutlined style={{ color: 'var(--ap-text-3)' }} />}
                 title="403"
                 subTitle="抱歉，您没有权限访问此资源"
                 extra={[

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>用户管理 · AdminPro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body data-page="users" data-crumb="系统管理 / 用户管理">
+
+<!-- 列表页范式：全站 20 多个管理页共用这一个骨架。
+     一张卡 = 工具条 + 表格 + 分页，不再是「筛选卡 + 按钮卡 + 表格卡」三张浮空卡。 -->
+<main class="ap-page">
+
+  <div class="ap-pagehead">
+    <div>
+      <h1 class="ap-page-title">用户管理</h1>
+      <p class="ap-page-sub">系统用户域 · 共 8 个账号，1 个已锁定、1 个待激活</p>
+    </div>
+    <div class="ap-page-act">
+      <button class="ap-btn" type="button">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10.5V2.5M5 5.5 8 2.5l3 3M2.8 10.5v2.2h10.4v-2.2"/></svg>
+        导出
+      </button>
+      <!-- 全页唯一的实心强调色，焦点就在这里 -->
+      <button class="ap-btn ap-btn-p" type="button">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 3.4v9.2M3.4 8h9.2"/></svg>
+        新增用户
+      </button>
+    </div>
+  </div>
+
+  <section class="ap-stats">
+    <div class="ap-stat">
+      <div class="ap-stat-l">在线会话</div>
+      <div class="ap-stat-v">12</div>
+      <div class="ap-stat-d">昨日同时段 <b>9</b></div>
+    </div>
+    <div class="ap-stat">
+      <div class="ap-stat-l">今日登录</div>
+      <div class="ap-stat-v">47</div>
+      <div class="ap-stat-d">昨日全天 <b>63</b></div>
+    </div>
+    <div class="ap-stat ap-stat-bad">
+      <div class="ap-stat-l">登录失败</div>
+      <div class="ap-stat-v">6</div>
+      <div class="ap-stat-d">昨日全天 <b>2</b> · <a class="ap-link" href="#">查看来源</a></div>
+    </div>
+    <div class="ap-stat">
+      <div class="ap-stat-l">待激活账号</div>
+      <div class="ap-stat-v">1</div>
+      <div class="ap-stat-d">邀请已发出 <b>3 天</b></div>
+    </div>
+  </section>
+
+  <section class="ap-card">
+    <div class="ap-tools">
+      <select class="ap-select" aria-label="部门">
+        <option>全部部门</option><option>技术中心</option><option>研发一部</option><option>财务部</option>
+      </select>
+      <input class="ap-input" type="search" placeholder="搜索登录名或姓名" aria-label="搜索登录名或姓名">
+      <select class="ap-select" aria-label="状态">
+        <option>全部状态</option><option>正常</option><option>已锁定</option><option>待激活</option><option>已停用</option>
+      </select>
+      <button class="ap-btn ap-btn-q" type="button">重置</button>
+      <div class="ap-tools-r">
+        <span class="ap-tools-s">已选 1 项</span>
+        <button class="ap-btn ap-btn-sm" type="button">分配角色</button>
+        <button class="ap-btn ap-btn-sm ap-btn-d" type="button">批量停用</button>
+      </div>
+    </div>
+
+    <div class="ap-tbl-wrap">
+      <table class="ap-tbl">
+        <thead>
+          <tr>
+            <th style="width:44px"><input class="ap-check" type="checkbox" aria-label="全选"></th>
+            <th>用户</th><th>部门</th><th>角色</th><th>状态</th><th>最近登录</th>
+            <th class="ap-tbl-act">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr aria-selected="true">
+            <td><input class="ap-check" type="checkbox" checked aria-label="选择超级管理员"></td>
+            <td><span class="ap-who"><span class="ap-who-av">超</span><span><span class="ap-who-n">超级管理员</span><br><span class="ap-who-l">superadmin</span></span></span></td>
+            <td>技术中心</td>
+            <td><span class="ap-chip ap-chip-hi">超级管理员</span></td>
+            <td><span class="ap-badge ap-badge-ok">正常</span></td>
+            <td class="ap-tbl-time">12-17 21:05</td>
+            <td class="ap-tbl-act"><button class="ap-btn ap-btn-q ap-btn-sm" type="button">编辑</button><button class="ap-btn ap-btn-q ap-btn-sm" type="button">更多</button></td>
+          </tr>
+          <tr>
+            <td><input class="ap-check" type="checkbox" aria-label="选择管理员"></td>
+            <td><span class="ap-who"><span class="ap-who-av g4">管</span><span><span class="ap-who-n">管理员</span><br><span class="ap-who-l">admin</span></span></span></td>
+            <td>技术中心</td>
+            <td><span class="ap-chip">系统管理员</span></td>
+            <td><span class="ap-badge ap-badge-ok">正常</span></td>
+            <td class="ap-tbl-time">12-15 23:20</td>
+            <td class="ap-tbl-act"><button class="ap-btn ap-btn-q ap-btn-sm" type="button">编辑</button><button class="ap-btn ap-btn-q ap-btn-sm" type="button">更多</button></td>
+          </tr>
+          <tr>
+            <td><input class="ap-check" type="checkbox" aria-label="选择张伟"></td>
+            <td><span class="ap-who"><span class="ap-who-av g4">张</span><span><span class="ap-who-n">张伟</span><br><span class="ap-who-l">zhangwei</span></span></span></td>
+            <td>研发一部</td>
+            <td><span class="ap-chip">开发工程师</span></td>
+            <td><span class="ap-badge ap-badge-ok">正常</span></td>
+            <td class="ap-tbl-time">12-17 09:12</td>
+            <td class="ap-tbl-act"><button class="ap-btn ap-btn-q ap-btn-sm" type="button">编辑</button><button class="ap-btn ap-btn-q ap-btn-sm" type="button">更多</button></td>
+          </tr>
+          <tr>
+            <td><input class="ap-check" type="checkbox" aria-label="选择李燕"></td>
+            <td><span class="ap-who"><span class="ap-who-av g4">李</span><span><span class="ap-who-n">李燕</span><br><span class="ap-who-l">liyan</span></span></span></td>
+            <td>财务部</td>
+            <td><span class="ap-chip">财务审核</span></td>
+            <td><span class="ap-badge ap-badge-ok">正常</span></td>
+            <td class="ap-tbl-time">12-16 18:03</td>
+            <td class="ap-tbl-act"><button class="ap-btn ap-btn-q ap-btn-sm" type="button">编辑</button><button class="ap-btn ap-btn-q ap-btn-sm" type="button">更多</button></td>
+          </tr>
+          <!-- 锁定：状态本身不够，必须说清为什么锁、什么时候解 -->
+          <tr>
+            <td><input class="ap-check" type="checkbox" aria-label="选择陈浩"></td>
+            <td><span class="ap-who"><span class="ap-who-av g3">陈</span><span><span class="ap-who-n">陈浩</span><br><span class="ap-who-l">chenhao</span></span></span></td>
+            <td>运维部</td>
+            <td><span class="ap-chip">运维工程师</span></td>
+            <td><span class="ap-badge ap-badge-bd" title="连续 5 次密码错误，30 分钟后自动解锁">已锁定</span></td>
+            <td class="ap-tbl-time">12-14 02:41</td>
+            <td class="ap-tbl-act"><button class="ap-btn ap-btn-q ap-btn-sm" type="button">解锁</button><button class="ap-btn ap-btn-q ap-btn-sm" type="button">更多</button></td>
+          </tr>
+          <tr>
+            <td><input class="ap-check" type="checkbox" aria-label="选择赵磊"></td>
+            <td><span class="ap-who"><span class="ap-who-av g2">赵</span><span><span class="ap-who-n">赵磊</span><br><span class="ap-who-l">zhaolei</span></span></span></td>
+            <td>研发一部</td>
+            <td><span class="ap-chip">开发工程师</span></td>
+            <td><span class="ap-badge ap-badge-wn">待激活</span></td>
+            <td style="color:var(--ap-text-3)">邀请已发出 3 天</td>
+            <td class="ap-tbl-act"><button class="ap-btn ap-btn-q ap-btn-sm" type="button">重发邀请</button><button class="ap-btn ap-btn-q ap-btn-sm" type="button">更多</button></td>
+          </tr>
+          <!-- 停用不是错误，所以用中性灰，不用红 -->
+          <tr>
+            <td><input class="ap-check" type="checkbox" aria-label="选择王小二"></td>
+            <td><span class="ap-who"><span class="ap-who-av g4">王</span><span><span class="ap-who-n">王小二</span><br><span class="ap-who-l">test</span></span></span></td>
+            <td style="color:var(--ap-text-3)">—</td>
+            <td><span class="ap-chip">只读</span></td>
+            <td><span class="ap-badge ap-badge-nu">已停用</span></td>
+            <td class="ap-tbl-time">2020-06-04</td>
+            <td class="ap-tbl-act"><button class="ap-btn ap-btn-q ap-btn-sm" type="button">启用</button><button class="ap-btn ap-btn-q ap-btn-sm" type="button">更多</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ap-pager">
+      <span>共 <b>8</b> 条记录</span>
+      <div class="ap-pg-r">
+        <button class="ap-pg-b" type="button" disabled aria-label="上一页">‹</button>
+        <button class="ap-pg-b" type="button" aria-current="page">1</button>
+        <button class="ap-pg-b" type="button" disabled aria-label="下一页">›</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="ap-cols ap-cols-1-1">
+    <!-- 表单弹窗：浮层是全站唯一用重投影的地方 -->
+    <section class="ap-card">
+      <div class="ap-card-h">
+        <h2 class="ap-card-t">表单弹窗</h2>
+        <span class="ap-card-n">全站唯一用重投影的地方</span>
+      </div>
+      <div class="ap-card-b" style="background:var(--ap-fill);display:flex;justify-content:center;padding:var(--ap-sp-8) var(--ap-sp-6)">
+        <div class="ap-overlay">
+          <div class="ap-ov-h"><span class="ap-ov-t">新增用户</span></div>
+          <div class="ap-ov-b">
+            <div class="ap-field">
+              <label class="ap-label ap-label-req" for="f1">登录名</label>
+              <input class="ap-input ap-input-lg ap-input-mono" id="f1" value="zhaolei">
+              <span class="ap-hint">创建后不可修改，用于登录和审计溯源。</span>
+            </div>
+            <div class="ap-field">
+              <label class="ap-label ap-label-req" for="f2">姓名</label>
+              <input class="ap-input ap-input-lg" id="f2" value="赵磊">
+            </div>
+            <div class="ap-field">
+              <label class="ap-label" for="f3">邮箱</label>
+              <input class="ap-input ap-input-lg ap-input-mono" id="f3" value="zhaolei@" aria-invalid="true">
+              <!-- 错误文案说清哪里错、怎么改，不写"输入有误，请重试" -->
+              <span class="ap-hint ap-hint-err">邮箱缺少域名部分，例如 zhaolei@example.com。</span>
+            </div>
+          </div>
+          <div class="ap-ov-f">
+            <button class="ap-btn" type="button">取消</button>
+            <button class="ap-btn ap-btn-p" type="button">创建用户</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ap-card">
+      <div class="ap-card-h">
+        <h2 class="ap-card-t">空状态</h2>
+        <span class="ap-card-n">一句说明 + 一个动作，不放插画</span>
+      </div>
+      <div class="ap-tools">
+        <select class="ap-select" aria-label="部门"><option>财务部</option></select>
+        <input class="ap-input" type="search" value="张" aria-label="姓名">
+        <button class="ap-btn ap-btn-q" type="button">重置</button>
+      </div>
+      <div class="ap-empty">
+        <p class="ap-empty-t">财务部里没有姓名含「张」的用户</p>
+        <p class="ap-empty-h">换个部门，或者清空姓名条件再试。</p>
+        <button class="ap-btn" type="button">清空筛选条件</button>
+      </div>
+    </section>
+  </div>
+
+</main>
+
+<script src="shell.js"></script>
+</body>
+</html>

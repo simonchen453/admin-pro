@@ -1,0 +1,638 @@
+/* ==========================================================================
+   AdminPro 组件层 · 纯白 / 墨黑
+   依赖 theme.css。设计稿同名文件的落地版：已去掉只属于静态稿的导航条，
+   外壳的 sticky 偏移回到 0。AntD 组件的对齐在 antd.css 里，不要混进这里。
+
+   一句话总结这套组件的做法：能用一条 1px 线说明白的，就不要用底色、
+   不要用边框盒子、更不要用投影。
+   ========================================================================== */
+
+/* --- 基础 ---------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--ap-bg);
+  color: var(--ap-text);
+  font-family: var(--ap-font);
+  font-size: var(--ap-fs-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* 机器产生的值一律等宽 + 表格数字，保证列与列竖直对齐 */
+.ap-mono {
+  font-family: var(--ap-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* 焦点环也是黑的 —— 这套设计里没有第二种强调色可用 */
+:focus-visible {
+  outline: 2px solid var(--ap-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+::selection { background: var(--ap-accent); color: var(--ap-text-inv); }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, .16);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, .28); background-clip: content-box; }
+
+
+/* ==========================================================================
+   外壳 —— 三块白，靠发丝线分开
+   ========================================================================== */
+.ap-app { display: flex; min-height: 100vh; }
+
+/* --- 侧栏 --- */
+.ap-rail {
+  width: var(--ap-w-rail); flex: none;
+  background: var(--ap-rail); color: var(--ap-text-2);
+  border-right: 1px solid var(--ap-card-line);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh;
+}
+.ap-brand {
+  display: flex; align-items: center; gap: 10px;
+  height: var(--ap-h-top); flex: none; padding: 0 var(--ap-sp-5);
+  border-bottom: 1px solid var(--ap-card-line);
+}
+/* 品牌标记是一枚黑方块，不是渐变色块 */
+.ap-logo {
+  width: 26px; height: 26px; flex: none; border-radius: 7px;
+  background: var(--ap-accent); color: var(--ap-text-inv);
+  display: grid; place-items: center;
+}
+.ap-logo svg { width: 15px; height: 15px; }
+.ap-brand-t {
+  font-family: var(--ap-font-d);
+  font-size: var(--ap-fs-lead); font-weight: 600; line-height: 1.2;
+  color: var(--ap-text); letter-spacing: var(--ap-tr-title);
+}
+
+.ap-nav { flex: 1; overflow-y: auto; padding: var(--ap-sp-3) var(--ap-sp-3) var(--ap-sp-6); }
+.ap-nav-g {
+  font-size: var(--ap-fs-micro); font-weight: 500; color: var(--ap-text-3);
+  padding: var(--ap-sp-5) 10px var(--ap-sp-2); letter-spacing: .04em;
+}
+.ap-nav-i {
+  display: flex; align-items: center; gap: 10px;
+  height: 36px; padding: 0 10px; margin-bottom: 2px;
+  border-radius: var(--ap-r-sm);
+  color: var(--ap-text-2); font-size: var(--ap-fs-body);
+  transition: background var(--ap-dur) var(--ap-ease), color var(--ap-dur) var(--ap-ease);
+}
+.ap-nav-i:hover { background: var(--ap-fill); color: var(--ap-text); }
+/* 当前项：浅灰底 + 墨黑字。没有投影、没有位移、没有右侧竖条。 */
+.ap-nav-i[aria-current="page"] {
+  background: var(--ap-fill); color: var(--ap-text); font-weight: 500;
+}
+.ap-nav-i svg { width: 16px; height: 16px; flex: none; opacity: .6; }
+.ap-nav-i:hover svg, .ap-nav-i[aria-current="page"] svg { opacity: 1; }
+.ap-nav-n {
+  margin-left: auto; font-variant-numeric: tabular-nums;
+  font-size: var(--ap-fs-meta); color: var(--ap-text-3);
+}
+
+.ap-rail-sep { display: none; }   /* 用户块自带上边线，不需要再来一条 */
+.ap-rail-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: var(--ap-sp-3) var(--ap-sp-5); flex: none;
+  border-top: 1px solid var(--ap-card-line);
+  cursor: pointer;
+  transition: background var(--ap-dur) var(--ap-ease);
+}
+.ap-rail-user:hover { background: var(--ap-fill); }
+.ap-ru-av {
+  width: 28px; height: 28px; flex: none; border-radius: 50%;
+  background: var(--ap-fill); color: var(--ap-text);
+  border: 1px solid var(--ap-card-line);
+  display: grid; place-items: center; font-size: var(--ap-fs-meta); font-weight: 500;
+}
+.ap-ru-n { font-size: var(--ap-fs-body); font-weight: 500; color: var(--ap-text); line-height: 1.35; }
+.ap-ru-r { font-size: var(--ap-fs-micro); color: var(--ap-text-3); line-height: 1.35; }
+.ap-ru-x { margin-left: auto; color: var(--ap-text-3); }
+.ap-ru-x svg { width: 14px; height: 14px; }
+
+/* --- 顶栏 --- */
+.ap-stage { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ap-topbar {
+  height: var(--ap-h-top); flex: none;
+  display: flex; align-items: center; gap: var(--ap-sp-3);
+  padding: 0 var(--ap-sp-8);
+  background: var(--ap-card); border-bottom: 1px solid var(--ap-card-line);
+  position: sticky; top: 0; z-index: 20;
+}
+.ap-crumb { font-size: var(--ap-fs-meta); color: var(--ap-text-3); }
+.ap-crumb i { font-style: normal; margin: 0 8px; color: var(--ap-field); }
+.ap-crumb b { color: var(--ap-text); font-weight: 500; }
+.ap-topbar-r { margin-left: auto; display: flex; align-items: center; gap: var(--ap-sp-2); }
+
+/* 搜索框是胶囊 —— 和按钮同形，顶栏里的东西形状统一 */
+.ap-search {
+  display: flex; align-items: center; gap: var(--ap-sp-2);
+  height: var(--ap-h-ctl); padding: 0 6px 0 13px; width: 260px;
+  background: var(--ap-card); border: 1px solid var(--ap-field);
+  border-radius: var(--ap-r-pill);
+  color: var(--ap-text-3); font-size: var(--ap-fs-meta); cursor: text;
+  transition: border-color var(--ap-dur) var(--ap-ease);
+}
+.ap-search:hover { border-color: var(--ap-text-3); }
+.ap-search svg { width: 15px; height: 15px; flex: none; }
+.ap-kbd {
+  margin-left: auto; font-size: var(--ap-fs-micro); line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ap-text-3); background: var(--ap-fill);
+  border-radius: var(--ap-r-pill); padding: 5px 8px;
+}
+.ap-icbtn {
+  width: var(--ap-h-ctl); height: var(--ap-h-ctl); display: grid; place-items: center;
+  border-radius: 50%; color: var(--ap-text-2);
+  background: none; border: 0; cursor: pointer; position: relative;
+  transition: background var(--ap-dur) var(--ap-ease), color var(--ap-dur) var(--ap-ease);
+}
+.ap-icbtn:hover { background: var(--ap-fill); color: var(--ap-text); }
+.ap-icbtn svg { width: 18px; height: 18px; }
+.ap-dot {
+  position: absolute; top: 7px; right: 8px; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--ap-bad); border: 1.5px solid var(--ap-card);
+}
+
+.ap-page {
+  flex: 1; padding: var(--ap-sp-8);
+  display: flex; flex-direction: column; gap: var(--ap-sp-7);
+}
+
+
+/* ==========================================================================
+   页头 —— 参照稿的骨架：一行小灰字，紧跟一个很大的紧字距标题
+   ========================================================================== */
+.ap-pagehead {
+  display: flex; align-items: flex-end; gap: var(--ap-sp-4); flex-wrap: wrap;
+  padding-bottom: var(--ap-sp-2);
+}
+.ap-page-title {
+  font-family: var(--ap-font-d);
+  font-size: var(--ap-fs-page); font-weight: 600;
+  letter-spacing: var(--ap-tr-page); line-height: 1.15; margin: 0;
+}
+.ap-page-sub {
+  font-size: var(--ap-fs-meta); color: var(--ap-text-3);
+  margin: var(--ap-sp-2) 0 0;
+}
+.ap-page-act { margin-left: auto; display: flex; gap: var(--ap-sp-2); }
+
+
+/* ==========================================================================
+   按钮 —— 全部胶囊。主操作实心黑，次操作白底描边，弱操作无框。
+   参照稿右下角就是这一对：Deny（描边）+ Allow（实心黑）。
+   ========================================================================== */
+.ap-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  height: var(--ap-h-ctl); padding: 0 18px;
+  font: inherit; font-size: var(--ap-fs-body); font-weight: 500;
+  letter-spacing: -.005em;
+  color: var(--ap-text); background: var(--ap-card);
+  border: 1px solid var(--ap-field); border-radius: var(--ap-r-pill);
+  cursor: pointer; white-space: nowrap;
+  transition: background var(--ap-dur) var(--ap-ease),
+              border-color var(--ap-dur) var(--ap-ease),
+              color var(--ap-dur) var(--ap-ease);
+}
+.ap-btn:hover { background: var(--ap-fill); }
+.ap-btn:active { background: var(--ap-fill-2); }
+.ap-btn svg { width: 15px; height: 15px; }
+
+/* 主操作 = 全页唯一的实心黑。一屏最多一个。 */
+.ap-btn-p {
+  background: var(--ap-accent); border-color: var(--ap-accent); color: var(--ap-text-inv);
+}
+.ap-btn-p:hover { background: var(--ap-accent-hover); border-color: var(--ap-accent-hover); }
+.ap-btn-p:active { background: var(--ap-accent); }
+
+.ap-btn-q { background: transparent; border-color: transparent; color: var(--ap-text-2); }
+.ap-btn-q:hover { background: var(--ap-fill); border-color: transparent; color: var(--ap-text); }
+
+.ap-btn-d { color: var(--ap-bad); border-color: var(--ap-field); }
+.ap-btn-d:hover { background: var(--ap-fill); border-color: var(--ap-bad); }
+
+.ap-btn-sm { height: 30px; padding: 0 13px; font-size: var(--ap-fs-meta); }
+.ap-btn-lg { height: var(--ap-h-ctl-lg); padding: 0 22px; font-size: var(--ap-fs-lead); }
+.ap-btn-block { width: 100%; }
+.ap-btn:disabled, .ap-btn[aria-disabled="true"] {
+  color: var(--ap-text-3); background: var(--ap-card);
+  border-color: var(--ap-line); cursor: not-allowed;
+}
+
+
+/* ==========================================================================
+   表单控件 —— 控件是圆角矩形，按钮是胶囊：形状本身区分"可输入"和"可点击"
+   ========================================================================== */
+.ap-field { display: flex; flex-direction: column; gap: var(--ap-sp-2); }
+.ap-label { font-size: var(--ap-fs-meta); font-weight: 500; color: var(--ap-text-2); }
+.ap-label-req::after {
+  content: "必填"; margin-left: 6px; font-size: var(--ap-fs-micro);
+  font-weight: 400; color: var(--ap-text-3);
+}
+.ap-hint { font-size: var(--ap-fs-meta); color: var(--ap-text-3); }
+.ap-hint-err { color: var(--ap-bad); }
+
+.ap-input, .ap-select {
+  height: var(--ap-h-ctl); width: 100%; padding: 0 13px;
+  font: inherit; font-size: var(--ap-fs-body); color: var(--ap-text);
+  background: var(--ap-card);
+  border: 1px solid var(--ap-field); border-radius: var(--ap-r-sm);
+  transition: border-color var(--ap-dur) var(--ap-ease), box-shadow var(--ap-dur) var(--ap-ease);
+}
+.ap-input::placeholder { color: var(--ap-text-3); }
+.ap-input:hover, .ap-select:hover { border-color: var(--ap-text-3); }
+.ap-input:focus, .ap-select:focus {
+  outline: none; border-color: var(--ap-accent);
+  box-shadow: 0 0 0 3px var(--ap-fill-2);
+}
+.ap-input[aria-invalid="true"] { border-color: var(--ap-bad); }
+.ap-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgba(180, 35, 24, .12); }
+.ap-input:disabled { background: var(--ap-fill); color: var(--ap-text-3); cursor: not-allowed; }
+.ap-input-lg { height: var(--ap-h-ctl-lg); }
+.ap-input-mono { font-family: var(--ap-mono); font-size: var(--ap-fs-meta); }
+
+.ap-select {
+  appearance: none; padding-right: 32px; cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23757575' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3.5 5.5 7 9l3.5-3.5'/></svg>");
+  background-repeat: no-repeat; background-position: right 11px center;
+}
+.ap-check { width: 15px; height: 15px; accent-color: var(--ap-accent); cursor: pointer; }
+
+
+/* ==========================================================================
+   卡片 —— 只有一条发丝外框和一个大圆角。零投影、零底色。
+   ========================================================================== */
+.ap-card {
+  background: var(--ap-card);
+  border: 1px solid var(--ap-card-line);
+  border-radius: var(--ap-r);
+  overflow: hidden;   /* 让内部的行分隔线在圆角处收得干净 */
+}
+.ap-card-h {
+  display: flex; align-items: center; gap: var(--ap-sp-3);
+  padding: var(--ap-sp-5) var(--ap-sp-6);
+  border-bottom: 1px solid var(--ap-line);
+}
+.ap-card-t {
+  font-family: var(--ap-font-d);
+  font-size: var(--ap-fs-title); font-weight: 600; margin: 0;
+  letter-spacing: var(--ap-tr-title);
+}
+.ap-card-n { font-size: var(--ap-fs-meta); color: var(--ap-text-3); }
+.ap-card-a { margin-left: auto; display: flex; align-items: center; gap: var(--ap-sp-2); }
+.ap-card-b { padding: var(--ap-sp-6); }
+
+/* 链接是黑字加发丝下划线 —— 没有链接蓝，也没有强调色 */
+.ap-link {
+  color: var(--ap-text); font-size: var(--ap-fs-meta); font-weight: 500;
+  text-decoration: underline; text-decoration-color: var(--ap-field);
+  text-underline-offset: 3px;
+}
+.ap-link:hover { text-decoration-color: var(--ap-text); }
+
+
+/* ==========================================================================
+   指标条 —— 不再是四张浮空卡片，而是一条被竖发丝线切成四段的带。
+   这是参照稿"行与行之间只有一条线"的横向版本。
+   有分母的画真实进度条，没分母的写清对比基准。绝不编百分比。
+   ========================================================================== */
+.ap-stats {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0;
+  border-top: 1px solid var(--ap-card-line);
+  border-bottom: 1px solid var(--ap-card-line);
+}
+.ap-stat { padding: var(--ap-sp-6) var(--ap-sp-6) var(--ap-sp-6) 0; }
+.ap-stat + .ap-stat {
+  border-left: 1px solid var(--ap-line);
+  padding-left: var(--ap-sp-6);
+}
+.ap-stat-l { font-size: var(--ap-fs-meta); font-weight: 400; color: var(--ap-text-3); }
+.ap-stat-v {
+  font-family: var(--ap-font-d); font-variant-numeric: tabular-nums;
+  font-size: var(--ap-fs-num); font-weight: 600; letter-spacing: var(--ap-tr-page);
+  line-height: 1.1; margin-top: var(--ap-sp-3);
+}
+.ap-stat-u {
+  font-size: var(--ap-fs-lead); font-weight: 400;
+  color: var(--ap-text-3); margin-left: 6px; letter-spacing: normal;
+}
+.ap-stat-d { font-size: var(--ap-fs-meta); color: var(--ap-text-3); margin-top: var(--ap-sp-3); }
+.ap-stat-d b { color: var(--ap-text); font-weight: 500; }
+/* 异常值不靠把整块数字染红，只在数字后面挂一个语义点 */
+.ap-stat-bad .ap-stat-v::after {
+  content: ""; display: inline-block; vertical-align: middle;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ap-bad); margin-left: 10px;
+}
+
+.ap-bar {
+  height: 3px; border-radius: 2px; background: var(--ap-line);
+  margin-top: var(--ap-sp-4); overflow: hidden;
+}
+.ap-bar i { display: block; height: 100%; border-radius: 2px; background: var(--ap-accent); }
+.ap-bar-w i { background: var(--ap-warn); }
+
+
+/* ==========================================================================
+   工具条 + 表格 —— 表头没有底色，只有一条线；行与行之间也只有一条线
+   ========================================================================== */
+.ap-tools {
+  display: flex; align-items: center; gap: var(--ap-sp-2);
+  padding: var(--ap-sp-4) var(--ap-sp-6); flex-wrap: wrap;
+  border-bottom: 1px solid var(--ap-line);
+}
+.ap-tools .ap-input, .ap-tools .ap-select { width: 170px; }
+.ap-tools-r { margin-left: auto; display: flex; align-items: center; gap: var(--ap-sp-2); }
+.ap-tools-s { font-size: var(--ap-fs-meta); color: var(--ap-text-3); padding-right: var(--ap-sp-2); }
+
+.ap-tbl-wrap { overflow-x: auto; }
+.ap-tbl { width: 100%; border-collapse: collapse; font-size: var(--ap-fs-body); }
+.ap-tbl th {
+  height: 44px; padding: 0 var(--ap-sp-4); text-align: left; white-space: nowrap;
+  font-size: var(--ap-fs-meta); font-weight: 400; color: var(--ap-text-3);
+  background: var(--ap-card); border-bottom: 1px solid var(--ap-card-line);
+  /* 注意：没有 text-transform / letter-spacing。
+     中文没有大小写，uppercase 无效，字距拉伸只会把词拆成孤字。 */
+}
+.ap-tbl th:first-child, .ap-tbl td:first-child { padding-left: var(--ap-sp-6); }
+.ap-tbl td {
+  height: var(--ap-h-row); padding: 0 var(--ap-sp-4); vertical-align: middle;
+  border-bottom: 1px solid var(--ap-line);
+}
+.ap-tbl tbody tr:last-child td { border-bottom: 0; }
+.ap-tbl tbody tr { transition: background var(--ap-dur) var(--ap-ease); }
+.ap-tbl tbody tr:hover td { background: var(--ap-hover); }
+.ap-tbl tbody tr[aria-selected="true"] td { background: var(--ap-fill); }
+.ap-tbl-sec { color: var(--ap-text-3); }
+.ap-tbl-time {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--ap-fs-meta); color: var(--ap-text-2);
+}
+.ap-tbl-act {
+  text-align: right; white-space: nowrap;
+  padding-right: var(--ap-sp-6) !important;
+}
+.ap-tbl-act .ap-btn-q { color: var(--ap-text-2); }
+
+/* 头像是中性的：浅灰底 + 黑字 + 发丝描边。
+   旧版用绿/琥珀/朱四色块区分人，在这套语言里属于噪音 ——
+   颜色只留给状态，人不是状态。 */
+.ap-who { display: flex; align-items: center; gap: var(--ap-sp-3); min-width: 0; }
+.ap-who-av {
+  width: 34px; height: 34px; flex: none; border-radius: 50%;
+  display: grid; place-items: center; font-size: var(--ap-fs-meta); font-weight: 500;
+  background: var(--ap-fill); color: var(--ap-text);
+  border: 1px solid var(--ap-card-line);
+}
+.ap-who-n { font-weight: 500; line-height: 1.35; }
+.ap-who-l {
+  font-size: var(--ap-fs-meta); color: var(--ap-text-3); line-height: 1.35;
+  font-family: var(--ap-mono);
+}
+
+/* 徽章：圆点 + 文字，没有底色填充。
+   点携带颜色，文字携带含义 —— 两者都在，色盲用户一样读得出。 */
+.ap-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: var(--ap-fs-body); font-weight: 400; white-space: nowrap;
+  color: var(--ap-text);
+}
+.ap-badge::before {
+  content: ""; width: 7px; height: 7px; flex: none;
+  border-radius: 50%; background: currentColor;
+}
+.ap-badge-ok::before { background: var(--ap-ok); }
+.ap-badge-wn::before { background: var(--ap-warn); }
+.ap-badge-bd::before { background: var(--ap-bad); }
+.ap-badge-nu { color: var(--ap-text-3); }
+.ap-badge-nu::before { background: var(--ap-field); }
+
+/* 标签是胶囊描边，不是彩色底块 */
+.ap-chip {
+  display: inline-flex; align-items: center; height: 26px; padding: 0 11px;
+  border-radius: var(--ap-r-pill); font-size: var(--ap-fs-meta); font-weight: 400;
+  background: var(--ap-card); color: var(--ap-text-2);
+  border: 1px solid var(--ap-card-line); white-space: nowrap;
+}
+.ap-chip-hi {
+  background: var(--ap-accent); color: var(--ap-text-inv);
+  border-color: var(--ap-accent); font-weight: 500;
+}
+.ap-chip-mono { font-family: var(--ap-mono); }
+
+.ap-pager {
+  display: flex; align-items: center; gap: var(--ap-sp-3);
+  padding: var(--ap-sp-4) var(--ap-sp-6); border-top: 1px solid var(--ap-line);
+  font-size: var(--ap-fs-meta); color: var(--ap-text-3); flex-wrap: wrap;
+}
+.ap-pager b { font-weight: 500; color: var(--ap-text); }
+.ap-pg-r { margin-left: auto; display: flex; gap: var(--ap-sp-1); }
+.ap-pg-b {
+  min-width: 32px; height: 32px; padding: 0 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font: inherit; font-size: var(--ap-fs-meta); color: var(--ap-text-2);
+  background: var(--ap-card); border: 1px solid var(--ap-field);
+  border-radius: var(--ap-r-pill); cursor: pointer;
+}
+.ap-pg-b:hover { background: var(--ap-fill); }
+.ap-pg-b[aria-current="page"] {
+  background: var(--ap-accent); border-color: var(--ap-accent);
+  color: var(--ap-text-inv); font-weight: 500;
+}
+.ap-pg-b:disabled { color: var(--ap-field); border-color: var(--ap-line); cursor: not-allowed; }
+
+
+/* ==========================================================================
+   授权行 —— 直接取自参照稿：一个线性图标 + 一句人话，行与行之间一条发丝线。
+   用在"这次操作到底会发生什么"必须逐条说清的地方：授权确认、变更影响、
+   危险操作二次确认。
+   ========================================================================== */
+.ap-rows { list-style: none; margin: 0; padding: 0; }
+.ap-rows li {
+  display: flex; align-items: center; gap: var(--ap-sp-4);
+  padding: var(--ap-sp-4) 0;
+  border-bottom: 1px solid var(--ap-line);
+  font-size: var(--ap-fs-lead);
+}
+.ap-rows li:last-child { border-bottom: 0; }
+.ap-rows svg { width: 18px; height: 18px; flex: none; color: var(--ap-text-2); }
+.ap-rows em {
+  font-style: normal; margin-left: auto;
+  font-size: var(--ap-fs-meta); color: var(--ap-text-3);
+}
+
+
+/* ==========================================================================
+   权限矩阵 —— 谁能碰什么，一屏之内看完。
+   已授权是实心黑，无权限是浅灰：靠明度而不是色相区分。
+   ========================================================================== */
+.ap-mx-wrap { overflow-x: auto; }
+.ap-mx { border-collapse: separate; border-spacing: 0; font-size: var(--ap-fs-meta); width: 100%; }
+.ap-mx th, .ap-mx td { border-bottom: 1px solid var(--ap-line); }
+.ap-mx thead th {
+  height: 44px; padding: 0 6px; white-space: nowrap; text-align: center;
+  font-size: var(--ap-fs-meta); font-weight: 400; color: var(--ap-text-3);
+  border-bottom-color: var(--ap-card-line);
+}
+.ap-mx thead th:first-child { text-align: left; padding-left: var(--ap-sp-6); }
+.ap-mx tbody th {
+  height: 48px; padding: 0 var(--ap-sp-4) 0 var(--ap-sp-6);
+  text-align: left; font-size: var(--ap-fs-body); font-weight: 400; white-space: nowrap;
+}
+.ap-mx tbody tr:last-child th, .ap-mx tbody tr:last-child td { border-bottom: 0; }
+.ap-mx td { text-align: center; padding: 0; width: 48px; }
+.ap-mx-n {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--ap-fs-meta); color: var(--ap-text-3); float: right;
+}
+/* 十字高亮：矩阵没有交叉参照就没法读 —— 停在一格上必须同时知道
+   「哪个角色」和「哪个资源」。这是可用性前提，不是装饰动画。 */
+.ap-mx tbody tr[data-hot] th, .ap-mx tbody tr[data-hot] td { background: var(--ap-hover); }
+.ap-mx td[data-hot], .ap-mx thead th[data-hot] { background: var(--ap-fill); }
+.ap-mx tbody tr[data-hot] td[data-hot] { background: var(--ap-fill-2); }
+
+.ap-k { display: inline-block; width: 16px; height: 16px; border-radius: 5px; vertical-align: middle; }
+.ap-k-all { background: var(--ap-accent); }
+.ap-k-part { background: var(--ap-card); box-shadow: inset 0 0 0 1.5px var(--ap-accent); }
+.ap-k-part::after {
+  content: ""; display: block; width: 8px; height: 8px;
+  margin: 4px; border-radius: 2px; background: var(--ap-accent);
+}
+.ap-k-no { background: var(--ap-fill-2); }
+.ap-k-na { width: 10px; height: 1.5px; border-radius: 1px; background: var(--ap-field); }
+
+.ap-legend {
+  display: flex; align-items: center; gap: var(--ap-sp-6); flex-wrap: wrap;
+  padding: var(--ap-sp-4) var(--ap-sp-6); border-top: 1px solid var(--ap-line);
+  font-size: var(--ap-fs-meta); color: var(--ap-text-3);
+}
+.ap-legend span { display: inline-flex; align-items: center; gap: var(--ap-sp-2); }
+
+
+/* ==========================================================================
+   动态流
+   ========================================================================== */
+.ap-feed { list-style: none; margin: 0; padding: 0; }
+.ap-feed li {
+  display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: var(--ap-sp-3);
+  padding: var(--ap-sp-4) var(--ap-sp-6);
+  border-bottom: 1px solid var(--ap-line);
+  transition: background var(--ap-dur) var(--ap-ease);
+}
+.ap-feed li:last-child { border-bottom: 0; }
+.ap-feed li:hover { background: var(--ap-hover); }
+.ap-f-av {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  font-size: var(--ap-fs-meta); font-weight: 500;
+  background: var(--ap-fill); color: var(--ap-text); border: 1px solid var(--ap-card-line);
+  position: relative;
+}
+/* 需要标状态的条目，在头像右下角点一个语义点 —— 不给整个头像染色 */
+.ap-f-av.ok::after, .ap-f-av.wn::after, .ap-f-av.bd::after {
+  content: ""; position: absolute; right: -1px; bottom: -1px;
+  width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--ap-card);
+}
+.ap-f-av.ok::after { background: var(--ap-ok); }
+.ap-f-av.wn::after { background: var(--ap-warn); }
+.ap-f-av.bd::after { background: var(--ap-bad); }
+.ap-f-t { font-size: var(--ap-fs-body); line-height: 1.5; min-width: 0; }
+.ap-f-t b { font-weight: 500; }
+.ap-f-m {
+  display: block;   /* 必须成块，否则主文一短，说明就跟着挤到同一行 */
+  font-size: var(--ap-fs-meta); color: var(--ap-text-3); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ap-f-time {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--ap-fs-meta); color: var(--ap-text-3); float: right; margin-left: var(--ap-sp-3);
+}
+
+
+/* ==========================================================================
+   键值表 / 空状态 / 浮层
+   ========================================================================== */
+.ap-kv {
+  display: grid; grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: var(--ap-sp-6); font-size: var(--ap-fs-body);
+}
+.ap-kv-k { color: var(--ap-text-3); padding: var(--ap-sp-3) 0; border-bottom: 1px solid var(--ap-line); }
+.ap-kv-v {
+  color: var(--ap-text); padding: var(--ap-sp-3) 0; text-align: right;
+  border-bottom: 1px solid var(--ap-line);
+  font-family: var(--ap-mono); font-variant-numeric: tabular-nums; font-size: var(--ap-fs-meta);
+}
+.ap-kv > :nth-last-child(-n+2) { border-bottom: 0; }
+
+/* 空状态：一句说明 + 一个动作。不放插画。 */
+.ap-empty { padding: 72px var(--ap-sp-6); text-align: center; }
+.ap-empty-t {
+  font-family: var(--ap-font-d);
+  font-size: var(--ap-fs-title); font-weight: 500; color: var(--ap-text);
+  letter-spacing: var(--ap-tr-title); margin: 0;
+}
+.ap-empty-h { font-size: var(--ap-fs-meta); color: var(--ap-text-3); margin: var(--ap-sp-2) 0 var(--ap-sp-5); }
+
+/* 浮层是全站唯一带投影的东西 */
+.ap-overlay {
+  width: 100%; max-width: 460px; background: var(--ap-card);
+  border: 1px solid var(--ap-card-line); border-radius: var(--ap-r);
+  box-shadow: var(--ap-shadow-lg);
+}
+.ap-ov-h { padding: var(--ap-sp-6) var(--ap-sp-6) var(--ap-sp-4); }
+.ap-ov-t {
+  font-family: var(--ap-font-d);
+  font-size: 22px; font-weight: 600; letter-spacing: var(--ap-tr-page);
+}
+.ap-ov-b {
+  padding: var(--ap-sp-2) var(--ap-sp-6) var(--ap-sp-6);
+  display: flex; flex-direction: column; gap: var(--ap-sp-5);
+}
+/* 页脚没有分隔线也没有灰底，两枚胶囊直接站在白底上 —— 和参照稿一致 */
+.ap-ov-f {
+  display: flex; justify-content: flex-end; gap: var(--ap-sp-3);
+  padding: 0 var(--ap-sp-6) var(--ap-sp-6);
+}
+
+
+/* ==========================================================================
+   栅格
+   ========================================================================== */
+.ap-cols { display: grid; gap: var(--ap-sp-6); align-items: start; }
+.ap-cols-2-1 { grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); }
+.ap-cols-1-1 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ap-row { display: flex; align-items: center; gap: var(--ap-sp-2); }
+.ap-stack { display: flex; flex-direction: column; gap: var(--ap-sp-6); }
+
+
+/* ==========================================================================
+   响应式
+   ========================================================================== */
+@media (max-width: 1280px) {
+  .ap-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ap-stat:nth-child(3) { border-left: 0; padding-left: 0; }
+  .ap-stat:nth-child(n+3) { border-top: 1px solid var(--ap-line); }
+}
+@media (max-width: 1100px) { .ap-cols-2-1, .ap-cols-1-1 { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 820px) {
+  .ap-rail { display: none; }
+  .ap-page { padding: var(--ap-sp-5); gap: var(--ap-sp-6); }
+  .ap-topbar { padding: 0 var(--ap-sp-5); }
+  .ap-search { display: none; }
+  .ap-page-title { font-size: 24px; }
+}

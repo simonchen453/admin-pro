@@ -1,22 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Row, Col, Statistic, Button, List, Avatar, Tag, Space, Typography, Empty, Spin, Descriptions, Tooltip } from 'antd';
+import { Button, Empty, Spin } from 'antd';
 import {
   UserOutlined,
   TeamOutlined,
   ApartmentOutlined,
-  WifiOutlined,
   SettingOutlined,
   MenuOutlined,
-  ToolOutlined,
   FileTextOutlined,
   ClockCircleOutlined,
   DatabaseOutlined,
   SafetyOutlined,
-  ThunderboltOutlined,
-  BarChartOutlined,
-  ArrowUpOutlined,
-  ArrowDownOutlined,
-  CheckCircleOutlined
+  BarChartOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getSystemInfoApi, getStatisticsApi, getRecentActivitiesApi, type RecentActivity as ApiRecentActivity } from '../api/common';
@@ -30,22 +24,26 @@ import './Home.css';
 dayjs.extend(relativeTime);
 dayjs.locale('zh-cn');
 
-const { Title, Text } = Typography;
+/* 首页重做的依据：管理员打开后台不是来被欢迎的，是来确认「系统现在是否正常、
+   有没有需要我处理的事」。所以砍掉了渐变欢迎横幅和图标的彩色圆底。
 
-interface StatisticCard {
-  title: string;
+   更要紧的一处：旧版四张统计卡上挂着 trend: 5.2 / 2.1 / 0 / -1.5，
+   这四个数字是写死在代码里的装饰，接口从来没返回过同比。在一套管理真实
+   权限的系统里显示编出来的数字是不能接受的 —— 一起删了。
+   现在这条带子上的每个数都来自 /common/statistics。 */
+
+interface StatisticItem {
+  label: string;
   value: number | string;
-  icon: React.ReactNode;
-  color: string;
-  bgGradient: string;
-  trend?: number; // Mock trend data for visual effect
+  /** 有对应页面才给链接，没有就不给 —— 不编入口 */
+  to?: string;
+  toLabel?: string;
 }
 
 interface QuickAction {
   title: string;
   icon: React.ReactNode;
   path: string;
-  color: string;
 }
 
 interface RecentActivity {
@@ -57,35 +55,28 @@ interface RecentActivity {
   user?: string;
 }
 
+const QUICK_ACTIONS: QuickAction[] = [
+  { title: '用户管理', icon: <UserOutlined />, path: '/admin/user' },
+  { title: '角色管理', icon: <TeamOutlined />, path: '/admin/role' },
+  { title: '菜单管理', icon: <MenuOutlined />, path: '/admin/menu' },
+  { title: '部门管理', icon: <ApartmentOutlined />, path: '/admin/dept' },
+  { title: '岗位管理', icon: <FileTextOutlined />, path: '/admin/post' },
+  { title: '参数配置', icon: <SettingOutlined />, path: '/admin/config' },
+  { title: '字典管理', icon: <DatabaseOutlined />, path: '/admin/dict' },
+  { title: '定时任务', icon: <ClockCircleOutlined />, path: '/admin/job' },
+  { title: '服务器监控', icon: <BarChartOutlined />, path: '/admin/server' },
+  { title: '系统日志', icon: <FileTextOutlined />, path: '/admin/syslog' },
+  { title: '审计日志', icon: <SafetyOutlined />, path: '/admin/audit' },
+];
+
 function Home() {
   const navigate = useNavigate();
   const { currentUser } = useAuthStore();
   const [loading, setLoading] = useState(true);
-  const [statistics, setStatistics] = useState<StatisticCard[]>([]);
+  const [statistics, setStatistics] = useState<StatisticItem[]>([]);
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
-
-  const quickActions: QuickAction[] = [
-    { title: '用户管理', icon: <UserOutlined />, path: '/admin/user', color: '#6366f1' },
-    { title: '角色管理', icon: <TeamOutlined />, path: '/admin/role', color: '#8b5cf6' },
-    { title: '菜单管理', icon: <MenuOutlined />, path: '/admin/menu', color: '#ec4899' },
-    { title: '部门管理', icon: <ApartmentOutlined />, path: '/admin/dept', color: '#10b981' },
-    { title: '岗位管理', icon: <FileTextOutlined />, path: '/admin/post', color: '#f59e0b' },
-    { title: '参数配置', icon: <SettingOutlined />, path: '/admin/config', color: '#3b82f6' },
-    { title: '字典管理', icon: <DatabaseOutlined />, path: '/admin/dict', color: '#ef4444' },
-    { title: '定时任务', icon: <ClockCircleOutlined />, path: '/admin/job', color: '#f97316' },
-    { title: '服务器监控', icon: <BarChartOutlined />, path: '/admin/server', color: '#06b6d4' },
-    { title: '系统日志', icon: <FileTextOutlined />, path: '/admin/syslog', color: '#64748b' },
-    { title: '审计日志', icon: <SafetyOutlined />, path: '/admin/audit', color: '#84cc16' },
-  ];
-
-  const handleQuickActionClick = useCallback((path: string) => {
-    return (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-      navigate(path);
-    };
-  }, [navigate]);
+  const [fetchedAt, setFetchedAt] = useState<string>('');
 
   const convertApiActivityToActivity = (apiActivity: ApiRecentActivity): RecentActivity => {
     let time = '未知时间';
@@ -106,230 +97,159 @@ function Home() {
     };
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [sysInfoRes, statsRes, activitiesRes] = await Promise.all([
-          getSystemInfoApi(),
-          getStatisticsApi(),
-          getRecentActivitiesApi()
-        ]);
+  const fetchData = useCallback(async () => {
+    try {
+      const [sysInfoRes, statsRes, activitiesRes] = await Promise.all([
+        getSystemInfoApi(),
+        getStatisticsApi(),
+        getRecentActivitiesApi()
+      ]);
 
-        if (sysInfoRes.success) {
-          setSystemInfo(sysInfoRes.data);
-        }
-
-        if (statsRes.success) {
-          const stats = statsRes.data;
-          setStatistics([
-            {
-              title: '用户总数',
-              value: stats.userCount,
-              icon: <UserOutlined />,
-              color: '#6366f1',
-              bgGradient: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.2) 100%)',
-              trend: 5.2
-            },
-            {
-              title: '角色数量',
-              value: stats.roleCount,
-              icon: <TeamOutlined />,
-              color: '#8b5cf6',
-              bgGradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.2) 100%)',
-              trend: 2.1
-            },
-            {
-              title: '部门数量',
-              value: stats.deptCount,
-              icon: <ApartmentOutlined />,
-              color: '#10b981',
-              bgGradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.2) 100%)',
-              trend: 0
-            },
-            {
-              title: '在线会话',
-              value: stats.sessionCount,
-              icon: <WifiOutlined />,
-              color: '#f59e0b',
-              bgGradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.2) 100%)',
-              trend: -1.5
-            },
-          ]);
-        }
-
-        if (activitiesRes.success && Array.isArray(activitiesRes.data)) {
-          const formattedActivities = activitiesRes.data.map(convertApiActivityToActivity);
-          setRecentActivities(formattedActivities);
-        }
-      } catch (error) {
-        console.error('Failed to fetch home data:', error);
-      } finally {
-        setLoading(false);
+      if (sysInfoRes.success) {
+        setSystemInfo(sysInfoRes.data);
       }
-    };
 
-    fetchData();
+      if (statsRes.success) {
+        const stats = statsRes.data;
+        setStatistics([
+          { label: '用户总数', value: stats.userCount, to: '/admin/user', toLabel: '用户管理' },
+          { label: '角色数量', value: stats.roleCount, to: '/admin/role', toLabel: '角色管理' },
+          { label: '部门数量', value: stats.deptCount, to: '/admin/dept', toLabel: '部门管理' },
+          { label: '在线会话', value: stats.sessionCount },
+        ]);
+      }
+
+      if (activitiesRes.success && Array.isArray(activitiesRes.data)) {
+        setRecentActivities(activitiesRes.data.map(convertApiActivityToActivity));
+      }
+
+      setFetchedAt(dayjs().format('YYYY-MM-DD HH:mm:ss'));
+    } catch (error) {
+      console.error('Failed to fetch home data:', error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'login':
-        return <CheckCircleOutlined style={{ color: '#10b981' }} />;
-      case 'operation':
-        return <ToolOutlined style={{ color: '#3b82f6' }} />;
-      case 'system':
-        return <SafetyOutlined style={{ color: '#ef4444' }} />;
-      default:
-        return <ClockCircleOutlined style={{ color: '#64748b' }} />;
-    }
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  /* 动态里只有「登录成功」是我们确定知道结果的一类，给它一个绿点。
+     其余的既不是成功也不是失败，就别用颜色暗示。 */
+  const activityDotClass = (type: string) => (type === 'login' ? 'ok' : '');
+
+  const displayName = currentUser?.realName || currentUser?.loginName || '管理员';
 
   if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Spin size="large" />
-      </div>
-    );
+    return <div className="hm-loading"><Spin size="large" /></div>;
   }
 
   return (
-    <div className="home-container fade-in">
-      {/* Welcome Banner */}
-      <div className="home-header-section">
-        <Card className="welcome-banner" variant="borderless">
-          <div className="welcome-content">
-            <Title level={2} style={{ color: '#fff', marginBottom: 8 }}>
-              欢迎回来，{currentUser?.realName || currentUser?.loginName || 'Admin'}
-            </Title>
-            <Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '16px' }}>
-              AdminPro 开发平台 - 准备好开始一天的工作了吗？
-            </Text>
-          </div>
-          <div className="welcome-decoration">
-            <ThunderboltOutlined style={{ fontSize: '120px', color: 'rgba(255, 255, 255, 0.1)' }} />
-          </div>
-        </Card>
+    <>
+      <div className="ap-pagehead">
+        <div>
+          <h1 className="ap-page-title">工作台</h1>
+          <p className="ap-page-sub">
+            欢迎回来，{displayName}
+            {fetchedAt && <> · 数据截至 <span className="ap-mono">{fetchedAt}</span></>}
+          </p>
+        </div>
+        <div className="ap-page-act">
+          <Button onClick={fetchData}>刷新</Button>
+          <Button type="primary" onClick={() => navigate('/admin/user')}>用户管理</Button>
+        </div>
       </div>
 
-      {/* Statistics Cards */}
-      <Row gutter={[24, 24]} style={{ marginBottom: 32 }}>
-        {statistics.map((stat, index) => (
-          <Col xs={24} sm={12} lg={6} key={index}>
-            <Card className="statistic-card modern-card" variant="borderless">
-              <div className="statistic-content">
-                <div className="statistic-icon-wrapper" style={{ background: stat.bgGradient, color: stat.color }}>
-                  {stat.icon}
+      {/* 统计带：四个数字并排，靠竖直发丝线分开，不是四张浮着的卡片 */}
+      {statistics.length > 0 && (
+        <section className="ap-stats">
+          {statistics.map((stat) => (
+            <div className="ap-stat" key={stat.label}>
+              <div className="ap-stat-l">{stat.label}</div>
+              <div className="ap-stat-v">{stat.value}</div>
+              {stat.to && (
+                <div className="ap-stat-d">
+                  <a className="ap-link" onClick={() => navigate(stat.to!)}>{stat.toLabel}</a>
                 </div>
-                <div className="statistic-info">
-                  <Text type="secondary" style={{ fontSize: '14px' }}>{stat.title}</Text>
-                  <div className="statistic-value-row">
-                    <Title level={3} style={{ margin: 0 }}>{stat.value}</Title>
-                    {stat.trend !== undefined && stat.trend !== 0 && (
-                      <div className={`statistic-trend ${stat.trend > 0 ? 'trend-up' : 'trend-down'}`}>
-                        {stat.trend > 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-                        <span>{Math.abs(stat.trend)}%</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-
-      <Row gutter={[24, 24]}>
-        {/* Quick Actions */}
-        <Col xs={24} lg={16}>
-          <Card
-            title={<Space><ThunderboltOutlined style={{ color: '#6366f1' }} /><span>快速操作</span></Space>}
-            className="modern-card"
-            variant="borderless"
-            style={{ height: '100%' }}
-          >
-            <Row gutter={[16, 16]}>
-              {quickActions.map((action, index) => (
-                <Col xs={12} sm={8} md={6} lg={4} key={index}>
-                  <Button
-                    className="quick-action-btn"
-                    onClick={handleQuickActionClick(action.path)}
-                  >
-                    <div className="quick-action-icon" style={{ color: action.color, background: `${action.color}15` }}>
-                      {action.icon}
-                    </div>
-                    <span className="quick-action-title">{action.title}</span>
-                  </Button>
-                </Col>
-              ))}
-            </Row>
-          </Card>
-        </Col>
-
-        {/* Recent Activities */}
-        <Col xs={24} lg={8}>
-          <Card
-            title={<Space><ClockCircleOutlined style={{ color: '#6366f1' }} /><span>最近活动</span></Space>}
-            className="modern-card"
-            variant="borderless"
-            style={{ height: '100%' }}
-          >
-            <div className="activity-timeline">
-              {recentActivities.length > 0 ? (
-                <List
-                  itemLayout="horizontal"
-                  dataSource={recentActivities}
-                  renderItem={(item) => (
-                    <List.Item className="activity-item">
-                      <List.Item.Meta
-                        avatar={
-                          <div className="activity-avatar">
-                            {getActivityIcon(item.type)}
-                          </div>
-                        }
-                        title={
-                          <Space size={4}>
-                            <Text strong>{item.title}</Text>
-                            <Text type="secondary" style={{ fontSize: '12px' }}>{item.time}</Text>
-                          </Space>
-                        }
-                        description={
-                          <div className="activity-description">
-                            {item.user && <Tag color="blue" style={{ marginRight: 4 }}>{item.user}</Tag>}
-                            <Text type="secondary" ellipsis={{ tooltip: item.description }} style={{ maxWidth: 200 }}>
-                              {item.description}
-                            </Text>
-                          </div>
-                        }
-                      />
-                    </List.Item>
-                  )}
-                />
-              ) : (
-                <Empty description="暂无活动" image={Empty.PRESENTED_IMAGE_SIMPLE} />
               )}
             </div>
-          </Card>
-        </Col>
-      </Row>
+          ))}
+        </section>
+      )}
 
-      {/* System Info */}
-      <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-        <Col span={24}>
-          <Card
-            title={<Space><SettingOutlined style={{ color: '#6366f1' }} /><span>系统信息</span></Space>}
-            className="modern-card"
-            variant="borderless"
-          >
-            <Descriptions bordered column={{ xxl: 4, xl: 3, lg: 3, md: 3, sm: 2, xs: 1 }} size="small" className="custom-descriptions">
-              <Descriptions.Item label="系统名称">{systemInfo?.sys?.computerName || '-'}</Descriptions.Item>
-              <Descriptions.Item label="操作系统">{systemInfo?.sys?.osName || '-'}</Descriptions.Item>
-              <Descriptions.Item label="系统架构">{systemInfo?.sys?.osArch || '-'}</Descriptions.Item>
-              <Descriptions.Item label="Java版本">{systemInfo?.jvm?.version || '-'}</Descriptions.Item>
-            </Descriptions>
-          </Card>
-        </Col>
-      </Row>
-    </div>
+      <div className="ap-cols ap-cols-2-1">
+        <section className="ap-card">
+          <div className="ap-card-h">
+            <h2 className="ap-card-t">快速操作</h2>
+            <span className="ap-card-n">{QUICK_ACTIONS.length} 个入口</span>
+          </div>
+          {/* 发丝线织成的格子，不是十一个彩色圆底图标 */}
+          <div className="hm-acts">
+            {QUICK_ACTIONS.map((action) => (
+              <button
+                type="button"
+                className="hm-act"
+                key={action.path + action.title}
+                onClick={() => navigate(action.path)}
+              >
+                {action.icon}
+                <span>{action.title}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="ap-card">
+          <div className="ap-card-h">
+            <h2 className="ap-card-t">近期动态</h2>
+            <div className="ap-card-a">
+              <a className="ap-link" onClick={() => navigate('/admin/syslog')}>全部日志</a>
+            </div>
+          </div>
+          {recentActivities.length > 0 ? (
+            <ul className="ap-feed">
+              {recentActivities.map((item) => (
+                <li key={item.id}>
+                  <span className={`ap-f-av ${activityDotClass(item.type)}`}>
+                    {(item.user || item.title || '·').slice(0, 1)}
+                  </span>
+                  <span className="ap-f-t">
+                    <span className="ap-f-time">{item.time}</span>
+                    {item.user && <b>{item.user}</b>} {item.title}
+                    {item.description && <span className="ap-f-m">{item.description}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="ap-card-b">
+              <Empty description="暂无活动" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            </div>
+          )}
+        </section>
+      </div>
+
+      <section className="ap-card">
+        <div className="ap-card-h"><h2 className="ap-card-t">运行信息</h2></div>
+        <div className="ap-card-b">
+          <div className="ap-kv">
+            <span className="ap-kv-k">系统名称</span>
+            <span className="ap-kv-v">{systemInfo?.sys?.computerName || '-'}</span>
+            <span className="ap-kv-k">操作系统</span>
+            <span className="ap-kv-v">{systemInfo?.sys?.osName || '-'}</span>
+            <span className="ap-kv-k">系统架构</span>
+            <span className="ap-kv-v">{systemInfo?.sys?.osArch || '-'}</span>
+            <span className="ap-kv-k">Java 版本</span>
+            <span className="ap-kv-v">{systemInfo?.jvm?.version || '-'}</span>
+            <span className="ap-kv-k">应用版本</span>
+            <span className="ap-kv-v">{systemInfo?.releaseVersion || '-'}</span>
+            <span className="ap-kv-k">构建版本</span>
+            <span className="ap-kv-v">{systemInfo?.buildVersion || '-'}</span>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
 

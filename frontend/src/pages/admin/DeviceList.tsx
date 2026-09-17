@@ -129,12 +129,13 @@ const DeviceList: React.FC = () => {
             key: 'userInfo',
             render: (_, record) => (
                 <Space>
-                    <div style={{ padding: 8, background: '#f0f5ff', borderRadius: '50%' }}>
-                        <UserOutlined style={{ color: '#2f54eb' }} />
+                    {/* 头像是中性的：这里的蓝没有任何含义，不该抢走真正有语义的那点颜色 */}
+                    <div style={{ padding: 8, background: 'var(--ap-fill)', borderRadius: '50%', border: '1px solid var(--ap-card-line)', lineHeight: 0 }}>
+                        <UserOutlined style={{ color: 'var(--ap-text-2)' }} />
                     </div>
                     <div>
                         <div style={{ fontWeight: 500 }}>{record.realName}</div>
-                        <div style={{ fontSize: 12, color: '#8c8c8c' }}>@{record.loginName}</div>
+                        <div style={{ fontSize: 12, color: 'var(--ap-text-3)' }}>@{record.loginName}</div>
                     </div>
                 </Space>
             )
@@ -150,12 +151,12 @@ const DeviceList: React.FC = () => {
             key: 'deviceInfo',
             render: (_, record) => (
                 <Space>
-                    <div style={{ fontSize: 18, color: '#595959' }}>
+                    <div style={{ fontSize: 18, color: 'var(--ap-text-2)' }}>
                         {getPlatformIcon(record.platform)}
                     </div>
                     <div>
                         <div style={{ fontWeight: 500 }}>{record.deviceName}</div>
-                        <div style={{ fontSize: 12, color: '#bfbfbf' }}>{record.platform}</div>
+                        <div style={{ fontSize: 12, color: 'var(--ap-text-3)' }}>{record.platform}</div>
                     </div>
                 </Space>
             )
@@ -182,7 +183,7 @@ const DeviceList: React.FC = () => {
             dataIndex: 'lastActiveAt',
             key: 'lastActiveAt',
             width: 250,
-            render: (text) => <span style={{ color: '#8c8c8c' }}>{text}</span>
+            render: (text) => <span style={{ color: 'var(--ap-text-3)' }}>{text}</span>
         },
         {
             title: '操作',
@@ -210,17 +211,17 @@ const DeviceList: React.FC = () => {
                     <Row gutter={24}>
                         <Col xs={24} sm={8} md={6}>
                             <Form.Item name="loginName" label="登录名">
-                                <Input placeholder="请输入登录名" prefix={<UserOutlined style={{ color: '#d9d9d9' }} />} allowClear />
+                                <Input placeholder="请输入登录名" prefix={<UserOutlined style={{ color: 'var(--ap-text-3)' }} />} allowClear />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={8} md={6}>
                             <Form.Item name="userDomain" label="用户域">
-                                <Input placeholder="请输入用户域" prefix={<GlobalOutlined style={{ color: '#d9d9d9' }} />} allowClear />
+                                <Input placeholder="请输入用户域" prefix={<GlobalOutlined style={{ color: 'var(--ap-text-3)' }} />} allowClear />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={8} md={6}>
                             <Form.Item name="deviceName" label="设备名称">
-                                <Input placeholder="请输入设备名称" prefix={<DesktopOutlined style={{ color: '#d9d9d9' }} />} allowClear />
+                                <Input placeholder="请输入设备名称" prefix={<DesktopOutlined style={{ color: 'var(--ap-text-3)' }} />} allowClear />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>

@@ -326,12 +326,12 @@ const RoleList: React.FC = () => {
           <Row gutter={24}>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="name" label="编号">
-                <Input placeholder="请输入编号" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入编号" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="display" label="显示名称">
-                <Input placeholder="请输入显示名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入显示名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6}>

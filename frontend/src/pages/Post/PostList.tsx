@@ -286,12 +286,12 @@ const PostList: React.FC = () => {
           <Row gutter={24}>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="code" label="岗位编码">
-                <Input placeholder="请输入岗位编码" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入岗位编码" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="name" label="岗位名称">
-                <Input placeholder="请输入岗位名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入岗位名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6}>

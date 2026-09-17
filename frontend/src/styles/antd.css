@@ -1,0 +1,520 @@
+/* ==========================================================================
+   AdminPro · Ant Design 对齐层
+   --------------------------------------------------------------------------
+   theme.ts 的 ThemeConfig 能改的（色、圆角、控件高、字号）都在那边改；
+   这里只写 token 够不到的东西：伪元素、底色块、表头分隔条、菜单缩进……
+
+   文件后半段是**旧类名的重新定义**。全站 20 多个页面都在用
+   .modern-card / .modern-table / .fade-in，与其去改 22 个文件，
+   不如把这几个名字在新语言里重新定义一遍 —— 页面一行不动，观感全换。
+   ========================================================================== */
+
+/* ==========================================================================
+   A · 外壳
+   ========================================================================== */
+.ant-layout,
+.ant-layout-content,
+.ant-layout-header,
+.ant-layout-footer,
+.ant-layout-sider,
+.ant-layout-sider-children { background: var(--ap-bg); }
+
+.ant-layout-sider { border-right: 1px solid var(--ap-card-line); }
+
+/* 侧栏的折叠触发器：AntD 默认给深底，这里回到白 + 上边线 */
+.ant-layout-sider-trigger {
+  background: var(--ap-card) !important;
+  color: var(--ap-text-2) !important;
+  border-top: 1px solid var(--ap-card-line);
+}
+.ant-layout-sider-trigger:hover { background: var(--ap-fill) !important; color: var(--ap-text) !important; }
+
+
+/* ==========================================================================
+   B · 菜单 —— 当前项是浅灰底 + 墨黑字，没有投影、没有位移、没有竖条
+   ========================================================================== */
+.ant-menu-light,
+.ant-menu-light .ant-menu-sub.ant-menu-inline { background: transparent; }
+.ant-menu-inline { border-inline-end: 0 !important; }
+
+.ant-menu-inline .ant-menu-item,
+.ant-menu-inline .ant-menu-submenu-title {
+  height: 36px;
+  line-height: 36px;
+  border-radius: var(--ap-r-sm);
+  font-size: var(--ap-fs-body);
+  font-weight: 400;
+  transition: background var(--ap-dur) var(--ap-ease), color var(--ap-dur) var(--ap-ease);
+}
+.ant-menu-inline .ant-menu-item-selected { font-weight: 500; }
+
+/* 子菜单不再压深一层底色 —— 层级靠缩进和分组标题表达 */
+.ant-menu-sub.ant-menu-inline { background: transparent !important; box-shadow: none !important; }
+.ant-menu-sub.ant-menu-inline > .ant-menu-item { font-size: var(--ap-fs-body); }
+
+.ant-menu-item .ant-menu-item-icon,
+.ant-menu-submenu-title .ant-menu-item-icon {
+  font-size: 16px;
+  opacity: .6;
+  transition: opacity var(--ap-dur) var(--ap-ease);
+}
+.ant-menu-item:hover .ant-menu-item-icon,
+.ant-menu-item-selected .ant-menu-item-icon,
+.ant-menu-submenu-title:hover .ant-menu-item-icon { opacity: 1; }
+
+.ant-menu-item-group-title {
+  font-size: var(--ap-fs-micro);
+  color: var(--ap-text-3);
+  letter-spacing: .04em;
+  padding-block: var(--ap-sp-5) var(--ap-sp-2);
+}
+
+
+/* ==========================================================================
+   C · 卡片 —— 一条发丝外框 + 14 圆角，零投影零底色
+   ========================================================================== */
+.ant-card {
+  border: 1px solid var(--ap-card-line);
+  border-radius: var(--ap-r);
+  box-shadow: none !important;
+}
+.ant-card-bordered { border-color: var(--ap-card-line); }
+.ant-card-head {
+  border-bottom: 1px solid var(--ap-line);
+  padding-inline: var(--ap-sp-6);
+  min-height: 60px;
+}
+.ant-card-head-title {
+  font-family: var(--ap-font-d);
+  font-size: var(--ap-fs-title);
+  font-weight: 600;
+  letter-spacing: var(--ap-tr-title);
+}
+.ant-card-extra { font-size: var(--ap-fs-meta); }
+.ant-card-body { padding: var(--ap-sp-6); }
+
+/* 卡片里直接放表格时，表格自己有边线，卡片不要再加一圈内边距 */
+.ant-card-body > .ant-table-wrapper:only-child,
+.ant-card-body > .modern-table:only-child { margin: calc(var(--ap-sp-6) * -1); }
+
+
+/* ==========================================================================
+   D · 表格 —— 表头没有底色只有一条线；行高 60，留白是主料
+   ========================================================================== */
+.ant-table { background: transparent; font-size: var(--ap-fs-body); }
+
+.ant-table-thead > tr > th {
+  background: var(--ap-card) !important;
+  color: var(--ap-text-3) !important;
+  font-size: var(--ap-fs-meta);
+  font-weight: 400 !important;
+  padding-block: 11px !important;
+  border-bottom: 1px solid var(--ap-card-line) !important;
+  /* 中文没有大小写，uppercase 无效；字距拉伸只会把「用户姓名」拆成四个孤字 */
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+/* 表头单元格之间那条竖线：这套语言里横线已经够用了 */
+.ant-table-thead > tr > th::before { display: none !important; }
+
+.ant-table-tbody > tr > td {
+  padding-block: 18px !important;
+  border-bottom: 1px solid var(--ap-line) !important;
+  color: var(--ap-text);
+}
+.ant-table-tbody > tr:last-child > td { border-bottom: 0 !important; }
+.ant-table-tbody > tr.ant-table-row:hover > td { background: var(--ap-hover) !important; }
+.ant-table-tbody > tr.ant-table-row-selected > td { background: var(--ap-fill) !important; }
+
+.ant-table-container,
+.ant-table-container table > thead > tr:first-child > *:first-child,
+.ant-table-container table > thead > tr:first-child > *:last-child { border-radius: 0 !important; }
+
+/* 数字列和时间列一律等宽，列与列才能竖直对齐 */
+.ant-table-tbody .ant-typography-secondary,
+.ant-table td .ap-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+.ant-table-placeholder > td { border-bottom: 0 !important; }
+.ant-table-placeholder:hover > td { background: var(--ap-card) !important; }
+
+
+/* ==========================================================================
+   E · 按钮 —— 全是胶囊。主操作实心黑，其余白底描边。零投影。
+   ========================================================================== */
+.ant-btn { box-shadow: none !important; font-weight: 500; }
+.ant-btn-primary { background: var(--ap-accent); border-color: var(--ap-accent); }
+.ant-btn-primary:not(:disabled):hover {
+  background: var(--ap-accent-hover) !important;
+  border-color: var(--ap-accent-hover) !important;
+}
+/* 旧版主按钮悬停会往上跳 1px —— 在这套语言里位移是噪音 */
+.ant-btn:not(:disabled):hover { transform: none !important; }
+
+.ant-btn-default { border-color: var(--ap-field); }
+.ant-btn-default:not(:disabled):hover {
+  background: var(--ap-fill);
+  border-color: var(--ap-field) !important;
+  color: var(--ap-text) !important;
+}
+
+/* 危险操作：平时只是一枚普通描边胶囊，悬停才把描边染红。
+   列表里往往一行一个「删除」，平时全红会把整页的注意力吃掉。 */
+.ant-btn-dangerous.ant-btn-default {
+  color: var(--ap-bad);
+  border-color: var(--ap-field);
+}
+.ant-btn-dangerous.ant-btn-default:not(:disabled):hover {
+  color: var(--ap-bad) !important;
+  border-color: var(--ap-bad) !important;
+  background: var(--ap-fill);
+}
+.ant-btn-dangerous.ant-btn-primary {
+  background: var(--ap-bad);
+  border-color: var(--ap-bad);
+}
+
+/* 文字按钮（表格行内操作用得最多）：黑字，悬停一块浅灰 */
+.ant-btn-link, .ant-btn-text { color: var(--ap-text-2); font-weight: 400; }
+.ant-btn-link:not(:disabled):hover, .ant-btn-text:not(:disabled):hover {
+  color: var(--ap-text) !important;
+  background: var(--ap-fill) !important;
+}
+.ant-btn-link.ant-btn-dangerous, .ant-btn-text.ant-btn-dangerous { color: var(--ap-bad); }
+
+
+/* ==========================================================================
+   F · 表单控件 —— 圆角矩形，和胶囊按钮形状不同：
+   「可输入」和「可点击」一眼分得开，不靠颜色提示
+   ========================================================================== */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input-number,
+.ant-select .ant-select-selector,
+.ant-picker {
+  border-color: var(--ap-field);
+  border-radius: var(--ap-r-sm);
+}
+.ant-input:hover,
+.ant-input-affix-wrapper:hover,
+.ant-input-number:hover,
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector,
+.ant-picker:hover { border-color: var(--ap-text-3) !important; }
+
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper-focused,
+.ant-input-number-focused,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused {
+  border-color: var(--ap-accent) !important;
+  box-shadow: 0 0 0 3px var(--ap-fill-2) !important;
+}
+.ant-input::placeholder, .ant-input-number-input::placeholder { color: var(--ap-text-3); }
+
+/* 表单标签：常驻，不拿 placeholder 当标签 */
+.ant-form-item-label > label {
+  font-size: var(--ap-fs-meta);
+  font-weight: 500;
+  color: var(--ap-text-2);
+}
+.ant-form-item-explain-error { font-size: var(--ap-fs-meta); color: var(--ap-bad); }
+
+.ant-checkbox-inner, .ant-radio-inner { border-color: var(--ap-field); }
+.ant-checkbox-checked .ant-checkbox-inner {
+  background: var(--ap-accent);
+  border-color: var(--ap-accent);
+}
+.ant-radio-checked .ant-radio-inner { border-color: var(--ap-accent); }
+.ant-radio-checked .ant-radio-inner::after { background: var(--ap-accent); }
+.ant-switch.ant-switch-checked { background: var(--ap-accent); }
+
+/* 树选择 / 下拉选项的选中态：浅灰底 + 黑字 */
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled),
+.ant-tree-node-selected {
+  background: var(--ap-fill) !important;
+  color: var(--ap-text) !important;
+  font-weight: 500;
+}
+
+
+/* ==========================================================================
+   G · 标签 / 徽章 / 头像 —— 颜色只表达状态，不表达身份
+   --------------------------------------------------------------------------
+   AntD 的预设色标签（blue / green / red…）在这套语言里全部收成描边胶囊。
+   状态类的保留含义：前面挂一颗 7px 圆点，点带颜色、字带意思，
+   色盲用户读文字一样能分辨 —— 这正是设计稿里徽章的做法。
+   ========================================================================== */
+.ant-tag {
+  border-radius: var(--ap-r-pill);
+  padding-inline: 11px;
+  font-size: var(--ap-fs-meta);
+  line-height: 24px;
+  background: var(--ap-card) !important;
+  color: var(--ap-text-2) !important;
+  border: 1px solid var(--ap-card-line) !important;
+}
+.ant-tag-success, .ant-tag-green, .ant-tag-lime, .ant-tag-cyan,
+.ant-tag-error, .ant-tag-red, .ant-tag-volcano, .ant-tag-magenta,
+.ant-tag-warning, .ant-tag-orange, .ant-tag-gold, .ant-tag-processing,
+.ant-tag-blue, .ant-tag-geekblue, .ant-tag-purple {
+  color: var(--ap-text) !important;
+}
+.ant-tag-success::before, .ant-tag-green::before, .ant-tag-lime::before,
+.ant-tag-error::before, .ant-tag-red::before, .ant-tag-volcano::before,
+.ant-tag-warning::before, .ant-tag-orange::before, .ant-tag-gold::before,
+.ant-tag-processing::before, .ant-tag-blue::before {
+  content: "";
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  margin-right: 7px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+.ant-tag-success::before, .ant-tag-green::before, .ant-tag-lime::before { background: var(--ap-ok); }
+.ant-tag-error::before, .ant-tag-red::before, .ant-tag-volcano::before { background: var(--ap-bad); }
+.ant-tag-warning::before, .ant-tag-orange::before, .ant-tag-gold::before { background: var(--ap-warn); }
+.ant-tag-processing::before, .ant-tag-blue::before { background: var(--ap-text-3); }
+
+/* 头像中性：浅灰底 + 黑字 + 发丝描边。人不是状态，不该被染色。 */
+.ant-avatar {
+  background: var(--ap-fill);
+  color: var(--ap-text);
+  border: 1px solid var(--ap-card-line);
+  font-weight: 500;
+}
+.ant-badge-dot { background: var(--ap-bad); box-shadow: 0 0 0 1.5px var(--ap-card); }
+.ant-badge-count {
+  background: var(--ap-accent);
+  box-shadow: none;
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ==========================================================================
+   H · 分页
+   ========================================================================== */
+.ant-pagination .ant-pagination-item,
+.ant-pagination .ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination .ant-pagination-next .ant-pagination-item-link {
+  border-radius: var(--ap-r-pill);
+  border-color: var(--ap-field);
+}
+.ant-pagination .ant-pagination-item-active {
+  background: var(--ap-accent);
+  border-color: var(--ap-accent);
+}
+.ant-pagination .ant-pagination-item-active a { color: var(--ap-text-inv); }
+.ant-pagination-total-text { color: var(--ap-text-3); font-size: var(--ap-fs-meta); }
+
+
+/* ==========================================================================
+   I · 浮层 —— 全站唯一允许带投影的东西
+   ========================================================================== */
+.ant-modal-content, .ant-drawer-content, .ant-dropdown-menu, .ant-picker-dropdown .ant-picker-panel-container {
+  border-radius: var(--ap-r);
+  box-shadow: var(--ap-shadow-lg) !important;
+}
+.ant-modal-header { border-bottom: 0; padding-bottom: var(--ap-sp-2); }
+.ant-modal-title {
+  font-family: var(--ap-font-d);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: var(--ap-tr-page);
+}
+/* 弹窗页脚没有分隔线也没有灰底，两枚胶囊直接站在白底上 */
+.ant-modal-footer { border-top: 0; margin-top: var(--ap-sp-6); }
+.ant-drawer-header { border-bottom: 1px solid var(--ap-line); }
+.ant-drawer-footer { border-top: 1px solid var(--ap-line); }
+
+.ant-dropdown-menu { padding: 6px; border: 1px solid var(--ap-card-line); }
+.ant-dropdown-menu-item { border-radius: var(--ap-r-sm); font-size: var(--ap-fs-body); }
+.ant-dropdown-menu-item:hover { background: var(--ap-fill) !important; }
+.ant-dropdown-menu-item-divider { background: var(--ap-line); }
+
+.ant-tooltip-inner {
+  background: var(--ap-accent);
+  border-radius: var(--ap-r-sm);
+  font-size: var(--ap-fs-meta);
+  box-shadow: none;
+}
+.ant-tooltip-arrow::before { background: var(--ap-accent); }
+.ant-popover-inner { border-radius: var(--ap-r); box-shadow: var(--ap-shadow-lg); }
+.ant-message-notice-content, .ant-notification-notice {
+  border-radius: var(--ap-r);
+  box-shadow: var(--ap-shadow-lg);
+  border: 1px solid var(--ap-card-line);
+}
+
+
+/* ==========================================================================
+   J · 其余组件
+   ========================================================================== */
+/* 描述列表：去掉灰色标签底，改成发丝线分隔 */
+.ant-descriptions-bordered .ant-descriptions-view {
+  border: 1px solid var(--ap-card-line);
+  border-radius: var(--ap-r);
+}
+.ant-descriptions-bordered .ant-descriptions-item-label {
+  background: var(--ap-card) !important;
+  color: var(--ap-text-3);
+  font-weight: 400;
+  font-size: var(--ap-fs-meta);
+  border-inline-end-color: var(--ap-line) !important;
+}
+.ant-descriptions-bordered .ant-descriptions-row { border-bottom-color: var(--ap-line) !important; }
+.ant-descriptions-bordered .ant-descriptions-item-content { border-inline-end-color: var(--ap-line) !important; }
+.ant-descriptions-title { font-family: var(--ap-font-d); letter-spacing: var(--ap-tr-title); }
+
+/* 空状态：一句说明就够，不要插画 */
+.ant-empty-description { color: var(--ap-text-3); font-size: var(--ap-fs-meta); }
+.ant-empty-normal { padding: 56px 0; }
+
+.ant-spin-dot-item { background: var(--ap-accent); }
+.ant-spin-text { color: var(--ap-text-3); font-size: var(--ap-fs-meta); }
+
+.ant-tabs-tab { font-size: var(--ap-fs-body); }
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn { color: var(--ap-text) !important; font-weight: 500; }
+.ant-tabs-ink-bar { background: var(--ap-accent); }
+.ant-tabs-top > .ant-tabs-nav::before { border-bottom-color: var(--ap-line); }
+
+.ant-breadcrumb { font-size: var(--ap-fs-meta); color: var(--ap-text-3); }
+.ant-breadcrumb a { color: var(--ap-text-3); }
+.ant-breadcrumb a:hover { color: var(--ap-text); background: none; }
+.ant-breadcrumb li:last-child { color: var(--ap-text); font-weight: 500; }
+.ant-breadcrumb-separator { color: var(--ap-field); }
+
+.ant-divider { border-color: var(--ap-line); }
+.ant-divider-with-text { color: var(--ap-text-3); font-size: var(--ap-fs-meta); font-weight: 400; }
+
+/* 提示条：不用大块底色，改成左侧一条语义色竖线 */
+.ant-alert {
+  border-radius: var(--ap-r-sm);
+  border: 1px solid var(--ap-line);
+  background: var(--ap-card);
+  border-left-width: 3px;
+}
+.ant-alert-success { border-left-color: var(--ap-ok); }
+.ant-alert-warning { border-left-color: var(--ap-warn); }
+.ant-alert-error   { border-left-color: var(--ap-bad); }
+.ant-alert-info    { border-left-color: var(--ap-text-3); }
+.ant-alert-message { color: var(--ap-text); font-size: var(--ap-fs-body); }
+.ant-alert-description { color: var(--ap-text-2); font-size: var(--ap-fs-meta); }
+
+.ant-statistic-title { color: var(--ap-text-3); font-size: var(--ap-fs-meta); }
+.ant-statistic-content {
+  font-family: var(--ap-font-d);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ap-tr-page);
+  color: var(--ap-text);
+}
+
+.ant-segmented { background: var(--ap-fill); border-radius: var(--ap-r-pill); }
+.ant-segmented-item-selected { background: var(--ap-card); border-radius: var(--ap-r-pill); }
+
+.ant-list-item { border-bottom: 1px solid var(--ap-line) !important; padding-inline: 0; }
+.ant-list-item:last-child { border-bottom: 0 !important; }
+
+.ant-tree-treenode { border-radius: var(--ap-r-sm); }
+.ant-tree .ant-tree-node-content-wrapper:hover { background: var(--ap-fill); }
+
+.ant-upload.ant-upload-select { border-radius: var(--ap-r-sm); }
+.ant-result-title { font-family: var(--ap-font-d); letter-spacing: var(--ap-tr-title); }
+.ant-result-subtitle { color: var(--ap-text-3); }
+
+.ant-typography.ant-typography-secondary { color: var(--ap-text-3); }
+a.ant-typography, .ant-typography a { color: var(--ap-text); text-decoration-color: var(--ap-field); }
+
+
+/* ==========================================================================
+   K · 旧类名的重新定义
+   --------------------------------------------------------------------------
+   这些名字散落在 20 多个页面里。不删它们、也不去改页面 —— 直接在新语言里
+   重新定义一遍：玻璃拟态变成发丝线，渐变变成墨黑，投影变成留白。
+   页面代码一行不改，观感整体切换。
+   ========================================================================== */
+.modern-card {
+  background: var(--ap-card) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid var(--ap-card-line) !important;
+  border-radius: var(--ap-r) !important;
+  box-shadow: none !important;
+}
+
+/* .modern-table 是包在 Table 外面的一层 div，真正的样式在上面 D 段。
+   这里只负责让它在卡片里贴边 —— 表格自带边线，不需要卡片再留一圈内边距。 */
+.modern-table { margin: 0 calc(var(--ap-sp-6) * -1) calc(var(--ap-sp-6) * -1); }
+.modern-table .ant-table { background: transparent !important; }
+.modern-table .ant-pagination { padding-inline: var(--ap-sp-6); }
+
+/* 搜索区：和表格之间用一条发丝线断开，而不是靠间距硬隔 */
+.search-form {
+  padding-bottom: var(--ap-sp-2);
+  margin-bottom: var(--ap-sp-5);
+  border-bottom: 1px solid var(--ap-line);
+}
+
+/* 玻璃拟态取消：这套语言里"抬起"靠线和留白，不靠半透明模糊 */
+.glass-effect, .glass-effect-dark {
+  background: var(--ap-card) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 0 !important;
+  border-right: 1px solid var(--ap-card-line) !important;
+  box-shadow: none !important;
+}
+
+/* 靛紫渐变 → 墨黑。这对颜色是旧版最标志性的装饰，不传达任何信息。 */
+.bg-primary-gradient { background: var(--ap-accent) !important; }
+.text-primary { color: var(--ap-text) !important; }
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ap-sp-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--ap-sp-7);
+}
+.page-header-title {
+  font-family: var(--ap-font-d) !important;
+  font-size: var(--ap-fs-page) !important;
+  font-weight: 600 !important;
+  color: var(--ap-text) !important;
+  letter-spacing: var(--ap-tr-page) !important;
+  line-height: 1.15;
+  margin: 0 !important;
+}
+
+/* 入场动画留着，但收到几乎察觉不到 —— 它的作用是让内容"落位"，不是表演 */
+.fade-in { animation: ap-fade var(--ap-dur) var(--ap-ease); }
+@keyframes ap-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.custom-scrollbar::-webkit-scrollbar { width: 8px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, .14);
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, .26); background-clip: content-box; }
+
+
+/* ==========================================================================
+   L · 减少动效
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in { animation: none; }
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}

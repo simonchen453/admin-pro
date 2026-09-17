@@ -245,7 +245,7 @@ const SysLogList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '0', background: '#f5f5f5' }}>
+    <div className="fade-in">
 
 
       <Card className="modern-card" title="系统日志" bordered={false}>
@@ -258,7 +258,7 @@ const SysLogList: React.FC = () => {
           <Row gutter={24}>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="condition" label="关键字">
-                <Input placeholder="请输入关键字" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} />
+                <Input placeholder="请输入关键字" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={16} md={12}>
@@ -296,7 +296,7 @@ const SysLogList: React.FC = () => {
               批量删除
             </Button>
           </Space>
-          <div style={{ color: '#666' }}>
+          <div style={{ color: 'var(--ap-text-3)' }}>
             {selectedLogs.length > 0 && `已选择 ${selectedLogs.length} 项`}
           </div>
         </div>

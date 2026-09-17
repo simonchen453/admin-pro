@@ -2,11 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { EyeInvisibleOutlined, EyeTwoTone, LockOutlined, UserOutlined, SafetyOutlined } from '@ant-design/icons';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
 import { useAuthStore } from '../../stores/useUserStore.ts';
 import Captcha, { type CaptchaRef } from '../../components/Captcha';
+import { LogoMark } from '../../components/Logo';
 import { getSystemInfoApi } from '../../api/common';
 import type { LoginRequest, SystemInfo } from '../../types/index';
 import './Login.css';
@@ -121,144 +122,113 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="login-container">
+    <div className="lg-page">
       {contextHolder}
-      <div className="login-background">
-        <div className="tech-grid"></div>
-        <div className="floating-particles">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <div key={i} className={`particle particle-${i + 1}`}></div>
-          ))}
-        </div>
-      </div>
+      <div className="lg">
 
-      <div className="login-card">
-        <div className="login-header">
-          <div className="brand-section">
-            <div className="logo-wrapper">
-              <div className="login-logo-background">
-                <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Admin Pro" className="logo-image" />
-              </div>
-            </div>
-            <div className="login-brand-text">
-              <h1 className="login-brand-title">{systemInfo?.platformShortName || 'Admin Pro'}</h1>
-              <div className="brand-subtitle">
-                <span className="subtitle-text">企业级管理系统</span>
-                <div className="subtitle-line"></div>
-              </div>
-            </div>
-          </div>
+        <div className="lg-eyebrow">
+          <span className="ap-logo"><LogoMark size={13} /></span>
+          <b>{systemInfo?.platformShortName || 'AdminPro'}</b>
+          {systemInfo?.platformName ? ` ${systemInfo.platformName}` : ' 企业级权限管理'}
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="login-form" autoComplete="off">
-          {/* 添加隐藏的输入框，欺骗浏览器自动填充机制 */}
+        <h1 className="lg-title">登录管理控制台</h1>
+
+        {/* 登错环境在企业后台是真实且昂贵的事故，值得占一行显眼的位置。
+            这里只写浏览器确实连着的主机名 —— 是「生产」还是「测试」前端无从得知，
+            就不替它下判断，点也保持中性灰。 */}
+        <div className="lg-env">
+          <strong>当前站点</strong>
+          <span>{window.location.host}</span>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="lg-form" autoComplete="off">
+          {/* 隐藏输入框：绕开浏览器的自动填充 */}
           <input type="text" style={{ display: 'none' }} />
           <input type="password" style={{ display: 'none' }} />
 
-          <div className="form-group">
-            <div className="input-wrapper">
-              <UserOutlined className="input-icon" />
-              <input
-                {...register('loginName')}
-                type="text"
-                placeholder="请输入用户名"
-                className={`form-input ${errors.loginName ? 'error' : ''}`}
-                autoComplete="off"
-                readOnly
-                onFocus={(e) => e.target.removeAttribute('readonly')}
-              />
-            </div>
-            {errors.loginName && (
-              <span className="error-message">{errors.loginName.message}</span>
-            )}
+          <div className="ap-field">
+            <label className="ap-label" htmlFor="lg-user">登录名</label>
+            <input
+              {...register('loginName')}
+              id="lg-user"
+              type="text"
+              className="ap-input ap-input-lg ap-input-mono"
+              autoComplete="off"
+              aria-invalid={errors.loginName ? 'true' : undefined}
+              readOnly
+              onFocus={(e) => e.target.removeAttribute('readonly')}
+            />
+            {errors.loginName && <span className="lg-err">{errors.loginName.message}</span>}
           </div>
 
-          <div className="form-group">
-            <div className="input-wrapper">
-              <LockOutlined className="input-icon" />
+          <div className="ap-field">
+            <label className="ap-label" htmlFor="lg-pass">密码</label>
+            <div className="lg-pw">
               <input
                 {...register('password')}
+                id="lg-pass"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="请输入密码"
-                className={`form-input ${errors.password ? 'error' : ''}`}
+                className="ap-input ap-input-lg"
                 autoComplete="off"
+                aria-invalid={errors.password ? 'true' : undefined}
                 readOnly
                 onFocus={(e) => e.target.removeAttribute('readonly')}
               />
               <button
                 type="button"
-                className="password-toggle"
+                className="lg-pw-t"
+                aria-label={showPassword ? '隐藏密码' : '显示密码'}
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
+                {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
               </button>
             </div>
-            {errors.password && (
-              <span className="error-message">{errors.password.message}</span>
-            )}
+            {errors.password && <span className="lg-err">{errors.password.message}</span>}
           </div>
 
-          <div className="form-group">
-            <div className="captcha-input-wrapper">
-              <div className="input-wrapper captcha-input">
-                <SafetyOutlined className="input-icon" />
-                <input
-                  {...register('captcha')}
-                  type="text"
-                  placeholder="请输入验证码"
-                  className={`form-input ${errors.captcha ? 'error' : ''}`}
-                  autoComplete="off"
-                />
-              </div>
-              <Captcha
-                ref={captchaRef}
-                onCaptchaChange={setCaptchaKey}
-                className="captcha-component"
-              />
-            </div>
-            {errors.captcha && (
-              <span className="error-message">{errors.captcha.message}</span>
-            )}
-          </div>
-
-          <div className="form-options">
-            <label className="remember-me">
+          <div className="ap-field">
+            <label className="ap-label" htmlFor="lg-cap">验证码</label>
+            <div className="lg-cap">
               <input
-                {...register('remember')}
-                type="checkbox"
-                className="checkbox"
+                {...register('captcha')}
+                id="lg-cap"
+                type="text"
+                className="ap-input ap-input-lg ap-input-mono"
+                autoComplete="off"
+                inputMode="numeric"
+                aria-invalid={errors.captcha ? 'true' : undefined}
               />
-              <span className="checkbox-custom"></span>
-              <span className="checkbox-text">记住我</span>
-            </label>
-            <a href="#" className="forgot-password">忘记密码？</a>
+              <Captcha ref={captchaRef} onCaptchaChange={setCaptchaKey} className="lg-cap-img" />
+            </div>
+            {errors.captcha && <span className="lg-err">{errors.captcha.message}</span>}
           </div>
 
-          <button
-            type="submit"
-            className={`login-button ${isLoading ? 'loading' : ''}`}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="loading-spinner"></div>
-            ) : (
-              '登录'
-            )}
+          <div className="lg-row">
+            <label>
+              <input {...register('remember')} type="checkbox" className="ap-check" />
+              记住登录名
+            </label>
+            <a className="ap-link" href="#">忘记密码</a>
+          </div>
+
+          <button type="submit" className="ap-btn ap-btn-p ap-btn-lg ap-btn-block" disabled={isLoading}>
+            {isLoading ? '登录中…' : '登录'}
           </button>
         </form>
 
-        <div className="login-footer">
-          <p className="copyright">
-            {systemInfo?.copyRight || `© ${new Date().getFullYear()} 管理系统. All rights reserved.`}
-          </p>
+        <div className="lg-foot">
           {(systemInfo?.releaseVersion || systemInfo?.buildVersion) && (
-            <p className="copyright" style={{ marginTop: '6px', fontSize: '11px' }}>
-              {systemInfo.releaseVersion && <span>版本: {systemInfo.releaseVersion}</span>}
-              {systemInfo.releaseVersion && systemInfo.buildVersion && <span> | </span>}
-              {systemInfo.buildVersion && <span>构建: {systemInfo.buildVersion}</span>}
-            </p>
+            <>
+              {systemInfo.releaseVersion && <span>{systemInfo.releaseVersion}</span>}
+              {systemInfo.releaseVersion && systemInfo.buildVersion && <span> · </span>}
+              {systemInfo.buildVersion && <span>{systemInfo.buildVersion}</span>}
+              <br />
+            </>
           )}
+          {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} AdminPro`}
         </div>
+
       </div>
     </div>
   );

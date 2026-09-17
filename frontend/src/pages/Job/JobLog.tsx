@@ -237,7 +237,7 @@ const JobLog: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '0', background: '#f5f5f5' }}>
+    <div className="fade-in">
       <Card>
         <Card size="small" style={{ marginBottom: 16 }}>
           <Form autoComplete="off"

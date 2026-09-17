@@ -323,12 +323,12 @@ const DictList: React.FC = () => {
           <Row gutter={24}>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="name" label="字典名称">
-                <Input placeholder="请输入字典名称" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} onPressEnter={() => form.submit()} />
+                <Input placeholder="请输入字典名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} onPressEnter={() => form.submit()} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6}>
               <Form.Item name="key" label="字典类型">
-                <Input placeholder="请输入字典类型" allowClear prefix={<SearchOutlined style={{ color: '#d9d9d9' }} />} onPressEnter={() => form.submit()} />
+                <Input placeholder="请输入字典类型" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} onPressEnter={() => form.submit()} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={8} md={6}>

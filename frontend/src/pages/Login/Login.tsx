@@ -136,110 +136,127 @@ const Login: React.FC = () => {
         <div className="lg-side-hero">
           <div className="lg-side-kicker">{systemInfo?.platformName || 'ADMIN PRO PLATFORM'}</div>
           <h2 className="lg-side-title">
-            一套后台，<br />管好每一份权限。
+            企业级中后台<br />数字化管理平台
           </h2>
           <p className="lg-side-sub">
-            用户、角色、菜单、部门与数据域的完整 RBAC 能力，
-            配套操作审计与系统监控 —— 开箱即用。
+            开箱即用的用户、角色、部门与多维数据权限控制，全链路审计日志与实时系统监控，为企业数字化运营提供安全稳健的基座支撑。
           </p>
+
+          <div className="lg-side-features">
+            <div className="lg-side-feat">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>
+              <span>细粒度 RBAC 权限与数据域隔离</span>
+            </div>
+            <div className="lg-side-feat">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>
+              <span>实时系统性能监控与全链路操作审计</span>
+            </div>
+            <div className="lg-side-feat">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg>
+              <span>现代规范的交互体验与多语言支持</span>
+            </div>
+          </div>
         </div>
 
         <div className="lg-side-meta">
-          {systemInfo?.releaseVersion && <span>{systemInfo.releaseVersion}</span>}
+          {systemInfo?.releaseVersion && <span>版本 {systemInfo.releaseVersion}</span>}
           {systemInfo?.releaseVersion && systemInfo?.buildVersion && <i>·</i>}
-          {systemInfo?.buildVersion && <span>{systemInfo.buildVersion}</span>}
+          {systemInfo?.buildVersion && <span>构建 {systemInfo.buildVersion}</span>}
         </div>
       </aside>
 
       <main className="lg-main">
-      <div className="lg">
-
-        <div className="lg-eyebrow">
-          <b>登录管理控制台</b>
-        </div>
-
-        <h1 className="lg-title">{systemInfo?.platformShortName || 'AdminPro'} · 管理员入口</h1>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="lg-form" autoComplete="off">
-          {/* 隐藏输入框：绕开浏览器的自动填充 */}
-          <input type="text" style={{ display: 'none' }} />
-          <input type="password" style={{ display: 'none' }} />
-
-          <div className="ap-field">
-            <label className="ap-label" htmlFor="lg-user">登录名</label>
-            <input
-              {...register('loginName')}
-              id="lg-user"
-              type="text"
-              className="ap-input ap-input-lg ap-input-mono"
-              autoComplete="off"
-              aria-invalid={errors.loginName ? 'true' : undefined}
-              readOnly
-              onFocus={(e) => e.target.removeAttribute('readonly')}
-            />
-            {errors.loginName && <span className="lg-err">{errors.loginName.message}</span>}
+        <div className="lg-card">
+          <div className="lg-header">
+            <span className="lg-header-badge">控制台管理系统</span>
+            <h1 className="lg-title">欢迎登录</h1>
+            <p className="lg-desc">请输入管理员账号、密码及验证码以进入系统</p>
           </div>
 
-          <div className="ap-field">
-            <label className="ap-label" htmlFor="lg-pass">密码</label>
-            <div className="lg-pw">
+          <form onSubmit={handleSubmit(onSubmit)} className="lg-form" autoComplete="off">
+            {/* 隐藏输入框：绕开浏览器的自动填充 */}
+            <input type="text" style={{ display: 'none' }} />
+            <input type="password" style={{ display: 'none' }} />
+
+            <div className="ap-field">
+              <label className="ap-label" htmlFor="lg-user">登录账号</label>
               <input
-                {...register('password')}
-                id="lg-pass"
-                type={showPassword ? 'text' : 'password'}
+                {...register('loginName')}
+                id="lg-user"
+                type="text"
+                placeholder="请输入用户名"
                 className="ap-input ap-input-lg"
                 autoComplete="off"
-                aria-invalid={errors.password ? 'true' : undefined}
+                aria-invalid={errors.loginName ? 'true' : undefined}
                 readOnly
                 onFocus={(e) => e.target.removeAttribute('readonly')}
               />
-              <button
-                type="button"
-                className="lg-pw-t"
-                aria-label={showPassword ? '隐藏密码' : '显示密码'}
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-              </button>
+              {errors.loginName && <span className="lg-err">{errors.loginName.message}</span>}
             </div>
-            {errors.password && <span className="lg-err">{errors.password.message}</span>}
-          </div>
 
-          <div className="ap-field">
-            <label className="ap-label" htmlFor="lg-cap">验证码</label>
-            <div className="lg-cap">
-              <input
-                {...register('captcha')}
-                id="lg-cap"
-                type="text"
-                className="ap-input ap-input-lg ap-input-mono"
-                autoComplete="off"
-                inputMode="numeric"
-                aria-invalid={errors.captcha ? 'true' : undefined}
-              />
-              <Captcha ref={captchaRef} onCaptchaChange={setCaptchaKey} className="lg-cap-img" />
+            <div className="ap-field">
+              <label className="ap-label" htmlFor="lg-pass">登录密码</label>
+              <div className="lg-pw">
+                <input
+                  {...register('password')}
+                  id="lg-pass"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="请输入登录密码"
+                  className="ap-input ap-input-lg"
+                  autoComplete="off"
+                  aria-invalid={errors.password ? 'true' : undefined}
+                  readOnly
+                  onFocus={(e) => e.target.removeAttribute('readonly')}
+                />
+                <button
+                  type="button"
+                  className="lg-pw-t"
+                  aria-label={showPassword ? '隐藏密码' : '显示密码'}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                </button>
+              </div>
+              {errors.password && <span className="lg-err">{errors.password.message}</span>}
             </div>
-            {errors.captcha && <span className="lg-err">{errors.captcha.message}</span>}
+
+            <div className="ap-field">
+              <label className="ap-label" htmlFor="lg-cap">安全验证码</label>
+              <div className="lg-cap">
+                <input
+                  {...register('captcha')}
+                  id="lg-cap"
+                  type="text"
+                  placeholder="请输入验证码"
+                  className="ap-input ap-input-lg ap-input-mono"
+                  autoComplete="off"
+                  inputMode="numeric"
+                  aria-invalid={errors.captcha ? 'true' : undefined}
+                />
+                <Captcha ref={captchaRef} onCaptchaChange={setCaptchaKey} className="lg-cap-img" />
+              </div>
+              {errors.captcha && <span className="lg-err">{errors.captcha.message}</span>}
+            </div>
+
+            <div className="lg-row">
+              <label>
+                <input {...register('remember')} type="checkbox" className="ap-check" />
+                记住账号
+              </label>
+              <a className="ap-link" href="#" onClick={(e) => { e.preventDefault(); message.info('请联系系统管理员重置密码'); }}>
+                忘记密码？
+              </a>
+            </div>
+
+            <button type="submit" className="ap-btn ap-btn-p ap-btn-lg lg-btn-submit" disabled={isLoading}>
+              {isLoading ? '正在验证身份...' : '立即登录'}
+            </button>
+          </form>
+
+          <div className="lg-foot">
+            {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} AdminPro Platform`}
           </div>
-
-          <div className="lg-row">
-            <label>
-              <input {...register('remember')} type="checkbox" className="ap-check" />
-              记住登录名
-            </label>
-            <a className="ap-link" href="#">忘记密码</a>
-          </div>
-
-          <button type="submit" className="ap-btn ap-btn-p ap-btn-lg ap-btn-block" disabled={isLoading}>
-            {isLoading ? '登录中…' : '登录'}
-          </button>
-        </form>
-
-        <div className="lg-foot">
-          {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} AdminPro`}
         </div>
-
-      </div>
       </main>
     </div>
   );

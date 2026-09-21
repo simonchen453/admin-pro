@@ -1,4 +1,4 @@
-import { Layout as AntLayout, Menu, Button, Dropdown, Tooltip, message } from 'antd';
+import { Layout as AntLayout, Menu, Button, Dropdown, Tooltip, message, Breadcrumb, Badge, Avatar } from 'antd';
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -25,15 +25,15 @@ import {
     SlidersOutlined,
     BookOutlined,
     BellOutlined,
-    TranslationOutlined
+    TranslationOutlined,
+    DownOutlined
 } from '@ant-design/icons';
-import { Breadcrumb, Badge } from 'antd';
 import { useAuthStore } from '../stores/useUserStore';
 import { getMenuList } from '../api/menu';
 import { getSystemInfoApi } from '../api/common';
 import { getCurrentUserInfoApi } from '../api/auth';
 import type { MenuItem, BackendMenuItem, SystemInfo, UserEntity, User } from '../types/index';
-import { LogoMark, ChevronRight } from '../components/Logo';
+import { LogoMark } from '../components/Logo';
 import './Layout.css';
 
 const { Header, Sider, Content, Footer } = AntLayout;
@@ -60,7 +60,6 @@ function MainLayout() {
         if (!url || url === 'null' || url.startsWith('null?')) {
             return null;
         }
-        // 移除_m_id参数
         return url.split('?')[0];
     };
 
@@ -88,13 +87,10 @@ function MainLayout() {
         'BookOutlined': <BookOutlined />,
     };
 
-    // 根据图标名称获取Ant Design图标组件
     const getIconComponent = (iconName: string) => {
-        // 如果是图片路径，返回null，后续会处理
         if (isImg(iconName)) {
             return null;
         }
-        // 直接使用Ant Design图标名称
         return iconComponents[iconName] || <UserOutlined />;
     };
 
@@ -108,7 +104,6 @@ function MainLayout() {
                 path: cleanedUrl || undefined,
             };
 
-            // 处理图标
             if (menu.icon) {
                 if (isImg(menu.icon)) {
                     menuItem.icon = <img src={menu.icon} alt={menu.title} style={{ width: 16, height: 16 }} />;
@@ -117,7 +112,6 @@ function MainLayout() {
                 }
             }
 
-            // 处理子菜单
             if (menu.subs && menu.subs.length > 0) {
                 menuItem.children = convertMenuItems(menu.subs);
             }
@@ -140,11 +134,24 @@ function MainLayout() {
         return null;
     };
 
+    // 获取层级父级Key
+    const getParentKeys = (items: MenuItem[], targetKey: string, parents: string[] = []): string[] | null => {
+        for (const item of items) {
+            if (item.key === targetKey) {
+                return parents;
+            }
+            if (item.children) {
+                const found = getParentKeys(item.children, targetKey, [...parents, item.key]);
+                if (found) return found;
+            }
+        }
+        return null;
+    };
+
     // 获取当前路径的面包屑数据
     const getBreadcrumbItems = () => {
         const currentPath = location.pathname;
 
-        // 如果是首页，直接返回首页面包屑，避免重复
         if (currentPath === '/' || currentPath === '/home') {
             return [{ title: '首页' }];
         }
@@ -153,7 +160,6 @@ function MainLayout() {
             { title: '首页', href: '/' }
         ];
 
-        // 特殊路径处理（不在菜单中的页面）
         const specialPaths: Record<string, string> = {
             '/settings': '个人设置'
         };
@@ -166,27 +172,18 @@ function MainLayout() {
             return items;
         }
 
-        // 查找当前页面对应的菜单项
-        let currentMenuItem: MenuItem | null = null;
-
-        const findItem = (items: MenuItem[]) => {
-            for (const item of items) {
-                if (item.path === currentPath) {
-                    currentMenuItem = item;
-                    return;
+        // 查找父级与当前项
+        const matchedItem = findMenuItemByPath(menuItems, currentPath);
+        if (matchedItem) {
+            const parentKeys = getParentKeys(menuItems, matchedItem.key) || [];
+            parentKeys.forEach(pKey => {
+                const parent = menuItems.find(m => m.key === pKey);
+                if (parent) {
+                    items.push({ title: parent.label });
                 }
-                if (item.children) {
-                    findItem(item.children);
-                }
-            }
-        };
-
-        findItem(menuItems);
-
-        if (currentMenuItem) {
+            });
             items.push({
-                title: (currentMenuItem as MenuItem).label,
-                // 最后一级不加链接
+                title: matchedItem.label,
                 href: undefined
             });
         }
@@ -214,16 +211,12 @@ function MainLayout() {
         const loadCurrentUserInfo = async () => {
             try {
                 const response = await getCurrentUserInfoApi();
-
-                // getCurrentUserInfoApi 返回的是 data 字段，即 UserEntity
-                // 但根据响应拦截器，实际返回的可能是整个响应对象
                 const userInfo = (response as any)?.data || response;
 
                 if (userInfo) {
                     const userEntity = userInfo as unknown as UserEntity;
                     setCurrentUserInfo(userEntity);
 
-                    // Convert UserEntity to User for store
                     const user: User = {
                         id: userEntity.id,
                         loginName: userEntity.loginName,
@@ -233,23 +226,18 @@ function MainLayout() {
                         mobileNo: userEntity.mobileNo,
                         email: userEntity.email,
                         userDomain: userEntity.userDomain,
-
                         status: (userEntity.status === 'active' || userEntity.status === '1') ? 'active' : 'inactive'
                     };
 
-                    // Sync to store
                     updateCurrentUser(user);
                 }
             } catch (error) {
                 console.error('获取用户信息失败:', error);
-                // 如果获取失败，尝试使用 currentUser 中的数据
                 if (currentUser) {
-
                     setCurrentUserInfo(currentUser as unknown as UserEntity);
                 }
             }
         };
-        // 无论currentUser是否存在，都尝试加载用户信息（因为可能通过session认证）
         loadCurrentUserInfo();
     }, []);
 
@@ -260,15 +248,9 @@ function MainLayout() {
                 setLoading(true);
                 const backendMenus = await getMenuList();
                 const convertedMenus = convertMenuItems(backendMenus);
-                // 开发环境下打印菜单数据
-                if (import.meta.env.DEV) {
-
-
-                }
                 setMenuItems(convertedMenus);
             } catch (error) {
                 console.error('加载菜单失败:', error);
-                // 如果加载失败，清空菜单
                 setMenuItems([]);
             } finally {
                 setLoading(false);
@@ -278,36 +260,42 @@ function MainLayout() {
         loadMenus();
     }, []);
 
-    // 菜单项转 AntD items：静态分组导航（参照 x.ai 控制台侧栏）
-    // 顶层有子项的节点渲染为不可折叠的分组标题（type:'group'），
-    // 组内成员平铺；更深层级拍平进最近的分组，不再出现第二级缩进树。
+    // 拍平所有叶子节点（防止多层嵌套，组内平铺）
     const flattenLeaves = (item: MenuItem): MenuItem[] => {
         if (!item.children || item.children.length === 0) return [item];
         return item.children.flatMap(flattenLeaves);
     };
 
-    const groupedMenuItems = menuItems.map(item => {
-        const leaves = flattenLeaves(item);
-        // 顶层叶子（如「首页」）直接作为独立项，不进任何分组
-        if (!item.children || item.children.length === 0) {
-            return { key: item.key, icon: item.icon, label: item.label };
-        }
-        return {
-            key: `grp-${item.key}`,
-            type: 'group' as const,
-            label: item.label,
-            children: leaves.map(leaf => ({
-                key: leaf.key,
-                icon: leaf.icon,
-                label: leaf.label,
-            })),
-        };
-    });
+    // 格式化为 AntD Menu items：静态分组导航（不收缩的分组样式）
+    // 顶层有子项的节点渲染为不可收缩的分组标题（type: 'group'），组内成员平铺
+    // 顶层叶子节点（如「首页」）作为独立项展示
+    const buildGroupedMenuItems = (items: MenuItem[]): any[] => {
+        return items.map(item => {
+            if (!item.children || item.children.length === 0) {
+                return {
+                    key: item.key,
+                    icon: item.icon,
+                    label: item.label,
+                };
+            }
+            const leaves = flattenLeaves(item);
+            return {
+                key: `grp-${item.key}`,
+                type: 'group' as const,
+                label: item.label,
+                children: leaves.map(leaf => ({
+                    key: leaf.key,
+                    icon: leaf.icon,
+                    label: leaf.label,
+                })),
+            };
+        });
+    };
 
     // 处理菜单点击
     const handleMenuClick = async ({ key }: { key: string }) => {
-        // 分组标题不可点，也没有对应路由
         if (key.startsWith('grp-')) return;
+
         const findMenuItem = (items: MenuItem[], targetKey: string): MenuItem | null => {
             for (const item of items) {
                 if (item.key === targetKey) {
@@ -322,11 +310,9 @@ function MainLayout() {
         };
 
         const menuItem = findMenuItem(menuItems, key);
-        // 只有当菜单项有有效路径时才进行路由跳转
         if (menuItem && menuItem.path && menuItem.path !== '/logout') {
             navigate(menuItem.path);
         } else if (menuItem && menuItem.path === '/logout') {
-            // 特殊处理退出登录
             try {
                 await logout();
                 setMenuItems([]);
@@ -339,7 +325,7 @@ function MainLayout() {
         }
     };
 
-    // 根据当前路由自动高亮菜单项（静态分组没有展开/收起状态可同步）
+    // 监听路由高亮菜单
     useEffect(() => {
         if (menuItems.length === 0) return;
 
@@ -362,8 +348,6 @@ function MainLayout() {
     const roleName = currentUserInfo?.roleName || '系统管理员';
     const avatarUrl = currentUserInfo?.avatarUrl || currentUser?.avatarUrl || currentUser?.avatar;
 
-    // 账号菜单从顶栏挪到了侧栏底部：这类操作一天用不了两次，
-    // 不该常年占着顶栏右上角最显眼的位置。
     const accountMenu = {
         items: [
             {
@@ -371,6 +355,9 @@ function MainLayout() {
                 label: '个人设置',
                 icon: <SettingOutlined />,
                 onClick: () => navigate('/settings')
+            },
+            {
+                type: 'divider' as const,
             },
             {
                 key: 'logout',
@@ -393,20 +380,20 @@ function MainLayout() {
 
     return (
         <AntLayout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'row' }}>
-            {/* 侧栏和工作区一样是纯白，只靠右侧一条发丝线分开 —— 没有深色玻璃、没有投影 */}
+            {/* 纯净浅色侧栏导航 */}
             <Sider
                 collapsible
                 collapsed={collapsed}
                 onCollapse={(value) => setCollapsed(value)}
                 trigger={null}
                 breakpoint="lg"
-                collapsedWidth="0"
-                width={248}
+                collapsedWidth={64}
+                width={240}
                 className="ap-rail-sider"
-                style={{ position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 1001 }}
+                style={{ position: 'fixed', left: 0, top: 0, bottom: 0, zIndex: 100 }}
             >
                 <div className="ap-brand">
-                    <span className="ap-logo"><LogoMark /></span>
+                    <span className="ap-logo"><LogoMark size={16} /></span>
                     {!collapsed && (
                         <span className="ap-brand-t">
                             {systemInfo?.platformShortName || 'AdminPro'}
@@ -419,43 +406,48 @@ function MainLayout() {
                         mode="inline"
                         selectedKeys={selectedKeys}
                         onClick={handleMenuClick}
-                        items={groupedMenuItems}
+                        items={buildGroupedMenuItems(menuItems)}
                         style={{ background: 'transparent', borderRight: 0 }}
                     />
                 </div>
 
                 <Dropdown menu={accountMenu} placement="topRight" trigger={['click']}>
                     <div className="ap-rail-user">
-                        {avatarUrl
-                            ? <img className="ap-ru-av" src={avatarUrl} alt="" />
-                            : <span className="ap-ru-av">{displayName.slice(0, 1)}</span>}
-                        <span style={{ minWidth: 0 }}>
-                            <span className="ap-ru-n">{displayName}</span><br />
-                            <span className="ap-ru-r">{roleName}</span>
-                        </span>
-                        <span className="ap-ru-x"><ChevronRight /></span>
+                        {avatarUrl ? (
+                            <img className="ap-ru-av" src={avatarUrl} alt="" />
+                        ) : (
+                            <span className="ap-ru-av">{displayName.slice(0, 1)}</span>
+                        )}
+                        {!collapsed && (
+                            <div className="ap-rail-user-inner">
+                                <div className="ap-ru-n">{displayName}</div>
+                                <div className="ap-ru-r">{roleName}</div>
+                            </div>
+                        )}
                     </div>
                 </Dropdown>
             </Sider>
 
             <AntLayout style={{
-                marginLeft: collapsed ? 0 : 248,
-                transition: 'margin-left 0.2s',
+                marginLeft: collapsed ? 64 : 240,
+                transition: 'margin-left 0.2s cubic-bezier(0.2, 0, 0, 1)',
                 display: 'flex',
                 flexDirection: 'column',
                 minHeight: '100vh',
                 flex: 1
             }}>
-                <Header className="ap-topbar" style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
-                    <Button
-                        type="text"
-                        shape="circle"
-                        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                        onClick={() => setCollapsed(!collapsed)}
-                        aria-label={collapsed ? '展开侧栏' : '收起侧栏'}
-                        style={{ marginLeft: -8, marginRight: 4 }}
-                    />
-                    <Breadcrumb items={getBreadcrumbItems()} />
+                <Header className="ap-topbar" style={{ position: 'sticky', top: 0, zIndex: 99 }}>
+                    <div className="ap-topbar-l">
+                        <Button
+                            type="text"
+                            shape="circle"
+                            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                            onClick={() => setCollapsed(!collapsed)}
+                            aria-label={collapsed ? '展开侧栏' : '收起侧栏'}
+                            style={{ marginLeft: -8, marginRight: 4 }}
+                        />
+                        <Breadcrumb items={getBreadcrumbItems()} />
+                    </div>
 
                     <div className="ap-topbar-r">
                         <Dropdown
@@ -469,6 +461,7 @@ function MainLayout() {
                         >
                             <Button type="text" shape="circle" icon={<TranslationOutlined />} aria-label="切换语言" />
                         </Dropdown>
+
                         <Tooltip title="消息通知">
                             <Button
                                 type="text"
@@ -481,10 +474,19 @@ function MainLayout() {
                                 }
                             />
                         </Tooltip>
+
+                        <Dropdown menu={accountMenu} placement="bottomRight" arrow>
+                            <div className="ap-topbar-user">
+                                <Avatar size={28} src={avatarUrl} style={{ backgroundColor: '#1677ff' }}>
+                                    {displayName.slice(0, 1)}
+                                </Avatar>
+                                <span className="ap-topbar-name">{displayName}</span>
+                                <DownOutlined style={{ fontSize: 10, color: 'var(--ap-text-3)' }} />
+                            </div>
+                        </Dropdown>
                     </div>
                 </Header>
 
-                {/* 留白由 .ap-page 统一给：32 的内边距、28 的纵向间距，页面自己不再加 margin */}
                 <Content style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column' }}>
                     <div className="ap-page fade-in">
                         <Outlet />
@@ -492,7 +494,7 @@ function MainLayout() {
                 </Content>
 
                 <Footer className="ap-foot">
-                    {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} AdminPro`}
+                    {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} AdminPro. All Rights Reserved.`}
                 </Footer>
             </AntLayout>
         </AntLayout>

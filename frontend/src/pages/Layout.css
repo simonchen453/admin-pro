@@ -1,21 +1,13 @@
 /* ==========================================================================
-   外壳：侧栏 / 顶栏 / 页脚
-   ------------------------------------------------------------------
-   上一版这里有 260 行：深色玻璃侧栏、靛紫渐变的选中态、悬停时
-   translateX(4px) 的位移、菜单项左侧那条发光竖条。全部去掉了。
-
-   这一版的分隔只有一种手段 —— 一条 1px 发丝线。侧栏、顶栏、工作区
-   都是纯白，谁在上层靠线和留白说明，不靠明度和投影。
-   组件通用的对齐在 styles/antd.css，这里只写外壳独有的部分。
+   外壳：侧栏 / 顶栏 / 页脚（经典企业商务风）
    ========================================================================== */
 
 /* --- 侧栏 --- */
-/* AntD 的 Sider 自己是 position: fixed（在 Layout.tsx 里内联给的），
-   所以这里不能直接复用 ui.css 的 .ap-rail —— 那是 sticky 版。
-   看起来一样，定位方式不同。 */
 .ap-rail-sider {
   background: var(--ap-rail) !important;
   border-right: 1px solid var(--ap-card-line);
+  box-shadow: 2px 0 6px rgba(0, 21, 41, 0.03);
+  transition: width 0.2s cubic-bezier(0.2, 0, 0, 1), min-width 0.2s cubic-bezier(0.2, 0, 0, 1) !important;
 }
 .ap-rail-sider .ant-layout-sider-children {
   display: flex;
@@ -23,35 +15,166 @@
   height: 100%;
 }
 
-/* 菜单区吃掉中间所有剩余高度，品牌行和用户块钉在两端 */
+.ap-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--ap-h-top);
+  flex: none;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--ap-card-line);
+  overflow: hidden;
+}
+.ap-brand-t {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ap-text);
+  white-space: nowrap;
+  letter-spacing: normal;
+}
+
+/* 菜单导航区 */
 .ap-rail-nav {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: var(--ap-sp-3) var(--ap-sp-3) var(--ap-sp-6);
+  padding: 8px 4px;
 }
 
-/* 侧栏收起到 0 宽时，里面的东西不该在动画中途露出来 */
-.ap-rail-sider.ant-layout-sider-collapsed .ap-brand,
-.ap-rail-sider.ant-layout-sider-collapsed .ap-rail-user {
-  opacity: 0;
+/* 侧栏收起状态 */
+.ap-rail-sider.ant-layout-sider-collapsed .ap-brand {
+  justify-content: center;
+  padding: 0;
+}
+.ap-rail-sider.ant-layout-sider-collapsed .ap-brand-t {
+  display: none;
+}
+.ap-rail-sider.ant-layout-sider-collapsed .ap-rail-user-inner {
+  display: none;
 }
 
-/* 用户头像是真图片时，撑满那个 28px 的圆 */
-img.ap-ru-av { object-fit: cover; padding: 0; }
+/* 侧栏底部用户块 */
+.ap-rail-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  flex: none;
+  border-top: 1px solid var(--ap-card-line);
+  cursor: pointer;
+  transition: background var(--ap-dur) var(--ap-ease);
+}
+.ap-rail-user:hover {
+  background: var(--ap-fill);
+}
+.ap-rail-user-inner {
+  min-width: 0;
+  flex: 1;
+}
+
+.ap-ru-av {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary);
+  display: grid;
+  place-items: center;
+  font-size: var(--ap-fs-meta);
+  font-weight: 600;
+  border: 1px solid var(--ap-primary-line);
+}
+img.ap-ru-av {
+  object-fit: cover;
+  padding: 0;
+}
+.ap-ru-n {
+  font-size: var(--ap-fs-body);
+  font-weight: 500;
+  color: var(--ap-text);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ap-ru-r {
+  font-size: var(--ap-fs-micro);
+  color: var(--ap-text-3);
+  line-height: 1.35;
+}
+.ap-ru-x {
+  margin-left: auto;
+  color: var(--ap-text-3);
+}
 
 /* --- 顶栏 --- */
-/* .ap-topbar 的观感在 ui.css 里；这里只处理 AntD Header 自带的内联留白 */
 .ant-layout-header.ap-topbar {
-  padding: 0 var(--ap-sp-8);
+  padding: 0 24px;
   line-height: normal;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--ap-h-top);
+}
+.ap-topbar-l {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ap-topbar-r {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 顶栏用户下拉 */
+.ap-topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: var(--ap-r-sm);
+  cursor: pointer;
+  transition: background var(--ap-dur) var(--ap-ease);
+}
+.ap-topbar-user:hover {
+  background: var(--ap-fill);
+}
+.ap-topbar-av,
+.ap-topbar-av-text {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex: none;
+}
+.ap-topbar-av {
+  object-fit: cover;
+}
+.ap-topbar-av-text {
+  background: var(--ap-primary);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 500;
+}
+.ap-topbar-name {
+  font-size: var(--ap-fs-body);
+  font-weight: 500;
+  color: var(--ap-text);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* --- 页脚 --- */
 .ant-layout-footer.ap-foot {
   flex: none;
-  padding: var(--ap-sp-5) var(--ap-sp-8);
+  padding: 16px 24px;
   background: var(--ap-bg);
   border-top: 1px solid var(--ap-card-line);
   text-align: center;
@@ -59,9 +182,8 @@ img.ap-ru-av { object-fit: cover; padding: 0; }
   color: var(--ap-text-3);
 }
 
-/* --- 窄屏 --- */
-/* 断点跟 styles/ui.css 里的外壳断点保持一致 */
 @media (max-width: 820px) {
-  .ant-layout-header.ap-topbar { padding: 0 var(--ap-sp-5); }
-  .ant-layout-footer.ap-foot { padding: var(--ap-sp-5); }
+  .ant-layout-header.ap-topbar { padding: 0 16px; }
+  .ant-layout-footer.ap-foot { padding: 16px; }
+  .ap-topbar-name { display: none; }
 }

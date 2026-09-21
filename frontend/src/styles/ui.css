@@ -68,11 +68,11 @@ a { color: inherit; text-decoration: none; }
   height: var(--ap-h-top); flex: none; padding: 0 var(--ap-sp-5);
   border-bottom: 1px solid var(--ap-card-line);
 }
-/* 品牌标记是一枚黑方块，不是渐变色块 */
 .ap-logo {
-  width: 26px; height: 26px; flex: none; border-radius: 7px;
-  background: var(--ap-accent); color: var(--ap-text-inv);
+  width: 28px; height: 28px; flex: none; border-radius: 6px;
+  background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%); color: #ffffff;
   display: grid; place-items: center;
+  box-shadow: 0 2px 6px rgba(22, 119, 255, 0.35);
 }
 .ap-logo svg { width: 15px; height: 15px; }
 .ap-brand-t {
@@ -170,13 +170,13 @@ a { color: inherit; text-decoration: none; }
 }
 
 .ap-page {
-  flex: 1; padding: var(--ap-sp-8);
-  display: flex; flex-direction: column; gap: var(--ap-sp-7);
+  flex: 1; padding: 20px 24px;
+  display: flex; flex-direction: column; gap: 16px;
 }
 
 
 /* ==========================================================================
-   页头 —— 参照稿的骨架：一行小灰字，紧跟一个很大的紧字距标题
+   页头
    ========================================================================== */
 .ap-pagehead {
   display: flex; align-items: flex-end; gap: var(--ap-sp-4); flex-wrap: wrap;
@@ -185,7 +185,7 @@ a { color: inherit; text-decoration: none; }
 .ap-page-title {
   font-family: var(--ap-font-d);
   font-size: var(--ap-fs-page); font-weight: 600;
-  letter-spacing: var(--ap-tr-page); line-height: 1.15; margin: 0;
+  letter-spacing: var(--ap-tr-page); line-height: 1.2; margin: 0;
 }
 .ap-page-sub {
   font-size: var(--ap-fs-meta); color: var(--ap-text-3);
@@ -195,49 +195,47 @@ a { color: inherit; text-decoration: none; }
 
 
 /* ==========================================================================
-   按钮 —— 全部胶囊。主操作实心黑，次操作白底描边，弱操作无框。
-   参照稿右下角就是这一对：Deny（描边）+ Allow（实心黑）。
+   按钮体系
    ========================================================================== */
 .ap-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  height: var(--ap-h-ctl); padding: 0 18px;
-  font: inherit; font-size: var(--ap-fs-body); font-weight: 500;
-  letter-spacing: -.005em;
+  height: var(--ap-h-ctl); padding: 0 16px;
+  font: inherit; font-size: var(--ap-fs-body); font-weight: 400;
+  letter-spacing: normal;
   color: var(--ap-text); background: var(--ap-card);
-  border: 1px solid var(--ap-field); border-radius: var(--ap-r-pill);
+  border: 1px solid var(--ap-field); border-radius: var(--ap-r-sm);
   cursor: pointer; white-space: nowrap;
-  transition: background var(--ap-dur) var(--ap-ease),
-              border-color var(--ap-dur) var(--ap-ease),
-              color var(--ap-dur) var(--ap-ease);
+  transition: all var(--ap-dur) var(--ap-ease);
 }
-.ap-btn:hover { background: var(--ap-fill); }
+.ap-btn:hover { background: var(--ap-fill); border-color: var(--ap-primary); color: var(--ap-primary); }
 .ap-btn:active { background: var(--ap-fill-2); }
 .ap-btn svg { width: 15px; height: 15px; }
 
-/* 主操作 = 全页唯一的实心黑。一屏最多一个。 */
+/* 主操作按钮：科技蓝 */
 .ap-btn-p {
-  background: var(--ap-accent); border-color: var(--ap-accent); color: var(--ap-text-inv);
+  background: var(--ap-primary); border-color: var(--ap-primary); color: #ffffff;
+  box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
 }
-.ap-btn-p:hover { background: var(--ap-accent-hover); border-color: var(--ap-accent-hover); }
-.ap-btn-p:active { background: var(--ap-accent); }
+.ap-btn-p:hover { background: var(--ap-primary-hover); border-color: var(--ap-primary-hover); color: #ffffff; }
+.ap-btn-p:active { background: var(--ap-primary-active); border-color: var(--ap-primary-active); }
 
 .ap-btn-q { background: transparent; border-color: transparent; color: var(--ap-text-2); }
-.ap-btn-q:hover { background: var(--ap-fill); border-color: transparent; color: var(--ap-text); }
+.ap-btn-q:hover { background: var(--ap-fill); border-color: transparent; color: var(--ap-primary); }
 
-.ap-btn-d { color: var(--ap-bad); border-color: var(--ap-field); }
-.ap-btn-d:hover { background: var(--ap-fill); border-color: var(--ap-bad); }
+.ap-btn-d { color: var(--ap-bad); border-color: #ffa39e; }
+.ap-btn-d:hover { background: #fff1f0; border-color: #ff7875; color: #ff4d4f; }
 
-.ap-btn-sm { height: 30px; padding: 0 13px; font-size: var(--ap-fs-meta); }
-.ap-btn-lg { height: var(--ap-h-ctl-lg); padding: 0 22px; font-size: var(--ap-fs-lead); }
+.ap-btn-sm { height: 28px; padding: 0 12px; font-size: var(--ap-fs-meta); }
+.ap-btn-lg { height: var(--ap-h-ctl-lg); padding: 0 20px; font-size: var(--ap-fs-lead); }
 .ap-btn-block { width: 100%; }
 .ap-btn:disabled, .ap-btn[aria-disabled="true"] {
-  color: var(--ap-text-3); background: var(--ap-card);
-  border-color: var(--ap-line); cursor: not-allowed;
+  color: var(--ap-text-3); background: var(--ap-fill);
+  border-color: var(--ap-card-line); cursor: not-allowed;
 }
 
 
 /* ==========================================================================
-   表单控件 —— 控件是圆角矩形，按钮是胶囊：形状本身区分"可输入"和"可点击"
+   表单控件
    ========================================================================== */
 .ap-field { display: flex; flex-direction: column; gap: var(--ap-sp-2); }
 .ap-label { font-size: var(--ap-fs-meta); font-weight: 500; color: var(--ap-text-2); }
@@ -249,20 +247,20 @@ a { color: inherit; text-decoration: none; }
 .ap-hint-err { color: var(--ap-bad); }
 
 .ap-input, .ap-select {
-  height: var(--ap-h-ctl); width: 100%; padding: 0 13px;
+  height: var(--ap-h-ctl); width: 100%; padding: 0 12px;
   font: inherit; font-size: var(--ap-fs-body); color: var(--ap-text);
   background: var(--ap-card);
   border: 1px solid var(--ap-field); border-radius: var(--ap-r-sm);
   transition: border-color var(--ap-dur) var(--ap-ease), box-shadow var(--ap-dur) var(--ap-ease);
 }
 .ap-input::placeholder { color: var(--ap-text-3); }
-.ap-input:hover, .ap-select:hover { border-color: var(--ap-text-3); }
+.ap-input:hover, .ap-select:hover { border-color: var(--ap-primary-hover); }
 .ap-input:focus, .ap-select:focus {
-  outline: none; border-color: var(--ap-accent);
-  box-shadow: 0 0 0 3px var(--ap-fill-2);
+  outline: none; border-color: var(--ap-primary);
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.15);
 }
 .ap-input[aria-invalid="true"] { border-color: var(--ap-bad); }
-.ap-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgba(180, 35, 24, .12); }
+.ap-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2); }
 .ap-input:disabled { background: var(--ap-fill); color: var(--ap-text-3); cursor: not-allowed; }
 .ap-input-lg { height: var(--ap-h-ctl-lg); }
 .ap-input-mono { font-family: var(--ap-mono); font-size: var(--ap-fs-meta); }
@@ -272,39 +270,40 @@ a { color: inherit; text-decoration: none; }
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23757575' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3.5 5.5 7 9l3.5-3.5'/></svg>");
   background-repeat: no-repeat; background-position: right 11px center;
 }
-.ap-check { width: 15px; height: 15px; accent-color: var(--ap-accent); cursor: pointer; }
+.ap-check { width: 15px; height: 15px; accent-color: var(--ap-primary); cursor: pointer; }
 
 
 /* ==========================================================================
-   卡片 —— 只有一条发丝外框和一个大圆角。零投影、零底色。
+   卡片
    ========================================================================== */
 .ap-card {
-  background: var(--ap-card);
+  background: #ffffff;
   border: 1px solid var(--ap-card-line);
   border-radius: var(--ap-r);
-  overflow: hidden;   /* 让内部的行分隔线在圆角处收得干净 */
+  box-shadow: var(--ap-shadow-sm);
+  overflow: hidden;
 }
 .ap-card-h {
   display: flex; align-items: center; gap: var(--ap-sp-3);
-  padding: var(--ap-sp-5) var(--ap-sp-6);
+  padding: 14px 20px;
   border-bottom: 1px solid var(--ap-line);
 }
 .ap-card-t {
   font-family: var(--ap-font-d);
   font-size: var(--ap-fs-title); font-weight: 600; margin: 0;
-  letter-spacing: var(--ap-tr-title);
+  color: var(--ap-text);
 }
 .ap-card-n { font-size: var(--ap-fs-meta); color: var(--ap-text-3); }
 .ap-card-a { margin-left: auto; display: flex; align-items: center; gap: var(--ap-sp-2); }
-.ap-card-b { padding: var(--ap-sp-6); }
+.ap-card-b { padding: 20px; }
 
-/* 链接是黑字加发丝下划线 —— 没有链接蓝，也没有强调色 */
+/* 链接 */
 .ap-link {
-  color: var(--ap-text); font-size: var(--ap-fs-meta); font-weight: 500;
-  text-decoration: underline; text-decoration-color: var(--ap-field);
-  text-underline-offset: 3px;
+  color: var(--ap-primary); font-size: var(--ap-fs-meta); font-weight: 400;
+  cursor: pointer; text-decoration: none;
+  transition: color var(--ap-dur) var(--ap-ease);
 }
-.ap-link:hover { text-decoration-color: var(--ap-text); }
+.ap-link:hover { color: var(--ap-primary-hover); text-decoration: underline; }
 
 
 /* ==========================================================================

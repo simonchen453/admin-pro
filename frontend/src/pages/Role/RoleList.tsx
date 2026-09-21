@@ -1,33 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Table,
   Button,
   Space,
   Form,
   Input,
-  Select,
-  Card,
   Tag,
   message,
   Modal,
   Row,
   Col,
-  Pagination,
-  Typography
+  Segmented,
+  Tooltip,
+  Dropdown,
+  Popover,
+  Checkbox,
+  Badge,
 } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
-  ClearOutlined
+  ClearOutlined,
+  ReloadOutlined,
+  ColumnHeightOutlined,
+  SettingOutlined,
+  FullscreenOutlined,
+  FullscreenExitOutlined,
+  InfoCircleFilled,
+  SafetyCertificateOutlined,
+  KeyOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import {
   deleteRoleApi,
   getMenuTreeApi,
-  getRoleListApi
+  getRoleListApi,
 } from '../../api/role';
 import {
   RoleStatus,
@@ -35,12 +45,10 @@ import {
   type RoleEntity,
   type RoleSearchForm,
   type MenuTreeNode,
-  type RoleListResponse
+  type RoleListResponse,
 } from '../../types';
 import RoleForm from './RoleForm';
-
-const { Option } = Select;
-const { Title } = Typography;
+import '../../styles/crud.css';
 
 const RoleList: React.FC = () => {
   const navigate = useNavigate();
@@ -53,11 +61,23 @@ const RoleList: React.FC = () => {
   const [searchForm, setSearchForm] = useState<RoleSearchForm>({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<RoleEntity[]>([]);
+
+  // 现代 ProTable 增强状态
+  const [tableSize, setTableSize] = useState<'small' | 'middle' | 'large'>('middle');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [statusTab, setStatusTab] = useState<string>('ALL');
+  const [visibleColumns, setVisibleColumns] = useState<string[]>([
+    'roleInfo',
+    'system',
+    'status',
+    'action',
+  ]);
+
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
   // 模态框状态
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingRole, setEditingRole] = useState<RoleEntity | null>(null);
-
-  // 菜单树数据
   const [menuOptions, setMenuOptions] = useState<MenuTreeNode[]>([]);
 
   // 获取角色列表
@@ -67,7 +87,7 @@ const RoleList: React.FC = () => {
       const params = {
         ...(searchParams || searchForm),
         pageNo: page ?? currentPage,
-        pageSize: size ?? pageSize
+        pageSize: size ?? pageSize,
       };
 
       const response: RoleListResponse = await getRoleListApi(params);
@@ -98,39 +118,51 @@ const RoleList: React.FC = () => {
         setMenuOptions(response.data || []);
       } else {
         message.error(response.message || '获取菜单树失败');
-        setMenuOptions([]);
       }
     } catch (error) {
       console.error('获取菜单树失败:', error);
       message.error('获取菜单树失败');
-      setMenuOptions([]);
     }
   };
 
   // 搜索
   const handleSearch = (values: RoleSearchForm) => {
-    setSearchForm(values);
+    const query = {
+      ...values,
+      status: statusTab === 'ALL' ? values.status : statusTab,
+    };
+    setSearchForm(query);
     setCurrentPage(1);
-    fetchRoleList(values, 1);
+    fetchRoleList(query, 1);
   };
 
   // 重置搜索
   const handleReset = () => {
     form.resetFields();
-    const emptyForm = {};
-    setSearchForm(emptyForm);
+    setStatusTab('ALL');
+    setSearchForm({});
     setCurrentPage(1);
-    fetchRoleList(emptyForm, 1);
+    fetchRoleList({}, 1);
+  };
+
+  // 状态 Tab 切换
+  const handleStatusTabChange = (val: string | number) => {
+    const tab = String(val);
+    setStatusTab(tab);
+    setCurrentPage(1);
+    const newStatus = tab === 'ALL' ? undefined : tab;
+    const newForm = { ...searchForm, status: newStatus };
+    setSearchForm(newForm);
+    fetchRoleList(newForm, 1);
   };
 
   // 分页变化
   const handlePageChange = (page: number, size?: number) => {
-    const newPageSize = size ?? pageSize;
     setCurrentPage(page);
     if (size) {
       setPageSize(size);
     }
-    fetchRoleList(undefined, page, newPageSize);
+    fetchRoleList(searchForm, page, size || pageSize);
   };
 
   // 编辑角色
@@ -151,27 +183,25 @@ const RoleList: React.FC = () => {
       message.warning('请选择要删除的角色');
       return;
     }
+
+    const ids = selectedRoles
+      .map((role) => role.id)
+      .filter(Boolean)
+      .join(',');
+
     Modal.confirm({
       title: '确认删除',
-      content: `确定要删除选中的 ${selectedRoles.length} 个角色吗？`,
+      content: `确定要删除选中的 ${selectedRoles.length} 个角色吗？删除后不可恢复。`,
+      okText: '确定删除',
+      okType: 'danger',
+      cancelText: '取消',
       onOk: async () => {
         try {
-          const validIds = selectedRoles
-            .map(role => role.id)
-            .filter((id): id is string => id !== undefined);
-
-          if (validIds.length === 0) {
-            message.error('选中的角色中没有有效的ID');
-            return;
-          }
-
-
-          const ids = validIds.join(',');
           const response = await deleteRoleApi(ids);
           if (response.restCode === '200') {
-            message.success('批量删除成功');
-            setSelectedRoles([]);
+            message.success('角色批量删除成功');
             setSelectedRowKeys([]);
+            setSelectedRoles([]);
             fetchRoleList();
           } else {
             message.error(response.message || '批量删除失败');
@@ -180,7 +210,7 @@ const RoleList: React.FC = () => {
           console.error('批量删除失败:', error);
           message.error('批量删除失败');
         }
-      }
+      },
     });
   };
 
@@ -193,12 +223,11 @@ const RoleList: React.FC = () => {
 
     Modal.confirm({
       title: '确认删除',
-      content: `确定要删除角色 "${role.display}" 吗？`,
-      okText: '确认',
+      content: `确定要删除角色「${role.display}」吗？`,
+      okText: '确定删除',
+      okType: 'danger',
       cancelText: '取消',
-      maskClosable: true,
       centered: true,
-      getContainer: () => document.getElementById('root') || document.body,
       onOk: async () => {
         try {
           const response = await deleteRoleApi(role.id!);
@@ -212,99 +241,153 @@ const RoleList: React.FC = () => {
           console.error('删除失败:', error);
           message.error('删除失败');
         }
-      }
+      },
     });
   };
 
   // 行选择
   const rowSelection = {
     selectedRowKeys,
-    onChange: (selectedRowKeys: React.Key[], selectedRows: RoleEntity[]) => {
-      setSelectedRowKeys(selectedRowKeys);
-      setSelectedRoles(selectedRows);
+    onChange: (keys: React.Key[], rows: RoleEntity[]) => {
+      setSelectedRowKeys(keys);
+      setSelectedRoles(rows);
     },
     getCheckboxProps: (record: RoleEntity) => ({
       name: record.display,
     }),
   };
 
-  // 获取状态标签
-  const getStatusTag = (status: string) => {
-    const statusMap: Record<string, { color: string; text: string }> = {
-      [RoleStatus.ACTIVE]: { color: 'green', text: '正常' },
-      [RoleStatus.INACTIVE]: { color: 'red', text: '停用' }
-    };
-    const statusInfo = statusMap[status] || { color: 'default', text: status };
-    return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>;
-  };
+  // 全量表格列定义
+  const allColumns: ColumnsType<RoleEntity> = useMemo(
+    () => [
+      {
+        title: '角色信息',
+        key: 'roleInfo',
+        width: 280,
+        render: (_, record: RoleEntity) => (
+          <div className="crud-user-cell">
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 8,
+                background: '#f0f5ff',
+                color: '#1677ff',
+                display: 'grid',
+                placeItems: 'center',
+                fontSize: 16,
+                flex: 'none',
+              }}
+            >
+              <KeyOutlined />
+            </div>
+            <div className="crud-user-meta">
+              <span className="crud-user-name">{record.display}</span>
+              <span className="crud-user-login">{record.name}</span>
+            </div>
+          </div>
+        ),
+      },
+      {
+        title: '角色类型',
+        dataIndex: 'system',
+        key: 'system',
+        width: 140,
+        align: 'center',
+        render: (system: string) =>
+          system === SystemConfig.YES || system === '1' ? (
+            <Tag color="purple" icon={<SafetyCertificateOutlined />}>
+              系统内置
+            </Tag>
+          ) : (
+            <Tag color="blue">自定义角色</Tag>
+          ),
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        key: 'status',
+        align: 'center',
+        width: 120,
+        render: (status: string) =>
+          status === RoleStatus.ACTIVE || status === '0' ? (
+            <Badge status="success" text="正常启用" />
+          ) : (
+            <Badge status="error" text="已停用" />
+          ),
+      },
+      {
+        title: '操作',
+        key: 'action',
+        width: 160,
+        fixed: 'right',
+        render: (_, record: RoleEntity) => (
+          <Space size="small">
+            <Button
+              size="small"
+              type="link"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            >
+              修改
+            </Button>
+            <Button
+              size="small"
+              type="link"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record)}
+            >
+              删除
+            </Button>
+          </Space>
+        ),
+      },
+    ],
+    []
+  );
 
-  // 获取系统配置标签
-  const getSystemTag = (system: string) => {
-    const systemMap: Record<string, { color: string; text: string }> = {
-      [SystemConfig.YES]: { color: 'blue', text: '是' },
-      [SystemConfig.NO]: { color: 'default', text: '否' }
-    };
-    const systemInfo = systemMap[system] || { color: 'default', text: system };
-    return <Tag color={systemInfo.color}>{systemInfo.text}</Tag>;
-  };
+  const columns = useMemo(() => {
+    return allColumns.filter((col) => !col.key || visibleColumns.includes(col.key as string));
+  }, [allColumns, visibleColumns]);
 
-  // 表格列定义
-  const columns: ColumnsType<RoleEntity> = [
-    {
-      title: '编号',
-      dataIndex: 'name',
-      key: 'name',
-      ellipsis: true
-    },
-    {
-      title: '显示名称',
-      dataIndex: 'display',
-      key: 'display',
-      ellipsis: true,
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      align: 'center',
-      width: 120,
-      render: (status: string) => getStatusTag(status)
-    },
-    {
-      title: '系统配置',
-      dataIndex: 'system',
-      key: 'system',
-      width: 120,
-      align: 'center',
-      render: (system: string) => getSystemTag(system)
-    },
-    {
-      title: '操作',
-      key: 'action',
-      width: 180,
-      render: (_, record: RoleEntity) => (
-        <Space size="small">
-          <Button
-            size="small"
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            修改
-          </Button>
-          <Button
-            size="small"
-            type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record)}
-          >
-            删除
-          </Button>
-        </Space>
-      )
-    }
-  ];
+  // 列配置 Popover
+  const columnSettingContent = (
+    <div style={{ width: 180 }}>
+      <div className="crud-col-popover-title">
+        <span>展示列配置</span>
+        <Button
+          type="link"
+          size="small"
+          style={{ padding: 0 }}
+          onClick={() => setVisibleColumns(['roleInfo', 'system', 'status', 'action'])}
+        >
+          重置
+        </Button>
+      </div>
+      {allColumns.map((col) => {
+        if (!col.key || col.key === 'action') return null;
+        const key = col.key as string;
+        const checked = visibleColumns.includes(key);
+        return (
+          <div key={key} className="crud-col-item">
+            <Checkbox
+              checked={checked}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setVisibleColumns([...visibleColumns, key]);
+                } else {
+                  setVisibleColumns(visibleColumns.filter((k) => k !== key));
+                }
+              }}
+            >
+              {typeof col.title === 'string' ? col.title : key}
+            </Checkbox>
+          </div>
+        );
+      })}
+    </div>
+  );
 
   useEffect(() => {
     fetchRoleList();
@@ -312,40 +395,46 @@ const RoleList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '0' }}>
+    <div className="crud-container fade-in">
+      {/* 顶部独立查询卡片 */}
+      <div className="crud-query-card">
+        <div className="crud-filter-tabs">
+          <Segmented
+            value={statusTab}
+            onChange={handleStatusTabChange}
+            options={[
+              { label: '全部角色', value: 'ALL' },
+              { label: '正常启用', value: RoleStatus.ACTIVE },
+              { label: '已停用', value: RoleStatus.INACTIVE },
+            ]}
+          />
+        </div>
 
+        <Form form={form} layout="vertical" onFinish={handleSearch}>
+          <Row gutter={[16, 12]}>
+            <Col xs={24} sm={8} md={8}>
+              <Form.Item name="name" label="角色标识/编号">
+                <Input
+                  placeholder="请输入角色编号 (如 SYS_ADMIN_ROLE)"
+                  allowClear
+                  prefix={<KeyOutlined style={{ color: 'var(--ap-text-3)' }} />}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={8} md={8}>
+              <Form.Item name="display" label="角色显示名称">
+                <Input
+                  placeholder="请输入显示名称 (如 管理员)"
+                  allowClear
+                  prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />}
+                />
+              </Form.Item>
+            </Col>
 
-      <Card className="modern-card" title="角色管理" bordered={false}>
-        {/* 搜索表单 */}
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSearch}
-          className="search-form"
-        >
-          <Row gutter={24}>
-            <Col xs={24} sm={8} md={6}>
-              <Form.Item name="name" label="编号">
-                <Input placeholder="请输入编号" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8} md={6}>
-              <Form.Item name="display" label="显示名称">
-                <Input placeholder="请输入显示名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8} md={6}>
-              <Form.Item name="status" label="状态">
-                <Select placeholder="请选择状态" allowClear style={{ width: '100%' }}>
-                  <Option value={RoleStatus.ACTIVE}>正常</Option>
-                  <Option value={RoleStatus.INACTIVE}>停用</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
-              <Space>
+            <Col xs={24} sm={8} md={8} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 16 }}>
+              <Space size={8}>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                  搜索
+                  查询
                 </Button>
                 <Button onClick={handleReset} icon={<ClearOutlined />}>
                   重置
@@ -354,10 +443,16 @@ const RoleList: React.FC = () => {
             </Col>
           </Row>
         </Form>
+      </div>
 
-        {/* 操作按钮 */}
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Space>
+      {/* 角色主数据表格卡片 */}
+      <div
+        ref={tableContainerRef}
+        className={`crud-table-card ${isFullscreen ? 'crud-fullscreen' : ''}`}
+      >
+        {/* 工具栏 */}
+        <div className="crud-toolbar">
+          <div className="crud-toolbar-left">
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
               新增角色
             </Button>
@@ -365,41 +460,114 @@ const RoleList: React.FC = () => {
               danger
               icon={<DeleteOutlined />}
               disabled={selectedRoles.length === 0}
-              onClick={() => {
-                handleBatchDelete();
-              }}
+              onClick={handleBatchDelete}
             >
               批量删除
             </Button>
-          </Space>
+          </div>
+
+          <div className="crud-toolbar-right">
+            <Tooltip title="刷新数据">
+              <Button
+                type="text"
+                className="crud-tool-btn"
+                icon={<ReloadOutlined spin={loading} />}
+                onClick={() => fetchRoleList(searchForm)}
+              />
+            </Tooltip>
+
+            <Dropdown
+              menu={{
+                items: [
+                  { key: 'large', label: '宽松' },
+                  { key: 'middle', label: '默认' },
+                  { key: 'small', label: '紧凑' },
+                ],
+                selectedKeys: [tableSize],
+                onClick: (e) => setTableSize(e.key as 'small' | 'middle' | 'large'),
+              }}
+              trigger={['click']}
+            >
+              <Tooltip title="表格密度">
+                <Button type="text" className="crud-tool-btn" icon={<ColumnHeightOutlined />} />
+              </Tooltip>
+            </Dropdown>
+
+            <Popover content={columnSettingContent} trigger="click" placement="bottomRight">
+              <Tooltip title="列显隐设置">
+                <Button type="text" className="crud-tool-btn" icon={<SettingOutlined />} />
+              </Tooltip>
+            </Popover>
+
+            <Tooltip title={isFullscreen ? '退出全屏' : '全屏聚焦'}>
+              <Button
+                type="text"
+                className="crud-tool-btn"
+                icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                onClick={() => setIsFullscreen(!isFullscreen)}
+              />
+            </Tooltip>
+          </div>
         </div>
 
-        {/* 角色表格 */}
-        <div className="modern-table">
-          <Table
-            columns={columns}
-            dataSource={roleList}
-            loading={loading}
-            rowKey={(record) => record.id || `role-${record.name}`}
-            rowSelection={rowSelection}
-            pagination={{
-              current: currentPage,
-              pageSize: pageSize,
-              total: total,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
-              onChange: handlePageChange,
-              onShowSizeChange: handlePageChange,
-              pageSizeOptions: ['10', '20', '30', '50']
-            }}
-            size="middle"
-            locale={{
-              emptyText: roleList.length === 0 && !loading ? '暂无数据' : undefined
-            }}
-          />
-        </div>
-      </Card>
+        {/* 批量操作浮条 */}
+        {selectedRowKeys.length > 0 && (
+          <div className="crud-selection-bar">
+            <div className="crud-selection-bar-text">
+              <InfoCircleFilled />
+              <span>
+                已选择 <strong style={{ color: '#1677ff' }}>{selectedRowKeys.length}</strong> 个角色
+              </span>
+              <Button
+                type="link"
+                size="small"
+                style={{ padding: 0 }}
+                onClick={() => {
+                  setSelectedRowKeys([]);
+                  setSelectedRoles([]);
+                }}
+              >
+                清空已选
+              </Button>
+            </div>
+            <Space size={8}>
+              <Button
+                size="small"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={handleBatchDelete}
+              >
+                批量删除
+              </Button>
+            </Space>
+          </div>
+        )}
+
+        {/* 表格 */}
+        <Table
+          columns={columns}
+          dataSource={roleList}
+          loading={loading}
+          rowKey={(record) => record.id || `role-${record.name}`}
+          rowSelection={rowSelection}
+          pagination={{
+            current: currentPage,
+            pageSize: pageSize,
+            total: total,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (totalCount, range) =>
+              `第 ${range[0]}-${range[1]} 条 / 共 ${totalCount} 条角色`,
+            onChange: handlePageChange,
+            onShowSizeChange: handlePageChange,
+            pageSizeOptions: ['10', '20', '30', '50'],
+          }}
+          size={tableSize}
+          locale={{
+            emptyText: roleList.length === 0 && !loading ? '暂无匹配角色' : undefined,
+          }}
+        />
+      </div>
 
       {/* 角色表单模态框 */}
       <Modal

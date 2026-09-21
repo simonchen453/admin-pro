@@ -734,6 +734,7 @@ export interface DictCreateResponse {
 // 定时任务管理相关类型
 export interface JobSearchForm {
   condition?: string;
+  status?: string;
   pageNo?: number;
   pageSize?: number;
   totalNum?: number;
@@ -884,6 +885,7 @@ export interface ServerMemInfo {
 
 export interface ServerJvmInfo {
   total: number;
+  max?: number;
   used: number;
   free: number;
   usage: number;

@@ -1,42 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Table,
   Button,
   Space,
   Form,
   Input,
-  Select,
-  Card,
   Tag,
   message,
   Modal,
   Row,
   Col,
-  Pagination
+  Segmented,
+  Tooltip,
+  Dropdown,
+  Popover,
+  Checkbox,
+  Badge,
 } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
-  ClearOutlined
+  ClearOutlined,
+  ReloadOutlined,
+  ColumnHeightOutlined,
+  SettingOutlined,
+  FullscreenOutlined,
+  FullscreenExitOutlined,
+  InfoCircleFilled,
+  IdcardOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import {
   deletePostApi,
   batchDeletePostApi,
-  getPostListApi
+  getPostListApi,
 } from '../../api/post';
 import {
   PostStatus,
   type PostEntity,
   type PostSearchForm,
-  type PostListResponse
+  type PostListResponse,
 } from '../../types';
 import PostForm from './PostForm';
-
-const { Option } = Select;
+import '../../styles/crud.css';
 
 const PostList: React.FC = () => {
   const navigate = useNavigate();
@@ -49,6 +58,20 @@ const PostList: React.FC = () => {
   const [searchForm, setSearchForm] = useState<PostSearchForm>({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [selectedPosts, setSelectedPosts] = useState<PostEntity[]>([]);
+
+  // ProTable 增强状态
+  const [tableSize, setTableSize] = useState<'small' | 'middle' | 'large'>('middle');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [statusTab, setStatusTab] = useState<string>('ALL');
+  const [visibleColumns, setVisibleColumns] = useState<string[]>([
+    'postInfo',
+    'sort',
+    'status',
+    'remark',
+    'action',
+  ]);
+
+  const tableContainerRef = useRef<HTMLDivElement>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingPost, setEditingPost] = useState<PostEntity | null>(null);
 
@@ -58,13 +81,15 @@ const PostList: React.FC = () => {
       const params = {
         ...(searchParams || searchForm),
         pageNo: page ?? currentPage,
-        pageSize: size ?? pageSize
+        pageSize: size ?? pageSize,
       };
 
       const response: PostListResponse = await getPostListApi(params);
 
       if (response.restCode === '200') {
-        setPostList((response.data.records || []).map((item: any, index: number) => ({ ...item, index })));
+        setPostList(
+          (response.data.records || []).map((item: any, index: number) => ({ ...item, index }))
+        );
         setTotal(response.data.totalCount || 0);
       } else {
         message.error(response.message || '获取岗位列表失败');
@@ -82,26 +107,39 @@ const PostList: React.FC = () => {
   };
 
   const handleSearch = (values: PostSearchForm) => {
-    setSearchForm(values);
+    const query = {
+      ...values,
+      status: statusTab === 'ALL' ? values.status : statusTab,
+    };
+    setSearchForm(query);
     setCurrentPage(1);
-    fetchPostList(values, 1);
+    fetchPostList(query, 1);
   };
 
   const handleReset = () => {
     form.resetFields();
+    setStatusTab('ALL');
     const emptyForm = {};
     setSearchForm(emptyForm);
     setCurrentPage(1);
     fetchPostList(emptyForm, 1);
   };
 
+  const handleStatusTabChange = (val: string | number) => {
+    const tab = String(val);
+    setStatusTab(tab);
+    setCurrentPage(1);
+    const newStatus = tab === 'ALL' ? undefined : tab;
+    const newForm = { ...searchForm, status: newStatus };
+    setSearchForm(newForm);
+    fetchPostList(newForm, 1);
+  };
+
   const handlePageChange = (page: number, size?: number) => {
     const newPageSize = size ?? pageSize;
     setCurrentPage(page);
-    if (size) {
-      setPageSize(size);
-    }
-    fetchPostList(undefined, page, newPageSize);
+    setPageSize(newPageSize);
+    fetchPostList(searchForm, page, newPageSize);
   };
 
   const handleEdit = (post: PostEntity) => {
@@ -114,43 +152,6 @@ const PostList: React.FC = () => {
     setIsModalVisible(true);
   };
 
-  const handleBatchDelete = () => {
-    if (selectedPosts.length === 0) {
-      message.warning('请选择要删除的岗位');
-      return;
-    }
-    Modal.confirm({
-      title: '确认删除',
-      content: `确定要删除选中的 ${selectedPosts.length} 个岗位吗？`,
-      onOk: async () => {
-        try {
-          const validIds = selectedPosts
-            .map(post => post.id)
-            .filter((id): id is string => id !== undefined);
-
-          if (validIds.length === 0) {
-            message.error('选中的岗位中没有有效的ID');
-            return;
-          }
-
-          const ids = validIds.join(',');
-          const response = await batchDeletePostApi(ids);
-          if (response.restCode === '200') {
-            message.success('批量删除成功');
-            setSelectedPosts([]);
-            setSelectedRowKeys([]);
-            fetchPostList();
-          } else {
-            message.error(response.message || '批量删除失败');
-          }
-        } catch (error) {
-          console.error('批量删除失败:', error);
-          message.error('批量删除失败');
-        }
-      }
-    });
-  };
-
   const handleDelete = (post: PostEntity) => {
     if (!post.id) {
       message.error('岗位ID不存在');
@@ -159,8 +160,9 @@ const PostList: React.FC = () => {
 
     Modal.confirm({
       title: '确认删除',
-      content: `确定要删除岗位 "${post.name}" 吗？`,
-      okText: '确认',
+      content: `确定要删除岗位「${post.name}」吗？`,
+      okText: '确定删除',
+      okType: 'danger',
       cancelText: '取消',
       onOk: async () => {
         try {
@@ -175,137 +177,235 @@ const PostList: React.FC = () => {
           console.error('删除失败:', error);
           message.error('删除失败');
         }
-      }
+      },
+    });
+  };
+
+  const handleBatchDelete = () => {
+    if (selectedPosts.length === 0) {
+      message.warning('请选择要删除的岗位');
+      return;
+    }
+
+    const ids = selectedPosts.map((post) => post.id).filter(Boolean).join(',');
+
+    Modal.confirm({
+      title: '确认删除',
+      content: `确定要删除选中的 ${selectedPosts.length} 个岗位吗？`,
+      okText: '确定删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          const response = await batchDeletePostApi(ids);
+          if (response.restCode === '200') {
+            message.success('批量删除成功');
+            setSelectedRowKeys([]);
+            setSelectedPosts([]);
+            fetchPostList();
+          } else {
+            message.error(response.message || '批量删除失败');
+          }
+        } catch (error) {
+          console.error('批量删除失败:', error);
+          message.error('批量删除失败');
+        }
+      },
     });
   };
 
   const rowSelection = {
     selectedRowKeys,
-    onChange: (selectedRowKeys: React.Key[], selectedRows: PostEntity[]) => {
-      setSelectedRowKeys(selectedRowKeys);
-      setSelectedPosts(selectedRows);
+    onChange: (keys: React.Key[], rows: PostEntity[]) => {
+      setSelectedRowKeys(keys);
+      setSelectedPosts(rows);
     },
     getCheckboxProps: (record: PostEntity) => ({
       name: record.name,
     }),
   };
 
-  const getStatusTag = (status: string) => {
-    const statusMap: Record<string, { color: string; text: string }> = {
-      [PostStatus.ACTIVE]: { color: 'green', text: '正常' },
-      [PostStatus.INACTIVE]: { color: 'red', text: '停用' }
-    };
-    const statusInfo = statusMap[status] || { color: 'default', text: status };
-    return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>;
-  };
+  const allColumns: ColumnsType<PostEntity> = useMemo(
+    () => [
+      {
+        title: '岗位信息',
+        key: 'postInfo',
+        width: 260,
+        render: (_, record: PostEntity) => (
+          <div className="crud-user-cell">
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 8,
+                background: '#e6f4ff',
+                color: '#1677ff',
+                display: 'grid',
+                placeItems: 'center',
+                fontSize: 16,
+                flex: 'none',
+              }}
+            >
+              <IdcardOutlined />
+            </div>
+            <div className="crud-user-meta">
+              <span className="crud-user-name">{record.name}</span>
+              <span className="crud-user-login">{record.code}</span>
+            </div>
+          </div>
+        ),
+      },
+      {
+        title: '显示顺序',
+        dataIndex: 'sort',
+        key: 'sort',
+        width: 100,
+        align: 'center',
+        render: (sort: number) => <Tag>{sort ?? 0}</Tag>,
+      },
+      {
+        title: '状态',
+        dataIndex: 'status',
+        key: 'status',
+        width: 110,
+        align: 'center',
+        render: (status: string) =>
+          status === PostStatus.ACTIVE || status === '0' ? (
+            <Badge status="success" text="正常启用" />
+          ) : (
+            <Badge status="error" text="已停用" />
+          ),
+      },
+      {
+        title: '备注说明',
+        dataIndex: 'remark',
+        key: 'remark',
+        ellipsis: true,
+        render: (text: string) => text || '-',
+      },
+      {
+        title: '操作',
+        key: 'action',
+        width: 140,
+        fixed: 'right',
+        render: (_, record: PostEntity) => (
+          <Space size="small">
+            <Button
+              size="small"
+              type="link"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            >
+              修改
+            </Button>
+            <Button
+              size="small"
+              type="link"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record)}
+            >
+              删除
+            </Button>
+          </Space>
+        ),
+      },
+    ],
+    []
+  );
 
-  const formatDate = (date?: string) => {
-    if (!date) return '-';
-    return new Date(date).toLocaleString('zh-CN');
-  };
+  const columns = useMemo(() => {
+    return allColumns.filter((col) => !col.key || visibleColumns.includes(col.key as string));
+  }, [allColumns, visibleColumns]);
 
-  const columns: ColumnsType<PostEntity> = [
-    {
-      title: '岗位编码',
-      dataIndex: 'code',
-      key: 'code',
-      ellipsis: true
-    },
-    {
-      title: '岗位名称',
-      dataIndex: 'name',
-      key: 'name',
-      ellipsis: true
-    },
-    {
-      title: '岗位排序',
-      dataIndex: 'sort',
-      key: 'sort',
-      align: 'center',
-      width: 100
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      align: 'center',
-      width: 100,
-      render: (status: string) => getStatusTag(status)
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createdDate',
-      key: 'createdDate',
-      align: 'center',
-      width: 180,
-      render: (date: string) => formatDate(date)
-    },
-    {
-      title: '操作',
-      key: 'action',
-      width: 150,
-      render: (_, record: PostEntity) => (
-        <Space size="small">
-          <Button
-            size="small"
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            修改
-          </Button>
-          <Button
-            size="small"
-            type="link"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record)}
-          >
-            删除
-          </Button>
-        </Space>
-      )
-    }
-  ];
+  const columnSettingContent = (
+    <div style={{ width: 180 }}>
+      <div className="crud-col-popover-title">
+        <span>展示列配置</span>
+        <Button
+          type="link"
+          size="small"
+          style={{ padding: 0 }}
+          onClick={() => setVisibleColumns(['postInfo', 'sort', 'status', 'remark', 'action'])}
+        >
+          重置
+        </Button>
+      </div>
+      {allColumns.map((col) => {
+        if (!col.key || col.key === 'action') return null;
+        const key = col.key as string;
+        const checked = visibleColumns.includes(key);
+        return (
+          <div key={key} className="crud-col-item">
+            <Checkbox
+              checked={checked}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setVisibleColumns([...visibleColumns, key]);
+                } else {
+                  setVisibleColumns(visibleColumns.filter((k) => k !== key));
+                }
+              }}
+            >
+              {typeof col.title === 'string' ? col.title : key}
+            </Checkbox>
+          </div>
+        );
+      })}
+    </div>
+  );
 
   useEffect(() => {
     fetchPostList();
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '0' }}>
+    <div className="crud-container fade-in">
+      {/* 顶部查询卡片 */}
+      <div className="crud-query-card">
+        <div className="crud-filter-tabs">
+          <Segmented
+            value={statusTab}
+            onChange={handleStatusTabChange}
+            options={[
+              { label: '全部岗位', value: 'ALL' },
+              { label: '正常启用', value: PostStatus.ACTIVE },
+              { label: '已停用', value: PostStatus.INACTIVE },
+            ]}
+          />
+        </div>
 
-
-      <Card className="modern-card" title="岗位管理" bordered={false}>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSearch}
-          className="search-form"
-        >
-          <Row gutter={24}>
-            <Col xs={24} sm={8} md={6}>
+        <Form form={form} layout="vertical" onFinish={handleSearch}>
+          <Row gutter={[16, 12]}>
+            <Col xs={24} sm={12} md={8}>
               <Form.Item name="code" label="岗位编码">
-                <Input placeholder="请输入岗位编码" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
+                <Input
+                  placeholder="请输入岗位编码 (如 ceo)"
+                  allowClear
+                  prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />}
+                />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={8} md={6}>
+
+            <Col xs={24} sm={12} md={8}>
               <Form.Item name="name" label="岗位名称">
-                <Input placeholder="请输入岗位名称" allowClear prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />} />
+                <Input
+                  placeholder="请输入岗位名称 (如 董事长)"
+                  allowClear
+                  prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />}
+                />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={8} md={6}>
-              <Form.Item name="status" label="状态">
-                <Select placeholder="请选择状态" allowClear style={{ width: '100%' }}>
-                  <Option value={PostStatus.ACTIVE}>正常</Option>
-                  <Option value={PostStatus.INACTIVE}>停用</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
-              <Space>
+
+            <Col
+              xs={24}
+              sm={12}
+              md={8}
+              style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 16 }}
+            >
+              <Space size={8}>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                  搜索
+                  查询
                 </Button>
                 <Button onClick={handleReset} icon={<ClearOutlined />}>
                   重置
@@ -314,11 +414,17 @@ const PostList: React.FC = () => {
             </Col>
           </Row>
         </Form>
+      </div>
 
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Space>
+      {/* 岗位表格卡片 */}
+      <div
+        ref={tableContainerRef}
+        className={`crud-table-card ${isFullscreen ? 'crud-fullscreen' : ''}`}
+      >
+        <div className="crud-toolbar">
+          <div className="crud-toolbar-left">
             <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-              新增
+              新增岗位
             </Button>
             <Button
               danger
@@ -326,33 +432,114 @@ const PostList: React.FC = () => {
               disabled={selectedPosts.length === 0}
               onClick={handleBatchDelete}
             >
-              删除
+              批量删除
             </Button>
-          </Space>
+          </div>
+
+          <div className="crud-toolbar-right">
+            <Tooltip title="刷新数据">
+              <Button
+                type="text"
+                className="crud-tool-btn"
+                icon={<ReloadOutlined spin={loading} />}
+                onClick={() => fetchPostList(searchForm)}
+              />
+            </Tooltip>
+
+            <Dropdown
+              menu={{
+                items: [
+                  { key: 'large', label: '宽松' },
+                  { key: 'middle', label: '默认' },
+                  { key: 'small', label: '紧凑' },
+                ],
+                selectedKeys: [tableSize],
+                onClick: (e) => setTableSize(e.key as 'small' | 'middle' | 'large'),
+              }}
+              trigger={['click']}
+            >
+              <Tooltip title="表格密度">
+                <Button
+                  type="text"
+                  className="crud-tool-btn"
+                  icon={<ColumnHeightOutlined />}
+                />
+              </Tooltip>
+            </Dropdown>
+
+            <Popover content={columnSettingContent} trigger="click" placement="bottomRight">
+              <Tooltip title="列显隐设置">
+                <Button type="text" className="crud-tool-btn" icon={<SettingOutlined />} />
+              </Tooltip>
+            </Popover>
+
+            <Tooltip title={isFullscreen ? '退出全屏' : '全屏聚焦'}>
+              <Button
+                type="text"
+                className="crud-tool-btn"
+                icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                onClick={() => setIsFullscreen(!isFullscreen)}
+              />
+            </Tooltip>
+          </div>
         </div>
 
-        <div className="modern-table">
-          <Table
-            columns={columns}
-            dataSource={postList}
-            loading={loading}
-            rowKey={(record) => record.id || `post-${record.code}`}
-            rowSelection={rowSelection}
-            pagination={{
-              current: currentPage,
-              pageSize: pageSize,
-              total: total,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`,
-              onChange: handlePageChange,
-              onShowSizeChange: handlePageChange,
-              pageSizeOptions: ['10', '20', '30', '50']
-            }}
-            size="middle"
-          />
-        </div>
-      </Card>
+        {selectedRowKeys.length > 0 && (
+          <div className="crud-selection-bar">
+            <div className="crud-selection-bar-text">
+              <InfoCircleFilled />
+              <span>
+                已选择 <strong style={{ color: '#1677ff' }}>{selectedRowKeys.length}</strong> 个岗位
+              </span>
+              <Button
+                type="link"
+                size="small"
+                style={{ padding: 0 }}
+                onClick={() => {
+                  setSelectedRowKeys([]);
+                  setSelectedPosts([]);
+                }}
+              >
+                清空已选
+              </Button>
+            </div>
+            <Space size={8}>
+              <Button
+                size="small"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={handleBatchDelete}
+              >
+                确认删除所选
+              </Button>
+            </Space>
+          </div>
+        )}
+
+        <Table
+          columns={columns}
+          dataSource={postList}
+          loading={loading}
+          rowKey={(record) => record.id || `post-${record.code}`}
+          rowSelection={rowSelection}
+          pagination={{
+            current: currentPage,
+            pageSize: pageSize,
+            total: total,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (totalCount, range) =>
+              `第 ${range[0]}-${range[1]} 条 / 共 ${totalCount} 条岗位`,
+            onChange: handlePageChange,
+            onShowSizeChange: handlePageChange,
+            pageSizeOptions: ['10', '20', '30', '50'],
+          }}
+          size={tableSize}
+          locale={{
+            emptyText: postList.length === 0 && !loading ? '暂无匹配岗位' : undefined,
+          }}
+        />
+      </div>
 
       <Modal
         title={editingPost ? '编辑岗位' : '新增岗位'}

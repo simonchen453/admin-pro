@@ -1,166 +1,192 @@
 /**
- * AdminPro · Ant Design 5 主题配置（纯白 / 墨黑）
+ * AdminPro · Ant Design 5 主题配置（经典企业商务风）
  *
- * 用法：复制到 frontend/src/config/theme.ts，然后在 App.tsx 里
- *   import { antdTheme } from './config/theme';
- *   <ConfigProvider locale={zhCN} theme={antdTheme}> ... </ConfigProvider>
- *
- * 色值与 docs/design/theme.css 一一对应。改配色时两边一起改，
- * 或者更彻底一点：把 theme.css 的 CSS 变量作为唯一真源，这里用
- * getComputedStyle 读取（构建期开销略大，但不会再出现两边不一致）。
+ * - 主色调：科技蓝 #1677ff
+ * - 画布：#f0f2f5
+ * - 纯净浅色侧栏与纯白卡片，结合精致微阴影
+ * - 规范统一的 6px/8px 圆角与标准企业级排版
  */
 import type { ThemeConfig } from 'antd';
 
 export const antdTheme: ThemeConfig = {
   token: {
-    /* --- 色 ---
-       强调色就是墨黑。AntD 会把 colorPrimary 铺到主按钮、链接、焦点环、
-       选中行、Tabs 墨条上 —— 这正是我们要的：整套控件一起变成黑白。 */
-    colorPrimary: '#0A0A0A',
-    colorSuccess: '#067647',
-    colorWarning: '#B54708',
-    colorError:   '#B42318',
-    colorInfo:    '#0A0A0A',
+    /* --- 核心色彩 --- */
+    colorPrimary: '#1677ff',
+    colorSuccess: '#52c41a',
+    colorWarning: '#faad14',
+    colorError:   '#ff4d4f',
+    colorInfo:    '#1677ff',
 
-    colorLink:          '#0A0A0A',
-    colorLinkHover:     '#2E2E2E',
-    colorPrimaryHover:  '#2E2E2E',   // 黑按钮悬停往上提亮，不是压暗
-    colorPrimaryActive: '#0A0A0A',
+    colorLink:          '#1677ff',
+    colorLinkHover:     '#4096ff',
+    colorPrimaryHover:  '#4096ff',
+    colorPrimaryActive: '#0958d9',
 
-    colorBgLayout:    '#F7F7F5',     // 工作区画布：极浅暖灰，白卡片浮在其上；侧栏与卡片纯白
-    colorBgContainer: '#FFFFFF',
-    colorBgElevated:  '#FFFFFF',
-    colorFillQuaternary: '#F1F1EF',  // 悬停、选中、键帽这类极浅填充
-    colorFillTertiary:   '#F1F1EF',
-    colorFillSecondary:  '#E7E7E5',
+    /* --- 画布与背景 --- */
+    colorBgLayout:       '#f0f2f5',
+    colorBgContainer:    '#ffffff',
+    colorBgElevated:     '#ffffff',
+    colorFillQuaternary: '#f5f5f5',
+    colorFillTertiary:   '#f5f5f5',
+    colorFillSecondary:  '#e8e8e8',
 
-    colorBorder:          '#D2D2D0', // 控件描边
-    colorBorderSecondary: '#E1E1DE', // 区块边界、分隔线
+    /* --- 边框与线 --- */
+    colorBorder:          '#d9d9d9',
+    colorBorderSecondary: '#f0f0f0',
 
-    colorText:           '#0A0A0A',
-    colorTextSecondary:  '#5C5C5C',
-    colorTextTertiary:   '#757575',
-    colorTextQuaternary: '#9E9E9E',
+    /* --- 字体与文本 --- */
+    colorText:           '#1f1f1f',
+    colorTextSecondary:  '#595959',
+    colorTextTertiary:   '#8c8c8c',
+    colorTextQuaternary: '#bfbfbf',
 
-    /* --- 字 ---
-       Inter 负责界面文字，思源黑体负责中文。标题的 Inter Tight 不走
-       AntD token（它只有一个 fontFamily），在 CSS 里按 .ap-* 类挂。 */
     fontFamily:
-      "'Inter','Noto Sans SC','PingFang SC','Microsoft YaHei',system-ui,sans-serif",
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif",
     fontFamilyCode: "'JetBrains Mono','Cascadia Mono',Consolas,monospace",
     fontSize: 14,
-    fontSizeHeading1: 30,
-    fontSizeHeading2: 22,
-    fontSizeHeading3: 17,
+    fontSizeHeading1: 26,
+    fontSizeHeading2: 20,
+    fontSizeHeading3: 16,
 
-    /* --- 尺 ---
-       按钮是胶囊，所以 borderRadius 给足；卡片 14，输入框在组件层单独压回 10。 */
-    borderRadius:   999,
-    borderRadiusLG: 14,
-    borderRadiusSM: 999,
-    borderRadiusXS: 6,
+    /* --- 圆角与尺寸 --- */
+    borderRadius:   6,
+    borderRadiusLG: 8,
+    borderRadiusSM: 4,
+    borderRadiusXS: 2,
     controlHeight:   36,
-    controlHeightLG: 44,
-    controlHeightSM: 30,
+    controlHeightLG: 40,
+    controlHeightSM: 28,
 
-    /* --- 投影 ---
-       卡片、按钮、下拉一律零投影，只有浮层有一档。
-       这套语言里"抬起"是靠发丝线和留白，不是靠阴影。 */
-    boxShadow:          'none',
-    boxShadowTertiary:  'none',
-    boxShadowSecondary: '0 16px 40px rgba(0,0,0,.10), 0 2px 8px rgba(0,0,0,.05)',
+    /* --- 阴影 --- */
+    boxShadow:          '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02)',
+    boxShadowTertiary:  '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02)',
+    boxShadowSecondary: '0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12)',
 
-    /* --- 动效：只服务状态切换的可读性 --- */
-    motionDurationMid:  '0.15s',
-    motionDurationSlow: '0.2s',
+    motionDurationMid:  '0.2s',
+    motionDurationSlow: '0.25s',
     wireframe: false,
   },
 
   components: {
     Layout: {
-      bodyBg:   '#F7F7F5',
-      headerBg: '#FFFFFF',
-      siderBg:  '#FFFFFF',   // 侧栏纯白，右侧一条发丝线，衬在暖灰画布上
-      headerHeight: 60,
-      headerPadding: '0 32px',
+      bodyBg:        '#f0f2f5',
+      headerBg:      '#ffffff',
+      siderBg:       '#ffffff',
+      headerHeight:  56,
+      headerPadding: '0 24px',
     },
 
-    /* 侧栏菜单：选中项用中灰底（#F0F0EE）—— 参照稿里的选中态是淡灰，
-       不是纯黑；纯黑适合按钮，不适合导航。悬停同样浅灰。 */
+    /* 纯净浅色侧栏导航 */
     Menu: {
       itemBg:             'transparent',
       subMenuItemBg:      'transparent',
-      itemColor:          '#5C5C5C',
-      itemHoverColor:     '#0A0A0A',
-      itemHoverBg:        '#F1F1EF',
-      itemSelectedColor:  '#0A0A0A',
-      itemSelectedBg:     '#F0F0EE',
-      itemBorderRadius:   10,
-      itemHeight:         36,
-      itemMarginInline:   0,
-      itemMarginBlock:    2,
+      itemColor:          '#595959',
+      itemHoverColor:     '#1677ff',
+      itemHoverBg:        '#f5f5f5',
+      itemSelectedColor:  '#1677ff',
+      itemSelectedBg:     '#e6f4ff',
+      itemBorderRadius:   6,
+      itemHeight:         40,
+      itemMarginInline:   8,
+      itemMarginBlock:    4,
       iconSize:           16,
       collapsedIconSize:  16,
-      groupTitleColor:    '#757575',
-      groupTitleFontSize: 11.5,
-      activeBarWidth:     0,
+      groupTitleColor:    '#8c8c8c',
+      groupTitleFontSize: 12,
     },
 
-    /* 主按钮实心黑，次按钮白底描边，全都是胶囊。一屏最多一个主按钮。 */
+    /* 标准企业按钮规范 */
     Button: {
-      fontWeight:    500,
-      borderRadius:   999,
-      borderRadiusLG: 999,
-      borderRadiusSM: 999,
-      paddingInline:   18,
-      primaryShadow: 'none',
-      defaultShadow: 'none',
-      dangerShadow:  'none',
-      defaultBorderColor: '#D2D2D0',
-      textHoverBg: '#F1F1EF',
+      fontWeight:         400,
+      borderRadius:       6,
+      borderRadiusLG:     6,
+      borderRadiusSM:     4,
+      paddingInline:      16,
+      defaultBorderColor: '#d9d9d9',
+      textHoverBg:        '#f5f5f5',
     },
 
-    /* 表头没有底色，只有一条线；行高 60，留白是这套语言的主料。 */
+    /* 规范标准数据表格 */
     Table: {
-      headerBg:           '#FFFFFF',
-      headerColor:        '#757575',
-      headerSplitColor:   'transparent',
-      borderColor:        '#E9E9E6',
-      rowHoverBg:         '#FAFAF8',
-      rowSelectedBg:      '#F1F1EF',
-      rowSelectedHoverBg: '#E7E7E5',
+      headerBg:           '#fafafa',
+      headerColor:        '#262626',
+      headerSplitColor:   '#f0f0f0',
+      borderColor:        '#f0f0f0',
+      rowHoverBg:         '#f6faff',
+      rowSelectedBg:      '#e6f4ff',
+      rowSelectedHoverBg: '#bae0ff',
       headerBorderRadius: 0,
-      /* 行高不在这里给：AntD 的 cellPaddingBlock 会同时作用于表头和内容，
-         而设计要的是表头 44、内容 60 两个不同的值 —— 放在 styles/antd.css 里分开写。 */
+      cellPaddingBlock:   12,
+      cellPaddingInline:  16,
     },
 
     Card: {
-      paddingLG: 24,
-      headerHeight: 64,
-      headerFontSize: 17,
-      headerBg: '#FFFFFF',
-      boxShadowTertiary: 'none',
+      paddingLG:         20,
+      headerHeight:      52,
+      headerFontSize:    16,
+      headerBg:          '#ffffff',
+      borderRadiusLG:    8,
     },
 
-    /* 输入类控件保持圆角矩形 —— 和胶囊按钮形状不同，
-       让"可输入"和"可点击"一眼分得开。 */
-    Input:       { borderRadius: 10, borderRadiusLG: 10, paddingBlock: 6, activeShadow: '0 0 0 3px #E7E7E5' },
-    InputNumber: { borderRadius: 10, borderRadiusLG: 10, activeShadow: '0 0 0 3px #E7E7E5' },
-    Select:      { borderRadius: 10, borderRadiusLG: 10, optionSelectedBg: '#F1F1EF', optionSelectedColor: '#0A0A0A' },
-    DatePicker:  { borderRadius: 10, borderRadiusLG: 10, activeShadow: '0 0 0 3px #E7E7E5' },
+    Input: {
+      borderRadius: 6,
+      controlHeight: 36,
+      activeShadow: '0 0 0 2px rgba(22, 119, 255, 0.15)',
+    },
+    InputNumber: {
+      borderRadius: 6,
+      controlHeight: 36,
+      activeShadow: '0 0 0 2px rgba(22, 119, 255, 0.15)',
+    },
+    Select: {
+      borderRadius: 6,
+      controlHeight: 36,
+      optionSelectedBg: '#e6f4ff',
+      optionSelectedColor: '#1677ff',
+    },
+    DatePicker: {
+      borderRadius: 6,
+      controlHeight: 36,
+      activeShadow: '0 0 0 2px rgba(22, 119, 255, 0.15)',
+    },
+    TreeSelect: {
+      borderRadius: 6,
+      controlHeight: 36,
+    },
 
     Tag: {
-      defaultBg:      '#FFFFFF',
-      defaultColor:   '#5C5C5C',
-      borderRadiusSM: 999,
+      borderRadiusSM: 4,
     },
 
-    Modal:   { headerBg: '#FFFFFF', contentBg: '#FFFFFF', footerBg: '#FFFFFF', borderRadiusLG: 14 },
-    Drawer:  { footerPaddingBlock: 20 },
-    Tooltip: { colorBgSpotlight: '#0A0A0A', borderRadius: 10 },
-    Segmented: { itemSelectedBg: '#FFFFFF', trackBg: '#F1F1EF', borderRadius: 999, itemSelectedColor: '#0A0A0A' },
-    Tabs:    { itemSelectedColor: '#0A0A0A', inkBarColor: '#0A0A0A' },
-    Pagination: { itemActiveBg: '#0A0A0A', itemBg: '#FFFFFF', borderRadius: 999 },
+    Modal: {
+      headerBg:       '#ffffff',
+      contentBg:      '#ffffff',
+      footerBg:       '#ffffff',
+      borderRadiusLG: 8,
+    },
+    Drawer: {
+      footerPaddingBlock: 16,
+    },
+    Tooltip: {
+      colorBgSpotlight: '#1f1f1f',
+      borderRadius:     4,
+    },
+    Segmented: {
+      itemSelectedBg:    '#ffffff',
+      trackBg:           '#f5f5f5',
+      borderRadius:      6,
+      itemSelectedColor: '#1677ff',
+    },
+    Tabs: {
+      itemSelectedColor: '#1677ff',
+      inkBarColor:       '#1677ff',
+      itemHoverColor:    '#4096ff',
+    },
+    Pagination: {
+      itemActiveBg:    '#ffffff',
+      itemActiveColor: '#1677ff',
+      borderRadius:    6,
+    },
   },
 };
 

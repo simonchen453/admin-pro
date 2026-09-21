@@ -1,212 +1,257 @@
 /* ==========================================================================
-   登录
-   ------------------------------------------------------------------
-   上一版把 420px 的一列表单摆在整页正中 —— 四周全是空白，页面像
-   没做完。这一版给登录页一个真正的构图：左右分栏。
-
-   左侧是墨黑品牌面板（ logo + 一句主张 + 版本号），右侧是纯白表单区。
-   黑白对半，这是这套语言里最重也最便宜的一个"设计动作"。
-   窄屏（<920px）收起品牌面板，表单回到居中单列。
-
-   表单件复用 styles/ui.css 的 .ap-field / .ap-input；
-   分隔仍然全部交给发丝线，没有卡片、没有投影、没有渐变。
+   登录页面（经典企业商务风）
    ========================================================================== */
 
 .lg-page {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
-  background: var(--ap-card);
+  grid-template-columns: minmax(0, 11fr) minmax(0, 10fr);
+  background: #f0f2f5;
 }
 
-/* --- 左：墨黑品牌面板 -------------------------------------------------- */
+/* --- 左：科技蓝企业品牌面板 --- */
 .lg-side {
-  background: var(--ap-accent);
-  color: var(--ap-text-inv);
+  background: linear-gradient(135deg, #002c8c 0%, #0958d9 45%, #1677ff 100%);
+  color: #ffffff;
   display: flex;
   flex-direction: column;
-  padding: clamp(28px, 4vw, 56px);
+  padding: clamp(32px, 5vw, 64px);
   position: relative;
   overflow: hidden;
 }
+
+/* 柔和科技感装饰光晕 */
+.lg-side::before {
+  content: "";
+  position: absolute;
+  top: -120px;
+  right: -120px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.lg-side::after {
+  content: "";
+  position: absolute;
+  bottom: -100px;
+  left: -80px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(64, 150, 255, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
 .lg-side-brand {
   display: flex;
   align-items: center;
-  gap: var(--ap-sp-3);
-  font-family: var(--ap-font-d);
-  font-size: var(--ap-fs-lead);
+  gap: 12px;
+  font-size: 18px;
   font-weight: 600;
-  letter-spacing: var(--ap-tr-title);
+  color: #ffffff;
+  position: relative;
+  z-index: 2;
 }
 .lg-side-brand .ap-logo {
-  width: 28px; height: 28px;
-  background: var(--ap-text-inv);
-  color: var(--ap-accent);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1677ff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-.lg-side-brand .ap-logo svg { width: 16px; height: 16px; }
 
 .lg-side-hero {
   margin: auto 0;
-  padding: var(--ap-sp-8) 0;
-  max-width: 460px;
+  padding: 40px 0;
+  max-width: 480px;
+  position: relative;
+  z-index: 2;
 }
 .lg-side-kicker {
-  font-size: var(--ap-fs-meta);
-  font-weight: 500;
-  color: rgba(255, 255, 255, .52);
-  letter-spacing: .14em;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 .lg-side-title {
-  font-family: var(--ap-font-d);
-  font-size: clamp(30px, 3.2vw, 44px);
-  font-weight: 600;
-  letter-spacing: var(--ap-tr-page);
-  line-height: 1.12;
-  margin: var(--ap-sp-3) 0 var(--ap-sp-5);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 16px 0 20px;
+  color: #ffffff;
 }
 .lg-side-sub {
-  font-size: var(--ap-fs-body);
+  font-size: 14px;
   line-height: 1.8;
-  color: rgba(255, 255, 255, .58);
-  margin: 0;
-  max-width: 34em;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 28px;
 }
+
+.lg-side-features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.lg-side-feat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+.lg-side-feat svg {
+  width: 16px;
+  height: 16px;
+  color: #91caff;
+  flex: none;
+}
+
 .lg-side-meta {
   display: flex;
   align-items: center;
-  gap: var(--ap-sp-3);
-  font-family: var(--ap-mono);
-  font-size: var(--ap-fs-micro);
-  color: rgba(255, 255, 255, .38);
-  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  position: relative;
+  z-index: 2;
 }
-.lg-side-meta i { font-style: normal; opacity: .5; }
 
-/* --- 右：表单区 --------------------------------------------------------- */
+/* --- 右：表单区 --- */
 .lg-main {
   display: grid;
   place-items: center;
-  padding: var(--ap-sp-8) var(--ap-sp-6);
-  background: var(--ap-card);
+  padding: 40px 24px;
+  background: #f0f2f5;
 }
-.lg { width: 100%; max-width: 400px; }
-
-/* 顶上一行小灰字 —— 右侧只留一句话，品牌声明交给左面板 */
-.lg-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: var(--ap-sp-2);
-  font-size: var(--ap-fs-meta);
-  color: var(--ap-text-3);
+.lg-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid var(--ap-card-line);
+  box-shadow: var(--ap-shadow-md);
+  padding: 36px 32px;
 }
-.lg-eyebrow b { color: var(--ap-text); font-weight: 500; }
 
+.lg-header {
+  margin-bottom: 28px;
+  text-align: left;
+}
+.lg-header-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
 .lg-title {
-  font-family: var(--ap-font-d);
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 600;
-  letter-spacing: var(--ap-tr-title);
-  line-height: 1.2;
   color: var(--ap-text);
-  margin: var(--ap-sp-3) 0 var(--ap-sp-5);
+  margin: 0 0 6px 0;
 }
-
-/* 站点条已按需求移除（原「当前站点 localhost:3000」一行）；
-   如需恢复，样式保留在这里。 */
-.lg-env {
-  display: flex;
-  align-items: center;
-  gap: var(--ap-sp-3);
-  padding: var(--ap-sp-4) 0;
-  border-top: 1px solid var(--ap-card-line);
-  border-bottom: 1px solid var(--ap-card-line);
-  font-size: var(--ap-fs-body);
-}
-.lg-env::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--ap-field);
-}
-.lg-env strong { font-weight: 500; }
-.lg-env span {
-  margin-left: auto;
+.lg-desc {
+  font-size: 13px;
   color: var(--ap-text-3);
-  font-family: var(--ap-mono);
-  font-size: var(--ap-fs-meta);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  margin: 0;
 }
 
 .lg-form {
   display: flex;
   flex-direction: column;
-  gap: var(--ap-sp-5);
-  margin-top: var(--ap-sp-6);
+  gap: 18px;
 }
 
-/* 校验提示：说清是哪一项不对，不写「登录失败，请重试」 */
-.lg-err { font-size: var(--ap-fs-meta); color: var(--ap-bad); }
-
-/* 密码可见性开关：压在输入框右端，本身不占布局 */
-.lg-pw { position: relative; display: flex; }
-.lg-pw .ap-input { flex: 1; padding-right: 42px; }
+.lg-pw {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.lg-pw input {
+  padding-right: 40px;
+}
 .lg-pw-t {
   position: absolute;
-  right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
+  right: 12px;
   background: none;
   border: 0;
-  border-radius: 50%;
   color: var(--ap-text-3);
   cursor: pointer;
-  transition: background var(--ap-dur) var(--ap-ease), color var(--ap-dur) var(--ap-ease);
+  padding: 4px;
+  display: grid;
+  place-items: center;
+  transition: color var(--ap-dur) var(--ap-ease);
 }
-.lg-pw-t:hover { background: var(--ap-fill); color: var(--ap-text); }
+.lg-pw-t:hover {
+  color: var(--ap-text);
+}
 
-.lg-cap { display: flex; gap: var(--ap-sp-2); align-items: stretch; }
-.lg-cap .ap-input { flex: 1; min-width: 0; }
-/* 验证码图由 Captcha 组件渲染；这里只规定它占多宽 */
-.lg-cap-img { width: 120px; flex: none; }
+.lg-cap {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.lg-cap-img {
+  flex: none;
+  height: 36px;
+  cursor: pointer;
+}
 
 .lg-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: var(--ap-fs-meta);
+  font-size: 13px;
   color: var(--ap-text-2);
 }
 .lg-row label {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: var(--ap-sp-2);
+  gap: 6px;
   cursor: pointer;
 }
 
-.lg-foot {
-  margin-top: var(--ap-sp-8);
-  padding-top: var(--ap-sp-5);
-  border-top: 1px solid var(--ap-line);
-  font-size: var(--ap-fs-micro);
-  color: var(--ap-text-3);
-  line-height: 1.9;
+.lg-err {
+  font-size: 12px;
+  color: var(--ap-bad);
+  margin-top: 4px;
 }
 
-/* --- 窄屏：收起品牌面板 ------------------------------------------------- */
-@media (max-width: 920px) {
-  .lg-page { grid-template-columns: 1fr; }
-  .lg-side { display: none; }
-  .lg-main { background: var(--ap-bg); }
-  .lg-title { font-size: 24px; }
+.lg-btn-submit {
+  height: 40px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  margin-top: 4px;
 }
-@media (max-width: 480px) {
-  .lg-main { padding: var(--ap-sp-6) var(--ap-sp-5); }
+
+.lg-foot {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ap-text-3);
+}
+
+@media (max-width: 960px) {
+  .lg-page {
+    grid-template-columns: 1fr;
+  }
+  .lg-side {
+    display: none;
+  }
+  .lg-main {
+    background: #ffffff;
+  }
+  .lg-card {
+    border: none;
+    box-shadow: none;
+    padding: 24px 16px;
+  }
 }

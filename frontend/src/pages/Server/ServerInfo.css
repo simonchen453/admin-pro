@@ -1,0 +1,298 @@
+/* ==========================================================================
+   服务监控页面样式 (经典 Ant Design 企业科技风)
+   ========================================================================== */
+
+.srv-container {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 顶部概览横幅 */
+.srv-header-card {
+  background: #ffffff;
+  border-radius: var(--ap-r, 8px);
+  border: 1px solid var(--ap-card-line, #f0f0f0);
+  box-shadow: var(--ap-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.03));
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.srv-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.srv-header-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.srv-header-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ap-text, #1f2329);
+  line-height: 1.3;
+}
+
+.srv-header-desc {
+  font-size: 13px;
+  color: var(--ap-text-3, #8f959e);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.srv-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 运行正常呼吸灯标记 */
+.srv-status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+}
+
+.srv-status-tag.warning {
+  background: #fffbe6;
+  border-color: #ffe58f;
+  color: #faad14;
+}
+
+.srv-status-tag.danger {
+  background: #fff1f0;
+  border-color: #ffa39e;
+  color: #ff4d4f;
+}
+
+.srv-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  box-shadow: 0 0 0 0 rgba(82, 196, 26, 0.7);
+  animation: srv-pulse 2s infinite;
+}
+
+@keyframes srv-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(82, 196, 26, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(82, 196, 26, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(82, 196, 26, 0);
+  }
+}
+
+/* 四张核心指标卡片 */
+.srv-stat-card {
+  background: #ffffff;
+  border-radius: var(--ap-r, 8px);
+  border: 1px solid var(--ap-card-line, #f0f0f0);
+  box-shadow: var(--ap-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.03));
+  padding: 16px 20px;
+  transition: all var(--ap-dur, 0.2s) var(--ap-ease, cubic-bezier(0.2, 0, 0, 1));
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.srv-stat-card:hover {
+  box-shadow: var(--ap-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08));
+  border-color: #d9d9d9;
+}
+
+.srv-stat-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.srv-stat-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ap-text, #1f2329);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.srv-stat-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex: 1;
+}
+
+.srv-gauge-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.srv-gauge-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+
+.srv-gauge-val {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ap-text, #1f2329);
+}
+
+.srv-gauge-sub {
+  font-size: 10px;
+  color: var(--ap-text-3, #8f959e);
+  margin-top: 2px;
+}
+
+.srv-metrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.srv-metric-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 3px 0;
+  border-bottom: 1px dashed #f0f0f0;
+}
+
+.srv-metric-row:last-child {
+  border-bottom: none;
+}
+
+.srv-metric-label {
+  color: var(--ap-text-3, #8f959e);
+  font-size: 12px;
+}
+
+.srv-metric-value {
+  font-weight: 600;
+  color: var(--ap-text, #1f2329);
+  font-size: 13px;
+}
+
+/* 运行时长卡片特别设计 */
+.srv-uptime-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.srv-uptime-main {
+  background: var(--ap-bg-subtle, #f5f7fa);
+  border-radius: 6px;
+  padding: 10px 14px;
+  border-left: 3px solid #1677ff;
+}
+
+.srv-uptime-title {
+  font-size: 12px;
+  color: var(--ap-text-3, #8f959e);
+  margin-bottom: 4px;
+}
+
+.srv-uptime-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1677ff;
+  letter-spacing: 0.3px;
+}
+
+/* 下方配置详情卡片 */
+.srv-panel-card {
+  background: #ffffff;
+  border-radius: var(--ap-r, 8px);
+  border: 1px solid var(--ap-card-line, #f0f0f0);
+  box-shadow: var(--ap-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.03));
+}
+
+.srv-panel-card .ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0 20px;
+  min-height: 52px;
+}
+
+.srv-panel-card .ant-card-head-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ap-text, #1f2329);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.srv-panel-card .ant-card-body {
+  padding: 20px;
+}
+
+/* 详情描述样式优化 */
+.srv-descriptions .ant-descriptions-item-label {
+  background-color: #fafafa !important;
+  color: var(--ap-text-2, #646a73) !important;
+  font-weight: 500 !important;
+  width: 140px;
+}
+
+.srv-descriptions .ant-descriptions-item-content {
+  color: var(--ap-text, #1f2329) !important;
+}
+
+/* 磁盘表格优化 */
+.srv-disk-table .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  color: var(--ap-text-2, #646a73);
+  font-size: 13px;
+}
+
+.srv-disk-path {
+  font-weight: 600;
+  color: var(--ap-text, #1f2329);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.srv-path-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+}

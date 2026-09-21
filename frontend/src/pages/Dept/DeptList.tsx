@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Table,
   Button,
   Space,
   Form,
   Input,
-  Select,
-  Card,
   Tag,
   message,
   Modal,
   Row,
-  Col
+  Col,
+  Segmented,
+  Tooltip,
+  Dropdown,
+  Badge,
 } from 'antd';
 import {
   PlusOutlined,
@@ -20,7 +22,12 @@ import {
   SearchOutlined,
   ClearOutlined,
   ExpandOutlined,
-  CompressOutlined
+  CompressOutlined,
+  ApartmentOutlined,
+  ReloadOutlined,
+  ColumnHeightOutlined,
+  FullscreenOutlined,
+  FullscreenExitOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -28,16 +35,15 @@ import {
   getDeptListApi,
   getDeptDetailApi,
   deleteDeptApi,
-  getDeptTreeSelectApi
+  getDeptTreeSelectApi,
 } from '../../api/dept';
 import type {
   DeptEntity,
-  DeptSearchForm
+  DeptSearchForm,
 } from '../../types';
 import { DeptStatus } from '../../types';
 import DeptForm from './DeptForm';
-
-const { Option } = Select;
+import '../../styles/crud.css';
 
 const DeptList: React.FC = () => {
   const navigate = useNavigate();
@@ -45,6 +51,12 @@ const DeptList: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [deptList, setDeptList] = useState<DeptEntity[]>([]);
   const [searchForm, setSearchForm] = useState<DeptSearchForm>({});
+
+  // 现代 ProTable 状态
+  const [tableSize, setTableSize] = useState<'small' | 'middle' | 'large'>('middle');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [statusTab, setStatusTab] = useState<string>('ALL');
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingDept, setEditingDept] = useState<DeptEntity | null>(null);
@@ -71,7 +83,7 @@ const DeptList: React.FC = () => {
   const getAllRowKeys = (data: DeptEntity[]): React.Key[] => {
     const keys: React.Key[] = [];
     const traverse = (items: DeptEntity[]) => {
-      items.forEach(item => {
+      items.forEach((item) => {
         if (item.id) {
           keys.push(item.id);
         }
@@ -106,45 +118,58 @@ const DeptList: React.FC = () => {
   const fetchDeptTreeOptions = async () => {
     try {
       const response = await getDeptTreeSelectApi();
-      const treeData = response.data || [];
-      const options = [
-        {
+      if (response.restCode === '200' || response.restCode === '0') {
+        const rootOption = {
+          id: '0',
+          label: '主部门',
           value: '0',
-          title: '主类目',
-          key: '0',
-          children: convertTreeSelectData(treeData)
-        }
-      ];
-      setDeptTreeOptions(options);
+          children: response.data || [],
+        };
+        setDeptTreeOptions([rootOption]);
+      } else {
+        setDeptTreeOptions([]);
+      }
     } catch (error) {
       console.error('获取部门树选项失败:', error);
       setDeptTreeOptions([]);
     }
   };
 
-  const convertTreeSelectData = (data: any[]): any[] => {
-    return data.map(item => ({
-      title: item.label,
-      value: item.id,
-      key: item.id,
-      children: item.children ? convertTreeSelectData(item.children) : undefined
-    }));
-  };
-
   const handleSearch = (values: DeptSearchForm) => {
-    setSearchForm(values);
-    fetchDeptList(values);
+    const query = {
+      ...values,
+      status: statusTab === 'ALL' ? values.status : statusTab,
+    };
+    setSearchForm(query);
+    fetchDeptList(query);
   };
 
   const handleReset = () => {
     form.resetFields();
+    setStatusTab('ALL');
     setSearchForm({});
     fetchDeptList({});
   };
 
+  const handleStatusTabChange = (val: string | number) => {
+    const tab = String(val);
+    setStatusTab(tab);
+    const newStatus = tab === 'ALL' ? undefined : tab;
+    const newForm = { ...searchForm, status: newStatus };
+    setSearchForm(newForm);
+    fetchDeptList(newForm);
+  };
+
+  const handleCreate = () => {
+    setEditingDept(null);
+    setFormKey((prev) => prev + 1);
+    fetchDeptTreeOptions();
+    setIsModalVisible(true);
+  };
+
   const handleAdd = (parentDept?: DeptEntity) => {
     setEditingDept(null);
-    setFormKey(prev => prev + 1);
+    setFormKey((prev) => prev + 1);
     fetchDeptTreeOptions();
     setIsModalVisible(true);
     if (parentDept) {
@@ -178,8 +203,9 @@ const DeptList: React.FC = () => {
     if (!dept.id) return;
     Modal.confirm({
       title: '确认删除',
-      content: `是否确认删除名称为"${dept.name}"的数据项?`,
-      okText: '确定',
+      content: `是否确认删除部门「${dept.name}」？如有下属子部门将无法直接删除。`,
+      okText: '确定删除',
+      okType: 'danger',
       cancelText: '取消',
       onOk: async () => {
         try {
@@ -194,39 +220,17 @@ const DeptList: React.FC = () => {
           console.error('删除失败:', error);
           message.error('删除失败');
         }
-      }
+      },
     });
-  };
-
-  const getStatusTag = (status?: string) => {
-    if (status === DeptStatus.ACTIVE) {
-      return <Tag color="green">正常</Tag>;
-    } else if (status === DeptStatus.INACTIVE) {
-      return <Tag color="red">停用</Tag>;
-    }
-    return <Tag>{status || '-'}</Tag>;
-  };
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return '-';
-    try {
-      const date = new Date(dateStr);
-      return date.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch {
-      return dateStr;
-    }
   };
 
   const isAllExpanded = () => {
     const allKeys = getAllRowKeys(deptList);
-    return allKeys.length > 0 && allKeys.length === expandedRowKeys.length &&
-      allKeys.every(key => expandedRowKeys.includes(key));
+    return (
+      allKeys.length > 0 &&
+      allKeys.length === expandedRowKeys.length &&
+      allKeys.every((key) => expandedRowKeys.includes(key))
+    );
   };
 
   const handleToggleExpand = () => {
@@ -240,41 +244,71 @@ const DeptList: React.FC = () => {
 
   const columns: ColumnsType<DeptEntity> = [
     {
-      title: '部门名称',
+      title: '部门架构名称',
       dataIndex: 'name',
       key: 'name',
+      width: 260,
+      render: (name: string) => (
+        <Space size={8}>
+          <ApartmentOutlined style={{ color: '#1677ff', fontSize: 15 }} />
+          <span style={{ fontWeight: 600, color: 'var(--ap-text)' }}>{name}</span>
+        </Space>
+      ),
     },
     {
-      title: '部门编号',
+      title: '部门编码',
       dataIndex: 'no',
       key: 'no',
+      width: 140,
+      render: (no: string) => (
+        <Tag color="geekblue" style={{ fontFamily: 'monospace' }}>
+          {no || '-'}
+        </Tag>
+      ),
     },
     {
-      title: '排序',
+      title: '排序权重',
       dataIndex: 'orderNum',
       key: 'orderNum',
-      width: 80,
+      width: 100,
+      align: 'center',
+      render: (num: number) => <Tag>{num ?? 0}</Tag>,
     },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      width: 100,
-      render: (status: string) => getStatusTag(status)
+      width: 110,
+      align: 'center',
+      render: (status: string) =>
+        status === DeptStatus.ACTIVE || status === '0' ? (
+          <Badge status="success" text="正常启用" />
+        ) : (
+          <Badge status="error" text="已停用" />
+        ),
     },
     {
       title: '创建时间',
       dataIndex: 'createdDate',
       key: 'createdDate',
       width: 180,
-      render: (date: string) => formatDate(date)
+      render: (date: string) => date || '-',
     },
     {
       title: '操作',
       key: 'action',
-      width: 180,
+      width: 200,
+      fixed: 'right',
       render: (_, record: DeptEntity) => (
-        <Space size="small">
+        <Space size={4}>
+          <Button
+            size="small"
+            type="link"
+            icon={<PlusOutlined />}
+            onClick={() => handleAdd(record)}
+          >
+            新增下级
+          </Button>
           <Button
             size="small"
             type="link"
@@ -286,14 +320,6 @@ const DeptList: React.FC = () => {
           <Button
             size="small"
             type="link"
-            icon={<PlusOutlined />}
-            onClick={() => handleAdd(record)}
-          >
-            新增
-          </Button>
-          <Button
-            size="small"
-            type="link"
             danger
             icon={<DeleteOutlined />}
             onClick={() => handleDelete(record)}
@@ -301,8 +327,8 @@ const DeptList: React.FC = () => {
             删除
           </Button>
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   useEffect(() => {
@@ -310,34 +336,41 @@ const DeptList: React.FC = () => {
   }, []);
 
   return (
-    <div className="fade-in" style={{ padding: '0' }}>
+    <div className="crud-container fade-in">
+      {/* 顶部查询卡片 */}
+      <div className="crud-query-card">
+        <div className="crud-filter-tabs">
+          <Segmented
+            value={statusTab}
+            onChange={handleStatusTabChange}
+            options={[
+              { label: '全部部门', value: 'ALL' },
+              { label: '正常启用', value: DeptStatus.ACTIVE },
+              { label: '已停用', value: DeptStatus.INACTIVE },
+            ]}
+          />
+        </div>
 
-
-      <Card className="modern-card" title="部门管理" bordered={false}>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSearch}
-          className="search-form"
-        >
-          <Row gutter={24}>
-            <Col xs={24} sm={8} md={6}>
+        <Form form={form} layout="vertical" onFinish={handleSearch}>
+          <Row gutter={[16, 12]}>
+            <Col xs={24} sm={12} md={8}>
               <Form.Item name="name" label="部门名称">
-                <Input placeholder="请输入部门名称" allowClear />
+                <Input
+                  placeholder="请输入部门名称"
+                  prefix={<SearchOutlined style={{ color: 'var(--ap-text-3)' }} />}
+                  allowClear
+                />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={8} md={6}>
-              <Form.Item name="status" label="状态">
-                <Select placeholder="请选择状态" allowClear style={{ width: '100%' }}>
-                  <Option value={DeptStatus.ACTIVE}>正常</Option>
-                  <Option value={DeptStatus.INACTIVE}>停用</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={6} style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 24 }}>
-              <Space>
+            <Col
+              xs={24}
+              sm={12}
+              md={8}
+              style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 16 }}
+            >
+              <Space size={8}>
                 <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-                  搜索
+                  查询
                 </Button>
                 <Button onClick={handleReset} icon={<ClearOutlined />}>
                   重置
@@ -346,11 +379,17 @@ const DeptList: React.FC = () => {
             </Col>
           </Row>
         </Form>
+      </div>
 
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Space>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => handleAdd()}>
-              新增
+      {/* 组织架构表格卡片 */}
+      <div
+        ref={tableContainerRef}
+        className={`crud-table-card ${isFullscreen ? 'crud-fullscreen' : ''}`}
+      >
+        <div className="crud-toolbar">
+          <div className="crud-toolbar-left">
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+              新增部门
             </Button>
             <Button
               icon={isAllExpanded() ? <CompressOutlined /> : <ExpandOutlined />}
@@ -358,38 +397,82 @@ const DeptList: React.FC = () => {
             >
               {isAllExpanded() ? '收起全部' : '展开全部'}
             </Button>
-          </Space>
+          </div>
+
+          <div className="crud-toolbar-right">
+            <Tooltip title="刷新数据">
+              <Button
+                type="text"
+                className="crud-tool-btn"
+                icon={<ReloadOutlined spin={loading} />}
+                onClick={() => fetchDeptList(searchForm)}
+              />
+            </Tooltip>
+
+            <Dropdown
+              menu={{
+                items: [
+                  { key: 'large', label: '宽松' },
+                  { key: 'middle', label: '默认' },
+                  { key: 'small', label: '紧凑' },
+                ],
+                selectedKeys: [tableSize],
+                onClick: (e) => setTableSize(e.key as 'small' | 'middle' | 'large'),
+              }}
+              trigger={['click']}
+            >
+              <Tooltip title="表格密度">
+                <Button
+                  type="text"
+                  className="crud-tool-btn"
+                  icon={<ColumnHeightOutlined />}
+                />
+              </Tooltip>
+            </Dropdown>
+
+            <Tooltip title={isFullscreen ? '退出全屏' : '全屏聚焦'}>
+              <Button
+                type="text"
+                className="crud-tool-btn"
+                icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                onClick={() => setIsFullscreen(!isFullscreen)}
+              />
+            </Tooltip>
+          </div>
         </div>
 
-        <div className="modern-table">
-          <Table
-            columns={columns}
-            dataSource={deptList}
-            loading={loading}
-            rowKey="id"
-            pagination={false}
-            size="middle"
-            expandedRowKeys={expandedRowKeys}
-            onExpandedRowsChange={setExpandedRowKeys}
-            locale={{
-              emptyText: deptList.length === 0 && !loading ? '暂无数据' : undefined
-            }}
-          />
-        </div>
-      </Card>
+        <Table
+          columns={columns}
+          dataSource={deptList}
+          loading={loading}
+          rowKey={(record) => record.id || `dept-${record.name}`}
+          pagination={false}
+          expandedRowKeys={expandedRowKeys}
+          onExpandedRowsChange={(keys) => setExpandedRowKeys(keys as React.Key[])}
+          size={tableSize}
+          locale={{
+            emptyText: deptList.length === 0 && !loading ? '暂无部门数据' : undefined,
+          }}
+        />
+      </div>
 
       <Modal
-        title={editingDept?.id ? '修改部门' : '添加部门'}
+        title={editingDept && editingDept.id ? '修改部门' : '添加部门'}
         open={isModalVisible}
         onCancel={() => {
           setIsModalVisible(false);
           setEditingDept(null);
         }}
         footer={null}
-        width={800}
+        width={600}
+        destroyOnHidden
       >
         <DeptForm
-          key={editingDept?.id ? `edit-${editingDept.id}` : `new-${formKey}`}
+          key={
+            editingDept && editingDept.id
+              ? `edit-${editingDept.id}`
+              : `new-${formKey}`
+          }
           dept={editingDept}
           deptTreeOptions={deptTreeOptions}
           onSuccess={() => {

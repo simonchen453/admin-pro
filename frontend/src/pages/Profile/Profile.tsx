@@ -1,6 +1,28 @@
-import { useState, useEffect } from 'react';
-import { Card, Descriptions, Avatar, Tag, Space, Button, Spin, message } from 'antd';
-import { UserOutlined, EditOutlined, KeyOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  Descriptions,
+  Avatar,
+  Tag,
+  Space,
+  Button,
+  Spin,
+  message,
+  Row,
+  Col,
+  Tabs,
+  Badge,
+} from 'antd';
+import {
+  UserOutlined,
+  KeyOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  ApartmentOutlined,
+  GlobalOutlined,
+  ClockCircleOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUserInfoApi } from '../../api/auth';
 import type { UserEntity } from '../../types';
@@ -34,93 +56,166 @@ function Profile() {
     return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss');
   };
 
-  const getStatusTag = (status?: string) => {
-    if (status === 'ACTIVE' || status === 'active') {
-      return <Tag color="success">激活</Tag>;
-    } else if (status === 'INACTIVE' || status === 'inactive') {
-      return <Tag color="default">停用</Tag>;
-    }
-    return <Tag>{status || '-'}</Tag>;
-  };
-
   const getSexText = (sex?: string) => {
     if (sex === 'M' || sex === 'male' || sex === '男') return '男';
     if (sex === 'F' || sex === 'female' || sex === '女') return '女';
     return sex || '-';
   };
 
+  const displayName = userInfo?.realName || userInfo?.loginName || '管理员';
+  const initial = displayName.charAt(0).toUpperCase();
+
   return (
-    <div className="profile-container">
-      <Card
-        className="modern-card"
-        bordered={false}
-        title={
-          <Space>
-            <UserOutlined />
-            <span>个人资料</span>
-          </Space>
-        }
-        extra={
-          <Space>
-            <Button
-              icon={<KeyOutlined />}
-              onClick={() => navigate('/changepwd')}
-            >
-              修改密码
-            </Button>
-          </Space>
-        }
-      >
-        <Spin spinning={loading}>
-          {userInfo && (
-            <Descriptions column={2} bordered>
-              <Descriptions.Item label="头像" span={2}>
-                <Avatar
-                  size={80}
-                  src={userInfo.avatarUrl}
-                  icon={<UserOutlined />}
+    <div className="profile-container fade-in">
+      <Spin spinning={loading}>
+        {userInfo && (
+          <Row gutter={[20, 20]}>
+            {/* 左侧个人名片卡 */}
+            <Col xs={24} md={8}>
+              <Card bordered={false} className="profile-card">
+                <div className="profile-user-summary">
+                  <div className="profile-avatar-box">
+                    <Avatar
+                      size={88}
+                      src={userInfo.avatarUrl}
+                      className="profile-avatar"
+                      style={{ backgroundColor: '#1677ff' }}
+                    >
+                      {initial}
+                    </Avatar>
+                  </div>
+                  <div className="profile-name">{displayName}</div>
+                  <div className="profile-account">@{userInfo.loginName}</div>
+                  <div style={{ marginTop: 12 }}>
+                    <Tag color="purple" icon={<SafetyCertificateOutlined />}>
+                      超级系统管理员
+                    </Tag>
+                  </div>
+                </div>
+
+                <div className="profile-contact-list">
+                  <div className="profile-contact-item">
+                    <span className="profile-contact-label">
+                      <UserOutlined /> 用户标识 ID
+                    </span>
+                    <span className="profile-contact-val">{userInfo.id || '-'}</span>
+                  </div>
+                  <div className="profile-contact-item">
+                    <span className="profile-contact-label">
+                      <GlobalOutlined /> 所属域
+                    </span>
+                    <span className="profile-contact-val">
+                      <Tag color="blue">{userInfo.userDomain || 'Default'}</Tag>
+                    </span>
+                  </div>
+                  <div className="profile-contact-item">
+                    <span className="profile-contact-label">
+                      <PhoneOutlined /> 手机号码
+                    </span>
+                    <span className="profile-contact-val">
+                      {userInfo.mobileNo || '未绑定'}
+                    </span>
+                  </div>
+                  <div className="profile-contact-item">
+                    <span className="profile-contact-label">
+                      <MailOutlined /> 电子邮箱
+                    </span>
+                    <span className="profile-contact-val">
+                      {userInfo.email || '未绑定'}
+                    </span>
+                  </div>
+                  <div className="profile-contact-item">
+                    <span className="profile-contact-label">
+                      <ApartmentOutlined /> 所属部门编号
+                    </span>
+                    <span className="profile-contact-val">
+                      {userInfo.deptNo || '-'}
+                    </span>
+                  </div>
+                  <div className="profile-contact-item">
+                    <span className="profile-contact-label">账号状态</span>
+                    <Badge status="success" text="正常活跃" />
+                  </div>
+                </div>
+              </Card>
+            </Col>
+
+            {/* 右侧详细资料与操作 Tabs */}
+            <Col xs={24} md={16}>
+              <Card bordered={false} className="profile-card">
+                <Tabs
+                  defaultActiveKey="info"
+                  items={[
+                    {
+                      key: 'info',
+                      label: '基本资料详情',
+                      children: (
+                        <div style={{ paddingTop: 8 }}>
+                          <Descriptions column={2} bordered size="middle">
+                            <Descriptions.Item label="登录名">
+                              <strong>{userInfo.loginName || '-'}</strong>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="真实姓名">
+                              {userInfo.realName || '-'}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="用户域">
+                              <Tag color="geekblue">{userInfo.userDomain || '-'}</Tag>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="性别">
+                              {getSexText(userInfo.sex)}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="手机号码">
+                              {userInfo.mobileNo || '-'}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="电子邮箱">
+                              {userInfo.email || '-'}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="部门编号">
+                              {userInfo.deptNo || '-'}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="账号状态">
+                              <Badge status="success" text="已激活" />
+                            </Descriptions.Item>
+                            <Descriptions.Item label="最后登录时间" span={2}>
+                              <Space>
+                                <ClockCircleOutlined style={{ color: 'var(--ap-text-3)' }} />
+                                <span>{formatDate(userInfo.latestLoginTime)}</span>
+                              </Space>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="用户备注" span={2}>
+                              {userInfo.description || '暂无备注说明'}
+                            </Descriptions.Item>
+                          </Descriptions>
+                        </div>
+                      ),
+                    },
+                    {
+                      key: 'security',
+                      label: '账号与安全设置',
+                      children: (
+                        <div style={{ padding: '16px 0', maxWidth: 480 }}>
+                          <p style={{ color: 'var(--ap-text-2)', marginBottom: 20 }}>
+                            定期更改登录密码有助于提高账号安全性，密码应包含字母与数字组合。
+                          </p>
+                          <Button
+                            type="primary"
+                            icon={<KeyOutlined />}
+                            onClick={() => navigate('/changepwd')}
+                          >
+                            前往修改登录密码
+                          </Button>
+                        </div>
+                      ),
+                    },
+                  ]}
                 />
-              </Descriptions.Item>
-              <Descriptions.Item label="登录名">
-                {userInfo.loginName || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="真实姓名">
-                {userInfo.realName || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="用户域">
-                {userInfo.userDomain || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="用户ID">
-                {userInfo.id || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="手机号码">
-                {userInfo.mobileNo || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="邮箱">
-                {userInfo.email || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="性别">
-                {getSexText(userInfo.sex)}
-              </Descriptions.Item>
-              <Descriptions.Item label="状态">
-                {getStatusTag(userInfo.status)}
-              </Descriptions.Item>
-              <Descriptions.Item label="部门编号">
-                {userInfo.deptNo || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="最后登录时间" span={2}>
-                {formatDate(userInfo.latestLoginTime)}
-              </Descriptions.Item>
-              <Descriptions.Item label="备注" span={2}>
-                {userInfo.description || '-'}
-              </Descriptions.Item>
-            </Descriptions>
-          )}
-        </Spin>
-      </Card>
+              </Card>
+            </Col>
+          </Row>
+        )}
+      </Spin>
     </div>
   );
 }
 
 export default Profile;
-

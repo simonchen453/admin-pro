@@ -415,3 +415,68 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.22);
 }
+
+
+/* ==========================================================================
+   Z · 视觉精修层（内页统一打磨）
+   ========================================================================== */
+
+/* 内容区：留出呼吸感，卡片悬停不再抖动阴影（数据区域应当稳定） */
+.ant-layout-content { padding-block: 4px; }
+.ant-card:hover,
+.modern-card:hover { box-shadow: var(--ap-shadow-sm) !important; }
+
+/* 顶栏：更轻的分隔，避免与内容区抢视觉 */
+.ant-layout-header,
+.ant-layout-header.ap-topbar { box-shadow: 0 1px 0 rgba(0, 21, 41, 0.02); }
+
+/* 侧栏选中项：左侧蓝色指示条 */
+.ant-menu-inline .ant-menu-item { position: relative; margin-block: 2px; }
+.ant-menu-inline .ant-menu-item-selected::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--ap-primary);
+}
+
+/* 表格：表头更安静，行更透气 */
+.ant-table-thead > tr > th {
+  background: #fafbfc !important;
+  color: var(--ap-text-2) !important;
+  letter-spacing: 0.02em;
+}
+.ant-table-tbody > tr > td { padding-block: 14px !important; }
+.ant-table-wrapper .ant-table-pagination.ant-pagination { margin-block: 20px 4px; }
+
+/* 状态标签：统一小圆角、去掉粗描边感 */
+.ant-tag {
+  border-radius: var(--ap-r-xs);
+  font-size: var(--ap-fs-micro);
+  line-height: 20px;
+  padding-inline: 8px;
+  border-width: 1px;
+}
+
+/* 主按钮：柔和的品牌色投影，悬停上提 */
+.ant-btn-primary:not(.ant-btn-dangerous) { box-shadow: 0 2px 6px rgba(22, 119, 255, 0.22); }
+.ant-btn-primary:not(:disabled):hover { box-shadow: 0 4px 10px rgba(22, 119, 255, 0.3); }
+
+/* 输入控件：聚焦时的柔和光圈 */
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper-focused,
+.ant-input-number-focused,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused { box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.12) !important; }
+
+/* 弹窗 / 抽屉：更大的圆角与更深的投影 */
+.ant-modal .ant-modal-content { border-radius: 12px; box-shadow: var(--ap-shadow-lg); }
+.ant-modal .ant-modal-header { margin-bottom: 16px; }
+.ant-modal .ant-modal-title { font-size: var(--ap-fs-lead); font-weight: 600; }
+
+/* 滚动条：细而克制 */
+* { scrollbar-width: thin; scrollbar-color: #d9d9d9 transparent; }

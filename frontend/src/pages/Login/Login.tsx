@@ -128,6 +128,7 @@ const Login: React.FC = () => {
       {/* 左侧品牌面板：墨黑半屏，把登录页从"一列孤零零的表单"变成一个真正的构图。
           窄屏整块收起，表单回到居中单列。 */}
       <aside className="lg-side">
+        <div className="lg-side-grid" />
         <div className="lg-side-brand">
           <span className="ap-logo"><LogoMark size={16} /></span>
           {systemInfo?.platformShortName || 'AdminPro'}
@@ -168,7 +169,6 @@ const Login: React.FC = () => {
       <main className="lg-main">
         <div className="lg-card">
           <div className="lg-header">
-            <span className="lg-header-badge">控制台管理系统</span>
             <h1 className="lg-title">欢迎登录</h1>
             <p className="lg-desc">请输入管理员账号、密码及验证码以进入系统</p>
           </div>
@@ -253,9 +253,10 @@ const Login: React.FC = () => {
             </button>
           </form>
 
-          <div className="lg-foot">
-            {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} AdminPro Platform`}
-          </div>
+        </div>
+
+        <div className="lg-foot">
+          {systemInfo?.copyRight || `Copyright © ${new Date().getFullYear()} AdminPro Platform`}
         </div>
       </main>
     </div>

@@ -11,13 +11,28 @@
 
 /* --- 左：科技蓝企业品牌面板 --- */
 .lg-side {
-  background: linear-gradient(135deg, #002c8c 0%, #0958d9 45%, #1677ff 100%);
+  background:
+    radial-gradient(circle at 80% 90%, rgba(19, 194, 194, 0.22) 0%, transparent 45%),
+    linear-gradient(135deg, #001d66 0%, #0958d9 50%, #1677ff 100%);
   color: #ffffff;
   display: flex;
   flex-direction: column;
   padding: clamp(32px, 5vw, 64px);
   position: relative;
   overflow: hidden;
+}
+
+/* 淡网格纹理，向右下渐隐 */
+.lg-side-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse at 30% 40%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse at 30% 40%, #000 0%, transparent 75%);
+  pointer-events: none;
 }
 
 /* 柔和科技感装饰光晕 */
@@ -66,7 +81,7 @@
 .lg-side-hero {
   margin: auto 0;
   padding: 40px 0;
-  max-width: 480px;
+  max-width: 520px;
   position: relative;
   z-index: 2;
 }
@@ -78,35 +93,38 @@
   text-transform: uppercase;
 }
 .lg-side-title {
-  font-size: clamp(28px, 3vw, 40px);
+  font-size: clamp(32px, 3.4vw, 48px);
   font-weight: 700;
   line-height: 1.25;
   margin: 16px 0 20px;
   color: #ffffff;
 }
 .lg-side-sub {
-  font-size: 14px;
-  line-height: 1.8;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 28px;
+  font-size: 15px;
+  line-height: 1.85;
+  color: rgba(255, 255, 255, 0.88);
+  margin-bottom: 32px;
 }
 
 .lg-side-features {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 .lg-side-feat {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
+  gap: 12px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.95);
 }
 .lg-side-feat svg {
-  width: 16px;
-  height: 16px;
-  color: #91caff;
+  width: 22px;
+  height: 22px;
+  padding: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
   flex: none;
 }
 
@@ -115,50 +133,39 @@
   align-items: center;
   gap: 12px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
   position: relative;
   z-index: 2;
 }
 
 /* --- 右：表单区 --- */
 .lg-main {
-  display: grid;
-  place-items: center;
-  padding: 40px 24px;
-  background: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px 24px;
+  background: #ffffff;
 }
 .lg-card {
   width: 100%;
-  max-width: 420px;
-  background: #ffffff;
-  border-radius: 10px;
-  border: 1px solid var(--ap-card-line);
-  box-shadow: var(--ap-shadow-md);
-  padding: 36px 32px;
+  max-width: 400px;
+  margin: auto 0;
 }
 
 .lg-header {
-  margin-bottom: 28px;
+  margin-bottom: 36px;
   text-align: left;
 }
-.lg-header-badge {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ap-primary);
-  background: var(--ap-primary-soft);
-  padding: 3px 10px;
-  border-radius: 4px;
-  margin-bottom: 8px;
-}
 .lg-title {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--ap-text);
-  margin: 0 0 6px 0;
+  margin: 0 0 10px 0;
 }
 .lg-desc {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--ap-text-3);
   margin: 0;
 }
@@ -166,7 +173,13 @@
 .lg-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 22px;
+}
+.lg-form .ap-field { gap: 8px; }
+.lg-form .ap-label { font-size: 14px; }
+.lg-form .ap-input {
+  height: 44px;
+  font-size: 14px;
 }
 
 .lg-pw {
@@ -200,17 +213,19 @@
 }
 .lg-cap-img {
   flex: none;
-  height: 36px;
+  width: 132px;
   cursor: pointer;
 }
+.lg-cap-img img { height: 44px; }
 
 .lg-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--ap-text-2);
 }
+.lg-row .ap-link:hover { text-decoration: underline; }
 .lg-row label {
   display: flex;
   align-items: center;
@@ -225,15 +240,21 @@
 }
 
 .lg-btn-submit {
-  height: 40px !important;
-  font-size: 15px !important;
+  height: 46px !important;
+  font-size: 16px !important;
   font-weight: 500 !important;
-  border-radius: 6px !important;
-  margin-top: 4px;
+  border-radius: 8px !important;
+  margin-top: 6px;
+  box-shadow: 0 6px 16px rgba(22, 119, 255, 0.28);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.lg-btn-submit:hover:not(:disabled) {
+  box-shadow: 0 8px 20px rgba(22, 119, 255, 0.38);
+  transform: translateY(-1px);
 }
 
 .lg-foot {
-  margin-top: 24px;
+  padding-top: 16px;
   text-align: center;
   font-size: 12px;
   color: var(--ap-text-3);
@@ -246,12 +267,7 @@
   .lg-side {
     display: none;
   }
-  .lg-main {
-    background: #ffffff;
-  }
   .lg-card {
-    border: none;
-    box-shadow: none;
-    padding: 24px 16px;
+    padding: 24px 0;
   }
 }

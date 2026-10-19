@@ -111,7 +111,7 @@
 /* 快捷操作区 */
 .hm-quick-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
 }
 .hm-quick-item {
@@ -196,4 +196,15 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* 并排卡片等高，避免一侧留白 */
+.hm-fill-card { height: 100%; }
+.hm-activity-desc { max-width: 100%; }
+
+@media (max-width: 1200px) {
+  .hm-quick-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 576px) {
+  .hm-quick-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }

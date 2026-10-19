@@ -13,7 +13,9 @@ import {
   BarChartOutlined,
   ReloadOutlined,
   ArrowRightOutlined,
-  CheckCircleOutlined
+  CheckCircleOutlined,
+  LoginOutlined,
+  ThunderboltOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { getSystemInfoApi, getStatisticsApi, getRecentActivitiesApi, type RecentActivity as ApiRecentActivity } from '../api/common';
@@ -260,6 +262,7 @@ function Home() {
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} lg={16}>
           <Card
+            className="hm-fill-card"
             title="常用功能快捷入口"
             extra={<Tag color="blue">{QUICK_ACTIONS.length} 个功能模块</Tag>}
           >
@@ -285,6 +288,7 @@ function Home() {
 
         <Col xs={24} lg={8}>
           <Card
+            className="hm-fill-card"
             title="近期操作动态"
             extra={<a className="ap-link" onClick={() => navigate('/admin/syslog')}>全部日志</a>}
           >
@@ -300,7 +304,7 @@ function Home() {
                         flex: 'none'
                       }}
                     >
-                      {(item.user || item.title || 'U').slice(0, 1)}
+                      {item.type === 'login' ? <LoginOutlined /> : <ThunderboltOutlined />}
                     </Avatar>
                     <div className="hm-activity-content">
                       <div className="hm-activity-header">
@@ -347,9 +351,6 @@ function Home() {
           </Descriptions.Item>
           <Descriptions.Item label="构建版本">
             {systemInfo?.buildVersion || 'Release'}
-          </Descriptions.Item>
-          <Descriptions.Item label="版权信息" span={2}>
-            {systemInfo?.copyRight || 'AdminPro Platform'}
           </Descriptions.Item>
         </Descriptions>
       </Card>

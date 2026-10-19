@@ -180,9 +180,20 @@ public class CommonController extends BaseController {
             if (desc.length() > 0) {
                 desc.append(" - ");
             }
-            desc.append(log.getParams());
+            desc.append(maskSensitiveParams(log.getParams()));
         }
         return desc.length() > 0 ? desc.toString() : "系统操作";
+    }
+
+    private static final java.util.regex.Pattern SENSITIVE_PARAM = java.util.regex.Pattern.compile(
+            "(\"(?:password|pwd|oldPwd|newPwd|confirmPwd|confirmPassword|confirmNewPwd|payPwd|captcha|captchaKey|token)\"\\s*:\\s*)\"[^\"]*\"",
+            java.util.regex.Pattern.CASE_INSENSITIVE);
+
+    /**
+     * 首页动态直接展示历史日志参数，历史记录里可能已存有明文密码，输出前统一脱敏
+     */
+    private String maskSensitiveParams(String params) {
+        return SENSITIVE_PARAM.matcher(params).replaceAll("$1\"***\"");
     }
 
     /**

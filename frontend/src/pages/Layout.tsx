@@ -1,6 +1,6 @@
 import { Layout as AntLayout, Menu, Button, Dropdown, Tooltip, message, Breadcrumb, Badge, Avatar } from 'antd';
 import { useState, useEffect } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
     UserOutlined,
     MenuFoldOutlined,
@@ -156,8 +156,8 @@ function MainLayout() {
             return [{ title: '首页' }];
         }
 
-        const items: { title: React.ReactNode, href?: string }[] = [
-            { title: '首页', href: '/' }
+        const items: { title: React.ReactNode }[] = [
+            { title: <Link to="/">首页</Link> }
         ];
 
         const specialPaths: Record<string, string> = {
@@ -166,8 +166,7 @@ function MainLayout() {
 
         if (specialPaths[currentPath]) {
             items.push({
-                title: specialPaths[currentPath],
-                href: undefined
+                title: specialPaths[currentPath]
             });
             return items;
         }
@@ -183,8 +182,7 @@ function MainLayout() {
                 }
             });
             items.push({
-                title: matchedItem.label,
-                href: undefined
+                title: matchedItem.label
             });
         }
 

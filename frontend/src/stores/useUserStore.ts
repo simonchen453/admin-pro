@@ -37,6 +37,11 @@ interface UserState {
     setError: (error: string | null) => void;
 }
 
+// 同一个 refreshToken 只能被轮换一次：并发调用 /auth/refresh 时，
+// 后到的请求会拿着已失效的旧 token 失败，把用户踢回登录页。
+// 用模块级 Promise 复用同一个刷新请求（StrictMode 会重复执行一次 effect）。
+let refreshInFlight: Promise<boolean> | null = null;
+
 export const useAuthStore = create<AuthState>()(
     persist(
         (set, get) => ({
@@ -120,46 +125,58 @@ export const useAuthStore = create<AuthState>()(
              * 使用 HttpOnly Cookie 中的 refreshToken 换取新的 accessToken
              */
             initAuth: async () => {
-                try {
-                    // 调用 refresh 接口，refreshToken 会自动通过 Cookie 发送
-                    const response = await request.post<any>('/api/v1/auth/refresh');
+                if (refreshInFlight) {
+                    return refreshInFlight;
+                }
 
-                    if (response.success && response.data) {
-                        const tokenData = response.data;
-                        const userInfo = tokenData.user || {};
+                refreshInFlight = (async () => {
+                    try {
+                        // 调用 refresh 接口，refreshToken 会自动通过 Cookie 发送
+                        const response = await request.post<any>('/api/v1/auth/refresh');
 
-                        const user: User = {
-                            loginName: userInfo.loginName || userInfo.userId,
-                            realName: userInfo.realName,
-                            name: userInfo.realName || userInfo.loginName || userInfo.userId,
-                            avatarUrl: userInfo.avatarUrl,
-                            mobileNo: userInfo.mobileNo,
-                            userDomain: userInfo.userDomain,
-                            id: userInfo.id,
-                            status: 'active'
-                        };
+                        if (response.success && response.data) {
+                            const tokenData = response.data;
+                            const userInfo = tokenData.user || {};
 
+                            const user: User = {
+                                loginName: userInfo.loginName || userInfo.userId,
+                                realName: userInfo.realName,
+                                name: userInfo.realName || userInfo.loginName || userInfo.userId,
+                                avatarUrl: userInfo.avatarUrl,
+                                mobileNo: userInfo.mobileNo,
+                                userDomain: userInfo.userDomain,
+                                id: userInfo.id,
+                                status: 'active'
+                            };
+
+                            set({
+                                isAuthenticated: true,
+                                isInitialized: true,
+                                currentUser: user,
+                                accessToken: tokenData.accessToken
+                            });
+
+                            return true;
+                        } else {
+                            set({ isInitialized: true, isAuthenticated: false });
+                            return false;
+                        }
+                    } catch (error) {
+                        console.log('Token refresh failed, user needs to login');
                         set({
-                            isAuthenticated: true,
                             isInitialized: true,
-                            currentUser: user,
-                            accessToken: tokenData.accessToken
+                            isAuthenticated: false,
+                            accessToken: null,
+                            currentUser: null
                         });
-
-                        return true;
-                    } else {
-                        set({ isInitialized: true, isAuthenticated: false });
                         return false;
                     }
-                } catch (error) {
-                    console.log('Token refresh failed, user needs to login');
-                    set({
-                        isInitialized: true,
-                        isAuthenticated: false,
-                        accessToken: null,
-                        currentUser: null
-                    });
-                    return false;
+                })();
+
+                try {
+                    return await refreshInFlight;
+                } finally {
+                    refreshInFlight = null;
                 }
             }
         }),

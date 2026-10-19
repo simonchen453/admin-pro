@@ -1,7 +1,12 @@
-.PHONY: help build up down restart logs ps clean
+.PHONY: help dev dev-backend dev-frontend build up down restart logs ps clean
 
 # 默认目标
 help:
+	@echo "本地开发命令（需先配置并启动 MySQL）:"
+	@echo "  make dev           - 同时启动后端和管理后台（Ctrl+C 停止）"
+	@echo "  make dev-backend   - 安装后端模块依赖并启动后端（dev 配置）"
+	@echo "  make dev-frontend  - 安装前端依赖并启动管理后台"
+	@echo ""
 	@echo "Docker 部署命令:"
 	@echo "  make build         - 构建所有镜像"
 	@echo "  make up            - 启动所有服务（生产环境）"
@@ -16,6 +21,19 @@ help:
 	@echo "  make ps            - 查看服务状态"
 	@echo "  make clean         - 清理所有容器和镜像"
 	@echo "  make clean-all     - 清理所有容器、镜像和 volumes"
+
+# 本地开发：并行启动后端和管理后台，日志输出到当前终端
+dev:
+	$(MAKE) -j2 dev-backend dev-frontend
+
+# 先安装多模块依赖，再使用开发配置启动后端
+dev-backend:
+	mvn -pl adminpro-web -am install -DskipTests
+	mvn -pl adminpro-web spring-boot:run -Dspring-boot.run.profiles=dev
+
+# 安装锁文件中的依赖并启动 Vite 开发服务器
+dev-frontend:
+	cd frontend && pnpm install --frozen-lockfile && pnpm dev
 
 # 构建镜像
 build:
